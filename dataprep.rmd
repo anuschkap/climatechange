@@ -1,0 +1,138 @@
+---
+title: "Untitled"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+#install.packages("retroharmonize")
+
+rm(list = ls())
+library(haven)
+library(dplyr)
+library(foreign)
+library(tidyverse)
+library(labelled)
+library(ggplot2)
+#library(rcompanion)
+#setwd("/Users/anuschka/Documents")
+
+```
+
+```{r}
+#Load in EVS trend file
+evs <- haven::read_sav("/Users/anuschka/Documents/gesis_dir/evs/ZA7503_v2-0-0.sav", encoding="latin1")
+
+evssel <- evs %>% filter(S009=="NL")  %>%
+            select(stdyno_w, S001, S002EVS, S006, S017, S018, pwght, S020, B001, X001, X002, X003, X003R, X003R2, X011, X023, X023R, X025, X028, X047CS, X047_EVS, X047R_EVS)
+
+evssel$B001
+evs$B001
+table(evssel$B001)
+
+evsselsplit <- split(evssel, f= factor(evssel$S020))
+evsselsplit$B001
+
+# So apparently, in the Netherlands in 1981 and in 2017, the question for the dependent var was not asked. This means that I cannot use those years from the EVS. A pity. 
+
+evssel <- evs %>% filter(S009=="NL")  %>%
+                filter (S020 >1981 & S020 <2017) %>%
+            select(stdyno_w, S001, S002EVS, S006, S017, S018, pwght, S020, B001, X001, X002, X003, X003R, X003R2, X011, X023, X023R, X025, X028, X047CS, X047_EVS, X047R_EVS)
+
+attributes(evs$B001)
+table(evssel$B001, useNA = "always")
+
+#Recode it, because now a higher number means lower willingness to make sacrifices. I want everything in the direction that a higher score equals more positive attitudes towards the climate. 
+
+evssel$b001n <- as.numeric(evssel$B001)
+evssel$climate <- NA
+evssel$climate[evssel$b001n==4] <- 1
+evssel$climate[evssel$b001n==3] <- 2
+evssel$climate[evssel$b001n==2] <- 3
+evssel$climate[evssel$b001n==1] <- 4
+table(evssel$climate, useNA = "always") #Indeed exactly the other way around
+
+mean(evssel$climate, na.rm=T) #Mean on this variable is 2.78
+
+#Let's first save the prepped data. 
+save(evssel, file="/Users/anuschka/Documents/gesis_dir/evs/evssel.Rdata")
+load("/Users/anuschka/Documents/gesis_dir/evs/evssel.Rdata")
+
+#Now I want to replace the missing values with the mean or create categories of missings 
+list_na <- colnames(evssel)[ apply(evssel, 2, anyNA) ]
+list_na
+
+average_missing <- apply(evssel[,colnames(evssel) %in% list_na],
+      2,
+      mean,
+      na.rm =  TRUE)
+average_missing
+
+#In the list, there are also some variables stored that are nominal. I don't want to replace those with the average so I will not include them. 
+
+evssel_replace <- evssel %>%
+   mutate(climate_mis  = ifelse(is.na(climate), average_missing[16], climate),
+   age_mis = ifelse(is.na(X003), average_missing[4], X003),
+   educ_mis = ifelse(is.na(X023), average_missing[8], X023),
+   inc_mis = ifelse(is.na(X047CS), average_missing[12], X047CS))
+
+table(evssel_replace$climate_mis, useNA = "always")
+table(evssel_replace$age_mis, useNA = "always")
+table(evssel_replace$educ_mis, useNA = "always")
+table(evssel_replace$inc_mis, useNA = "always")
+
+table(evssel_replace$X001, useNA = "always") #I don't want to replace the 2 missings on gender because that just creates a very small category. But let's see how it works. 
+evssel_replace$sex <- NA
+evssel_replace$sex[is.na(evssel_replace$X001)] <- 3
+evssel_replace$sex[evssel_replace$X001==1] <- 1
+evssel_replace$sex[evssel_replace$X001==2] <- 2
+table(evssel_replace$sex, useNA = "always") 
+#Now the 2 missings are a different category (3). 
+
+#For now I don't want to substitute other missings, because I'm not sure which demographic variables I will use yet (that depends on how they're coded in the other datasets). Later on, I may have to come back here. Let's save the new dataset now. 
+
+save(evssel_replace, file="/Users/anuschka/Documents/gesis_dir/evs/evssel_nomis.Rdata")
+load("/Users/anuschka/Documents/gesis_dir/evs/evssel_nomis.Rdata")
+
+#Can I plot how the mean develops?
+
+table(evssel_replace$S020)
+attributes(evssel_replace$climate_mis)
+  
+mean(evssel_replace$climate_mis[S020=1990])
+mean(evssel_replace$climate[S020=1990])  
+mean(evssel_replace$climate_mis[S020=1999])
+mean(evssel_replace$climate[S020=1999])
+mean(evssel_replace$climate_mis[S020=2008])
+mean(evssel_replace$climate[S020=2008])
+
+meanclimate <- c(2, 3, 3)
+years <- c(1990, 1999, 2008)
+
+ggplot(evssel_replace, aes(x=years, y=meanclimate)) +
+  geom_line()
+
+evssel_replace$surveyyear <- as.numeric(evssel_replace$S020)
+
+# Make a plot showing the mean attitudes over time (not a large change)
+p <- ggplot(data = evssel_replace, aes(x = surveyyear, y = climate_mis)) + 
+   stat_summary(geom = "line", fun = mean, color="turquoise", linetype=2) +
+   ggtitle ("Change of attitudes 1990-2008") +
+  theme_minimal() 
+  
+p + coord_cartesian(xlim = c(1990, 2010), ylim = c(0, 4))
+
+#Predict the change in climate attitudes by survey year. This is a sig. decline. 
+lm <- lm(climate_mis ~ evssel_replace$surveyyear, data=evssel_replace)
+summary(lm)
+
+#Now i want to find 
+plot(lm)
+predict(lm,newdata=data.frame(x=0.5),type="response",interval="prediction",level=0.95)
+
+
+```
+
+
+
