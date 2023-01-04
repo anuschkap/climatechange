@@ -42,7 +42,7 @@ evsselsplit$B001
 
 evssel <- evs %>% filter(S009=="NL")  %>%
                 filter (S020 >1981 & S020 <2017) %>%
-            select(stdyno_w, S001, S002EVS, S006, S017, S018, pwght, S020, B001, X001, X002, X003, X003R, X003R2, X011, X023, X023R, X025, X028, X047CS, X047_EVS, X047R_EVS)
+            select(stdyno_w, S001, S002EVS, S006, S017, S018, pwght, S020, B001, X001, X002, X003, X003R, X003R2, X011, X023, X023R, X025, X028, X047CS, X047_EVS, X047R_EVS, A006, E033)
 
 attributes(evs$B001)
 table(evssel$B001, useNA = "always")
@@ -57,7 +57,15 @@ evssel$climate[evssel$b001n==2] <- 3
 evssel$climate[evssel$b001n==1] <- 4
 table(evssel$climate, useNA = "always") #Indeed exactly the other way around
 
-mean(evssel$climate, na.rm=T) #Mean on this variable is 2.78
+evssel$A006n <- as.numeric(evssel$A006)
+evssel$religious <- NA
+evssel$religious[evssel$A006n==4] <- 1
+evssel$religious[evssel$A006n==3] <- 2
+evssel$religious[evssel$A006n==2] <- 3
+evssel$religious[evssel$A006n==1] <- 4
+table(evssel$religious, useNA = "always")
+evssel$religious[is.na(evssel$religious)] <- 88 #11 missings get value 88
+evssel$religious <- as.character(evssel$religious)
 
 #Let's first save the prepped data. 
 save(evssel, file="/Users/anuschka/Documents/gesis_dir/evs/evssel.Rdata")
@@ -75,16 +83,15 @@ average_missing
 
 #In the list, there are also some variables stored that are nominal. I don't want to replace those with the average so I will not include them. 
 
-evssel_replace <- evssel %>%
-   mutate(climate_mis  = ifelse(is.na(climate), average_missing[16], climate),
-   age_mis = ifelse(is.na(X003), average_missing[4], X003),
-   educ_mis = ifelse(is.na(X023), average_missing[8], X023),
-   inc_mis = ifelse(is.na(X047CS), average_missing[12], X047CS))
+table(evssel$X049CS, useNA = "always")
 
-table(evssel_replace$climate_mis, useNA = "always")
-table(evssel_replace$age_mis, useNA = "always")
-table(evssel_replace$educ_mis, useNA = "always")
-table(evssel_replace$inc_mis, useNA = "always")
+freq(evssel$X023)
+
+evssel <- evssel %>%
+   mutate(age_mis = ifelse(is.na(X003), average_missing[4], X003),
+   educ_mis = ifelse(is.na(X023), average_missing[8], X023),
+   inc_mis = ifelse(is.na(X047CS), average_missing[12], X047CS),
+   lr_mis = ifelse(is.na(E033), average_missing[16], E033))
 
 table(evssel_replace$X001, useNA = "always") #I don't want to replace the 2 missings on gender because that just creates a very small category. But let's see how it works. 
 evssel_replace$sex <- NA
@@ -94,12 +101,22 @@ evssel_replace$sex[evssel_replace$X001==2] <- 2
 table(evssel_replace$sex, useNA = "always") 
 #Now the 2 missings are a different category (3). 
 
-#For now I don't want to substitute other missings, because I'm not sure which demographic variables I will use yet (that depends on how they're coded in the other datasets). Later on, I may have to come back here. Let's save the new dataset now. 
+save(evssel, file="/Users/anuschka/Documents/gesis_dir/evs/evssel.Rdata")
 
-save(evssel_replace, file="/Users/anuschka/Documents/gesis_dir/evs/evssel_nomis.Rdata")
-load("/Users/anuschka/Documents/gesis_dir/evs/evssel_nomis.Rdata")
+table(evssel$A006, useNA = "always")
+table(evssel$X011, useNA = "always") #Children 25 missings. 
+evssel$X011n <- as.numeric(evssel$X011)
+evssel$child[evssel$X011==0] <- 0 
+evssel$child[evssel$X011>=1] <- 1
+evssel$child[is.na(evssel$X011)] <- 88
+table(evssel$child, useNA = "always")
 
-#Can I plot how the mean develops?
+evssel$climate5 <- (evssel$climate-1)*(4/3)+1
+
+table(evssel$climate, useNA = "always")
+table(evssel$climate5, useNA = "always")
+
+#Can I plot how the mean develops? (This can be done faster, see code I use later)
 
 table(evssel_replace$S020)
 attributes(evssel_replace$climate_mis)
@@ -144,15 +161,7 @@ predict(lm,newdata=data.frame(x=0.5),type="response",interval="prediction",level
 ess2016 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/ess/ESS8e02_2.sav", use.value.labels = T,  to.data.frame = T)
 
 ess16sel <- ess2016 %>% filter(cntry=="Netherlands")  %>%
-            select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight,ccnthum, ccrdprs, wrclmch, marsts, eisced, edulvlb, edlvenl, eduyrs, mainact, gndr, agea, yrbrn, prtvtfnl, lrscale)
-
-# Imagine large numbers of people limit energy use, how likely reduce climate change
-attributes(ess16sel$lkredcc)
-table(ess16sel$lkredcc, useNA = "always")
-
-#How likely that large numbers of people will limit their energy use
-attributes(ess16sel$lklmten)
-table(ess16sel$lklmten, useNA = "always")
+            select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight,ccnthum, ccrdprs, wrclmch, marsts, eisced, edulvlb, edlvenl, eduyrs, mainact, gndr, agea, yrbrn, prtvtfnl, lrscale, domicil, hinctnta, chldhm, chldhhe, rlgatnd)
 
 #Climate change caused by natural processes, human activity, or both
 attributes(ess16sel$ccnthum)
@@ -177,13 +186,12 @@ ess16sel$ccrdprsn_cat[ess16sel$ccrdprsn ==9 | ess16sel$ccrdprsn ==10] <- 5
 table(ess16sel$ccrdprsn_cat, useNA = "always")
 table(ess16sel$ccrdprsn, useNA = "always")
 
-mean(ess16sel$ccrdprsn, na.rm=T)
-mean(ess16sel$ccrdprsn_cat, na.rm=T)
-mean(ess16sel$lklmtenn, na.rm=T)
-mean(ess16sel$lklmten_cat, na.rm=T)
-mean(ess16sel$lkredccn, na.rm=T)
-mean(ess16sel$lkredcc_cat, na.rm=T)
+table(ess16sel$ccnthum_n, useNA = "always")
+ess16sel$ccnthum_n <- as.numeric(ess16sel$ccnthum)
+ess16sel$ccnthum_n[ess16sel$ccnthum_n==6] <- NA
 
+table(ess16sel$wrclmch_n, useNA = "always")
+ess16sel$wrclmch_n <- as.numeric(ess16sel$wrclmch)
 
 save(ess16sel, file="/Users/anuschka/Documents/gesis_dir/ess/ess16sel.Rdata")
 
@@ -197,37 +205,47 @@ table(ess16sel$eisced, useNA = "always")
 ess16sel$eisced[ess16sel$eisced==55] <- NA
 table(ess16sel$lrscale, useNA = "always")
 
-
-list_na <- colnames(ess16sel)[ apply(ess16sel, 2, anyNA) ]
-list_na
-
-average_missing <- apply(ess16sel[,colnames(ess16sel) %in% list_na],
-      2,
-      mean,
-      na.rm =  TRUE)
-average_missing
-
 ess16sel$eisced <- as.numeric(ess16sel$eisced)
 ess16sel$edlvenl <- as.numeric(ess16sel$edlvenl)
 ess16sel$eduyrs <- as.numeric(ess16sel$eduyrs)
 ess16sel$lrscale <- as.numeric(ess16sel$lrscale)
+ess16sel$hinctnta <- as.numeric(ess16sel$hinctnta)
 
-ess16sel_replace <- ess16sel %>%
-   mutate(eisced_mis  = ifelse(is.na(eisced), average_missing[7], eisced),
-   edlvenl_mis = ifelse(is.na(edlvenl), average_missing[9], edlvenl),
-   eduyrs_mis = ifelse(is.na(eduyrs), average_missing[10], eduyrs),
-   lr_mis = ifelse(is.na(lrscale), average_missing[13], lrscale))
+table(ess16sel$rlgatnd, useNA = "always")
+ess16sel$rlgatnd <- as.numeric(ess16sel$rlgatnd)
+ess16sel$chattend[ess16sel$rlgatnd ==1] <- 7
+ess16sel$chattend[ess16sel$rlgatnd ==2] <- 6
+ess16sel$chattend[ess16sel$rlgatnd ==3] <- 5
+ess16sel$chattend[ess16sel$rlgatnd ==4] <- 4
+ess16sel$chattend[ess16sel$rlgatnd ==5] <- 3
+ess16sel$chattend[ess16sel$rlgatnd ==6] <- 2
+ess16sel$chattend[ess16sel$rlgatnd ==7] <- 1
+ess16sel$chattend <- as.character(ess16sel$chattend)
+table(ess16sel$chattend, useNA = "always")
 
-table(ess16sel_replace$eisced_mis, useNA = "always")
-table(ess16sel_replace$edlvenl_mis, useNA = "always") 
+table(ess16sel$chldhhe, useNA = "always") #524 missings on this variable, maybe not so useful
+table(ess16sel$chldhm, useNA = "always") #This one has 0 missings, but does living with children in the household really express having children? You can also have children not living at home. 
 
-save(ess16sel_replace, file="/Users/anuschka/Documents/climatechange/climatechange/ess16sel_mis.Rdata")
-load("/Users/anuschka/Documents/climatechange/climatechange/ess16sel_mis.Rdata")
+table(ess16sel$hinctnta, useNA = "always") #195 missings on income. 
+mean(ess16sel$hinctnta, na.rm=TRUE)
+ess16sel$hinctnta[is.na(ess16sel$hinctnta)] <- 5.993271
+table(ess16sel$lrscale, useNA = "always")
+freq(ess16sel$lrscale)
+ess16sel$lrscaletest <- (ess16sel$lrscale-1)*(9/10) +1
+ess16sel$lrscale <- ess16sel$lrscaletest
+mean(ess16sel$lrscale, na.rm = T)
+ess16sel$lrscale[is.na(ess16sel$lrscale)] <- 5.690286
+table(ess16sel$eduyrs, useNA = "always") #There are outliers: 5 people studied 31 years 
+mean(ess16sel$eduyrs, na.rm = T)
+ess16sel$eduyrs[is.na(ess16sel$eduyrs)] <- 14.80859
+table(ess16sel$agea, useNA = "always")
+
+save(ess16sel, file="/Users/anuschka/Documents/gesis_dir/ess/ess16sel.Rdata")
 
 ess2020 <- haven::read_sav("/Users/anuschka/Documents/gesis_dir/ess/ESS10.sav", encoding="latin1")
 
 ess20sel <- ess2020 %>% filter(cntry=="NL")  %>%
-            select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, ccnthum, ccrdprs, wrclmch, marsts, eisced, edulvlb, edlvenl, eduyrs, mainact, gndr, agea, yrbrn, prtvthnl, lrscale)
+            select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, ccnthum, ccrdprs, wrclmch, marsts, eisced, edulvlb, edlvenl, eduyrs, mainact, gndr, agea, yrbrn, prtvthnl, lrscale, domicil, hinctnta, chldhhe, rlgatnd)
 
 #I can't use the variables on energy and likelihood because in the wave of 2020 they are test questions, meaning that the respondents were divided in three groups and each group got different response categories --> can't necessarily compare those. 
 attributes(ess2020$admrclc)
@@ -257,84 +275,91 @@ save(ess20sel, file="/Users/anuschka/Documents/climatechange/climatechange/ess20
 table(ess20sel$edlvenl, useNA = "always") # I want to code 5555 as missing. 
 ess20sel$edlvenl[ess20sel$edlvenl==5555] <- NA
 table(ess20sel$eduyrs, useNA = "always")
+mean(ess20sel$eduyrs, na.rm=T)
+ess20sel$eduyrs[is.na(ess20sel$eduyrs)] <- 15.03547
 table(ess20sel$gndr, useNA = "always")
 table(ess20sel$eisced, useNA = "always")
 ess20sel$eisced[ess20sel$eisced==55] <- NA
 table(ess20sel$lrscale, useNA = "always")
+ess20sel$lrscaletest <- ess20sel$lrscale*(9/10) +1
+ess20sel$lrscale <- ess20sel$lrscaletest
+mean(ess20sel$lrscale, na.rm = T)
+ess20sel$lrscale[is.na(ess20sel$lrscale)] <- 5.62264
+table(ess20sel$hinctnta, useNA = "always")
+mean(ess20sel$hinctnta, na.rm=T)
+ess20sel$hinctnta[is.na(ess20sel$hinctnta)] <- 6.455235
+table(ess20sel$agea, useNA = "always") #5 missings on age
+mean(ess20sel$agea, na.rm=T)
+ess20sel$agea[is.na(ess20sel$agea)] <- 48.62457
 
-list_na2 <- colnames(ess20sel)[ apply(ess20sel, 2, anyNA) ]
-list_na2
+table(ess20sel$rlgatnd, useNA = "always")
+ess20sel$rlgatnd <- as.numeric(ess20sel$rlgatnd)
+ess20sel$chattend[ess20sel$rlgatnd ==1] <- 7
+ess20sel$chattend[ess20sel$rlgatnd ==2] <- 6
+ess20sel$chattend[ess20sel$rlgatnd ==3] <- 5
+ess20sel$chattend[ess20sel$rlgatnd ==4] <- 4
+ess20sel$chattend[ess20sel$rlgatnd ==5] <- 3
+ess20sel$chattend[ess20sel$rlgatnd ==6] <- 2
+ess20sel$chattend[ess20sel$rlgatnd ==7] <- 1
+ess20sel$chattend <- as.character(ess20sel$chattend)
+table(ess20sel$chattend, useNA = "always")
 
-average_missing2 <- apply(ess20sel[,colnames(ess20sel) %in% list_na2],
-      2,
-      mean,
-      na.rm =  TRUE)
-average_missing2
+save(ess20sel, file="/Users/anuschka/Documents/climatechange/climatechange/ess20sel.Rdata")
 
-ess20sel_replace <- ess20sel %>%
-   mutate(eisced_mis  = ifelse(is.na(eisced), average_missing2[5], eisced),
-   edlvenl_mis = ifelse(is.na(edlvenl), average_missing2[7], edlvenl),
-   eduyrs_mis = ifelse(is.na(eduyrs), average_missing2[8], eduyrs),
-   lr_mis = ifelse(is.na(lrscale), average_missing2[13], lrscale), 
-   age_mis = ifelse(is.na(agea), average_missing2[10], agea))
-
-table(ess20sel_replace$eisced_mis, useNA = "always")
-table(ess20sel_replace$edlvenl_mis, useNA = "always")
-
-save(ess20sel_replace, file="/Users/anuschka/Documents/climatechange/climatechange/ess20sel_mis.Rdata")
-load("/Users/anuschka/Documents/climatechange/climatechange/ess20sel_mis.Rdata")
-
-table(ess20sel_replace$ccnthum, useNA = "always")
 
 #Merge data 2016 and 2020
 
-ess16sel_replace <- ess16sel_replace %>% select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, ccnthum, ccrdprs, wrclmch, marsts, edulvlb, edlvenl, eduyrs, mainact, gndr, agea, yrbrn, prtvtfnl, lrscale, ccrdprsn_cat, eisced_mis, edlvenl_mis, eduyrs_mis, lr_mis)
+ess16sel <- ess16sel %>% select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, ccnthum, ccrdprs, wrclmch, marsts, edulvlb, edlvenl, eduyrs, mainact, gndr, agea, yrbrn, prtvtfnl, lrscale, ccrdprsn_cat, eisced_mis, edlvenl_mis, eduyrs_mis, lr_mis)
 
 ess20sel_replace$agea <- ess20sel_replace$age_mis 
 
 ess20sel_replace <- rename(ess20sel_replace, prtvtfnl = prtvthnl)
 
+#NEW ONE
+ess16sel <- ess16sel %>% select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, ccnthum_n, ccrdprsn_cat, wrclmch_n, edulvlb, eduyrs, gndr, agea, yrbrn, lrscale, domicil, hinctnta, chattend)
+
+
+
 ess20sel_replace <- ess20sel_replace %>% select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, ccnthum, ccrdprs, wrclmch, marsts, edulvlb, edlvenl, eduyrs, mainact, gndr, agea, yrbrn, prtvthnl, lrscale, ccrdprsn_cat, eisced_mis, edlvenl_mis, eduyrs_mis, lr_mis)
 
-esstotal <- dplyr::bind_rows(ess16sel_replace, ess20sel_replace)
+ess20sel <- ess20sel %>% select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, ccnthum, ccrdprsn_cat, wrclmch, edulvlb, eduyrs, gndr, agea, yrbrn, lrscale, domicil, hinctnta, chattend)
+
+ess16sel <- rename(ess16sel, ccnthum = ccnthum_n)
+ess16sel <- rename(ess16sel, wrclmch = wrclmch_n)
+ess20sel$edulvlb <- as.numeric(ess20sel$edulvlb)
+ess16sel$edulvlb <- as.numeric(ess16sel$edulvlb)
+
+ess20sel$gndr <- as.factor(ess20sel$gndr)
+ess16sel$gndr <- as.factor(ess16sel$gndr)
+
+ess20sel$agea <- as.numeric(ess20sel$agea)
+ess16sel$agea <- as.numeric(ess16sel$agea)
+
+ess20sel$yrbrn <- as.numeric(ess20sel$yrbrn)
+ess16sel$yrbrn <- as.numeric(ess16sel$yrbrn)
+
+ess20sel$domicil <- as.factor(ess20sel$domicil)
+ess16sel$domicil <- as.factor(ess16sel$domicil)
+
+esstotal <- dplyr::bind_rows(ess16sel, ess20sel)
+save(esstotal, file="/Users/anuschka/Documents/climatechange/climatechange/esstotal.Rdata")
+
+#WHY? esstotalsel <- esstotalsel[complete.cases(esstotalsel), ] #Deleted 3151 - 3079 (72) missings listwise. 
+
+esstotal$surveyyear <- NA
+esstotal$surveyyear[esstotal$essround==8] <- 2016
+esstotal$surveyyear[esstotal$essround==10] <- 2020
+esstotal$surveyyear <- as.numeric(esstotal$surveyyear)
+table(esstotal$surveyyear, useNA = "always")
+
+esstotal$n <- NA
+esstotal$n[esstotal$essround==8] <- 1681
+esstotal$n[esstotal$essround==10] <- 1470
+table(esstotal$n, useNA = "always")
+
 save(esstotal, file="/Users/anuschka/Documents/climatechange/climatechange/esstotal.Rdata")
 
 
-#Dit even verder in orde maken. 
-attributes(esstotal$ccnthum)
-esstotal$ccnthum <- as.numeric(esstotal$ccnthum)
-mean(esstotal$ccnthum[esstotal$essround=="8"])
-
-
-```
-
-
-```{r}
-load("/Users/anuschka/Documents/climatechange/climatechange/esstotal.Rdata")
-
-
-#Delete the demographic vars marital status and main activity because they have a lot of missings and I don't want to use those. 
-esstotal <- esstotal %>% select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, ccnthum, ccrdprs, wrclmch, edulvlb, edlvenl, eduyrs, gndr, agea, yrbrn, prtvtfnl, lrscale, ccrdprsn_cat, eisced_mis, edlvenl_mis, eduyrs_mis, lr_mis)
-
-save(esstotal, file="/Users/anuschka/Documents/climatechange/climatechange/esstotal.Rdata")
-
-esstotalsel <- esstotal %>% select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, ccnthum, ccrdprs, wrclmch, edulvlb, gndr, agea, yrbrn, prtvtfnl, ccrdprsn_cat, eisced_mis, edlvenl_mis, eduyrs_mis, lr_mis)
-
-table(esstotalsel$prtvtfnl, useNA = "always")
-esstotalsel$prtvtfnl[is.na(esstotalsel$prtvtfnl)] <- 99
-
-esstotalsel <- esstotalsel[complete.cases(esstotalsel), ] #Deleted 3151 - 3079 (72) missings listwise. 
-
-esstotalsel$surveyyear <- NA
-esstotalsel$surveyyear[esstotalsel$essround==8] <- 2016
-esstotalsel$surveyyear[esstotalsel$essround==10] <- 2020
-esstotalsel$surveyyear <- as.numeric(esstotalsel$surveyyear)
-table(esstotalsel$surveyyear, useNA = "always")
-
-esstotalsel$ccrdprsn_cat <- as.numeric(esstotalsel$ccrdprsn_cat)
-esstotalsel$wrclmch <- as.numeric(esstotalsel$wrclmch)
-
-save(esstotalsel, file="/Users/anuschka/Documents/climatechange/climatechange/esstotalsel.Rdata")
 
 # I would like a line graph in which I plot all three means. So I first calculate the mean for each dependent variable per year. Because I get an error when calculating all means in one piece of code, I did it three times and joined the results. 
 df_mean_by_group <- esstotalsel %>% 
@@ -767,6 +792,25 @@ head(worry_mean)
 worry_var <- aggregate(issptotal$worry, by = list(issptotal$surveyyear), FUN = var, na.rm=T)
 head(worry_var)
 
+table(issptotal$worry, useNA = "always")
+table(issptotal$lifeharm_r, useNA = "always")
+table(issptotal$progharm, useNA = "always")
+table(issptotal$econprotect, useNA = "always")
+table(issptotal$willing_price_r, useNA = "always")
+table(issptotal$willing_tax_r, useNA = "always")
+table(issptotal$willing_living_r, useNA = "always")
+table(issptotal$dodiff, useNA = "always")
+table(issptotal$doright, useNA = "always")
+table(issptotal$people_decide, useNA = "always") #
+issptotal$people_decidetest <- (issptotal$people_decide-1)*(4/1)+1
+table(issptotal$people_decidetest, useNA = "always")
+table(issptotal$growharm, useNA = "always")
+table(issptotal$pop_support, useNA = "always")
+table(issptotal$moreimp, useNA = "always")
+table(issptotal$pop_support, useNA = "always")
+table(issptotal$othersame, useNA = "always")
+table(issptotal$exag, useNA = "always")
+table(issptotal$country_effort, useNA = "always")
 ```
 
 ```{r}
