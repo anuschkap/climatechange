@@ -6,8 +6,9 @@ output: html_document
 ---
 
 ```{r}
-#install.packages("retroharmonize")
 
+#install.packages("questionr")
+#install.packages("psych")
 rm(list = ls())
 library(haven)
 library(dplyr)
@@ -15,6 +16,9 @@ library(foreign)
 library(tidyverse)
 library(labelled)
 library(ggplot2)
+library(questionr)
+library(psych)
+library(plyr)
 #library(rcompanion)
 #setwd("/Users/anuschka/Documents")
 
@@ -127,7 +131,7 @@ p + coord_cartesian(xlim = c(1990, 2010), ylim = c(0, 4))
 lm <- lm(climate_mis ~ evssel_replace$surveyyear, data=evssel_replace)
 summary(lm)
 
-#Now i want to find 
+#Now i want to find the variance as well. I don't understand the output i get here so i don't think it's correct
 plot(lm)
 predict(lm,newdata=data.frame(x=0.5),type="response",interval="prediction",level=0.95)
 
@@ -135,4 +139,698 @@ predict(lm,newdata=data.frame(x=0.5),type="response",interval="prediction",level
 ```
 
 
+```{r}
+# Let's do the same with the ESS, for which I will use the 2016 and 2020 wave. 
+ess2016 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/ess/ESS8e02_2.sav", use.value.labels = T,  to.data.frame = T)
+
+ess16sel <- ess2016 %>% filter(cntry=="Netherlands")  %>%
+            select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight,ccnthum, ccrdprs, wrclmch, marsts, eisced, edulvlb, edlvenl, eduyrs, mainact, gndr, agea, yrbrn, prtvtfnl, lrscale)
+
+# Imagine large numbers of people limit energy use, how likely reduce climate change
+attributes(ess16sel$lkredcc)
+table(ess16sel$lkredcc, useNA = "always")
+
+#How likely that large numbers of people will limit their energy use
+attributes(ess16sel$lklmten)
+table(ess16sel$lklmten, useNA = "always")
+
+#Climate change caused by natural processes, human activity, or both
+attributes(ess16sel$ccnthum)
+table(ess16sel$ccnthum, useNA = "always")
+
+#Personal responsibility to reduce climate change
+attributes(ess16sel$ccrdprs)
+table(ess16sel$ccrdprs, useNA = "always")
+
+#How worried about climate change
+attributes(ess16sel$wrclmch)
+table(ess16sel$wrclmch, useNA = "always")
+
+#Create a range from 1 to 5 for all vars.
+ess16sel$ccrdprsn <- as.numeric(ess16sel$ccrdprs)
+ess16sel$ccrdprsn_cat <- NA
+ess16sel$ccrdprsn_cat[ess16sel$ccrdprsn >= 0 & ess16sel$ccrdprsn <= 2] <- 1
+ess16sel$ccrdprsn_cat[ess16sel$ccrdprsn ==3 | ess16sel$ccrdprsn ==4] <- 2
+ess16sel$ccrdprsn_cat[ess16sel$ccrdprsn ==5 | ess16sel$ccrdprsn ==6] <- 3
+ess16sel$ccrdprsn_cat[ess16sel$ccrdprsn ==7 | ess16sel$ccrdprsn ==8] <- 4
+ess16sel$ccrdprsn_cat[ess16sel$ccrdprsn ==9 | ess16sel$ccrdprsn ==10] <- 5
+table(ess16sel$ccrdprsn_cat, useNA = "always")
+table(ess16sel$ccrdprsn, useNA = "always")
+
+mean(ess16sel$ccrdprsn, na.rm=T)
+mean(ess16sel$ccrdprsn_cat, na.rm=T)
+mean(ess16sel$lklmtenn, na.rm=T)
+mean(ess16sel$lklmten_cat, na.rm=T)
+mean(ess16sel$lkredccn, na.rm=T)
+mean(ess16sel$lkredcc_cat, na.rm=T)
+
+
+save(ess16sel, file="/Users/anuschka/Documents/gesis_dir/ess/ess16sel.Rdata")
+
+#Let's check the missings. I decide not to substitute missings for my dependent variables, as it reduces variance and variance is very important in my thesis. 
+
+table(ess16sel$edlvenl, useNA = "always") # I want to code 5555 as missing. 
+ess16sel$edlvenl[ess16sel$edlvenl==5555] <- NA
+table(ess16sel$eduyrs, useNA = "always")
+table(ess16sel$gndr, useNA = "always")
+table(ess16sel$eisced, useNA = "always")
+ess16sel$eisced[ess16sel$eisced==55] <- NA
+table(ess16sel$lrscale, useNA = "always")
+
+
+list_na <- colnames(ess16sel)[ apply(ess16sel, 2, anyNA) ]
+list_na
+
+average_missing <- apply(ess16sel[,colnames(ess16sel) %in% list_na],
+      2,
+      mean,
+      na.rm =  TRUE)
+average_missing
+
+ess16sel$eisced <- as.numeric(ess16sel$eisced)
+ess16sel$edlvenl <- as.numeric(ess16sel$edlvenl)
+ess16sel$eduyrs <- as.numeric(ess16sel$eduyrs)
+ess16sel$lrscale <- as.numeric(ess16sel$lrscale)
+
+ess16sel_replace <- ess16sel %>%
+   mutate(eisced_mis  = ifelse(is.na(eisced), average_missing[7], eisced),
+   edlvenl_mis = ifelse(is.na(edlvenl), average_missing[9], edlvenl),
+   eduyrs_mis = ifelse(is.na(eduyrs), average_missing[10], eduyrs),
+   lr_mis = ifelse(is.na(lrscale), average_missing[13], lrscale))
+
+table(ess16sel_replace$eisced_mis, useNA = "always")
+table(ess16sel_replace$edlvenl_mis, useNA = "always") 
+
+save(ess16sel_replace, file="/Users/anuschka/Documents/climatechange/climatechange/ess16sel_mis.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/ess16sel_mis.Rdata")
+
+ess2020 <- haven::read_sav("/Users/anuschka/Documents/gesis_dir/ess/ESS10.sav", encoding="latin1")
+
+ess20sel <- ess2020 %>% filter(cntry=="NL")  %>%
+            select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, ccnthum, ccrdprs, wrclmch, marsts, eisced, edulvlb, edlvenl, eduyrs, mainact, gndr, agea, yrbrn, prtvthnl, lrscale)
+
+#I can't use the variables on energy and likelihood because in the wave of 2020 they are test questions, meaning that the respondents were divided in three groups and each group got different response categories --> can't necessarily compare those. 
+attributes(ess2020$admrclc)
+table(ess20sel$testic41, useNA = "always")
+table(ess20sel$testic40, useNA = "always")
+table(ess20sel$testic37, useNA = "always")
+
+#Luckily, worry and cause are asked to everyone. 
+
+table(ess20sel$ccnthum, useNA = "always")
+table(ess20sel$ccrdprs, useNA = "always")
+table(ess20sel$wrclmch, useNA = "always")
+
+ess20sel$ccrdprsn <- as.numeric(ess20sel$ccrdprs)
+ess20sel$ccrdprsn_cat <- NA
+ess20sel$ccrdprsn_cat[ess20sel$ccrdprsn >= 0 & ess20sel$ccrdprsn <= 2] <- 1
+ess20sel$ccrdprsn_cat[ess20sel$ccrdprsn ==3 | ess20sel$ccrdprsn ==4] <- 2
+ess20sel$ccrdprsn_cat[ess20sel$ccrdprsn ==5 | ess20sel$ccrdprsn ==6] <- 3
+ess20sel$ccrdprsn_cat[ess20sel$ccrdprsn ==7 | ess20sel$ccrdprsn ==8] <- 4
+ess20sel$ccrdprsn_cat[ess20sel$ccrdprsn ==9 | ess20sel$ccrdprsn ==10] <- 5
+table(ess20sel$ccrdprsn_cat, useNA = "always")
+table(ess20sel$ccrdprsn, useNA = "always")
+
+
+save(ess20sel, file="/Users/anuschka/Documents/climatechange/climatechange/ess20sel.Rdata")
+
+table(ess20sel$edlvenl, useNA = "always") # I want to code 5555 as missing. 
+ess20sel$edlvenl[ess20sel$edlvenl==5555] <- NA
+table(ess20sel$eduyrs, useNA = "always")
+table(ess20sel$gndr, useNA = "always")
+table(ess20sel$eisced, useNA = "always")
+ess20sel$eisced[ess20sel$eisced==55] <- NA
+table(ess20sel$lrscale, useNA = "always")
+
+list_na2 <- colnames(ess20sel)[ apply(ess20sel, 2, anyNA) ]
+list_na2
+
+average_missing2 <- apply(ess20sel[,colnames(ess20sel) %in% list_na2],
+      2,
+      mean,
+      na.rm =  TRUE)
+average_missing2
+
+ess20sel_replace <- ess20sel %>%
+   mutate(eisced_mis  = ifelse(is.na(eisced), average_missing2[5], eisced),
+   edlvenl_mis = ifelse(is.na(edlvenl), average_missing2[7], edlvenl),
+   eduyrs_mis = ifelse(is.na(eduyrs), average_missing2[8], eduyrs),
+   lr_mis = ifelse(is.na(lrscale), average_missing2[13], lrscale), 
+   age_mis = ifelse(is.na(agea), average_missing2[10], agea))
+
+table(ess20sel_replace$eisced_mis, useNA = "always")
+table(ess20sel_replace$edlvenl_mis, useNA = "always")
+
+save(ess20sel_replace, file="/Users/anuschka/Documents/climatechange/climatechange/ess20sel_mis.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/ess20sel_mis.Rdata")
+
+table(ess20sel_replace$ccnthum, useNA = "always")
+
+#Merge data 2016 and 2020
+
+ess16sel_replace <- ess16sel_replace %>% select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, ccnthum, ccrdprs, wrclmch, marsts, edulvlb, edlvenl, eduyrs, mainact, gndr, agea, yrbrn, prtvtfnl, lrscale, ccrdprsn_cat, eisced_mis, edlvenl_mis, eduyrs_mis, lr_mis)
+
+ess20sel_replace$agea <- ess20sel_replace$age_mis 
+
+ess20sel_replace <- rename(ess20sel_replace, prtvtfnl = prtvthnl)
+
+ess20sel_replace <- ess20sel_replace %>% select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, ccnthum, ccrdprs, wrclmch, marsts, edulvlb, edlvenl, eduyrs, mainact, gndr, agea, yrbrn, prtvthnl, lrscale, ccrdprsn_cat, eisced_mis, edlvenl_mis, eduyrs_mis, lr_mis)
+
+esstotal <- dplyr::bind_rows(ess16sel_replace, ess20sel_replace)
+save(esstotal, file="/Users/anuschka/Documents/climatechange/climatechange/esstotal.Rdata")
+
+
+#Dit even verder in orde maken. 
+attributes(esstotal$ccnthum)
+esstotal$ccnthum <- as.numeric(esstotal$ccnthum)
+mean(esstotal$ccnthum[esstotal$essround=="8"])
+
+
+```
+
+
+```{r}
+load("/Users/anuschka/Documents/climatechange/climatechange/esstotal.Rdata")
+
+
+#Delete the demographic vars marital status and main activity because they have a lot of missings and I don't want to use those. 
+esstotal <- esstotal %>% select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, ccnthum, ccrdprs, wrclmch, edulvlb, edlvenl, eduyrs, gndr, agea, yrbrn, prtvtfnl, lrscale, ccrdprsn_cat, eisced_mis, edlvenl_mis, eduyrs_mis, lr_mis)
+
+save(esstotal, file="/Users/anuschka/Documents/climatechange/climatechange/esstotal.Rdata")
+
+esstotalsel <- esstotal %>% select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, ccnthum, ccrdprs, wrclmch, edulvlb, gndr, agea, yrbrn, prtvtfnl, ccrdprsn_cat, eisced_mis, edlvenl_mis, eduyrs_mis, lr_mis)
+
+table(esstotalsel$prtvtfnl, useNA = "always")
+esstotalsel$prtvtfnl[is.na(esstotalsel$prtvtfnl)] <- 99
+
+esstotalsel <- esstotalsel[complete.cases(esstotalsel), ] #Deleted 3151 - 3079 (72) missings listwise. 
+
+esstotalsel$surveyyear <- NA
+esstotalsel$surveyyear[esstotalsel$essround==8] <- 2016
+esstotalsel$surveyyear[esstotalsel$essround==10] <- 2020
+esstotalsel$surveyyear <- as.numeric(esstotalsel$surveyyear)
+table(esstotalsel$surveyyear, useNA = "always")
+
+esstotalsel$ccrdprsn_cat <- as.numeric(esstotalsel$ccrdprsn_cat)
+esstotalsel$wrclmch <- as.numeric(esstotalsel$wrclmch)
+
+save(esstotalsel, file="/Users/anuschka/Documents/climatechange/climatechange/esstotalsel.Rdata")
+
+# I would like a line graph in which I plot all three means. So I first calculate the mean for each dependent variable per year. Because I get an error when calculating all means in one piece of code, I did it three times and joined the results. 
+df_mean_by_group <- esstotalsel %>% 
+  group_by(surveyyear) %>%
+  summarise(mean = mean(ccnthum)) 
+df_mean_by_group <- rename(df_mean_by_group, human_mean = mean)
+
+df_mean_wr <- esstotalsel %>% 
+  group_by(surveyyear) %>%
+  summarise(mean = mean(wrclmch)) 
+df_mean_wr <- rename(df_mean_wr, worry_mean = mean)
+
+df_mean_3 <- esstotalsel %>% 
+  group_by(surveyyear) %>%
+  summarise(mean = mean(ccrdprsn_cat)) 
+df_mean_3 <- rename(df_mean_3, resp_mean = mean)
+
+mean_tot <- left_join(mean_tot, df_mean_3)
+
+# I still want to add a legend, but I am not sure how to do so. That is something for later. 
+ggplot(mean_tot, aes(x=surveyyear)) + 
+  geom_line(aes(y = human_mean), color = "darkred") + 
+  geom_line(aes(y = resp_mean), color="steelblue", linetype="twodash") +
+  geom_line(aes(y = worry_mean), color = "pink") +
+  ggtitle ("Change of attitudes 2016-2020")
+
+```
+
+
+```{r}
+issp1993 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/issp/ISSP1993.sav", use.value.labels = T,  to.data.frame = T)
+
+issp93sel <- issp1993 %>% filter(V3=="Netherlands - NL")  %>%
+            select(V1, V2, V13, V14, V17, V19, V24, V25, V26, V27, V28, V54, V55, V200, V201, V204, V205, V212, V281, V231, V245, V253, V268, V276, V277, V296, V352)
+
+attributes(issp93sel$V13) #Higher score means more positive (then you think we don't worry too much)
+attributes(issp93sel$V14) #Higher score means that you don't think that everything in modern life harms the environment. SO I want to recode this variable
+issp93sel$V14_r <- NA
+issp93sel$V14 <- as.numeric(issp93sel$V14)
+issp93sel$V14_r[issp93sel$V14==5] <- 1
+issp93sel$V14_r[issp93sel$V14==4] <- 2
+issp93sel$V14_r[issp93sel$V14==3] <- 3
+issp93sel$V14_r[issp93sel$V14==2] <- 4
+issp93sel$V14_r[issp93sel$V14==1] <- 5
+table(issp93sel$V14_r, useNA = "always")
+table(issp93sel$V14, useNA = "always")
+
+attributes(issp93sel$V17) #Higher score means that you don't think we worry too much about human progress harming the environment. A low score means you think we worry too much, so that represents more negative attitudes. No recoding. 
+attributes(issp93sel$V19) #Difficult one. "In order to protect the environment, we need economic growth". A higher score does not necessarily mean worse or better attitudes. So I leave this one as it is. 
+attributes(issp93sel$V24) #Willing to pay higher prices in order to protect environment. Very unwilling is negative so I recode this var. Then a higher score means very willing. 
+
+load ("/Users/anuschka/Documents/climatechange/climatechange/issp93sel.Rdata")
+issp93sel$V24 <- as.numeric(issp93sel$V24)
+issp93sel$V24_r <- NA
+issp93sel$V24_r[issp93sel$V24==5] <- 1
+issp93sel$V24_r[issp93sel$V24==4] <- 2
+issp93sel$V24_r[issp93sel$V24==3] <- 3
+issp93sel$V24_r[issp93sel$V24==2] <- 4
+issp93sel$V24_r[issp93sel$V24==1] <- 5
+table(issp93sel$V24_r, useNA = "always")
+table(issp93sel$V24, useNA = "always")
+
+attributes(issp93sel$V25) # Same applies
+issp93sel$V25 <- as.numeric(issp93sel$V25)
+issp93sel$V25_r <- NA
+issp93sel$V25_r[issp93sel$V25==5] <- 1
+issp93sel$V25_r[issp93sel$V25==4] <- 2
+issp93sel$V25_r[issp93sel$V25==3] <- 3
+issp93sel$V25_r[issp93sel$V25==2] <- 4
+issp93sel$V25_r[issp93sel$V25==1] <- 5
+table(issp93sel$V25_r, useNA = "always")
+table(issp93sel$V25, useNA = "always")
+
+attributes(issp93sel$V26) #Same as above
+issp93sel$V26 <- as.numeric(issp93sel$V26)
+issp93sel$V26_r <- NA
+issp93sel$V26_r[issp93sel$V26==5] <- 1
+issp93sel$V26_r[issp93sel$V26==4] <- 2
+issp93sel$V26_r[issp93sel$V26==3] <- 3
+issp93sel$V26_r[issp93sel$V26==2] <- 4
+issp93sel$V26_r[issp93sel$V26==1] <- 5
+table(issp93sel$V26_r, useNA = "always")
+table(issp93sel$V26, useNA = "always")
+
+attributes(issp93sel$V27) #Too difficult for someone like me to do sth about the environment. This also a difficult one. If you are worried but pessimistic, you may believe that you can't solve it on your own. If you then strongly agree, it means you do care about the environment. However, it can also be interpreted as sth of an excuse, you don't have to do anything bc as an individual you can't do much anyway. I will interpret it as the last one; Strongly disagree means you're optimistic and maybe positive about climate change. No recode necessary. 
+
+attributes(issp93sel$V28) # I do what is right for the environment, even if it costs a little bit extra time. Strongly agree is more positive attitude, so recode. 
+issp93sel$V28 <- as.numeric(issp93sel$V28)
+issp93sel$V28_r <- NA
+issp93sel$V28_r[issp93sel$V28==5] <- 1
+issp93sel$V28_r[issp93sel$V28==4] <- 2
+issp93sel$V28_r[issp93sel$V28==3] <- 3
+issp93sel$V28_r[issp93sel$V28==2] <- 4
+issp93sel$V28_r[issp93sel$V28==1] <- 5
+table(issp93sel$V28_r, useNA = "always")
+table(issp93sel$V28, useNA = "always")
+
+attributes(issp93sel$V54) #Score 1 means that ordinary people should decide how to tackle env. problems, score 2 means that government should pass laws. 
+attributes(issp93sel$V55) #Same as previous one, but then for businesses. I think for these statements, there is not one side that expresses more positive attitudes. 
+
+#Frecuency table of all variables in dataset
+apply((issp93sel), 2, table)
+
+table(issp93sel$V13, useNA = "always")
+table(issp93sel$V14_r, useNA = "always")
+table(issp93sel$V17, useNA = "always")
+table(issp93sel$V19, useNA = "always")
+table(issp93sel$V24, useNA = "always")
+table(issp93sel$V25, useNA = "always")
+table(issp93sel$V26, useNA = "always")
+table(issp93sel$V27, useNA = "always")
+table(issp93sel$V28, useNA = "always")
+table(issp93sel$V54, useNA = "always")
+table(issp93sel$V55, useNA = "always")
+
+table(issp93sel$V200, useNA = "always") # no missings on gender
+table(issp93sel$V201, useNA = "always") # no missings on age
+table(issp93sel$V204, useNA = "always") #7 missings on educ years
+table(issp93sel$V205, useNA = "always") #25 missings on education cat
+table(issp93sel$V212, useNA = "always") #28 missings on main activity, less important
+table(issp93sel$V281, useNA = "always") # On party left right there are 345 missings. let's make a different cat. 
+issp93sel$V281 <- as.numeric(issp93sel$V281)
+issp93sel$V281[is.na(issp93sel$V281)] <- 88
+table(issp93sel$V31, useNA = "always") #NA, delete this one. 
+table(issp93sel$V245, useNA = "always") #Income a lot of missings (263). 
+issp93sel$V245 <- as.numeric(issp93sel$V245)
+table(issp93sel$V253, useNA = "always") #Delete
+table(issp93sel$V268, useNA = "always") #526 missings, don't think I can use this variable?
+table(issp93sel$V276, useNA = "always") #Religion 15 missings, bit small for a diff cat? 
+issp93sel$V276 <- as.numeric(issp93sel$V276)
+issp93sel$V276[is.na(issp93sel$V276)] <- 88
+table(issp93sel$V277, useNA = "always") #18 missings on church attendance, but I won't consider this var anyway.
+table(issp93sel$V296, useNA = "always") #Delete
+table(issp93sel$V352, useNA = "always") #11 missings on urbanity
+issp93sel$V352 <- as.numeric(issp93sel$V352)
+issp93sel$V352[is.na(issp93sel$V352)] <- 88
+
+#Deselect some vars with no values. For some reason the newly created variables got strange variable labels. 
+
+issp93sel <- issp93sel %>% 
+            select(V1, V2, V13, V14, V17, V19, V24, V25, V26, V27, V28, V54, V55, V200, V201, V204, V205, V212, V281, V245, V268, V276, V277, V352, V14_r, V24_r, V25_r, V26_r, V28_r)
+
+#Replace missings on numeric independent vars with mean. 
+list_na <- colnames(issp93sel)[ apply(issp93sel, 2, anyNA) ]
+list_na
+
+issp93sel$V13 <- as.numeric(issp93sel$V13)
+issp93sel$V14 <- as.numeric(issp93sel$V14)
+issp93sel$V17 <- as.numeric(issp93sel$V17)
+issp93sel$V19 <- as.numeric(issp93sel$V19)
+issp93sel$V24 <- as.numeric(issp93sel$V24)
+issp93sel$V25 <- as.numeric(issp93sel$V25)
+issp93sel$V26 <- as.numeric(issp93sel$V26)
+issp93sel$V27 <- as.numeric(issp93sel$V27)
+issp93sel$V28 <- as.numeric(issp93sel$V28)
+issp93sel$V54 <- as.numeric(issp93sel$V54)
+issp93sel$V55 <- as.numeric(issp93sel$V55)
+issp93sel$V204 <- as.numeric(issp93sel$V204)
+issp93sel$V205 <- as.numeric(issp93sel$V205)
+issp93sel$V212 <- as.numeric(issp93sel$V212)
+issp93sel$V245 <- as.numeric(issp93sel$V245)
+issp93sel$V268 <- as.numeric(issp93sel$V268)
+issp93sel$V277 <- as.numeric(issp93sel$V277)
+
+average_missing <- apply(issp93sel[,colnames(issp93sel) %in% list_na],
+      2,
+      mean,
+      na.rm =  TRUE)
+average_missing
+
+issp93sel_replace <- issp93sel %>%
+   mutate(educ_mis  = ifelse(is.na(V205), average_missing[13], V205),
+   mainstat_mis = ifelse(is.na(V212), average_missing[14], V212),
+   eduyrs_mis = ifelse(is.na(V204), average_missing[12], V204),
+   pinc_mis = ifelse(is.na(V245), average_missing[15], V245), 
+   finc_mis = ifelse(is.na(V268), average_missing[16], V268),
+   church_mis = ifelse(is.na(V277), average_missing[17], V277))
+
+apply((issp93sel_replace[c('educ_mis', 'mainstat_mis', 'eduyrs_mis', 'pinc_mis', 'finc_mis', 'church_mis')]), 2, table)
+
+save(issp93sel, file="/Users/anuschka/Documents/climatechange/climatechange/issp93sel.Rdata")
+save(issp93sel_replace, file="/Users/anuschka/Documents/climatechange/climatechange/issp93sel_mis.Rdata")
+
+#Now 2000. 
+issp2000 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/issp/ISSP2000.sav", use.value.labels = T,  to.data.frame = T)
+
+issp00sel <- issp2000 %>% filter(V3=="NL-Netherlands")  %>%
+            select(V1, V2, V11, V12, V13, V14, V16, V17, V19, V20, V21, V22, V23, V40, V41, V24, V25, V26, V42, V200, V201, V204, V205, V246, V241, V242, V243, V262, V274)
+
+apply((issp00sel), 2, table)   
+
+#For some very unlogic reason, the order of categories has changed, so everything has to be recoded. 
+table(issp00sel$V12)
+issp00sel$V12_r <- NA
+issp00sel$V12 <- as.numeric(issp00sel$V12)
+issp00sel$V12_r[issp00sel$V12==5] <- 1
+issp00sel$V12_r[issp00sel$V12==4] <- 2
+issp00sel$V12_r[issp00sel$V12==3] <- 3
+issp00sel$V12_r[issp00sel$V12==2] <- 4
+issp00sel$V12_r[issp00sel$V12==1] <- 5
+table(issp00sel$V12_r, useNA = "always")
+table(issp00sel$V12, useNA = "always")
+
+table(issp00sel$V19)
+issp00sel$V19_r <- NA
+issp00sel$V19 <- as.numeric(issp00sel$V19)
+issp00sel$V19_r[issp00sel$V19==5] <- 1
+issp00sel$V19_r[issp00sel$V19==4] <- 2
+issp00sel$V19_r[issp00sel$V19==3] <- 3
+issp00sel$V19_r[issp00sel$V19==2] <- 4
+issp00sel$V19_r[issp00sel$V19==1] <- 5
+table(issp00sel$V19_r, useNA = "always")
+table(issp00sel$V19, useNA = "always")
+
+issp00sel$V20_r <- NA
+issp00sel$V20 <- as.numeric(issp00sel$V20)
+issp00sel$V20_r[issp00sel$V20==5] <- 1
+issp00sel$V20_r[issp00sel$V20==4] <- 2
+issp00sel$V20_r[issp00sel$V20==3] <- 3
+issp00sel$V20_r[issp00sel$V20==2] <- 4
+issp00sel$V20_r[issp00sel$V20==1] <- 5
+table(issp00sel$V20_r, useNA = "always")
+table(issp00sel$V20, useNA = "always")
+
+issp00sel$V21_r <- NA
+issp00sel$V21 <- as.numeric(issp00sel$V21)
+issp00sel$V21_r[issp00sel$V21==5] <- 1
+issp00sel$V21_r[issp00sel$V21==4] <- 2
+issp00sel$V21_r[issp00sel$V21==3] <- 3
+issp00sel$V21_r[issp00sel$V21==2] <- 4
+issp00sel$V21_r[issp00sel$V21==1] <- 5
+table(issp00sel$V21_r, useNA = "always")
+table(issp00sel$V21, useNA = "always")
+
+issp00sel$V23_r <- NA
+issp00sel$V23 <- as.numeric(issp00sel$V23)
+issp00sel$V23_r[issp00sel$V23==5] <- 1
+issp00sel$V23_r[issp00sel$V23==4] <- 2
+issp00sel$V23_r[issp00sel$V23==3] <- 3
+issp00sel$V23_r[issp00sel$V23==2] <- 4
+issp00sel$V23_r[issp00sel$V23==1] <- 5
+table(issp00sel$V23_r, useNA = "always")
+table(issp00sel$V23, useNA = "always")
+
+
+table(issp00sel$V24, useNA = "always") #More important things in life than protecting the environment. Higher score (strongly disagree) means that you care more about the environment than strongly disagree. 
+table(issp00sel$V25, useNA = "always") #There's no point in doing what I can for the environment unless others do the same. Higher score means more positive attitudes, although again (like mentioned at the other statement) you can also interpret strongly agree as caring about the environment but not knowing what to do. 
+table(issp00sel$V26, useNA = "always") #Many of the claims exaggerated. Higher score means strongly disagree so more positive attitudes. 
+table(issp00sel$V42, useNA = "always") #Higher score means that government is doing too little, which expresses worry and that we should do sth. 
+
+#Missings
+table(issp00sel$V200, useNA = "always") # no missings on gender
+table(issp00sel$V201, useNA = "always") # no missings on age
+table(issp00sel$V204, useNA = "always") # no missings on educ years
+table(issp00sel$V205, useNA = "always") #no missings on education cat
+table(issp00sel$V246, useNA = "always") #232 missings on pol party (left-right)
+issp00sel$V246 <- as.numeric(issp00sel$V246)
+issp00sel$V246[is.na(issp00sel$V246)] <- 88
+table(issp00sel$V241, useNA = "always") #Can't see how many missings on income.
+table(issp00sel$V242, useNA = "always") #No missings on religion
+table(issp00sel$V243, useNA = "always") #5 missings on church attendance. 
+issp00sel$V243 <- as.numeric(issp00sel$V243)
+issp00sel$V243[is.na(issp00sel$V243)] <- 88
+table(issp00sel$V262, useNA = "always") #Nl party, same 232 missings?
+issp00sel$V262 <- as.numeric(issp00sel$V262)
+issp00sel$V262[is.na(issp00sel$V262)] <- 88
+table(issp00sel$V274, useNA = "always") #6 missings on urbanity. 
+issp00sel$V274 <- as.numeric(issp00sel$V274)
+issp00sel$V274[is.na(issp00sel$V274)] <- 88
+
+save(issp00sel, file="/Users/anuschka/Documents/climatechange/climatechange/issp00sel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/issp00sel.Rdata")
+
+list_na <- colnames(issp00sel)[ apply(issp00sel, 2, anyNA) ]
+list_na   
+
+#Apparently there are no missings on the demographic variables so I don't have to replace any missings. 
+issp00sel[] <- lapply(issp00sel, as.numeric)
+
+#Last dataset of 2010. 
+issp2010 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/issp/ISSP2010.sav", use.value.labels = T,  to.data.frame = T)
+
+issp10sel <- issp2010 %>% filter(country=="NL-Netherlands") %>%
+            select(studyno, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v46, v47, v34, v35, v36, v48, SEX, AGE, EDUCYRS, DEGREE, MAINSTAT, PARTY_LR, NL_RINC, NL_INC, RELIGGRP, ATTEND, NL_PRTY, URBRURAL)
+
+table(issp10sel$v24)
+issp10sel$v24_r <- NA
+issp10sel$v24 <- as.numeric(issp10sel$v24)
+issp10sel$v24_r[issp10sel$v24==5] <- 1
+issp10sel$v24_r[issp10sel$v24==4] <- 2
+issp10sel$v24_r[issp10sel$v24==3] <- 3
+issp10sel$v24_r[issp10sel$v24==2] <- 4
+issp10sel$v24_r[issp10sel$v24==1] <- 5
+table(issp10sel$v24_r, useNA = "always")
+table(issp10sel$v24, useNA = "always")
+
+table(issp10sel$v29)
+issp10sel$v29_r <- NA
+issp10sel$v29 <- as.numeric(issp10sel$v29)
+issp10sel$v29_r[issp10sel$v29==5] <- 1
+issp10sel$v29_r[issp10sel$v29==4] <- 2
+issp10sel$v29_r[issp10sel$v29==3] <- 3
+issp10sel$v29_r[issp10sel$v29==2] <- 4
+issp10sel$v29_r[issp10sel$v29==1] <- 5
+table(issp10sel$v29_r, useNA = "always")
+table(issp10sel$v29, useNA = "always")
+
+table(issp10sel$v30)
+issp10sel$v30_r <- NA
+issp10sel$v30 <- as.numeric(issp10sel$v30)
+issp10sel$v30_r[issp10sel$v30==5] <- 1
+issp10sel$v30_r[issp10sel$v30==4] <- 2
+issp10sel$v30_r[issp10sel$v30==3] <- 3
+issp10sel$v30_r[issp10sel$v30==2] <- 4
+issp10sel$v30_r[issp10sel$v30==1] <- 5
+table(issp10sel$v30_r, useNA = "always")
+table(issp10sel$v30, useNA = "always")
+
+table(issp10sel$v31)
+issp10sel$v31_r <- NA
+issp10sel$v31 <- as.numeric(issp10sel$v31)
+issp10sel$v31_r[issp10sel$v31==5] <- 1
+issp10sel$v31_r[issp10sel$v31==4] <- 2
+issp10sel$v31_r[issp10sel$v31==3] <- 3
+issp10sel$v31_r[issp10sel$v31==2] <- 4
+issp10sel$v31_r[issp10sel$v31==1] <- 5
+table(issp10sel$v31_r, useNA = "always")
+table(issp10sel$v31, useNA = "always")
+
+table(issp10sel$v33)
+issp10sel$v33_r <- NA
+issp10sel$v33 <- as.numeric(issp10sel$v33)
+issp10sel$v33_r[issp10sel$v33==5] <- 1
+issp10sel$v33_r[issp10sel$v33==4] <- 2
+issp10sel$v33_r[issp10sel$v33==3] <- 3
+issp10sel$v33_r[issp10sel$v33==2] <- 4
+issp10sel$v33_r[issp10sel$v33==1] <- 5
+table(issp10sel$v33_r, useNA = "always")
+table(issp10sel$v33, useNA = "always")
+               
+table(issp10sel$SEX, useNA = "always") # No missings
+table(issp10sel$AGE, useNA = "always") # No missings
+table(issp10sel$EDUCYRS, useNA = "always") #170 missings. Have to replace them with mean.
+table(issp10sel$DEGREE, useNA = "always") #73 missings. Replace with mean cat. 
+table(issp10sel$MAINSTAT, useNA = "always") #51 missings. 
+issp10sel$MAINSTAT <- as.numeric(issp10sel$MAINSTAT)
+issp10sel$MAINSTAT[is.na(issp10sel$MAINSTAT)] <- 88
+table(issp10sel$PARTY_LR, useNA = "always") #168 missings. 
+issp10sel$PARTY_LR <- as.numeric(issp10sel$PARTY_LR)
+issp10sel$PARTY_LR[is.na(issp10sel$PARTY_LR)] <- 88
+table(issp10sel$NL_RINC, useNA = "always") #169 missings on personal income. Substitute by mean. 
+table(issp10sel$NL_INC, useNA = "always") #Here 182 missings
+table(issp10sel$RELIGGRP, useNA = "always") #54 missings. 
+issp10sel$RELIGGRP <- as.numeric(issp10sel$RELIGGRP)
+issp10sel$RELIGGRP[is.na(issp10sel$RELIGGRP)] <- 88
+table(issp10sel$ATTEND, useNA = "always") #72 missings on church attendance. 
+issp10sel$ATTEND <- as.numeric(issp10sel$ATTEND)
+issp10sel$ATTEND[is.na(issp10sel$ATTEND)] <- 88
+table(issp10sel$NL_PRTY, useNA = "always") #Again same 168 missings as on left-right party. 
+issp10sel$NL_PRTY <- as.numeric(issp10sel$NL_PRTY)
+issp10sel$NL_PRTY[is.na(issp10sel$NL_PRTY)] <- 88
+table(issp10sel$URBRURAL, useNA = "always") #24 missings. Also seems to have gotten more answer cats over the years. 
+issp10sel$URBRURAL <- as.numeric(issp10sel$URBRURAL)
+issp10sel$URBRURAL[is.na(issp10sel$URBRURAL)] <- 88
+
+save(issp10sel, file="/Users/anuschka/Documents/climatechange/climatechange/issp10sel.Rdata")
+
+list_na <- colnames(issp10sel)[ apply(issp10sel, 2, anyNA) ]
+list_na  
+
+issp10sel[] <- lapply(issp10sel, as.numeric)
+
+average_missing <- apply(issp10sel[,colnames(issp10sel) %in% list_na],
+      2,
+      mean,
+      na.rm =  TRUE)
+average_missing
+
+issp10sel_replace <- issp10sel %>%
+   mutate(educyrs_mis  = ifelse(is.na(EDUCYRS), average_missing[18], EDUCYRS),
+   degree_mis = ifelse(is.na(DEGREE), average_missing[19], DEGREE),
+   nlrinc_mis = ifelse(is.na(NL_RINC), average_missing[20], NL_RINC),
+   nlinc_mis = ifelse(is.na(NL_INC), average_missing[21], NL_INC))
+
+apply((issp10sel_replace[c('educyrs_mis', 'degree_mis', 'nlrinc_mis', 'nlinc_mis')]), 2, table)
+
+save(issp10sel_replace, file="/Users/anuschka/Documents/climatechange/climatechange/issp10sel_mis.Rdata")
+
+```
+
+```{r}
+#Now I have to make one long datafile of these three datasets. 
+load("/Users/anuschka/Documents/climatechange/climatechange/issp93sel_mis.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/issp00sel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/issp10sel_mis.Rdata")
+
+issp93sel_replace$V204 <- issp93sel_replace$eduyrs_mis
+issp93sel_replace$V205 <- issp93sel_replace$educ_mis
+issp93sel_replace$V268 <- issp93sel_replace$finc_mis
+issp93sel_replace$V277 <- issp93sel_replace$church_mis
+
+issp93sel_replace <- issp93sel_replace %>% select(V1, V13, V14, V17, V19, V24, V25, V26, V27, V28, V54, V55, V200, V201, V204, V205, V281, V268, V276, V277, V352, V14_r, V24_r, V25_r, V26_r, V28_r)
+
+issp00sel <- issp00sel %>% select(V1, V11, V12, V13, V14, V19, V20, V21, V22, V23, V40, V41, V200, V201, V204, V205, V246, V241, V242, V243, V274, V12_r, V19_r, V20_r, V21_r, V23_r, V16, V17, V24, V25, V26, V42)
+
+issp10sel_replace$EDUCYRS <- issp10sel_replace$educyrs_mis
+issp10sel_replace$DEGREE <- issp10sel_replace$degree_mis
+issp10sel_replace$NL_INC <- issp10sel_replace$nlinc_mis
+
+issp10sel_replace <- issp10sel_replace %>% select(studyno, v23, v24, v25, v26, v29, v30, v31, v32, v33, v46, v47, SEX, AGE, EDUCYRS, DEGREE, PARTY_LR, NL_INC, RELIGGRP, ATTEND, URBRURAL, v24_r, v29_r, v30_r, v31_r, v33_r, v27, v28, v34, v35, v36, v48) 
+
+names(issp93sel_replace) <- c("studyno", "worry", "lifeharm", "progharm", "econprotect", "willing_price", "willing_tax", "willing_living", "dodiff", "doright", "people_decide", "bus_decide", "sex", "age", "eduyrs", "educat", "party_lr", "nl_finc", "religrp", "attend", "urbrur", "lifeharm_r", "willing_price_r", "willing_tax_r", "willing_living_r", "doright_r")
+
+names(issp00sel) <- c("studyno", "worry", "lifeharm", "progharm", "econprotect", "willing_price", "willing_tax", "willing_living", "dodiff", "doright", "people_decide", "bus_decide", "sex", "age", "eduyrs", "educat", "party_lr", "nl_finc", "religrp", "attend", "urbrur", "lifeharm_r", "willing_price_r", "willing_tax_r", "willing_living_r", "doright_r", "growharm", "pop_support", "moreimp", "othersame", "exag", "country_effort")
+
+names(issp10sel_replace) <- c("studyno", "worry", "lifeharm", "progharm", "econprotect", "willing_price", "willing_tax", "willing_living", "dodiff", "doright", "people_decide", "bus_decide", "sex", "age", "eduyrs", "educat", "party_lr", "nl_finc", "religrp", "attend", "urbrur", "lifeharm_r", "willing_price_r", "willing_tax_r", "willing_living_r", "doright_r", "growharm", "pop_support", "moreimp", "othersame", "exag", "country_effort")
+
+#If i bind rows now, it just doubles the variables. I thus have to give each their own name. 
+issptotal <- dplyr::bind_rows(issp00sel, issp10sel_replace)
+issptotal <- plyr::rbind.fill(issp93sel_replace, issptotal)
+save(issptotal, file="/Users/anuschka/Documents/climatechange/climatechange/issptotal.Rdata")
+issptotal$surveyyear <- NA
+issptotal$surveyyear[issptotal$studyno==2450] <- 1993
+issptotal$surveyyear[issptotal$studyno==3440] <- 2000
+issptotal$surveyyear[issptotal$studyno==1] <- 2010
+
+worry_mean <- aggregate(issptotal$worry, by = list(issptotal$surveyyear), FUN = mean, na.rm=T)
+head(worry_mean)
+
+worry_var <- aggregate(issptotal$worry, by = list(issptotal$surveyyear), FUN = var, na.rm=T)
+head(worry_var)
+
+```
+
+```{r}
+load("/Users/anuschka/Documents/climatechange/climatechange/issptotal.Rdata")
+#THE TOTAL MEANS FILE IS NOT SAVED, SO TO MAKE THE PLOTS I HAVE TO RUN THIS CODE FIRST
+
+#This copy file has no missings (listwise deletion) so that I can calculate all the means with a constant N. 
+issptotal$growharm[issptotal$growharm==88] <- 0
+issptotal$pop_support[issptotal$pop_support==88] <- 0
+issptotal$moreimp[is.na(issptotal$moreimp)] <- 0
+issptotal$exag[is.na(issptotal$exag)] <- 0
+issptotal$othersame[is.na(issptotal$othersame)] <- 0
+issptotal$country_effort[is.na(issptotal$country_effort)] <- 0
+
+issptotal_copy <- issptotal[complete.cases(issptotal), ]
+
+# Group by mean of multiple columns.  
+means <- issptotal_copy %>% group_by(surveyyear) %>% 
+  summarise(mean_lifeharm=mean(lifeharm_r),
+            mean_progharm= mean(progharm),
+            mean_worry= mean(worry),
+            mean_econprotect= mean(econprotect),
+            mean_wprice= mean(willing_price_r),
+            mean_wtax= mean(willing_tax_r),
+            mean_wliving= mean(willing_living_r),
+            mean_dodiff= mean(dodiff),
+            mean_doright= mean(doright_r),
+            mean_peopled= mean(people_decide),
+            mean_busd= mean(bus_decide),
+            mean_growharm= mean(growharm),
+            mean_popsup= mean(pop_support),
+            mean_moreimp= mean(moreimp),
+            mean_othersame= mean(othersame),
+            mean_exag= mean(exag),
+            mean_countryef= mean(country_effort),
+            .groups = 'drop') %>%
+  as.data.frame()
+
+issptotmeans <- merge(issptotal_copy, means, by= "surveyyear", all.x=T)
+
+#Now see if I can get this in a plot. 
+
+ggplot(issptotmeans, aes(x=surveyyear)) + 
+  geom_line(aes(y = mean_wprice), color = "purple") + 
+  geom_line(aes(y = mean_wtax), color="turquoise", linetype="twodash") +
+  geom_line(aes(y = mean_wliving), color = "pink", linetype=2) +
+  ggtitle ("Willingness to make changes 1993-2010") +
+  coord_cartesian(xlim = c(1993,2010), ylim = c(0,5)) +
+  guides(fill="legend") +
+  labs(y="Mean score", x="Year of survey")
+
+
+ggplot(issptotmeans, aes(x=surveyyear)) + 
+  geom_line(aes(y = mean_lifeharm), color = "purple") + 
+  geom_line(aes(y = mean_progharm), color="turquoise", linetype=6) +
+  geom_line(aes(y = mean_worry), color = "pink", linetype=2) +
+  geom_line(aes(y = mean_econprotect), color = "black", linetype=4) +
+  ggtitle ("Attitudes 1993-2010") +
+  coord_cartesian(xlim = c(1993,2010), ylim = c(0,5)) +
+  guides(fill="legend") +
+  labs(y="Mean score", x="Year of survey")
+  
+
+
+
+```
 
