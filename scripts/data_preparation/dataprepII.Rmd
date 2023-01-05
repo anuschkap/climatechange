@@ -40,7 +40,7 @@ eb1982sel$v52 <- as.numeric(eb1982sel$v52)
 eb1982sel$v52[is.na(eb1982sel$v52)] <- 88
 eb1982sel$v52 <- as.factor(eb1982sel$v52)
 levels(eb1982sel$v52) <- c("Very close", "Fairly close", "Merely sympthasis", "Close to no party", "Missing")
-table(eb1982sel$v53, useNA = "always")
+table(eb1982$v53, useNA = "always")
 eb1982sel$v53 <- as.numeric(eb1982sel$v53)
 eb1982sel$v53[is.na(eb1982sel$v53)] <- 88
 eb1982sel$v53 <- as.factor(eb1982sel$v53)

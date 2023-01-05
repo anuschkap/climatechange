@@ -1,0 +1,92 @@
+---
+title: "dataprepIII"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+
+```{r}
+
+rm(list = ls())
+library(haven)
+library(dplyr)
+library(foreign)
+library(tidyverse)
+library(labelled)
+library(ggplot2)
+library(questionr)
+library(psych)
+library(plyr)
+#library(rcompanion)
+#setwd("/Users/anuschka/Documents")
+```
+
+```{r}
+load("/Users/anuschka/Documents/gesis_dir/evs/evssel_nomis.Rdata")
+
+load("/Users/anuschka/Documents/climatechange/climatechange/esstotal.Rdata")
+look_for(ess2016, "religious")
+
+load("/Users/anuschka/Documents/climatechange/climatechange/eb_tot.Rdata")
+
+#Collect data on religion (because didn't include that everywhere for EB)
+eb1982 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb1982.sav", use.value.labels = T,  to.data.frame = T)
+
+look_for(eb1982, "religious")
+
+relsel <- eb1982 %>% filter(v5=="NETHERLANDS") %>%
+              select(v1, v53)
+
+table(relsel$v53, useNA = "always")
+relsel$religion <- as.numeric(relsel$v53)
+relsel$religion[is.na(relsel$religion)] <- 88
+relsel$religion <- as.factor(relsel$religion)
+levels(relsel$religion) <- c("Religious", "Not religious", "Atheist", "Missing")
+
+look_for(eb1986, "attendance")
+
+rel86 <- eb1986 %>% filter(v5=="NETHERLANDS") %>%
+  select(v1, v281)
+
+table(rel86$v281, useNA = "always") #15 missings on religion. 
+rel86$v281 <- as.numeric(rel86$v281)
+mean(rel86$v281, na.rm = T)
+rel86$v281[is.na(rel86$v281)] <- 4.794118 #High score means very religious.
+
+relsel = subset(relsel, select = -c(v53) )
+relsel <- plyr::rbind.fill(relsel, rel86)
+
+look_for(eb1992, "church")
+
+rel92 <- eb1992 %>% filter(v5=="NETHERLANDS") %>%
+      select(v1, v647, v648)
+table(rel92$v647, useNA = "always") #488 missings on this variable
+rel92$v647 <- as.numeric(rel92$v647)
+rel92$attend[rel92$v647==1] <- 5
+rel92$attend[rel92$v647==2] <- 4
+rel92$attend[rel92$v647==3] <- 3
+rel92$attend[rel92$v647==4] <- 2
+rel92$attend[rel92$v647==5] <- 1
+table(rel92$attend, useNA = "always")
+
+table(rel92$v648, useNA = "always") #Religion has 77 missings. But I notice that answer cats differ over the years. To compare with the other years, I will create one cat agnost/atheist
+rel92$v648 <- as.numeric(rel92$v648)
+rel92$religion <- NA
+rel92$religion[rel92$v648==1] <- 1
+rel92$religion[rel92$v648==2] <- 2
+rel92$religion[rel92$v648==3 | rel92$v648==4] <- 3
+rel92$religion[is.na(rel92$religion)] <- 88
+rel92$religion <- as.factor(rel92$religion)
+levels(rel92$religion) <- c("Religious", "Not religious", "Agnost/Atheist", "Missing")
+
+rel92 = subset(rel92, select = -c(v647, v648) )
+relsel <- plyr::rbind.fill(relsel, rel92)
+
+save(relsel, file = "./data/all_waves/relsel.RData")
+#In the years after 1992 nothing with regard to religion was asked.
+
+
+
+```
+
