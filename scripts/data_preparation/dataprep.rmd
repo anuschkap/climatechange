@@ -5,6 +5,8 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
+In this script, I select, recode and create variables of the EVS, ESS and ISSP.
+
 ```{r}
 
 #install.packages("questionr")
@@ -27,6 +29,7 @@ library(plyr)
 ```{r}
 #Load in EVS trend file
 evs <- haven::read_sav("/Users/anuschka/Documents/gesis_dir/evs/ZA7503_v2-0-0.sav", encoding="latin1")
+look_for(evs, "X001")
 
 evssel <- evs %>% filter(S009=="NL")  %>%
             select(stdyno_w, S001, S002EVS, S006, S017, S018, pwght, S020, B001, X001, X002, X003, X003R, X003R2, X011, X023, X023R, X025, X028, X047CS, X047_EVS, X047R_EVS)
@@ -93,15 +96,7 @@ evssel <- evssel %>%
    inc_mis = ifelse(is.na(X047CS), average_missing[12], X047CS),
    lr_mis = ifelse(is.na(E033), average_missing[16], E033))
 
-table(evssel_replace$X001, useNA = "always") #I don't want to replace the 2 missings on gender because that just creates a very small category. But let's see how it works. 
-evssel_replace$sex <- NA
-evssel_replace$sex[is.na(evssel_replace$X001)] <- 3
-evssel_replace$sex[evssel_replace$X001==1] <- 1
-evssel_replace$sex[evssel_replace$X001==2] <- 2
-table(evssel_replace$sex, useNA = "always") 
-#Now the 2 missings are a different category (3). 
-
-save(evssel, file="/Users/anuschka/Documents/gesis_dir/evs/evssel.Rdata")
+save(evssel, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/evssel.Rdata")
 
 table(evssel$A006, useNA = "always")
 table(evssel$X011, useNA = "always") #Children 25 missings. 
@@ -392,6 +387,9 @@ ggplot(mean_tot, aes(x=surveyyear)) +
 ```{r}
 issp1993 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/issp/ISSP1993.sav", use.value.labels = T,  to.data.frame = T)
 
+table(issp1993$V277, useNA = "always")
+table(issp1993$V352, useNA = "always")
+
 issp93sel <- issp1993 %>% filter(V3=="Netherlands - NL")  %>%
             select(V1, V2, V13, V14, V17, V19, V24, V25, V26, V27, V28, V54, V55, V200, V201, V204, V205, V212, V281, V231, V245, V253, V268, V276, V277, V296, V352)
 
@@ -491,7 +489,7 @@ table(issp93sel$V268, useNA = "always") #526 missings, don't think I can use thi
 table(issp93sel$V276, useNA = "always") #Religion 15 missings, bit small for a diff cat? 
 issp93sel$V276 <- as.numeric(issp93sel$V276)
 issp93sel$V276[is.na(issp93sel$V276)] <- 88
-table(issp93sel$V277, useNA = "always") #18 missings on church attendance, but I won't consider this var anyway.
+table(issp93sel$V277, useNA = "always") #18 missings on church attendance
 table(issp93sel$V296, useNA = "always") #Delete
 table(issp93sel$V352, useNA = "always") #11 missings on urbanity
 issp93sel$V352 <- as.numeric(issp93sel$V352)
@@ -548,6 +546,8 @@ issp2000 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/issp/ISSP200
 
 issp00sel <- issp2000 %>% filter(V3=="NL-Netherlands")  %>%
             select(V1, V2, V11, V12, V13, V14, V16, V17, V19, V20, V21, V22, V23, V40, V41, V24, V25, V26, V42, V200, V201, V204, V205, V246, V241, V242, V243, V262, V274)
+
+table(as.numeric(as.character(issp00sel$V241)), useNA = "always")
 
 apply((issp00sel), 2, table)   
 
@@ -813,68 +813,5 @@ table(issptotal$exag, useNA = "always")
 table(issptotal$country_effort, useNA = "always")
 ```
 
-```{r}
-load("/Users/anuschka/Documents/climatechange/climatechange/issptotal.Rdata")
-#THE TOTAL MEANS FILE IS NOT SAVED, SO TO MAKE THE PLOTS I HAVE TO RUN THIS CODE FIRST
 
-#This copy file has no missings (listwise deletion) so that I can calculate all the means with a constant N. 
-issptotal$growharm[issptotal$growharm==88] <- 0
-issptotal$pop_support[issptotal$pop_support==88] <- 0
-issptotal$moreimp[is.na(issptotal$moreimp)] <- 0
-issptotal$exag[is.na(issptotal$exag)] <- 0
-issptotal$othersame[is.na(issptotal$othersame)] <- 0
-issptotal$country_effort[is.na(issptotal$country_effort)] <- 0
-
-issptotal_copy <- issptotal[complete.cases(issptotal), ]
-
-# Group by mean of multiple columns.  
-means <- issptotal_copy %>% group_by(surveyyear) %>% 
-  summarise(mean_lifeharm=mean(lifeharm_r),
-            mean_progharm= mean(progharm),
-            mean_worry= mean(worry),
-            mean_econprotect= mean(econprotect),
-            mean_wprice= mean(willing_price_r),
-            mean_wtax= mean(willing_tax_r),
-            mean_wliving= mean(willing_living_r),
-            mean_dodiff= mean(dodiff),
-            mean_doright= mean(doright_r),
-            mean_peopled= mean(people_decide),
-            mean_busd= mean(bus_decide),
-            mean_growharm= mean(growharm),
-            mean_popsup= mean(pop_support),
-            mean_moreimp= mean(moreimp),
-            mean_othersame= mean(othersame),
-            mean_exag= mean(exag),
-            mean_countryef= mean(country_effort),
-            .groups = 'drop') %>%
-  as.data.frame()
-
-issptotmeans <- merge(issptotal_copy, means, by= "surveyyear", all.x=T)
-
-#Now see if I can get this in a plot. 
-
-ggplot(issptotmeans, aes(x=surveyyear)) + 
-  geom_line(aes(y = mean_wprice), color = "purple") + 
-  geom_line(aes(y = mean_wtax), color="turquoise", linetype="twodash") +
-  geom_line(aes(y = mean_wliving), color = "pink", linetype=2) +
-  ggtitle ("Willingness to make changes 1993-2010") +
-  coord_cartesian(xlim = c(1993,2010), ylim = c(0,5)) +
-  guides(fill="legend") +
-  labs(y="Mean score", x="Year of survey")
-
-
-ggplot(issptotmeans, aes(x=surveyyear)) + 
-  geom_line(aes(y = mean_lifeharm), color = "purple") + 
-  geom_line(aes(y = mean_progharm), color="turquoise", linetype=6) +
-  geom_line(aes(y = mean_worry), color = "pink", linetype=2) +
-  geom_line(aes(y = mean_econprotect), color = "black", linetype=4) +
-  ggtitle ("Attitudes 1993-2010") +
-  coord_cartesian(xlim = c(1993,2010), ylim = c(0,5)) +
-  guides(fill="legend") +
-  labs(y="Mean score", x="Year of survey")
-  
-
-
-
-```
 

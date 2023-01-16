@@ -5,6 +5,8 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
+In this script, I select, recode and create variables of the Eurobarometer
+
 ```{r}
 rm(list = ls())
 #library(haven)
@@ -511,7 +513,6 @@ table(eb2009bsel$v399, useNA = "always")
 var_label(eb2009bsel$v399_r) <-  "Personally have taken action"
 
 attributes(eb2009bsel$v387) #Nat gov doing enough. Higher score means that they are not doing enough (1 is doing too much)
-eb2009bsel$v387 <- as.numeric(eb2009bsel$v387) #SHOULD NOT RECODE IT. DO not use 387_r
 attributes(eb2009bsel$v388) #European union doing enough
 attributes(eb2009bsel$v389) #Reg/local gov doing enough
 attributes(eb2009bsel$v390) #Corporate/industry doing enough
@@ -1175,6 +1176,9 @@ freq(eb2008sel$eduyrs) #53 individuals said they stopped school at 59.
 freq(eb2009asel$eduyrs) #Here there are 66 individuals who said they stopped at 61 years. 
 freq(eb2009bsel$eduyrs) #Here even 110 individuals who stopped at 61 years. I don't understand what's going on because these are not codes used to express missings. However, I do have to code them as missing. 
 #Oké heel dom, met het numeriek maken is dit de cat still studying, maar die heeft R een random nummer gegeven. Weer opnieuw aanpassen dus. 
+
+
+table(ebu2000$eduyrs, ebu2000$surveyyear)
 
 
 eb2004sel$surveyyear <- 2004
