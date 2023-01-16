@@ -2,3 +2,4 @@
 descriptives212.Rmd
 *.Rdata
 .DS_Store
+*.png
