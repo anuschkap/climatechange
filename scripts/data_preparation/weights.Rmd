@@ -1,0 +1,34 @@
+---
+title: "Untitled"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+In this datascripts I want to practice applying weights with the anesrake package
+```{r}
+#install.packages("anesrake")
+library(anesrake)
+library(haven)
+library(readxl)
+
+```
+
+```{r}
+# Load the datasets
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/dpes2021sel.RData")
+weights <- read_excel("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/weigh_data.xlsx")
+
+```
+
+
+```{r}
+# The variables that I will use to weigh the data have to have the same coding as the original variables (in this case of the dpes datafile)
+weights$sex <- weights$male / weights$total_pop
+
+
+
+
+```
+
+

@@ -1,0 +1,856 @@
+---
+title: "Untitled"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+In this script, I select, recode and create variables of the Eurobarometer
+
+```{r}
+rm(list = ls())
+#library(haven)
+library(plyr)
+library(dplyr)
+library(foreign)
+library(tidyverse)
+library(labelled)
+library(ggplot2)
+library(questionr)
+library(psych)
+
+```
+
+```{r}
+#Now the biggest project of all: the Eurobarometer. 
+#1986.
+eb1986 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb1986.sav", use.value.labels = T,  to.data.frame = T)
+
+eb1986sel <- eb1986 %>% filter(v5=="NETHERLANDS") %>%
+            select(v1, v4, v8, v9, v218, v161, v270, v280, v281, v284, v290, v291, v296, v302, v303)
+
+table(eb1986sel$v161, useNA = "always") #19 missings. Have to recode bc now a low score means that it's not really a problem. 
+eb1986sel$env_prsimp <- as.numeric(eb1986sel$v161)
+eb1986sel <- eb1986sel %>% 
+     mutate_at(c("env_prsimp"), funs(recode(., `1` = 3, `2` = 2, `3` = 1)))
+eb1986sel$env_prsimp <- (eb1986sel$env_prsimp -1) * (4/2) + 1
+table(eb1986sel$v218, useNA = "always") #60 missings. 1 means development of economy is more important than environment, 3 means protecting environment are necessary for economic development --> higher score thus more positive. 
+eb1986sel$env_ec_stat <- as.numeric(eb1986sel$v218)
+eb1986sel$env_ec_stat <- (eb1986sel$env_ec_stat -1) * (4/2) + 1
+
+# Independent variables 
+table(eb1986sel$v270, useNA = "always") #55 missings on rl placement. Numeric: highest score is most right. 
+eb1986sel$lrplace <- as.numeric(eb1986sel$v270)
+table(eb1986sel$v281, useNA = "always") #15 missings on religion. 
+eb1986sel$relig <- as.numeric(eb1986sel$v281)
+table(eb1986sel$v284, useNA = "always") #No missings education. 
+eb1986sel$eduyrs_cat <- eb1986sel$v284 #Now still factor level, bc idk what to do with cat under 14 years and 22 yrs and older 
+table(eb1986sel$v290, useNA = "always") 
+eb1986sel$sex <- revalue(eb1986sel$v290, c("MAN"="1", "WOMAN"="2"))
+table(eb1986sel$v291, useNA = "always") #No missings on age. 
+eb1986sel$age <- as.numeric(as.character(eb1986sel$v291))
+table(eb1986sel$v296, useNA = "always") #159 missings income. 
+eb1986sel$income <- as.numeric(eb1986sel$v296) #Household income in 12 cats
+table(eb1986sel$urban, useNA = "always") #no missings on community
+eb1986sel$urban <- revalue(eb1986sel$v302, c("RURAL AREA - VIL"= "Low urbanity", "SM,MDL SZE TOWN"="Medium urbanity", "BIG TOWN" = "High urbanity"))
+
+eb1986sel <- eb1986sel %>% select(v1, v8, env_ec_stat, env_prsimp, sex, eduyrs_cat, lrplace, age, income, urban, relig)
+
+save(eb1986sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb1986sel.Rdata")
+
+
+#Continue with 1992
+eb1992 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb1992.sav", use.value.labels = T,  to.data.frame = T)
+
+eb1992sel <- eb1992 %>% filter(v5=="NETHERLANDS") %>%
+  select(v1, v8, v9, v456, v449, v645, v647, v649, v650, v601, v602, v611, v615, v616)
+
+#Dependent variables 
+table(eb1992sel$v456)
+eb1992sel$env_ec_stat <- as.numeric(eb1992sel$v456)
+eb1992sel$env_ec_stat <- (eb1992sel$env_ec_stat - 1) * (4/2) + 1
+attributes(eb1992sel$v449) #After recode --> higher score means more of a problem. 
+eb1992sel$env_prsimp <- as.numeric(eb1992sel$v449)
+eb1992sel <- eb1992sel %>% 
+     mutate_at(c("env_prsimp"), funs(recode(., `1` = 3, `2` = 2, `3` = 1)))
+eb1992sel$env_prsimp <- (eb1992sel$env_prsimp -1) * (4/2) + 1
+
+#Independent vars
+table(eb1992sel$v645, useNA = "always") #9 missings on urbanity.
+eb1992sel$urban <- revalue(eb1992sel$v645, c("RURAL AREA/VILLAGE"= "Low urbanity", "SMALL/MIDDLE TOWN"="Medium urbanity", "LARGE TOWN" = "High urbanity"))
+table(eb1992sel$v647, useNA = "always") 
+eb1992sel$ch_attend <- as.numeric(eb1992sel$v647)
+eb1992sel <- eb1992sel %>% 
+     mutate_at(c("ch_attend"), funs(recode(., `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5`= 1)))
+table(eb1992sel$v649, useNA = "always") #Income has 143 missings. In the same 12 categories as first wave
+eb1992sel$income <- as.numeric(eb1992sel$v649)
+table(eb1992sel$v601, useNA = "always") #78 missings on left right placement. 
+eb1992sel$lrplace <- as.numeric(eb1992sel$v601)
+table(eb1992sel$v611, useNA = "always") #No missings on education
+eb1992sel$eduyrs <- as.numeric(as.character(eb1992sel$v611))
+table(eb1992sel$eduyrs, useNA = "always") #The 103 missings are the ones who are still studying. I will thus replace those as missings later with the mice package. 
+table(eb1992sel$v615, useNA = "always")#No missings gender
+eb1992sel$sex <- revalue(eb1992sel$v615, c("MALE"="1", "FEMALE"="2"))
+table(eb1992sel$v616, useNA = "always") #No missings on age
+eb1992sel$age <- eb1992sel$v616
+
+save(eb1992sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb1992sel.Rdata")
+
+eb1992sel <- eb1992sel %>% select(v1, v8, env_ec_stat, env_prsimp, lrplace, eduyrs, sex, age, urban, income, ch_attend)
+
+#1995
+eb1995 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb1995.sav", use.value.labels = T,  to.data.frame = T)
+
+eb1995sel <- eb1995 %>% filter(v5=="Netherlands") %>%
+  select(v1, v8, v9, v182, v134, v339, v343, v344, v345, v354, v355)
+
+#Dependent variables
+attributes(eb1995sel$v182) #Higher score means environment higher priority. 
+eb1995sel$env_ec_stat <- as.numeric(eb1995sel$v182)
+eb1995sel$env_ec_stat <- (eb1995sel$env_ec_stat-1) * (4/2) + 1
+attributes(eb1995sel$v134)
+eb1995sel$env_prsimp <- as.numeric(eb1995sel$v134)
+eb1995sel <- eb1995sel %>% 
+     mutate_at(c("env_prsimp"), funs(recode(., `1` = 3, `2` = 2, `3` = 1)))
+eb1995sel$env_prsimp <- (eb1995sel$env_prsimp -1) * (4/2) + 1
+
+#Independent variables
+table(eb1995sel$v339, useNA = "always") #90 missings on lr placement
+eb1995sel$lrplace <- as.numeric(eb1995sel$v339)
+table(eb1995sel$v343, useNA = "always") #No missings education
+eb1995sel$eduyrs_cat <- eb1995sel$v343
+table(eb1995sel$v344, useNA = "always") 
+eb1995sel$sex <- revalue(eb1995sel$v344, c("Male"="1", "Female"="2"))
+table(eb1995sel$v345, useNA = "always") #No missings age
+eb1995sel$v345 <- revalue(eb1995sel$v345, c("15 years"="15"))
+eb1995sel$age <- as.numeric(as.character(eb1995sel$v345))
+table(eb1995sel$v354, useNA = "always") #No missings urbanity
+eb1995sel$urban <- revalue(eb1995sel$v354, c("Rural area or village"= "Low urbanity", "Small or middle size town"="Medium urbanity", "Large town" = "High urbanity"))
+table(eb1995sel$v355, useNA = "always") #199 missings  income, still in 12 cats. 
+eb1995sel$income <- as.numeric(eb1995sel$v355)
+
+save(eb1995sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb1995sel.Rdata")
+
+eb1995sel <- eb1995sel %>% select(v1, v8, env_prsimp, env_ec_stat, lrplace, eduyrs_cat, sex, age, urban, income)
+
+#2004
+eb2004 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2004.sav", use.value.labels = T,  to.data.frame = T)
+
+look_for(eb2004, "education")
+
+eb2004sel <- eb2004 %>% filter(v6=="The Netherlands") %>%
+  select(v1, v8, v307, v312, v579, v583, v585, v586, v58)
+
+#Dependent vars 
+
+eb2004sel$env_quallife <- as.numeric(eb2004sel$v307)
+eb2004sel$pers_effort <- as.numeric(eb2004sel$v312)
+
+eb2004sel <- eb2004sel %>% 
+     mutate_at(c("env_quallife", "pers_effort"), funs(recode(., `1` = 4, `2` = 3, `3` = 2, `4` = 1)))
+
+eb2004sel$env_quallife <- (eb2004sel$env_quallife -1) + (4/3) + 1
+eb2004sel$pers_effort <- (eb2004sel$pers_effort -1) + (4/3) + 1
+
+#Independent variables 
+table(eb2004sel$v579, useNA = "always") #54 missings on left-right placement. 
+eb2004sel$lrplace <- as.numeric(eb2004sel$v579)
+
+table(eb2004sel$v583, useNA = "always") #8 missings on education. 
+eb2004sel$eduyrs <- as.numeric(as.character(eb2004sel$v583))
+table(eb2004sel$eduyrs, useNA = "always") #Again there are missings for the individuals who are still studying, so have to replace those later
+table(eb2004sel$v585, useNA = "always") 
+eb2004sel$sex <- revalue(eb2004sel$v585, c("Male"="1", "Female"="2"))
+table(eb2004sel$v586, useNA = "always") 
+eb2004sel$urban <- revalue(eb2004sel$v586, c("Rural area or village"= "Low urbanity", "Small or middle sized town"="Medium urbanity", "Large town" = "High urbanity"))
+table(eb2004sel$v58, useNA = "always") #No missings on age
+eb2004sel$v58 <- revalue(eb2004sel$v58, c("15 years"="15"))
+eb2004sel$age <- as.numeric(as.character(eb2004sel$v58))
+
+eb2004sel <- eb2004sel %>% select(v1, v8, env_quallife, pers_effort, lrplace, age, urban, sex, eduyrs)
+
+save(eb2004sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2004sel.Rdata")
+
+```
+
+
+```{r}
+eb2007 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2007.sav", use.value.labels = T,  to.data.frame = T)
+
+eb2007sel <- eb2007 %>% filter(v6=="The Netherlands") %>%
+  select(v1, v8, v548, v543, v544, v592, v593, v594, v549, v474, v612, v616, v618, v619, v624)
+
+attributes(eb2007sel$v548) #Recode. Now a higher score means that environment has priority over economic competitiveness.
+eb2007sel$env_vs_ec <- as.numeric(eb2007sel$v548)
+eb2007sel <- eb2007sel %>% 
+     mutate_at(c("env_vs_ec"), funs(recode(., `1` = 2, `2` = 1)))
+eb2007sel$env_vs_ec <- (eb2007sel$env_vs_ec -1) * (4/1) + 1
+table(eb2007sel$env_vs_ec, useNA = "always")
+
+eb2007sel$env_quallife <- as.numeric(eb2007sel$v544)
+eb2007sel$role_ind <- as.numeric(eb2007sel$v592)
+eb2007sel$big_pol <- as.numeric(eb2007sel$v593)
+eb2007sel$eff_daily <- as.numeric(eb2007sel$v594)
+eb2007sel$buyprod <- as.numeric(eb2007sel$v549)
+eb2007sel$pers_imp <- as.numeric(eb2007sel$v474)
+
+eb2007sel <- eb2007sel %>% 
+     mutate_at(c("env_quallife", "role_ind", "big_pol", "eff_daily", "buyprod", "pers_imp"), funs(recode(., `1` = 4, `2` = 3, `3` = 2, `4` = 1)))
+
+# All these scales need to have the same calculation to transform scales, but I can't figure out how to apply a function to the variables for that 
+function_change_scales <- function() { 
+  (x -1) * (4/1) + 1
+  }
+
+# So by hand
+eb2007sel$env_quallife <- (eb2007sel$env_quallife-1) * (4/3) + 1
+eb2007sel$role_ind <- (eb2007sel$role_ind-1) * (4/3) + 1
+eb2007sel$big_pol <- (eb2007sel$big_pol-1) * (4/3) + 1
+eb2007sel$eff_daily <- (eb2007sel$eff_daily-1) * (4/3) + 1
+eb2007sel$buyprod <- (eb2007sel$buyprod-1) * (4/3) + 1
+eb2007sel$pers_imp <- (eb2007sel$pers_imp-1) * (4/3) + 1
+
+# Independent variables 
+table(eb2007sel$v612, useNA = "always") #45 missings on l-r placement. Replace with mean. 
+eb2007sel$lrplace <- as.numeric(eb2007sel$v612)
+table(eb2007sel$v616, useNA = "always") #8 missings on educyrs. 
+eb2007sel$eduyrs <- as.numeric(as.character(eb2007sel$v616)) #Same as above about the people still studying
+
+table(eb2007sel$v618, useNA = "always") #No  missings on gender. 
+eb2007sel$sex <- revalue(eb2007sel$v618, c("Male"="1", "Female"="2"))
+table(eb2007sel$v619, useNA = "always") #No missings on age. 
+eb2007sel$v619 <- revalue(eb2007sel$v619, c("15 years"="15"))
+eb2007sel$age <- as.numeric(as.character(eb2007sel$v619))
+table(eb2007sel$v624, useNA = "always") #No missings on urbanity. 
+eb2007sel$urban <- revalue(eb2007sel$v624, c("Rural area or village"= "Low urbanity", "Small/middle town"="Medium urbanity", "Large town" = "High urbanity"))
+table(eb2007sel$urban)
+
+eb2007sel <- eb2007sel %>% select(v1, v8, env_vs_ec, env_quallife, role_ind, big_pol, buyprod, eff_daily, lrplace, sex, age, eduyrs, urban)
+
+save(eb2007sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2007sel.Rdata")
+```
+
+
+```{r}
+#2008
+eb2008 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2008.sav", use.value.labels = T,  to.data.frame = T)
+
+eb2008sel <- eb2008 %>% filter(v6=="The Netherlands") %>%
+  select(v1, v8, v647, v725, v705, v720, v721, v722, v723, v761, v765, v767, v768, v773)
+
+#Dependent variables 
+attributes(eb2008sel$v720) #Climate change is an unstoppable process. Difficult, bc even if you believe in it/are concerned you may think it's unstoppable. For now ill code it as more agreeness --> more positive
+attributes(eb2008sel$v723) #Fighting climate change has positive impact on EU. Again, can't simply divide that into more positive. You may still think climate change is important and that it does not matter that it has a negative impact on the economy. For now I recode it, because then it means that you at least don't think the economy is an obstacle in fighting climate change. 
+attributes(eb2008sel$v721) #Seriousness is exaggerated. If you disagree, you have more positive attitudes. 
+
+eb2008sel$cc_unstop <- as.numeric(eb2008sel$v720)
+eb2008sel$cc_poseu <- as.numeric(eb2008sel$v723)
+eb2008sel$cc_prsact <- as.numeric(eb2008sel$v725)
+
+
+eb2008sel <- eb2008sel %>% 
+     mutate_at(c("cc_unstop", "cc_poseu", "cc_poseu", "cc_prsact"), funs(recode(., `1` = 4, `2` = 3, `3` = 2, `4` = 1)))
+
+eb2008sel$cc_exag <- as.numeric(eb2008sel$v721)
+eb2008sel$cc_exag <- (eb2008sel$cc_exag - 1) * (4/3) + 1
+eb2008sel$cc_unstop <- (eb2008sel$cc_unstop - 1) + (4/3) + 1
+eb2008sel$cc_poseu <- (eb2008sel$cc_poseu - 1) + (4/3) + 1
+eb2008sel$cc_prsact <- (eb2008sel$cc_prsact - 1) + (4/3) + 1
+
+#Independent variables 
+table(eb2008sel$v761, useNA = "always") #41 missings on l-r placement. 
+eb2008sel$lrplace <- as.numeric(eb2008sel$v761)
+table(eb2008sel$v765, useNA = "always") 
+eb2008sel$eduyrs <- as.numeric(as.character(eb2008sel$v765)) #Same as earlier about the missings on education and people still studying
+table(eb2008sel$v767, useNA = "always") #Gender no missings
+eb2008sel$sex <- revalue(eb2008sel$v767, c("Male"="1", "Female"="2"))
+table(eb2008sel$v768, useNA = "always") #Age neither
+eb2008sel$v768 <- revalue(eb2008sel$v768, c("15 years"="15"))
+eb2008sel$age <- as.numeric(as.character(eb2008sel$v768))
+table(eb2008sel$v773, useNA = "always") #Urbanity neither
+eb2008sel$urban <- revalue(eb2008sel$v773, c("Rural area or village"= "Low urbanity", "Small/middle town"="Medium urbanity", "Large town" = "High urbanity"))
+
+eb2008sel <- eb2008sel %>% select(v1, v8, cc_unstop, cc_exag, cc_poseu, cc_prsact, eduyrs, lrplace, sex, age, urban)
+
+save(eb2008sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2008sel.Rdata")
+```
+
+
+```{r}
+#2009 (2 datasets)
+eb2009_1 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2009_1.sav", use.value.labels = T,  to.data.frame = T)
+
+eb2009asel <- eb2009_1 %>% filter(v6=="The Netherlands") %>%
+  select(v1, v8, v129, v522, v526, v527, v528, v529, v530, v531, v145, v638, v642, v644, v645, v650)
+
+attributes(eb2009asel$v129) #Environmental protection is important country issue. 2 = mentioned
+eb2009asel$envprotect_imp  <- as.numeric(eb2009asel$v129)
+eb2009asel$envprotect_imp <- (eb2009asel$envprotect_imp -1) * (4/1) + 1
+
+eb2009asel$pers_imp <- as.numeric(eb2009asel$v145)
+eb2009asel$pers_imp <- (eb2009asel$pers_imp -1) * (4/1) + 1
+
+eb2009asel$cc_unstop <- as.numeric(eb2009asel$v526)
+eb2009asel$cc_poseu <- as.numeric(eb2009asel$v529)
+eb2009asel$cc_prsact <- as.numeric(eb2009asel$v531)
+
+eb2009asel <- eb2009asel %>% 
+     mutate_at(c("cc_unstop", "cc_poseu", "cc_prsact"), funs(recode(., `1` = 4, `2` = 3, `3` = 2, `4` = 1)))
+
+eb2009asel$cc_unstop <- (eb2009asel$cc_unstop -1) * (4/3) + 1
+eb2009asel$cc_poseu <- (eb2009asel$cc_poseu -1) * (4/3) + 1
+eb2009asel$cc_prsact <- (eb2009asel$cc_prsact -1) * (4/3) + 1
+
+eb2009asel$ccpercept <- as.numeric(eb2009asel$v522)
+eb2009asel$ccpercept <- (eb2009asel$ccpercept -1) * (4/9) + 1
+
+eb2009asel$cc_exag <- as.numeric(eb2009asel$v527)
+eb2009asel$cc_exag <- (eb2009asel$cc_exag -1) + (4/3) + 1
+
+#Independent variables 
+table(eb2009asel$v638, useNA = "always") #46 missings on r-l placement. 
+eb2009asel$lrplace <- as.numeric(eb2009asel$v638)
+table(eb2009asel$v642, useNA = "always") #Again the same as above 
+eb2009asel$eduyrs <- as.numeric(as.character(eb2009asel$v642))
+table(eb2009asel$v644, useNA = "always") #no missings gender
+eb2009asel$sex <- revalue(eb2009asel$v644, c("Male"="1", "Female"="2"))
+table(eb2009asel$v645, useNA = "always") #No missings on age
+eb2009asel$v645 <- revalue(eb2009asel$v645, c("15 years"="15"))
+eb2009asel$age <- as.numeric(as.character(eb2009asel$v645))
+table(eb2009asel$v650, useNA = "always") #No missings on urbanity
+eb2009asel$urban <- revalue(eb2009asel$v650, c("Rural area or village"= "Low urbanity", "Small/middle town"="Medium urbanity", "Large town" = "High urbanity"))
+
+eb2009asel <- eb2009asel %>% select(v1, v8, ccpercept, cc_unstop, cc_exag, cc_poseu, cc_prsact, pers_imp, lrplace, eduyrs, sex, age, urban)
+
+save(eb2009asel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2009asel.Rdata")
+```
+
+
+```{r}
+eb2009_2 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2009_2.sav", use.value.labels = T,  to.data.frame = T)
+
+eb2009bsel <- eb2009_2 %>% filter(v6=="The Netherlands") %>%
+  select(v1, v8, v385, v364, v363, v374, v392, v393, v394, v395, v396, v397, v398, v399, v387, v388, v389, v390, v391, v439, v440, v441, v442, v445, v279)
+
+# Dependent variables
+eb2009bsel$ccpercept <- as.numeric(eb2009bsel$v385)
+eb2009bsel$ccpercept <- (eb2009bsel$ccpercept -1) * (4/9) + 1
+
+eb2009bsel$cchange <- NA
+eb2009bsel$v364 <- as.numeric(eb2009bsel$v364)
+eb2009bsel$cchange[eb2009bsel$v364==1] <- 1
+eb2009bsel$cchange[eb2009bsel$v364!=1] <- 0
+table(eb2009bsel$cchange, useNA = "always") 
+
+eb2009bsel$cc_unstop <- as.numeric(eb2009bsel$v392)
+eb2009bsel$cc_poseu <- as.numeric(eb2009bsel$v396)
+eb2009bsel$cc_prsact <- as.numeric(eb2009bsel$v399)
+
+eb2009bsel <- eb2009bsel %>% 
+     mutate_at(c("cc_unstop", "cc_poseu", "cc_prsact"), funs(recode(., `1` = 4, `2` = 3, `3` = 2, `4` = 1)))
+
+eb2009bsel$cc_unstop <- (eb2009bsel$cc_unstop -1) * (4/3) + 1
+eb2009bsel$cc_poseu <- (eb2009bsel$cc_poseu -1) * (4/3) + 1
+eb2009bsel$cc_prsact <- (eb2009bsel$cc_prsact -1) * (4/3) + 1
+
+eb2009bsel$cc_exag <- as.numeric(eb2009bsel$v393)
+eb2009bsel$cc_exag <- (eb2009bsel$cc_exag -1) + (4/3) + 1
+
+
+
+attributes(eb2009bsel$v387) #Nat gov doing enough. Higher score means that they are not doing enough (1 is doing too much)
+eb2009bsel$doprot_natgov <- as.numeric(eb2009bsel$v387)
+eb2009bsel$doprot_natgov <- (eb2009bsel$doprot_natgov -1) + (4/2) + 1
+attributes(eb2009bsel$v388) #European union doing enough
+eb2009bsel$doprot_eu <- as.numeric(eb2009bsel$v387)
+eb2009bsel$doprot_eu <- (eb2009bsel$doprot_eu -1) + (4/2) + 1
+attributes(eb2009bsel$v389) #Reg/local gov doing enough
+eb2009bsel$doprot_region <- as.numeric(eb2009bsel$v389)
+eb2009bsel$doprot_region <- (eb2009bsel$doprot_natgov -1) + (4/2) + 1
+attributes(eb2009bsel$v390) #Corporate/industry doing enough
+eb2009bsel$doprot_comp <- as.numeric(eb2009bsel$v390)
+eb2009bsel$doprot_comp <- (eb2009bsel$doprot_comp -1) + (4/2) + 1
+attributes(eb2009bsel$v391) #Citizens doing enough
+eb2009bsel$doprot_citiz <- as.numeric(eb2009bsel$v391)
+eb2009bsel$doprot_citiz <- (eb2009bsel$doprot_citiz -1) + (4/2) + 1
+
+#Independent variables 
+table(eb2009bsel$v439, useNA = "always") #2 missings.
+eb2009bsel$eduyrs <- as.numeric(as.character(eb2009bsel$v439)) #People who are still studying now have a missing
+table(eb2009bsel$v441, useNA = "always") #Gender no missings
+eb2009bsel$sex <- revalue(eb2009bsel$v441, c("Male"="1", "Female"="2"))
+table(eb2009bsel$v442, useNA = "always")  #Age no missings
+eb2009bsel$v442 <- revalue(eb2009bsel$v442, c("15 years"="15"))
+eb2009bsel$age <- as.numeric(as.character(eb2009bsel$v442))
+table(eb2009bsel$v445, useNA = "always") 
+eb2009bsel$urban <- revalue(eb2009bsel$v445, c("Rural area or village"= "Low urbanity", "Small/middle town"="Medium urbanity", "Large town" = "High urbanity"))
+
+eb2009bsel <- eb2009bsel %>% select(v1, v8, ccpercept, cchange, cc_unstop, cc_exag, cc_poseu, cc_prsact, doprot_natgov:doprot_citiz, eduyrs, sex, age, urban)
+
+save(eb2009bsel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2009bsel.Rdata")
+```
+
+
+```{r}
+#2011 consists of 2 waves as well
+eb2011_1 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2011_1.sav", use.value.labels = T,  to.data.frame = T)
+
+eb2011asel <- eb2011_1 %>% filter(v6=="The Netherlands") %>%
+  select(v1, v8, v303, v304, v307, v308, v340:v343, v334:v336, v183, v309, v593, v599, v601, v602, v609)
+
+eb2011asel$env_quallife <- as.numeric(eb2011asel$v304)
+eb2011asel$envp_eg <- as.numeric(eb2011asel$v307)
+eb2011asel$effr_eg <- as.numeric(eb2011asel$v308)
+eb2011asel$role_ind <- as.numeric(eb2011asel$v334)
+eb2011asel$big_pol <- as.numeric(eb2011asel$v335)
+eb2011asel$eff_daily <- as.numeric(eb2011asel$v336)
+eb2011asel$pers_imp <- as.numeric(eb2011asel$v183)
+eb2011asel$buyprod <- as.numeric(eb2011asel$v309)
+
+eb2011asel <- eb2011asel %>% 
+     mutate_at(c("env_quallife", "envp_eg", "effr_eg", "role_ind", "big_pol", "eff_daily", "pers_imp", "buyprod"), funs(recode(., `1` = 4, `2` = 3, `3` = 2, `4` = 1)))
+
+eb2011asel <- eb2011asel %>% mutate_at(vars("env_quallife", "envp_eg", "effr_eg", "role_ind", "big_pol", "eff_daily", "pers_imp", "buyprod"), funs((. - 1)*(4/3) + 1))
+
+
+# Independent variables 
+
+table(eb2011asel$v593, useNA = "always") #57 missings l-r placement. 
+eb2011asel$lrplace <- as.numeric(eb2011asel$v593)
+table(eb2011asel$eduyrs, useNA = "always") 
+eb2011asel$eduyrs <- as.numeric(as.character(eb2011asel$v599)) #Same about the individuals that are still studying
+table(eb2011asel$v601, useNA = "always") #No missings on gender
+eb2011asel$sex <- revalue(eb2011asel$v601, c("Male"="1", "Female"="2"))
+table(eb2011asel$v602, useNA = "always") #No missings on age
+eb2011asel$v602 <- revalue(eb2011asel$v602, c("15 years"="15", "96 years" = "96"))
+eb2011asel$age <- as.numeric(as.character(eb2011asel$v602))
+table(eb2011asel$v609, useNA = "always") #No missings on urbanity
+eb2011asel$urban <- revalue(eb2011asel$v609, c("Rural area or village"= "Low urbanity", "Small/middle town"="Medium urbanity", "Large town" = "High urbanity"))
+
+eb2011asel <- eb2011asel %>% select(v1, v8, env_quallife, envp_eg, effr_eg, role_ind, big_pol, eff_daily, pers_imp, buyprod, lrplace, eduyrs, sex, age, urban)
+
+save(eb2011asel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2011asel.Rdata")
+```
+
+
+```{r}
+eb2011_2 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2011_2.sav", use.value.labels = T,  to.data.frame = T)
+
+eb2011bsel <- eb2011_2 %>% filter(v6=="The Netherlands") %>% 
+  select(v1, v8, v534, v535, v546, v557, v592, v594, v595, v602)
+
+# Dependent variables 
+eb2011bsel$v534 <- as.numeric(eb2011bsel$v534)
+eb2011bsel$cchange[eb2011bsel$v534==1] <- 1
+eb2011bsel$cchange[eb2011bsel$v534!=1] <- 0
+table(eb2011bsel$cchange, useNA = "always")
+
+eb2011bsel$v535 <- as.numeric(eb2011bsel$v535)
+eb2011bsel$cchange2[eb2011bsel$v535==1] <- 1
+eb2011bsel$cchange2[eb2011bsel$v535!=1] <- 0
+table(eb2011bsel$cchange2, useNA = "always")
+
+eb2011bsel$v546 <- as.numeric(eb2011bsel$v546)
+eb2011bsel$cchangetot[eb2011bsel$v546==1] <- 1
+eb2011bsel$cchangetot[eb2011bsel$v546!=1] <- 0
+table(eb2011bsel$cchangetot, useNA = "always")
+
+eb2011bsel$v570 <- as.numeric(eb2011bsel$v570)
+eb2011bsel$prsaction[eb2011bsel$v570==1] <- 1
+eb2011bsel$prsaction[eb2011bsel$v570==2] <- 0
+
+eb2011bsel <- eb2011bsel %>% mutate_at(vars("cchange", "cchange2", "cchangetot", "prsaction"), funs((.)*(4/1) + 1))
+
+eb2011bsel$ccpercept <- as.numeric(eb2011bsel$v557)
+eb2011bsel$ccpercept <- (eb2011bsel$ccpercept -1) * (4/9) + 1
+
+# Independent variables 
+table(eb2011bsel$v592, useNA = "always") #2 missings on education. 
+eb2011bsel$eduyrs <- as.numeric(as.character(eb2011bsel$v592)) #Same about individuals still studying
+table(eb2011bsel$v594, useNA = "always") #no missings gender
+eb2011bsel$sex <- revalue(eb2011bsel$v594, c("Male"="1", "Female"="2"))
+table(eb2011bsel$v595, useNA = "always") #no missings age
+eb2011bsel$v595 <- revalue(eb2011bsel$v595, c("15 years"="15", "98 years" = "98"))
+eb2011bsel$age <- as.numeric(as.character(eb2011bsel$v595))
+table(eb2011bsel$v602, useNA = "always") #no missing on urbanity
+eb2011bsel$urban <- revalue(eb2011bsel$v602, c("Rural area or village"= "Low urbanity", "Small/middle town"="Medium urbanity", "Large town" = "High urbanity"))
+
+eb2011bsel <- eb2011bsel %>% select(v1, v8, cchange, cchange2, cchangetot, ccpercept, prsaction, eduyrs, sex, age, urban)
+
+save(eb2011bsel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2011bsel.Rdata")
+```
+
+
+```{r}
+#2013 
+eb2013 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2013.sav", use.value.labels = T,  to.data.frame = T)
+
+eb2013sel <- eb2013 %>% filter(country=="NL - The Netherlands") %>%
+  select(studyno1, w1, qa1a, qa5, qa2, qa1b_1, qa1t_1, d10, d8, d11, d25)
+
+# Dependent variables 
+eb2013sel$qa1a <- as.numeric(eb2013sel$qa1a)
+eb2013sel$cchange[eb2013sel$qa1a==1] <- 1
+eb2013sel$cchange [eb2013sel$qa1a!=1] <- 0
+
+eb2013sel$qa1b_1 <- as.numeric(eb2013sel$qa1b_1)
+eb2013sel$cchange2[eb2013sel$qa1b_1==1] <- 1
+eb2013sel$cchange2[eb2013sel$qa1b_1!=1] <- 0
+
+eb2013sel$qa1t_1 <- as.numeric(eb2013sel$qa1t_1)
+eb2013sel$cchangetot[eb2013sel$qa1t_1==1] <- 1
+eb2013sel$cchangetot[eb2013sel$qa1t_1!=1] <- 0
+
+eb2013sel$qa5 <- as.numeric(eb2013sel$qa5)
+eb2013sel$prsaction[eb2013sel$qa5==2] <- 0
+eb2013sel$prsaction[eb2013sel$qa5==1] <- 1
+
+eb2013sel <- eb2013sel %>% mutate_at(vars("cchange", "cchange2", "cchangetot", "prsaction"), funs((.)*(4/1) + 1))
+
+
+eb2013sel$ccpercept <- as.numeric(eb2013sel$qa2)
+eb2013sel$ccpercept <- (eb2013sel$ccpercept -1) * (4/9) + 1
+
+# Independent variables 
+table(eb2013sel$d10, useNA = "always") #no missings on gender
+eb2013sel$sex <- revalue(eb2013sel$d10, c("Male"="1", "Female"="2"))
+table(eb2013sel$d8, useNA = "always") #8 missings on educyrs
+eb2013sel$eduyrs <- as.numeric(as.character(eb2013sel$d8)) #Same with resp still studying
+table(eb2013sel$d11, useNA = "always") #No missings on age
+eb2013sel$d11 <- revalue(eb2013sel$d11, c("15 years"="15"))
+eb2013sel$age <- as.numeric(as.character(eb2013sel$d11))
+table(eb2013sel$d25, useNA = "always") #no missings on urbanity
+eb2013sel$urban <- revalue(eb2013sel$d25, c("Rural area or village"= "Low urbanity", "Small/middle town"="Medium urbanity", "Large town" = "High urbanity"))
+
+eb2013sel <- eb2013sel %>% select(studyno1, w1, cchange, cchange2, cchangetot, ccpercept, prsaction, eduyrs, sex, age, urban)
+
+eb2013sel <- eb2013sel %>% rename (v1 = studyno1, v8 = w1)
+
+save(eb2013sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2013sel.Rdata")
+```
+
+
+```{r}
+eb2014 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2014.sav", use.value.labels = T,  to.data.frame = T)
+
+eb2014sel <- eb2014 %>% filter(country=="NL - The Netherlands") %>%
+  select(studyno1, w1,qa9_1, qa9_2, qa7, qa8_1, qa16_1:qa16_6, qa13_1:qa13_3, qa1, qa10, d8, d10, d11, d25)
+
+eb2014sel$env_quallife <- as.numeric(eb2014sel$qa8_1)
+eb2014sel$envp_eg <- as.numeric(eb2014sel$qa9_1)
+eb2014sel$effr_eg <- as.numeric(eb2014sel$qa9_2)
+eb2014sel$role_ind <- as.numeric(eb2014sel$qa13_1)
+eb2014sel$big_pol <- as.numeric(eb2014sel$qa13_2)
+eb2014sel$eff_daily <- as.numeric(eb2014sel$qa13_3)
+eb2014sel$pers_imp <- as.numeric(eb2014sel$qa1)
+eb2014sel$buyprod <- as.numeric(eb2014sel$qa10)
+
+eb2014sel <- eb2014sel %>% 
+     mutate_at(c("env_quallife", "envp_eg", "effr_eg", "role_ind", "big_pol", "eff_daily", "pers_imp", "buyprod"), funs(recode(., `1` = 4, `2` = 3, `3` = 2, `4` = 1)))
+
+eb2014sel <- eb2014sel %>% mutate_at(vars("env_quallife", "envp_eg", "effr_eg", "role_ind", "big_pol", "eff_daily", "pers_imp", "buyprod"), funs((. - 1)*(4/3) + 1))
+
+eb2014sel$doprot_comp <- as.numeric(eb2014sel$qa16_1)
+eb2014sel$doprot_citiz <- as.numeric(eb2014sel$qa16_2)
+eb2014sel$doprot_city <- as.numeric(eb2014sel$qa16_3)
+eb2014sel$doprot_region <- as.numeric(eb2014sel$qa16_4)
+eb2014sel$doprot_natgov <- as.numeric(eb2014sel$qa16_5)
+eb2014sel$doprot_eu <- as.numeric(eb2014sel$qa16_6)
+
+eb2014sel <- eb2014sel %>% mutate_at(vars("doprot_comp":"doprot_eu"), funs((. - 1)*(4/2) + 1))
+
+# Independent variables 
+table(eb2014sel$d8, useNA = "always") #1 missing on educ
+eb2014sel$eduyrs <- as.numeric(as.character(eb2014sel$d8)) #same as above
+table(eb2014sel$d10, useNA = "always") #no missings gender
+eb2014sel$sex <- revalue(eb2014sel$d10, c("Male"="1", "Female"="2"))
+table(eb2014sel$d11, useNA = "always") 
+eb2014sel$d11 <- revalue(eb2014sel$d11, c("15 years"="15"))
+eb2014sel$age <- as.numeric(as.character(eb2014sel$d11))
+table(eb2014sel$d25, useNA = "always") #no missings on urbanity
+eb2014sel$urban <- revalue(eb2014sel$d25, c("Rural area or village"= "Low urbanity", "Small or medium-sized town"="Medium urbanity", "Large town/city" = "High urbanity"))
+
+eb2014sel <-  eb2014sel %>% select(studyno1, w1, envp_eg, effr_eg, role_ind, big_pol, eff_daily, env_quallife, doprot_comp:doprot_eu, pers_imp, buyprod, eduyrs, sex, age, urban)
+
+eb2014sel <-  eb2014sel %>% rename(v1 = studyno1, v8 = w1)
+
+save(eb2014sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2014sel.Rdata")
+```
+
+
+```{r}
+#2015
+eb2015 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2015.sav", use.value.labels = T,  to.data.frame = T)
+
+look_for(eb2015, "left")
+
+eb2015sel <- eb2015 %>% filter(country=="NL - The Netherlands") %>%
+  select(studyno1, w1, w3a4a, qa1a, qa1b_1, qa1t_1, qa5, qa2, d1, d8, d10, d11, d25)
+
+# Dependent variables 
+eb2015sel$qa1a <- as.numeric(eb2015sel$qa1a)
+eb2015sel$cchange[eb2015sel$qa1a==1] <- 1
+eb2015sel$cchange [eb2015sel$qa1a!=1] <- 0
+
+eb2015sel$qa1b_1 <- as.numeric(eb2015sel$qa1b_1)
+eb2015sel$cchange2[eb2015sel$qa1b_1==1] <- 1
+eb2015sel$cchange2[eb2015sel$qa1b_1!=1] <- 0
+
+eb2015sel$qa1t_1 <- as.numeric(eb2015sel$qa1t_1)
+eb2015sel$cchangetot[eb2015sel$qa1t_1==1] <- 1
+eb2015sel$cchangetot[eb2015sel$qa1t_1!=1] <- 0
+
+eb2015sel$qa5 <- as.numeric(eb2015sel$qa5)
+eb2015sel$prsaction[eb2015sel$qa5==1] <- 1
+eb2015sel$prsaction[eb2015sel$qa5==2] <- 0
+
+eb2015sel <- eb2015sel %>% mutate_at(vars("cchange", "cchange2", "cchangetot", "prsaction"), funs((.)*(4/1) + 1))
+
+eb2015sel$ccpercept <- as.numeric(eb2015sel$qa2)
+eb2015sel$ccpercept <- (eb2015sel$ccpercept -1) * (4/9) + 1
+
+# Independent variables
+table(eb2015sel$d1, useNA = "always")
+eb2015sel$lrplace <- as.numeric(eb2015sel$d1)
+table(eb2015sel$d8, useNA = "always")
+eb2015sel$eduyrs <- as.numeric(as.character(eb2015sel$d8)) #same as above
+table(eb2015sel$d10, useNA = "always") 
+eb2015sel$sex <- revalue(eb2015sel$d10, c("Man"="1", "Woman"="2"))
+table(eb2015sel$d11, useNA = "always") 
+eb2015sel$d11 <- revalue(eb2015sel$d11, c("15 years"="15"))
+eb2015sel$age <- as.numeric(as.character(eb2015sel$d11))
+table(eb2015sel$d25, useNA = "always") 
+eb2015sel$urban <- revalue(eb2015sel$d25, c("Rural area or village"= "Low urbanity", "Small or middle sized town"="Medium urbanity", "Large town" = "High urbanity"))
+
+eb2015sel <- eb2015sel %>% select(studyno1, w1, cchange, cchange2, cchangetot, prsaction, ccpercept, eduyrs, sex, age, lrplace, urban)
+
+eb2015sel <- eb2015sel %>% rename (v1 = studyno1, v8 = w1)
+
+save(eb2015sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2015sel.Rdata")
+```
+
+
+```{r}
+#2017 consists of 2 waves
+eb2017_1 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2017_1.sav", use.value.labels = T,  to.data.frame = T)
+
+eb2017asel <- eb2017_1 %>% filter(country=="NL - The Netherlands") %>%
+  select(studyno1, w1, qc1a, qc1b_1, qc1t_1, qc4_1, qc5,qc2, d1, d8, d10, d11, d25)
+
+# Dependent variables 
+eb2017asel$qc1a <- as.numeric(eb2017asel$qc1a)
+eb2017asel$cchange[eb2017asel$qc1a==1] <- 1
+eb2017asel$cchange [eb2017asel$qc1a!=1] <- 0
+
+eb2017asel$qc1b_1 <- as.numeric(eb2017asel$qc1b_1)
+eb2017asel$cchange2[eb2017asel$qc1b_1==1] <- 1
+eb2017asel$cchange2[eb2017asel$qc1b_1!=1] <- 0
+
+eb2017asel$qc1t_1 <- as.numeric(eb2017asel$qc1t_1)
+eb2017asel$cchangetot[eb2017asel$qc1t_1==1] <- 1
+eb2017asel$cchangetot[eb2017asel$qc1t_1!=1] <- 0
+
+eb2017asel$qc5 <- as.numeric(eb2017asel$qc5)
+eb2017asel$prsaction[eb2017asel$qc5==1] <- 1
+eb2017asel$prsaction[eb2017asel$qc5==2] <- 0
+
+eb2017asel <- eb2017asel %>% mutate_at(vars("cchange", "cchange2", "cchangetot", "prsaction"), funs((.)*(4/1) + 1))
+
+eb2017asel$ccpercept <- as.numeric(eb2017asel$qc2)
+eb2017asel$ccpercept <- (eb2017asel$ccpercept -1) * (4/9) + 1
+
+eb2017asel$cc_boost_growth <- as.numeric(eb2017asel$qc4_1)
+eb2017asel <- eb2017asel %>% 
+     mutate_at(c("cc_boost_growth"), funs(recode(., `1` = 4, `2` = 3, `3` = 2, `4` = 1)))
+
+# Independent variables 
+table(eb2017asel$d1, useNA = "always")
+eb2017asel$lrplace <- as.numeric(eb2017asel$d1)
+table(eb2017asel$d8, useNA = "always")
+eb2017asel$d8 <- revalue(eb2017asel$d8, c("2 years"="2"))
+eb2017asel$eduyrs <- as.numeric(as.character(eb2017asel$d8)) #same as above
+table(eb2017asel$d10, useNA = "always") 
+eb2017asel$sex <- revalue(eb2017asel$d10, c("Man"="1", "Woman"="2"))
+table(eb2017asel$d11, useNA = "always") 
+eb2017asel$d11 <- revalue(eb2017asel$d11, c("15 years"="15"))
+eb2017asel$age <- as.numeric(as.character(eb2017asel$d11))
+table(eb2017asel$d25, useNA = "always") 
+eb2017asel$urban <- revalue(eb2017asel$d25, c("Rural area or village"= "Low urbanity", "Small or middle sized town"="Medium urbanity", "Large town" = "High urbanity"))
+
+eb2017asel <- eb2017asel %>% select(studyno1, w1, cchange, cchange2, cchangetot, prsaction, ccpercept, eduyrs, sex, age, lrplace, urban)
+
+eb2017asel <- eb2017asel %>% rename (v1 = studyno1, v8 = w1)
+
+save(eb2017asel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2017asel.Rdata")
+
+# 2nd wave of 2017 
+eb2017_2 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2017_2.sav", use.value.labels = T,  to.data.frame = T)
+
+eb2017bsel <- eb2017_2 %>% filter(country=="NL - The Netherlands") %>%
+  select(studyno1, w1, qd7_1:qd7_6, qd5_1:qd5_3, d1, d8, d10, d11, d25)
+
+# Dependent variables 
+eb2017bsel$doprot_comp <- as.numeric(eb2017bsel$qd7_1)
+eb2017bsel$doprot_citiz <- as.numeric(eb2017bsel$qd7_2)
+eb2017bsel$doprot_city <- as.numeric(eb2017bsel$qd7_3)
+eb2017bsel$doprot_region <- as.numeric(eb2017bsel$qd7_4)
+eb2017bsel$doprot_natgov <- as.numeric(eb2017bsel$qd7_5)
+eb2017bsel$doprot_eu <- as.numeric(eb2017bsel$qd7_6)
+
+eb2017bsel <- eb2017bsel %>% mutate_at(vars("doprot_comp":"doprot_eu"), funs((. - 1)*(4/2) + 1))
+
+eb2017bsel$role_ind <- as.numeric(eb2017bsel$qd5_1)
+eb2017bsel$big_pol <- as.numeric(eb2017bsel$qd5_2)
+eb2017bsel$eff_daily <- as.numeric(eb2017bsel$qd5_3)
+
+eb2017bsel <- eb2017bsel %>% 
+     mutate_at(c("role_ind", "big_pol", "eff_daily"), funs(recode(., `1` = 4, `2` = 3, `3` = 2, `4` = 1)))
+
+eb2017bsel <- eb2017bsel %>% mutate_at(vars("role_ind", "big_pol", "eff_daily"), funs((. - 1)*(4/3) + 1))
+
+# Independent variables 
+table(eb2017bsel$d1, useNA = "always")
+eb2017bsel$lrplace <- as.numeric(eb2017bsel$d1)
+table(eb2017bsel$d8, useNA = "always")
+eb2017bsel$eduyrs <- as.numeric(as.character(eb2017bsel$d8)) #same as above
+table(eb2017bsel$d10, useNA = "always") 
+eb2017bsel$sex <- revalue(eb2017bsel$d10, c("Man"="1", "Woman"="2"))
+table(eb2017bsel$d11, useNA = "always") 
+eb2017bsel$d11 <- revalue(eb2017bsel$d11, c("15 years"="15"))
+eb2017bsel$age <- as.numeric(as.character(eb2017bsel$d11))
+table(eb2017bsel$d25, useNA = "always") 
+eb2017bsel$urban <- revalue(eb2017bsel$d25, c("Rural area or village"= "Low urbanity", "Small/middle town"="Medium urbanity", "Large town" = "High urbanity"))
+
+eb2017bsel <- eb2017bsel %>% select(studyno1, w1, doprot_comp:doprot_eu, role_ind:eff_daily, eduyrs, sex, age, urban, lrplace)
+
+eb2017bsel <- eb2017bsel %>% rename(v1 = studyno1, v8 = w1)
+
+save(eb2017bsel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2017bsel.Rdata")
+```
+
+
+```{r}
+#Lastly, 2021
+
+eb2021 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2021.sav", use.value.labels = T,  to.data.frame = T)
+
+eb2021sel <- eb2021 %>% filter(country=="NL - The Netherlands") %>%
+  select(studyno1, w1, qb2, qb1a, qb1b.1, qb1t.1, d1, d8, d10, d11, d25 )
+
+
+# Dependent variables 
+eb2021sel$qb1a <- as.numeric(eb2021sel$qb1a)
+eb2021sel$cchange[eb2021sel$qb1a==1] <- 1
+eb2021sel$cchange [eb2021sel$qb1a!=1] <- 0
+
+eb2021sel$qb1b.1 <- as.numeric(eb2021sel$qb1b.1)
+eb2021sel$cchange2[eb2021sel$qb1b.1==1] <- 1
+eb2021sel$cchange2[eb2021sel$qb1b.1!=1] <- 0
+
+eb2021sel$qb1t.1 <- as.numeric(eb2021sel$qb1t.1)
+eb2021sel$cchangetot[eb2021sel$qb1t.1==1] <- 1
+eb2021sel$cchangetot[eb2021sel$qb1t.1!=1] <- 0
+
+eb2021sel <- eb2021sel %>% mutate_at(vars("cchange", "cchange2", "cchangetot"), funs((.)*(4/1) + 1))
+
+eb2021sel$ccpercept <- as.numeric(eb2021sel$qb2)
+eb2021sel$ccpercept <- (eb2021sel$ccpercept -1) * (4/9) + 1
+
+
+# Independent variables 
+table(eb2021sel$d1, useNA = "always")
+eb2021sel$lrplace <- as.numeric(eb2021sel$d1)
+eb2021sel$lrplace[eb2021sel$lrplace==11 | eb2021sel$lrplace ==12] <- NA
+table(eb2021sel$d8, useNA = "always")
+eb2021sel$eduyrs <- as.numeric(as.character(eb2021sel$d8)) #same as above
+table(eb2021sel$d10, useNA = "always") 
+eb2021sel$sex <- revalue(eb2021sel$d10, c("Man"="1", "Woman"="2"))
+table(eb2021sel$d11, useNA = "always") 
+eb2021sel$d11 <- revalue(eb2021sel$d11, c("15 years"="15"))
+eb2021sel$age <- as.numeric(as.character(eb2021sel$d11))
+table(eb2021sel$d25, useNA = "always") 
+eb2021sel$urban <- revalue(eb2021sel$d25, c("Rural area or village"= "Low urbanity", "Small/middle town"="Medium urbanity", "Large town" = "High urbanity"))
+
+eb2021sel <- eb2021sel %>% select(studyno1, w1, cchange, cchange2, cchangetot, ccpercept, eduyrs, sex, age, urban, lrplace )
+
+eb2021sel <- eb2021sel %>% rename(v1 = studyno1, v8 = w1)
+
+save(eb2021sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2021sel.Rdata")
+```
+
+
+
+```{r}
+#Create one large dataset in smaller steps. 
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb1986sel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb1992sel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb1995sel.Rdata")
+
+eb1986sel$surveyyear <- 1986
+eb1992sel$surveyyear <- 1992
+eb1995sel$surveyyear <- 1995
+
+ebu2000 <- plyr::rbind.fill(eb1986sel, eb1992sel, eb1995sel)
+
+save(ebu2000, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ebu2000.Rdata")
+
+#Now the years under 2010
+rm(list = ls())
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2004sel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2007sel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2008sel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2009asel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2009bsel.Rdata")
+
+eb2004sel$surveyyear <- 2004
+eb2007sel$surveyyear <- 2007
+eb2008sel$surveyyear <- 2008
+eb2009asel$surveyyear<- 20091
+eb2009bsel$surveyyear <- 20092
+
+eb0010 <- plyr::rbind.fill(eb2004sel, eb2007sel, eb2008sel, eb2009asel, eb2009bsel) #Looks how it should look. 
+
+save(eb0010, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ebu0010.Rdata")
+
+rm(list=ls())
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2011asel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2011bsel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2013sel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2014sel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2015sel.Rdata")
+
+eb2011asel$surveyyear <- 20111
+eb2011bsel$surveyyear <- 20112
+eb2013sel$surveyyear <- 2013
+eb2014sel$surveyyear <- 2014
+eb2015sel$surveyyear <- 2015
+
+ebtm15 <- plyr::rbind.fill(eb2011asel, eb2011bsel, eb2013sel, eb2014sel, eb2015sel)
+
+save(ebtm15, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ebutm15.Rdata")
+
+#Now the last waves
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2017asel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2017bsel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2021sel.Rdata")
+
+eb2017asel$surveyyear <- 20171
+eb2017bsel$surveyyear <- 20172 
+eb2021sel$surveyyear <- 2021
+
+eb17up <- plyr::rbind.fill(eb2017asel, eb2017bsel, eb2021sel)
+
+save(eb17up, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb17up.Rdata")
+
+# Final merge 
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ebu2000.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ebu0010.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ebutm15.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb17up.Rdata")
+
+eb_tot <- plyr::rbind.fill(ebu2000, eb0010, ebtm15, eb17up)
+
+save(eb_tot, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/eb_tot.Rdata")
+```
+

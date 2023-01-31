@@ -1,0 +1,63 @@
+pop <- read_dta("/Users/anuschka/Documents/gesis_dir/poppa/expert_data_stata.dta")
+
+popsel <- pop %>% filter(country_id==19) %>%
+  select(nr_experts, party, lroverall) %>%
+  dplyr::rename(party_name = party) 
+
+popsel$party_name <- revalue(popsel$party_name, c("50Plus"= "50PLUS"))
+
+ches <- read_dta("/Users/anuschka/Documents/gesis_dir/ches/ches2019.dta")
+dutch <- 1001:1051  #Dutch party ids
+ches <- ches[ches$party_id %in% dutch, ] 
+
+ches <- ches %>% select(party, party_name, lrgen) 
+ches$party_name <- revalue(ches$party_name, c("PVdD" = "PvdD"))
+
+#expert <- merge(ches, popsel, by = "party_name", all = T) #Overgenomen van jouw website maar krijg veel meer observaties
+
+names(ches) <- names(popsel) #namen gelijk maken
+
+
+
+expert <- rbind(ches, popsel)
+expert <- na.omit(expert)
+
+
+expert2 <- expert %>% #Deze doet niet wat ik wil
+  group_by(party_name) %>%
+  summarise(lroverall_mean = mean(lroverall),
+            lroverall_sd = sd(lroverall))
+
+expert2 <- expert %>% #Maar deze wel
+  group_by(party_name) %>%
+  summarise_at(vars(lroverall), list(lroverall_mean = mean), na.rm=T) 
+
+save(expert, file = "/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/expert.RData")
+
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/dpes2021sel.RData")
+
+
+unique(dpes2021sel$party_name)
+
+dpes2021sel$party_name <- as.character(dpes2021sel$party_name)
+unique(dpes2021sel$party_name2)
+unique(expert2$party_name)
+#namen lijken nu te kloppen. 
+
+dpes2021sel %>% 
+  left_join(expert2, by="party_name") -> dpes2021seltest
+
+save(expert2, file = "/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/expert.RData")
+
+#Dividing in three cats left/middle/right. NOT NEEDED
+expert$lr_cat <- NA
+expert$lr_cat[expert$total_mean <= 4] <- 1
+expert$lr_cat[expert$total_mean >4 & expert$total_mean <= 7] <- 2
+expert$lr_cat[expert$total_mean > 7] <- 3 
+
+
+
+
+#Now I want the same for I&O research
+

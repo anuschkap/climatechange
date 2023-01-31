@@ -1,0 +1,98 @@
+---
+title: "Untitled"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+
+```{r}
+#install.packages("meta")
+#install.packages("metafor")
+library(meta)
+library(metafor)
+library("devtools")
+devtools::install_github("MathiasHarrer/dmetar")
+
+ 
+#/var/folders/m0/dkr_gls971qbr83f1b0wh5300000gn/T//Rtmpth1KLb/downloaded_packages
+
+```
+
+```{r}
+#First practice meta analysis with suicide prevention dataset that I found online
+load("var/folders/m0/dkr_gls971qbr83f1b0wh5300000gn/T//Rtmpth1KLb/downloaded_packages/thirdwave.Rda")
+
+load("/Users/anuschka/Documents/meta_practice/thirdwave.rda")
+
+year <- c(2014, 1998, 2010, 1999, 2005, 2014, 
+          2019, 2010, 1982, 2020, 1978, 2001,
+          2018, 2002, 2009, 2011, 2011, 2013)
+
+m.gen <- metagen(TE = TE,
+                 seTE = seTE,
+                 studlab = Author,
+                 data = ThirdWave,
+                 sm = "SMD",
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE,
+                 title = "Third Wave Psychotherapies")
+
+m.gen.reg <- metareg(m.gen, ~year + ThirdWave$TypeControlGroup)
+
+bubble(m.gen.reg, studlab = TRUE)
+
+```
+```{r}
+# Try to repeat this with my "own" data
+
+results_reg_tot <- rbind(results_reg_dpes, results_reg_ess)
+
+
+intercept_reg <- metareg(results_reg_tot$intercept, ~ results_reg_tot$year) #Doesnt work yet because I have to define the model first, which I do with the following code: 
+
+intercept.gen <- metagen(TE = intercept,
+                 seTE = std_dev,
+                 data = results_reg_tot,
+                 intercept = "M",
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+summary(intercept.gen)
+
+intercept_reg <- metareg(intercept.gen, ~results_reg_tot$surveyyear + results_reg_tot$data_coll_procedure)
+# It throws out redundant variables, and apparently data collection procedure was such a redundant variable
+intercept_reg <- metareg(intercept.gen, ~results_reg_tot$surveyyear + results_reg_tot$meas_education)
+intercept_reg <- metareg(intercept.gen, ~results_reg_tot$surveyyear + results_reg_tot$meas_lr)
+intercept_reg <- metareg(intercept.gen, ~results_reg_tot$surveyyear + results_reg_tot$meas_religion)
+
+# Of course, nothing is sig yet
+
+summary(intercept_reg)
+
+forest(intercept_reg)
+
+#Repeat the same for the variance (and thus polarization)
+
+variance.gen <- metagen(TE = variance,
+                 seTE = std_dev,
+                 data = results_reg_tot,
+                 intercept = "var",
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+variance_reg <- metareg(variance.gen, ~results_reg_tot$surveyyear + results_reg_tot$data_coll_procedure)
+summary(variance_reg)
+variance_reg <- metareg(variance.gen, ~results_reg_tot$surveyyear + results_reg_tot$meas_education)
+variance_reg <- metareg(variance.gen, ~results_reg_tot$surveyyear + results_reg_tot$meas_lr)
+variance_reg <- metareg(variance.gen, ~results_reg_tot$surveyyear + results_reg_tot$meas_religion)
+
+
+```
+

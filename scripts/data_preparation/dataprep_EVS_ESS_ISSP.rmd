@@ -1,0 +1,529 @@
+---
+title: "Untitled"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+In this script, I select, recode and create variables of the EVS, ESS and ISSP.
+
+```{r}
+
+#install.packages("questionr")
+#install.packages("psych")
+rm(list = ls())
+#library(haven)
+library(plyr)
+library(dplyr)
+library(foreign)
+library(tidyverse)
+library(labelled)
+library(ggplot2)
+library(questionr)
+library(psych)
+
+#setwd("/Users/anuschka/Documents")
+
+```
+
+```{r}
+set.seed(23)
+
+#Load in EVS trend file
+evs <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/evs/ZA7503_v2-0-0.sav", use.value.labels = T,  to.data.frame = T)
+
+# So apparently, in the Netherlands in 1981 and in 2017, the question for the dependent var was not asked. This means that I cannot use those years from the EVS. A pity. 
+
+evs$S003_n <- as.numeric(evs$S003)
+evs$S020 <- as.numeric(as.character(evs$S020))
+
+evssel <- evs %>% filter(S003_n == 31)  %>%
+                filter (S020 >1981 & S020 <2017) %>%
+            select(stdyno_w, S001, S002EVS, S006, S017, S018, pwght, S020, B001, X001, X002, X003, X003R, X003R2, X011, X023, X023R, X025, X028, X047CS, X047_EVS, X047R_EVS, A006, E033)
+
+attributes(evs$B001)
+table(evssel$B001, useNA = "always")
+
+#Recode it, because now a higher number means lower willingness to make sacrifices. I want everything in the direction that a higher score equals more positive attitudes towards the climate. 
+
+evssel$climate <- as.numeric(evssel$B001)
+evssel$religious <- as.numeric(evssel$A006)
+evssel <- evssel %>% 
+     mutate_at(c("climate", "religious"), funs(recode(., `1` = 4, `2` = 3, `3` = 2, `4` = 1)))
+evssel$climate5 <- (evssel$climate-1)*(4/3)+1
+evssel$religious[is.na(evssel$religious)] <- 88 #11 missings get value 88
+evssel$religious <- as.factor(evssel$religious)
+evssel$religious <- revalue(evssel$religious, c("1"="Not at all important", "2"="Not very important", "3"="Rather important", "4" = "Very important", "88"="Missing"))
+
+table(evssel$X047_EVS, useNA = "always") #Scale of household incomes from 1 to 10, with 540 missings (gross)
+evssel$sex <- revalue(evssel$X001, c("Male"="1", "Female"="2"))
+#Has no urbanity
+#Lr place doesn't need recoding
+evssel$edu_yrs <- as.numeric(evssel$X003) - as.numeric(evssel$X023)
+#Only still decide what to do with income !!
+
+#Let's first save the prepped data. 
+save(evssel, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/evssel.Rdata")
+
+#Now I want to replace the missing values with the mean or create categories of missings. But going to do this with mice package so not now
+list_na <- colnames(evssel)[ apply(evssel, 2, anyNA) ]
+list_na
+
+average_missing <- apply(evssel[,colnames(evssel) %in% list_na],
+      2,
+      mean,
+      na.rm =  TRUE)
+average_missing
+
+#In the list, there are also some variables stored that are nominal. I don't want to replace those with the average so I will not include them. 
+
+table(evssel$X049CS, useNA = "always")
+
+freq(evssel$X023)
+
+evssel <- evssel %>%
+   mutate(age_mis = ifelse(is.na(X003), average_missing[4], X003),
+   educ_mis = ifelse(is.na(X023), average_missing[8], X023),
+   inc_mis = ifelse(is.na(X047CS), average_missing[12], X047CS),
+   lr_mis = ifelse(is.na(E033), average_missing[16], E033))
+
+evssel <- evssel %>% select(stdyno_w, S001, S002EVS, S006, S017, S018, pwght, S020, climate5, sex, X002, X003, edu_yrs, X023, X023R, X047CS, X047_EVS, X047R_EVS, religious, E033) %>% 
+        dplyr::rename(surveyyear = S020, age = X003, lrscale = E033)
+
+save(evssel, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/evssel.Rdata")
+
+```
+
+
+```{r}
+# Let's do the same with the ESS, for which I will use the 2016 and 2020 wave. 
+ess2016 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/ess/ESS8e02_2.sav", use.value.labels = T,  to.data.frame = T)
+
+ess16sel <- ess2016 %>% filter(cntry=="Netherlands")  %>%
+            select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight,ccnthum, ccrdprs, wrclmch, edulvlb, edlvenl, eduyrs, mainact, gndr, agea, yrbrn, prtvtfnl, lrscale, domicil, hinctnta, rlgatnd)
+
+#Climate change caused by natural processes, human activity, or both. 4 people who do not believe are missing
+attributes(ess16sel$ccnthum)
+table(ess16sel$cause, useNA = "always")
+ess16sel$cause <- as.numeric(ess16sel$ccnthum)
+ess16sel$cause[ess16sel$cause==6] <- NA
+
+#Personal responsibility to reduce climate change
+attributes(ess16sel$ccrdprs)
+table(ess16sel$pers_resp, useNA = "always")
+ess16sel$pers_resp <- (as.numeric(ess16sel$ccrdprs) - 1)* (4/10) + 1
+
+#How worried about climate change
+table(ess16sel$wrclmch, useNA = "always")
+ess16sel$worry <- as.numeric(ess16sel$wrclmch)
+
+save(ess16sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess16sel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess16sel.Rdata")
+
+#Let's check the missings. I decide not to substitute missings for my dependent variables, as it reduces variance and variance is very important in my thesis. 
+
+#Independent vars
+table(ess16sel$eduyrs, useNA = "always")
+ess16sel$eduyrs <- as.numeric(as.character(ess16sel$eduyrs))
+table(ess16sel$gndr, useNA = "always")
+ess16sel$sex <- revalue(ess16sel$gndr, c("Male"="1", "Female"="2"))
+table(ess16sel$lrscale, useNA = "always")
+ess16sel$lrscale <- as.numeric(ess16sel$lrscale)
+ess16sel$lrscale <- (ess16sel$lrscale - 1) * (9/10) + 1
+attributes(ess16sel$urban)
+ess16sel$urban <- revalue(ess16sel$domicil, c("Farm or home in countryside"= "Low urbanity", "Country village"="Low urbanity", "Town or small city"="Medium urbanity", "Suburbs or outskirts of big city"="High urbanity", "A big city"="High urbanity"))
+ess16sel$urban <- factor(ess16sel$urban, levels=c("Low urbanity", "Medium urbanity", "High urbanity"), ordered=TRUE)
+ess16sel$ch_attend <- as.numeric(ess16sel$rlgatnd)
+ess16sel <- ess16sel %>% 
+     mutate_at(c("ch_attend"), funs(recode(., `1` = 7, `2` = 6, `3` = 5, `4` = 4, `5` = 3, `6` = 2, `7` =1)))
+table(ess16sel$ch_attend, useNA = "always")
+ess16sel$income <- as.numeric(ess16sel$hinctnta) #On a scale from 1 to 10, household income
+table(ess16sel$income, useNA = "always") #195 missings on income. 
+ess16sel$agea <- as.numeric(as.character(ess16sel$agea))
+
+#Substitution of missings, do that later ---------------------------------
+
+mean(ess16sel$hinctnta, na.rm=TRUE)
+ess16sel$hinctnta[is.na(ess16sel$hinctnta)] <- 5.993271
+table(ess16sel$lrscale, useNA = "always")
+freq(ess16sel$lrscale)
+ess16sel$lrscaletest <- (ess16sel$lrscale-1)*(9/10) +1
+ess16sel$lrscale <- ess16sel$lrscaletest
+mean(ess16sel$lrscale, na.rm = T)
+ess16sel$lrscale[is.na(ess16sel$lrscale)] <- 5.690286
+table(ess16sel$eduyrs, useNA = "always") #There are outliers: 5 people studied 31 years 
+mean(ess16sel$eduyrs, na.rm = T)
+ess16sel$eduyrs[is.na(ess16sel$eduyrs)] <- 14.80859
+table(ess16sel$agea, useNA = "always")
+
+save(ess16sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess16sel.Rdata")
+
+ess2020 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/ess/ESS10.sav", use.value.labels = T,  to.data.frame = T)
+
+ess20sel <- ess2020 %>% filter(cntry=="Netherlands")  %>%
+            select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, ccnthum, ccrdprs, wrclmch, edulvlb, edlvenl, eduyrs,gndr, agea, yrbrn, prtvthnl, lrscale, domicil, hinctnta, rlgatnd)
+
+
+#Recode the dependent vars just like the previous wave
+attributes(ess20sel$ccnthum)
+table(ess20sel$cause, useNA = "always")
+ess20sel$cause <- as.numeric(ess20sel$ccnthum)
+ess20sel$cause[ess20sel$cause==6] <- NA
+
+#Personal responsibility to reduce climate change
+attributes(ess20sel$ccrdprs)
+table(ess20sel$pers_resp, useNA = "always")
+ess20sel$pers_resp <- (as.numeric(ess20sel$ccrdprs) - 1)* (4/10) + 1
+
+#How worried about climate change
+table(ess20sel$wrclmch, useNA = "always")
+ess20sel$worry <- as.numeric(ess20sel$wrclmch)
+
+
+
+save(ess20sel, file="/Users/anuschka/Documents/climatechange/climatechange/ess20sel.Rdata")
+
+# Independent vars 
+table(ess20sel$eduyrs, useNA = "always")
+ess20sel$eduyrs <- as.numeric(as.character(ess20sel$eduyrs))
+table(ess20sel$gndr, useNA = "always")
+ess20sel$sex <- revalue(ess20sel$gndr, c("Male"="1", "Female"="2"))
+table(ess20sel$lrscale, useNA = "always")
+ess20sel$lrscale <- as.numeric(ess20sel$lrscale)
+ess20sel$lrscale <- (ess20sel$lrscale - 1) * (9/10) + 1
+attributes(ess20sel$domicil)
+ess20sel$urban <- revalue(ess20sel$domicil, c("Farm or home in countryside"= "Low urbanity", "Country village"="Low urbanity", "Town or small city"="Medium urbanity", "Suburbs or outskirts of big city"="High urbanity", "A big city"="High urbanity"))
+ess20sel$urban <- factor(ess20sel$urban, levels=c("Low urbanity", "Medium urbanity", "High urbanity"), ordered=TRUE)
+ess20sel$ch_attend <- as.numeric(ess20sel$rlgatnd)
+ess20sel <- ess20sel %>% 
+     mutate_at(c("ch_attend"), funs(recode(., `1` = 7, `2` = 6, `3` = 5, `4` = 4, `5` = 3, `6` = 2, `7` =1)))
+table(ess20sel$ch_attend, useNA = "always")
+ess20sel$income <- as.numeric(ess20sel$hinctnta) #On a scale from 1 to 10, household income
+table(ess20sel$income, useNA = "always") #152 missings on income.
+ess20sel$agea <- as.numeric(as.character(ess20sel$agea))
+
+save(ess20sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess20sel.Rdata")
+
+
+#Merge data 2016 and 2020
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess16sel.Rdata")
+
+#Select the variables that I want to keep
+ess16sel <- ess16sel %>% select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, worry, cause, pers_resp, sex, eduyrs, urban, ch_attend, income, yrbrn, lrscale, agea)
+                                
+ess20sel <- ess20sel %>% select(name, essround, proddate, idno, dweight, pspwght, pweight, anweight, worry, cause, pers_resp, sex, eduyrs, urban, ch_attend, income, yrbrn, lrscale, agea)
+
+#First check whether the levels/attributes of variables are the same
+attributes(ess16sel$worry)
+attributes(ess20sel$worry) 
+# Also did this for the other variables, they're the same so I can merge
+
+esstotal <- dplyr::bind_rows(ess16sel, ess20sel)
+
+save(esstotal, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/esstotal.Rdata")
+
+esstotal$surveyyear[esstotal$essround==8] <- 2016
+esstotal$surveyyear[esstotal$essround==10] <- 2020
+esstotal$surveyyear <- as.numeric(esstotal$surveyyear)
+table(esstotal$surveyyear, useNA = "always")
+
+esstotal$n[esstotal$essround==8] <- 1681
+esstotal$n[esstotal$essround==10] <- 1470
+table(esstotal$n, useNA = "always")
+
+save(esstotal, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/esstotal.Rdata")
+
+```
+
+
+```{r}
+issp1993 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/issp/ISSP1993.sav", use.value.labels = T,  to.data.frame = T)
+
+issp93sel <- issp1993 %>% filter(V3=="Netherlands - NL")  %>%
+            select(V1, V2, V13, V14, V17, V19, V24, V25, V26, V27, V28, V54, V55, V200, V201, V204, V205, V281, V253, V268, V277, V352)
+
+attributes(issp93sel$V13) #Higher score means more positive (then you think we don't worry too much)
+issp93sel$worry <- as.numeric(issp93sel$V13)
+attributes(issp93sel$V14) #Higher score means that you don't think that everything in modern life harms the environment. SO I want to recode this variable
+attributes(issp93sel$V24) #Willing to pay higher prices in order to protect environment. Very unwilling is negative so I recode this var. Then a higher score means very willing. Same applies for v25 and v26. 
+attributes(issp93sel$V28) # I do what is right for the environment, even if it costs a little bit extra time. Strongly agree is more positive attitude, so recode. 
+issp93sel$lifeharm <- as.numeric(issp93sel$V14)
+issp93sel$willing_price <- as.numeric(issp93sel$V24)
+issp93sel$willing_tax <- as.numeric(issp93sel$V25)
+issp93sel$willing_living <- as.numeric(issp93sel$V26)
+issp93sel$do_right <- as.numeric(issp93sel$V28)
+
+issp93sel <- issp93sel %>% 
+     mutate_at(c("lifeharm", "willing_price", "willing_tax", "willing_living", "do_right"), funs(recode(., `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5`= 1)))
+
+attributes(issp93sel$V17) #Higher score means that you don't think we worry too much about human progress harming the environment. A low score means you think we worry too much, so that represents more negative attitudes. No recoding.
+issp93sel$progharm <- as.numeric(issp93sel$V17)
+attributes(issp93sel$V19) #Difficult one. "In order to protect the environment, we need economic growth". A higher score does not necessarily mean worse or better attitudes. So I leave this one as it is. 
+issp93sel$econprotect <- as.numeric(issp93sel$V19)
+attributes(issp93sel$V27) #Too difficult for someone like me to do sth about the environment. This also a difficult one. If you are worried but pessimistic, you may believe that you can't solve it on your own. If you then strongly agree, it means you do care about the environment. However, it can also be interpreted as sth of an excuse, you don't have to do anything bc as an individual you can't do much anyway. I will interpret it as the last one; Strongly disagree means you're optimistic and maybe positive about climate change. No recode necessary. 
+issp93sel$dodiff <- as.numeric(issp93sel$V27)
+attributes(issp93sel$V54) #Score 1 means that ordinary people should decide how to tackle env. problems, score 2 means that government should pass laws. 
+issp93sel$people_decide <- as.numeric(issp93sel$V54)
+issp93sel$people_decide <- (issp93sel$people_decide - 1) * (4/1) + 1
+attributes(issp93sel$V55) #Same as previous one, but then for businesses. I think for these statements, there is not one side that expresses more positive attitudes. 
+issp93sel$bus_decide <- as.numeric(issp93sel$V55)
+issp93sel$bus_decide <- (issp93sel$bus_decide - 1) * (4/1) + 1
+
+
+#Independent vars
+issp93sel$V204 <- revalue(issp93sel$V204 , c("No formal schooling, NAV"= "0", "1 year"="1", "GB:10 or less"="10", "GB:14 or more"="14", "AUS: 20 or more"="20", "43 years" = "43", "Still school J:high s" = "0", "Still college,uni" = "0", "Other answer" = "0"))
+issp93sel$eduyrs <- as.numeric(as.character(issp93sel$V204))
+table(issp93sel$V200, useNA = "always")
+issp93sel$sex <- revalue(issp93sel$V200, c("Male"="1", "Female"="2"))
+table(issp93sel$lrscale, useNA = "always")
+issp93sel$lrscale <- as.numeric(issp93sel$V281)
+issp93sel$lrscale <- (issp93sel$lrscale - 1) * (9/4) + 1
+issp00sel$lrscale[issp00sel$lrscale==12.25 | issp00sel$lrscale ==14.5] <- 11
+table(issp93sel$urban, useNA = "always")
+issp93sel$urban <- revalue(issp93sel$V352, c("Rural"= "Low urbanity", "Suburbs, city-town"="Medium urbanity", "Urban"="High urbanity"))
+issp93sel$urban <- factor(issp93sel$urban, levels=c("Low urbanity", "Medium urbanity", "High urbanity"), ordered=TRUE)
+table(issp93sel$V277)
+issp93sel$ch_attend <- as.numeric(issp93sel$V277)
+issp93sel <- issp93sel %>% 
+     mutate_at(c("ch_attend"), funs(recode(., `1` = 6, `2` = 5, `3` = 4, `4` = 3, `5` = 2, `6` = 1)))
+table(issp93sel$ch_attend, useNA = "always")
+table(issp93sel$V268, useNA = "always")
+issp93sel$income <- as.numeric(issp93sel$V268) #Family income in categories (guilders). 526 missings
+table(issp93sel$age, useNA = "always")
+issp93sel$age <- as.numeric(as.character(issp93sel$V201))
+
+```
+
+# Missings 
+```{r}
+#Replace missings on numeric independent vars with mean. -------------------
+list_na <- colnames(issp93sel)[ apply(issp93sel, 2, anyNA) ]
+list_na
+
+issp93sel$V13 <- as.numeric(issp93sel$V13)
+issp93sel$V14 <- as.numeric(issp93sel$V14)
+issp93sel$V17 <- as.numeric(issp93sel$V17)
+issp93sel$V19 <- as.numeric(issp93sel$V19)
+issp93sel$V24 <- as.numeric(issp93sel$V24)
+issp93sel$V25 <- as.numeric(issp93sel$V25)
+issp93sel$V26 <- as.numeric(issp93sel$V26)
+issp93sel$V27 <- as.numeric(issp93sel$V27)
+issp93sel$V28 <- as.numeric(issp93sel$V28)
+issp93sel$V54 <- as.numeric(issp93sel$V54)
+issp93sel$V55 <- as.numeric(issp93sel$V55)
+issp93sel$V204 <- as.numeric(issp93sel$V204)
+issp93sel$V205 <- as.numeric(issp93sel$V205)
+issp93sel$V212 <- as.numeric(issp93sel$V212)
+issp93sel$V245 <- as.numeric(issp93sel$V245)
+issp93sel$V268 <- as.numeric(issp93sel$V268)
+issp93sel$V277 <- as.numeric(issp93sel$V277)
+
+average_missing <- apply(issp93sel[,colnames(issp93sel) %in% list_na],
+      2,
+      mean,
+      na.rm =  TRUE)
+average_missing
+
+issp93sel_replace <- issp93sel %>%
+   mutate(educ_mis  = ifelse(is.na(V205), average_missing[13], V205),
+   mainstat_mis = ifelse(is.na(V212), average_missing[14], V212),
+   eduyrs_mis = ifelse(is.na(V204), average_missing[12], V204),
+   pinc_mis = ifelse(is.na(V245), average_missing[15], V245), 
+   finc_mis = ifelse(is.na(V268), average_missing[16], V268),
+   church_mis = ifelse(is.na(V277), average_missing[17], V277))
+
+apply((issp93sel_replace[c('educ_mis', 'mainstat_mis', 'eduyrs_mis', 'pinc_mis', 'finc_mis', 'church_mis')]), 2, table)
+
+save(issp93sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp93sel.Rdata")
+
+```
+
+
+```{r}
+#Now 2000. 
+issp2000 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/issp/ISSP2000.sav", use.value.labels = T,  to.data.frame = T)
+
+issp00sel <- issp2000 %>% filter(V3=="NL-Netherlands")  %>%
+            select(V1, V2, V11, V12, V13, V14, V16, V17, V19, V20, V21, V22, V23, V40, V41, V24, V25, V26, V42, V200, V201, V204, V205, V246, V241, V242, V243, V262, V274)
+
+ 
+#Dependent variables
+issp00sel$lifeharm <- as.numeric(issp00sel$V12)
+issp00sel$willing_price <- as.numeric(issp00sel$V19)
+issp00sel$willing_tax <- as.numeric(issp00sel$V20)
+issp00sel$willing_living <- as.numeric(issp00sel$V21)
+issp00sel$do_right <- as.numeric(issp00sel$V23)
+issp00sel$growharm <- as.numeric(issp00sel$V16)
+
+issp00sel <- issp00sel %>% 
+     mutate_at(c("lifeharm", "willing_price", "willing_tax", "willing_living", "do_right", "growharm"), funs(recode(., `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5`= 1)))
+
+issp00sel$worry <- as.numeric(issp00sel$V11)
+issp00sel$progharm <- as.numeric(issp00sel$V13)
+issp00sel$econprotect <- as.numeric(issp00sel$V14)
+issp00sel$dodiff <- as.numeric(issp00sel$V22)
+issp00sel$people_decide <- as.numeric(issp00sel$V40)
+issp00sel$people_decide <- (issp00sel$people_decide - 1) * (4/1) + 1
+issp00sel$bus_decide <- as.numeric(issp00sel$V41)
+issp00sel$bus_decide <- (issp00sel$bus_decide - 1) * (4/1) + 1
+
+table(issp00sel$V24, useNA = "always") #More important things in life than protecting the environment. Higher score (strongly disagree) means that you care more about the environment than strongly disagree. 
+issp00sel$moreimp <- as.numeric(issp00sel$V24)
+table(issp00sel$V25, useNA = "always") #There's no point in doing what I can for the environment unless others do the same. Higher score means more positive attitudes, although again (like mentioned at the other statement) you can also interpret strongly agree as caring about the environment but not knowing what to do. 
+issp00sel$othersame <- as.numeric(issp00sel$V25)
+table(issp00sel$V26, useNA = "always") #Many of the claims exaggerated. Higher score means strongly disagree so more positive attitudes. 
+issp00sel$exag <- as.numeric(issp00sel$V26)
+table(issp00sel$V42, useNA = "always") #Higher score means that government is doing too little, which expresses worry and that we should do sth. 
+issp00sel$country_effort <- as.numeric(issp00sel$V42)
+
+#Independent vars 
+table(issp00sel$V204, useNA = "always")
+issp00sel$V204 <- revalue(issp00sel$V204 , c("No form school"= "0", "AUS: 0 or 1 yr"="0", "NZ:1-8 yrs"="8", "N:7-9 yrs"="9", "NZ:9-11 yrs"="11", "NZ:12-13 yrs" = "13", "NZ:14-16 yrs" = "15", "NZ:17+ yrs" = "17", "Other educ,other answer" = "0", "Still at college,uni" = "20", "Still at school,N:+uni" = "20"))
+issp00sel$eduyrs <- as.numeric(as.character(issp00sel$V204))
+table(issp00sel$V200, useNA = "always")
+issp00sel$sex <- revalue(issp00sel$V200, c("Male"="1", "Female"="2"))
+table(issp00sel$lrscale, useNA = "always")
+issp00sel$lrscale <- as.numeric(issp00sel$V246)
+issp00sel$lrscale[issp00sel$lrscale==6 | issp00sel$lrscale ==7] <- 11
+issp00sel$lrscale <- (issp00sel$lrscale - 1) * (9/4) + 1
+issp00sel$lrscale[issp00sel$lrscale==23.5] <- 11
+table(issp00sel$V274, useNA = "always")
+issp00sel$urban <- revalue(issp00sel$V274, c("Rural,RP:total rur"= "Low urbanity", "Suburb,city,town,county seat"="Medium urbanity", "Urban,RP:total urb"="High urbanity"))
+issp00sel$urban <- factor(issp00sel$urban, levels=c("Low urbanity", "Medium urbanity", "High urbanity"), ordered=TRUE)
+table(issp00sel$V243)
+issp00sel$ch_attend <- as.numeric(issp00sel$V243)
+issp00sel <- issp00sel %>% 
+     mutate_at(c("ch_attend"), funs(recode(., `1` = 6, `2` = 5, `3` = 4, `4` = 3, `5` = 2, `6` = 1)))
+table(issp00sel$ch_attend, useNA = "always")
+table(issp00sel$V241, useNA = "always") 
+issp00sel$income_a <- as.numeric(as.character(issp00sel$V241)) #Family income absolute (so different than previous wave)
+table(issp00sel$income_a, useNA = "always") #230 missings
+table(issp00sel$V201, useNA = "always")
+issp00sel$V201 <- revalue(issp00sel$V201, c("16 years"= "16", "GB:18 yrs or above"="18"))
+issp00sel$age <- as.numeric(as.character(issp00sel$V201))
+table(issp00sel$age, useNA = "always")
+
+save(issp00sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp00sel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/issp00sel.Rdata")
+
+#Missings -----
+
+#Last dataset of 2010. 
+issp2010 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/issp/ISSP2010.sav", use.value.labels = T,  to.data.frame = T)
+
+issp10sel <- issp2010 %>% filter(country=="NL-Netherlands") %>%
+            select(studyno, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v46, v47, v34, v35, v36, v48, SEX, AGE, EDUCYRS, PARTY_LR, NL_INC, ATTEND, URBRURAL)
+
+#Dependent variables 
+issp10sel$lifeharm <- as.numeric(issp10sel$v24)
+issp10sel$willing_price <- as.numeric(issp10sel$v29)
+issp10sel$willing_tax <- as.numeric(issp10sel$v30)
+issp10sel$willing_living <- as.numeric(issp10sel$v31)
+issp10sel$do_right <- as.numeric(issp10sel$v33)
+issp10sel$growharm <- as.numeric(issp10sel$v27)
+
+issp10sel <- issp10sel %>% 
+     mutate_at(c("lifeharm", "willing_price", "willing_tax", "willing_living", "do_right", "growharm"), funs(recode(., `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5`= 1)))
+
+issp10sel$worry <- as.numeric(issp10sel$v23)
+issp10sel$progharm <- as.numeric(issp10sel$v25)
+issp10sel$econprotect <- as.numeric(issp10sel$v26)
+issp10sel$dodiff <- as.numeric(issp10sel$v32)
+issp10sel$people_decide <- as.numeric(issp10sel$v46)
+issp10sel$people_decide <- (issp10sel$people_decide - 1) * (4/1) + 1
+issp10sel$bus_decide <- as.numeric(issp10sel$v47)
+issp10sel$bus_decide <- (issp10sel$bus_decide - 1) * (4/1) + 1
+issp10sel$moreimp <- as.numeric(issp10sel$v34)
+issp10sel$othersame <- as.numeric(issp10sel$v35)
+issp10sel$exag <- as.numeric(issp10sel$v36)
+issp10sel$country_effort <- as.numeric(issp10sel$v48)
+
+
+#Independent vars
+table(issp10sel$EDUCYRS, useNA = "always")
+issp10sel$EDUCYRS <- revalue(issp10sel$EDUCYRS , c("No formal schooling, no years at school"= "0", "8 years, NZ: primary"="8", "11 years, NZ: secondary school less than 3 years"="11", "13 years, NZ: secondary school more han 4 years"="13", "16 years, NZ: university less than 3 years"="16", "18 years, NZ: university more than 4 years" = "18", "Still at college, university, in vocational training" = "20"))
+issp10sel$eduyrs <- as.numeric(as.character(issp10sel$EDUCYRS)) #170 missings on education
+table(issp10sel$SEX, useNA = "always")
+issp10sel$sex <- revalue(issp10sel$SEX, c("Male"="1", "Female"="2"))
+table(issp10sel$PARTY_LR, useNA = "always")
+issp10sel$lrscale <- as.numeric(issp10sel$PARTY_LR)
+#issp10sel$lrscale[issp10sel$lrscale==6] <- 11
+issp10sel$lrscale <- (issp10sel$lrscale - 1) * (9/4) + 1
+issp10sel$lrscale[issp10sel$lrscale==12.25] <- 11
+table(issp10sel$URBRURAL, useNA = "always") #24 missings 
+issp10sel$urban <- revalue(issp10sel$URBRURAL, c("A farm or home in the country"= "Low urbanity","A country village" = "Low urbanity",  "A town or a small city"="Medium urbanity", "The suburbs or outskirts of a big city" = "High urbanity", "A big city"="High urbanity"))
+issp10sel$urban <- factor(issp10sel$urban, levels=c("Low urbanity", "Medium urbanity", "High urbanity"), ordered=TRUE)
+table(issp10sel$ch_attend)
+table(issp00sel$V243) #See how I can recode them to be the same as in previous waves
+issp10sel$ch_attend <- as.numeric(issp10sel$ATTEND)
+issp10sel <- issp10sel %>% 
+     mutate_at(c("ch_attend"), funs(recode(., `1` = 6, `2` = 6, `3` = 5, `4` = 4, `5` = 3, `6` = 2, `7` = 2, `8`= 1)))
+table(issp10sel$ch_attend, useNA = "always")
+table(issp10sel$NL_INC, useNA = "always") #This one has categories(14) again, but not the same as in 1993
+#Dont recode income for now bc still have to figure out how I can make it consistent across waves
+table(issp10sel$AGE, useNA = "always")
+issp10sel$age <- as.numeric(as.character(issp10sel$AGE))
+table(issp10sel$age, useNA = "always")
+
+
+save(issp10sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp10sel.Rdata")
+
+#Missings later ----------------------------------
+list_na <- colnames(issp10sel)[ apply(issp10sel, 2, anyNA) ]
+list_na  
+
+issp10sel[] <- lapply(issp10sel, as.numeric)
+
+average_missing <- apply(issp10sel[,colnames(issp10sel) %in% list_na],
+      2,
+      mean,
+      na.rm =  TRUE)
+average_missing
+
+issp10sel_replace <- issp10sel %>%
+   mutate(educyrs_mis  = ifelse(is.na(EDUCYRS), average_missing[18], EDUCYRS),
+   degree_mis = ifelse(is.na(DEGREE), average_missing[19], DEGREE),
+   nlrinc_mis = ifelse(is.na(NL_RINC), average_missing[20], NL_RINC),
+   nlinc_mis = ifelse(is.na(NL_INC), average_missing[21], NL_INC))
+
+apply((issp10sel_replace[c('educyrs_mis', 'degree_mis', 'nlrinc_mis', 'nlinc_mis')]), 2, table)
+
+save(issp10sel_replace, file="/Users/anuschka/Documents/climatechange/climatechange/issp10sel_mis.Rdata")
+
+```
+
+```{r}
+#Now I have to make one long datafile of these three datasets. 
+load("/Users/anuschka/Documents/climatechange/climatechange/issp93sel_mis.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/issp00sel.Rdata")
+load("/Users/anuschka/Documents/climatechange/climatechange/issp10sel_mis.Rdata")
+
+issp93sel <- issp93sel %>% select(V1, worry, lifeharm, willing_price, willing_tax, willing_living, do_right, progharm, econprotect, people_decide, bus_decide, eduyrs, sex, lrscale, urban, ch_attend, income, age)
+                                  
+issp00sel <- issp00sel %>% select(V1, worry, lifeharm, willing_price, willing_tax, willing_living, do_right, progharm, econprotect, people_decide, bus_decide, exag, moreimp, othersame, country_effort, growharm, eduyrs, sex, lrscale, urban, ch_attend, income_a, age)
+
+issp10sel <- issp10sel %>% select(studyno, worry, lifeharm, willing_price, willing_tax, willing_living, do_right, progharm, econprotect, people_decide, bus_decide, exag, moreimp, othersame, country_effort, growharm, eduyrs, sex, lrscale, urban, ch_attend, NL_INC, age) 
+
+issp93sel <- issp93sel %>% rename(studyno = V1)
+issp00sel <- issp00sel %>% rename(studyno = V1)
+
+#Check again whether variables have the same levels etc. (should be)
+attributes(issp93sel$worry)
+attributes(issp00sel$worry)
+attributes(issp10sel$worry) #etc etc 
+
+#Bind rows
+issptotal <- plyr::rbind.fill(issp93sel, issp00sel, issp10sel)
+
+table(issptotal$bus_decide, useNA = "always")
+
+save(issptotal, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/issptotal.Rdata")
+
+issptotal$surveyyear <- NA
+issptotal$surveyyear[issptotal$studyno==2450] <- 1993
+issptotal$surveyyear[issptotal$studyno==3440] <- 2000
+issptotal$surveyyear[issptotal$studyno==1] <- 2010
+```
+
+
+

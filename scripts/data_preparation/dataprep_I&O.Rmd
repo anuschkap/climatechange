@@ -1,0 +1,307 @@
+---
+title: "Untitled"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+#Preparing 
+```{r}
+#Load packages required for dataprep
+rm(list = ls())
+library(foreign) #loads sav files into R, haven package is less useful with variable structure/type and recoding
+library(tidyverse) 
+library(plyr) 
+library(dplyr)
+
+```
+
+```{r}
+#Load the datafiles one by one
+io2019 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/i&o/i&o2019.sav", use.value.labels = T,  to.data.frame = T)
+#Gives a warning because of the open answers (long strings), but I won't use those anyway
+
+#Now I will only select the variables that I need for my thesis, but here you can insert any variable that's in the dataset. Furthermore, I don't want the respondents that completed the survey with panelclix because they have more missings on demographic variables that i want to use
+io2019sel <- io2019 %>% filter(bron=="IOPanel") %>%
+            select(v18, v10_1:v10_3, v20_2, v20_4, v20_6, v20_8, v19c_1, id, bron, GESLACHT, IOOPLEIDING, IOINKOMEN, IOPOL2017, LEEFTIJD, ETNICITEIT_CBS2STEEKPROEF, stedc, opleiding_her, weging_totaal)
+
+
+#Let's inspect the other datasets first to determine which questions are asked more often
+io2020 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/i&o/i&o2020.sav", use.value.labels = T,  to.data.frame = T)
+
+io2020sel <- io2020 %>% filter(bron=="I&O panel") %>%
+            select(V01, V02, V10_1:V10_3, v20a_2, v20a_4, v20a_6, v20a_8, bron, id, cross1, IOOPLEIDING, IOINKOMEN, IOPOL2017, LEEFTIJD, OPLEID_HER, ETNICITEIT_CBS2STEEKPROEF, weging_totaal)
+
+io2022 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/i&o/i&o2022.sav", use.value.labels = T,  to.data.frame = T)
+
+io2022sel <- io2022 %>% filter(bron=="I&O panel") %>%
+            select(V01, V02, v10_1:v10_3, V20a_2, V20a_4, V20a_6, V20a_8, bron, id, cross1, IOOPLEIDING, LEEFTIJD, OPLEID_HER, IOINKOMEN_NEW, IOPOL2021, ETNICITEIT_CBS2STEEKPROEF, opleiding_her, weging_totaal) 
+
+#No urbanity in 2020 and 2022
+
+```
+
+
+```{r}
+#Now I've selected the variables, I need to recode them in the same way across the three datasets
+io2019sel$worried <- as.numeric(io2019sel$v18)
+io2019sel <- io2019sel %>% 
+     mutate_at(c("worried"), funs(recode(., `1` = 4, `2` = 3, `3` = 2, `4` = 1)))
+io2019sel$worried[io2019sel$worried==5] <- NA
+
+#Have to create a variable that ranges from 1 to 5
+io2019sel$worried <- (io2019sel$worried - 1) *(4/3) + 1 
+
+io2019sel$frontrunner <- as.numeric(io2019sel$v20_6)
+io2019sel$worry_future <- as.numeric(io2019sel$v20_8)
+
+io2019sel <- io2019sel %>% 
+     mutate_at(c("frontrunner", "worry_future"), funs(recode(., `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5`= 1)))
+
+io2019sel$frontrunner[io2019sel$frontrunner==6] <- NA
+io2019sel$worry_future[io2019sel$worry_future==6] <- NA
+
+#Make the non-recoded dep vars also numeric, code "idk" as missing. 
+io2019sel$resp_citiz <- as.numeric(io2019sel$v20_2)
+io2019sel$resp_citiz[io2019sel$resp_citiz==6] <- NA
+io2019sel$dk_start <- as.numeric(io2019sel$v20_4)
+io2019sel$dk_start[io2019sel$dk_start==6] <- NA
+io2019sel$do_gov <- as.numeric(io2019sel$v19c_1)
+io2019sel$do_gov[io2019sel$do_gov==4] <- NA
+io2019sel$do_gov <- (io2019sel$do_gov - 1) *(4/2) + 1
+io2019sel$buss_help <- as.numeric(io2019sel$v10_1)
+io2019sel$buss_help[io2019sel$buss_help==6] <- NA
+io2019sel$min_contr <- as.numeric(io2019sel$v10_2)
+io2019sel$min_contr[io2019sel$min_contr==6] <- NA
+io2019sel$human_resp <- as.numeric(io2019sel$v10_3)
+io2019sel$human_resp[io2019sel$human_resp==6] <- NA
+
+#Recode the independent vars and substitute missings
+io2019sel$sex <- revalue(io2019sel$GESLACHT, c("Man"="1", "Vrouw"="2"))
+table(io2019sel$IOINKOMEN, useNA = "always") 
+io2019sel$income <- revalue(io2019sel$IOINKOMEN, c("minimum en beneden modaal (tot € 26.500)"= "min or below mode", "bijna modaal (€ 26.500 tot € 33.000)"="almost mode", "modaal (€ 33.000 tot € 39.500)"="mode", "tussen 1 en 2 keer modaal (€ 39.500 tot € 66.000)"="between 1 or 2 times mode", "twee keer modaal of meer (€ 66.000 of meer)"="2 times mode or higher", "geen antwoord" = "no answer"))
+freq(io2019sel$IOPOL2017) 
+freq(io2019sel$ETNICITEIT_CBS2STEEKPROEF) 
+io2019sel$ethnicity <- revalue(io2019sel$ETNICITEIT_CBS2STEEKPROEF, c("Autochtoon"="dutch", "Westerse allochtoon"="western", "Niet-Westerse allochtoon"="non-western","Onbekend" = "unknown"))
+io2019sel$educ_cat <- revalue(io2019sel$opleiding_her, c("Laag"="Low", "Middelbaar"="Medium", "Hoog"="High"))
+io2019sel$urban <- revalue(io2019sel$stedc, c("Niet stedelijk"= "Low urbanity", "Weinig stedelijk"="Low urbanity", "Matig stedelijk"="Medium urbanity", "Sterk stedelijk"="High urbanity", "Zeer sterk stedelijk"="High urbanity"))
+table(io2019sel$urban, useNA = "always") #2 missings
+
+#Now I again select the variables that I want to keep
+io2019sel <- io2019sel %>% 
+            select(id, worried, frontrunner, worry_future, resp_citiz, dk_start, do_gov, buss_help, min_contr, human_resp, sex, educ_cat, urban, LEEFTIJD, income, IOPOL2017, ethnicity, weging_totaal)
+
+io2019sel <- io2019sel %>%
+          dplyr::rename(age = LEEFTIJD, party_vote = IOPOL2017, weight = weging_totaal) 
+
+#Lr placement based on CHES en poppa data on expert means
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2019sel.RData")
+
+unique(io2019sel$party_vote) #Of course you can also choose to rename IOPOL2017 as party_name directly at line 95, then you don't have to delete it at line 107. I wanted to keep it first
+io2019sel$party_name <- as.character(io2019sel$party_vote)
+io2019sel$party_name <- revalue(io2019sel$party_name, c("ChristenUnie"= "CU", "50 Plus"="50PLUS", "GroenLinks"="GL", "Partij voor de Dieren"="PvdD", "Forum voor Democratie"="FvD"))
+
+io2019sel <- io2019sel %>% left_join(expert2, by="party_name") 
+
+#No longer need the original variable party_vote
+io2019sel <- subset(io2019sel, select = -c(party_vote) )
+
+save(io2019sel, file = "/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2019sel.RData")
+
+```
+
+```{r}
+#Do the same for 2020
+io2020sel$worried <- as.numeric(io2020sel$V01)
+io2020sel <- io2020sel %>% 
+     mutate_at(c("worried"), funs(recode(., `1` = 4, `2` = 3, `3` = 2, `4` = 1)))
+io2020sel$worried[io2020sel$worried==5] <- NA
+io2020sel$worried <- (io2020sel$worried - 1) * (4/3) + 1
+
+io2020sel$frontrunner <- as.numeric(io2020sel$v20a_6)
+io2020sel$worry_future <- as.numeric(io2020sel$v20a_8)
+
+io2020sel <- io2020sel %>% 
+     mutate_at(c("frontrunner", "worry_future"), funs(recode(., `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5`= 1)))
+
+io2020sel$frontrunner[io2020sel$frontrunner==6] <- NA
+io2020sel$worry_future[io2020sel$worry_future==6] <- NA
+
+#Make the non-recoded dep vars also numeric, code "idk" as missing. 
+io2020sel$resp_citiz <- as.numeric(io2020sel$v20a_2)
+io2020sel$resp_citiz[io2020sel$resp_citiz==6] <- NA
+io2020sel$dk_start <- as.numeric(io2020sel$v20a_4)
+io2020sel$dk_start[io2020sel$dk_start==6] <- NA
+io2020sel$buss_help <- as.numeric(io2020sel$V10_1)
+io2020sel$buss_help[io2020sel$buss_help==6] <- NA
+io2020sel$min_contr <- as.numeric(io2020sel$V10_2)
+io2020sel$min_contr[io2020sel$min_contr==6] <- NA
+io2020sel$human_resp <- as.numeric(io2020sel$V10_3)
+io2020sel$human_resp[io2020sel$human_resp==6] <- NA
+
+
+## This variable is not exactly asked in the same way as in previous wave
+io2020sel$do_gov <- as.numeric(io2020sel$V02)
+io2020sel <- io2020sel %>% 
+     mutate_at(c("do_gov"), funs(recode(., `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5`= 1)))
+io2020sel$do_gov[io2020sel$do_gov==6] <- NA
+
+#Independent vars
+table(io2020sel$sex, useNA = "always")
+io2020sel$sex <- revalue(io2020sel$cross1, c("Man"="1", "Vrouw"="2"))
+freq(io2020sel$IOINKOMEN) #331 individuals without an answer, 7 missings. 
+io2020sel$income <- revalue(io2020sel$IOINKOMEN, c("minimum en beneden modaal (tot € 26.500)"= "min or below mode", "bijna modaal (€ 26.500 tot € 33.000)"="almost mode", "modaal (€ 33.000 tot € 39.500)"="mode", "tussen 1 en 2 keer modaal (€ 39.500 tot € 66.000)"="between 1 or 2 times mode", "twee keer modaal of meer (€ 66.000 of meer)"="2 times mode or higher", "geen antwoord" = "no answer"))
+freq(io2020sel$IOPOL2017) #Indelen in links-rechts?
+freq(io2020sel$ETNICITEIT_CBS2STEEKPROEF) #62 unknown
+io2020sel$ethnicity <- revalue(io2020sel$ETNICITEIT_CBS2STEEKPROEF, c("Autochtoon"="dutch", "Westerse allochtoon"="western", "Niet-Westerse allochtoon"="non-western","Onbekend" = "unknown"))
+freq(io2020sel$OPLEID_HER)
+io2020sel$educ_cat <- revalue(io2020sel$OPLEID_HER, c("laag"="Low", "midden"="Medium", "hoog"="High"))
+#No urbanity here
+
+#Select the variables that I want to keep
+io2020sel <- io2020sel %>% 
+            select(id, worried, frontrunner, worry_future, resp_citiz, dk_start, do_gov, buss_help, min_contr, human_resp, sex, educ_cat, LEEFTIJD, income, IOPOL2017, ethnicity, weging_totaal)
+
+io2020sel <- io2020sel %>%
+          dplyr::rename(age = LEEFTIJD,  party_vote = IOPOL2017, weight = weging_totaal)
+
+save(io2020sel, file = "/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2020sel.RData")
+
+
+#Lr placement based on CHES en poppa data on expert means
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2020sel.RData")
+
+unique(io2020sel$party_name)
+io2020sel$party_name <- as.character(io2020sel$party_vote)
+io2020sel$party_name <- revalue(io2020sel$party_name, c("ChristenUnie"= "CU", "50 Plus"="50PLUS", "GroenLinks"="GL", "Partij voor de Dieren"="PvdD", "Forum voor Democratie"="FvD"))
+
+io2020sel <- io2020sel %>% left_join(expert2, by="party_name") 
+
+#No longer need the original variable party_vote
+io2020sel <- subset(io2020sel, select = -c(party_vote) )
+
+save(io2020sel, file = "/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2020sel.RData")
+
+```
+
+
+```{r}
+#And the last wave of 2022
+io2022sel$worried <- as.numeric(io2022sel$V01)
+io2022sel <- io2022sel %>% 
+     mutate_at(c("worried"), funs(recode(., `1` = 4, `2` = 3, `3` = 2, `4` = 1)))
+io2022sel$worried[io2022sel$worried==5] <- NA
+io2022sel$worried <- (io2022sel$worried - 1) * (4/3) + 1
+
+io2022sel$frontrunner <- as.numeric(io2022sel$V20a_6)
+io2022sel$worry_future <- as.numeric(io2022sel$V20a_8)
+
+io2022sel <- io2022sel %>% 
+     mutate_at(c("frontrunner", "worry_future"), funs(recode(., `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5`= 1)))
+
+io2022sel$frontrunner[io2022sel$frontrunner==6] <- NA
+io2022sel$worry_future[io2022sel$worry_future==6] <- NA
+
+#Make the non-recoded dep vars also numeric, code "idk" as missing. 
+io2022sel$resp_citiz <- as.numeric(io2022sel$V20a_2)
+io2022sel$resp_citiz[io2022sel$resp_citiz==6] <- NA
+io2022sel$dk_start <- as.numeric(io2022sel$V20a_4)
+io2022sel$dk_start[io2022sel$dk_start==6] <- NA
+io2022sel$buss_help <- as.numeric(io2022sel$v10_1)
+io2022sel$buss_help[io2022sel$buss_help==6] <- NA
+io2022sel$min_contr <- as.numeric(io2022sel$v10_2)
+io2022sel$min_contr[io2022sel$min_contr==6] <- NA
+io2022sel$human_resp <- as.numeric(io2022sel$v10_3)
+io2022sel$human_resp[io2022sel$human_resp==6] <- NA
+
+
+io2022sel$do_gov <- as.numeric(io2022sel$V02)
+io2022sel <- io2022sel %>% 
+     mutate_at(c("do_gov"), funs(recode(., `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5`= 1)))
+io2022sel$do_gov[io2022sel$do_gov==6] <- NA
+
+#Independent vars
+table(io2022sel$sex, useNA = "always")
+io2022sel$sex <- revalue(io2022sel$cross1, c("Man"="1", "Vrouw"="2")) #6 missings on gender, too small for a category
+freq(io2022sel$IOINKOMEN) #250 individuals without an answer, 16 missings. And the answer categories are different than in previous waves
+io2022sel$income <- revalue(io2022sel$IOINKOMEN_NEW, c("minimum (minder dan€14.100)"= "min or below mode", "beneden modaal (€14.100 tot€29.500)"= "min or below mode", "bijna modaal (€29.500 tot€36.500)"="almost mode", "modaal (€36.500 tot€43.500)"="mode", "tussen 1 en 2 keer modaal (€43.500 tot€73.000)"="between 1 or 2 times mode", "twee keer modaal (€73.000 tot€87.100)"="2 times mode or higher", "meer dan 2 keer modaal (€87.100 of meer)"="2 times mode or higher", 
+"weet ik niet / wil ik niet zeggen" = "no answer"))
+freq(io2022sel$IOPOL2021) #Indelen in links-rechts?
+freq(io2022sel$ETNICITEIT_CBS2STEEKPROEF) #6 unknown
+io2022sel$ethnicity <- revalue(io2022sel$ETNICITEIT_CBS2STEEKPROEF, c("Nederlands"="dutch", "Westers"="western", "Niet-westers"="non-western","Onbekend" = "unknown"))
+io2022sel$educ_cat <- revalue(io2022sel$OPLEID_HER, c("laag"="Low", "midden"="Medium", "hoog"="High"))
+
+#Select the variables that I want to keep
+io2022sel <- io2022sel %>% 
+            select(id, worried, frontrunner, worry_future, resp_citiz, dk_start, do_gov, buss_help, min_contr, human_resp, sex, educ_cat, LEEFTIJD, income, IOPOL2021, ethnicity, weging_totaal)
+
+io2022sel <- io2022sel %>%
+          dplyr::rename(age = LEEFTIJD, party_vote = IOPOL2021, weight = weging_totaal)
+
+save(io2022sel, file = "/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2022sel.RData")
+
+#Lr placement based on CHES en poppa data on expert means
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2022sel.RData")
+
+unique(io2022sel$party_name)
+io2022sel$party_name <- as.character(io2022sel$party_vote)
+io2022sel$party_name <- revalue(io2022sel$party_name, c("ChristenUnie"= "CU", "GroenLinks"="GL", "Partij voor de Dieren"="PvdD", "Forum voor Democratie"="FvD"))
+
+io2022sel <- io2022sel %>% left_join(expert2, by="party_name") 
+
+#No longer need the original variable party_vote
+io2022sel <- subset(io2022sel, select = -c(party_vote) )
+
+save(io2022sel, file = "/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2022sel.RData")
+
+```
+
+
+```{r}
+#Check whether variables have the same level before merging
+attributes(io2019sel$worried)
+attributes(io2020sel$worried)
+attributes(io2022sel$worried)
+
+attributes(io2019sel$frontrunner)
+attributes(io2020sel$frontrunner)
+attributes(io2022sel$frontrunner)
+
+attributes(io2019sel$sex)
+attributes(io2020sel$sex)
+attributes(io2022sel$sex)
+
+attributes(io2019sel$income)
+attributes(io2020sel$income)
+attributes(io2022sel$income) 
+
+attributes(io2019sel$educ_cat)
+attributes(io2020sel$educ_cat)
+attributes(io2022sel$educ_cat)
+
+attributes(io2019sel$party_name)
+attributes(io2020sel$party_name)
+attributes(io2022sel$party_name) 
+
+attributes(io2019sel$ethnicity)
+attributes(io2020sel$ethnicity)
+attributes(io2022sel$ethnicity) 
+
+```
+
+```{r}
+#Merging the variables into one dataset is quite easy now all variables are the same
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2019sel.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2020sel.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2022sel.RData")
+
+io2019sel$surveyyear <- 2019
+io2020sel$surveyyear <- 2020
+io2022sel$surveyyear <- 2022
+
+io_total <- plyr::rbind.fill(io2019sel, io2020sel, io2022sel)
+
+save(io_total, file = "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/io_total.RData")
+
+```
+
