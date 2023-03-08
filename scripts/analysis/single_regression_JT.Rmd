@@ -6,6 +6,8 @@ output: html_document
 ---
 ```{r}
 rm(list = ls())
+install.packages("gamlss")
+library(gamlss)
 
 ```
 
@@ -17,17 +19,12 @@ here::i_am("scripts/analysis/single_regression.Rmd")
 load(here("data", "dpes2021sel.RData")) 
 ```
 
-
-```{r}
-#Weight
-#Missings 
-```
-
 ```{r}
 # I want to have a regression where both the intercept and the variance are also stored in some list/df. 
 
 
 set.seed(23)
+
 predictors <- c("sex", "urban", "educ_cat", "lroverall_mean")
 fit_list <- list()
 for (i in c("cchange_prob", "cc_measures", "cc_cause")) {
@@ -179,21 +176,61 @@ sapply(lapply(issptotal, unique), length)
 #But all my variables have more than 1 level...
 
 ```
+
+
 ```{r}
 summary(fit_list[[1]])
 
 hist(fit_list[[1]]$residuals)
 
-library(gamlss)
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/issptotal.RData")
 
-test <- data.frame(issptotal$worry, issptotal$eduyrs)
+test <- data.frame(issptotal$worry, issptotal$eduyrs, issptotal$surveyyear)
 test <- na.omit(test)
-names(test) <- c("worry", "eduyrs")
-
+names(test) <- c("worry", "eduyrs", "surveyyear")
 
 summary(lm(worry ~ 1 + eduyrs, data=test))
 
 gamlss(worry ~ 1 + eduyrs,  sigma.formula = ~ 1 + eduyrs,  data = test,    family = NO)
+
+
+split_test <- split(test, test$surveyyear)
+
+predictors <- c("sex", "eduyrs", "urban", "ch_attend", "income", "age", "lrscale")
+predictors <- c("sex", "eduyrs", "urban", "ch_attend")
+
+head(issptotal$income)
+
+# Define the predictor variables
+predictors <- c("eduyrs")
+deps <- c("worry")
+
+test_list <- list()
+
+# Loop through each survey year
+for (i in 1:length(split_test)) {
+  tmp <- list()
+  # Loop through each dependent variable
+  for (j in 1:length(deps)) {
+  # Perform the linear regression
+  tmp[[j]] <- lm(as.formula(paste(deps[j], "~", paste(predictors, collapse = " + "))), data = split_test[[i]])
+  }
+  test_list[[i]] <- tmp
+} 
+
+
+gamlss(worry ~ 1 + eduyrs,  sigma.formula = ~ 1 + eduyrs,  data = test,    family = NO)
+
+
+                                                                                                   
+
+
+
+
+                                                                                                
+                                                                                                   
+                                                                                                                                          
+                                                                                                   
 
 ```
 

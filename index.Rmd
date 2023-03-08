@@ -1,0 +1,58 @@
+---
+title: "Lab journal"
+author: "by: Anuschka Peelen"
+bibliography: references.bib
+---
+
+```{r, install remotely, globalsettings, echo=FALSE, warning=FALSE, results='hide', eval=FALSE}
+install.packages("remotes")
+remotes::install_github("rlesur/klippy")
+```
+
+```{r, globalsettings, echo=FALSE, warning=FALSE, results='hide'}
+library(knitr)
+
+knitr::opts_chunk$set(echo = TRUE)
+opts_chunk$set(tidy.opts=list(width.cutoff=100),tidy=TRUE, warning = FALSE, message = FALSE,comment = "#>", cache=TRUE, class.source=c("test"), class.output=c("test2"))
+options(width = 100)
+rgl::setupKnitr()
+
+
+
+colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
+
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'))
+#klippy::klippy(color = 'darkred')
+#klippy::klippy(tooltip_message = 'Click to copy', tooltip_success = 'Done')
+```
+
+------------------------------------------------------------------------
+
+::: columns
+::: {.column width="50%"}
+# Trends in climate change
+
+Last compiled on `r format(Sys.time(), '%B, %Y')`
+
+\*\* <br>
+
+------------------------------------------------------------------------
+:::
+
+::: {.column width="50%"}
+![](./images/oefen.jpg)
+:::
+:::
+
+
+## Welcome
+Welcome to the replication website that comes with the article on climate change attitudes and polarization. This is based on my thesis. 
+
+## How to use this website
+
+In the top menu, you can navigate through different parts of this project. Under "scripts" you will find all the scripts to replicate the data preparation and analyses of this thesis yourself. Under "blog" you will find the blog post accompanying this thesis, a lay summary about whether climate change attitudes and polarization therein have changed. 
+
+

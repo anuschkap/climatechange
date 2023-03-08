@@ -1,3 +1,12 @@
+---
+title: "Untitled"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+
 pop <- read_dta("/Users/anuschka/Documents/gesis_dir/poppa/expert_data_stata.dta")
 
 popsel <- pop %>% filter(country_id==19) %>%
@@ -50,14 +59,5 @@ dpes2021sel %>%
 
 save(expert2, file = "/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/expert.RData")
 
-#Dividing in three cats left/middle/right. NOT NEEDED
-expert$lr_cat <- NA
-expert$lr_cat[expert$total_mean <= 4] <- 1
-expert$lr_cat[expert$total_mean >4 & expert$total_mean <= 7] <- 2
-expert$lr_cat[expert$total_mean > 7] <- 3 
-
-
-
-
-#Now I want the same for I&O research
+```
 

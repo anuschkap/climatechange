@@ -1,0 +1,65 @@
+name: "Trends in climate change attitudes"
+author: 
+  - 'Anuschka Peelen'
+output_dir: "docs"
+exclude: 
+  - "data"
+  - "_test"
+bibliography: references.bib
+navbar:
+  left:
+    - icon: fa-home
+      href: index.html
+    - text: "Blog"
+      href: blog.html
+    - text: "Scripts"
+      menu:
+      - text: "Data preparation Eurobarometer"
+        href: dataprep_EB.html
+      - text: "Data preparation EVS, ESS, ISSP"
+        href: dataprep_EVS_ESS_ISSP.html
+      - text: "Data preparation I&O Research"  
+        href: dataprep_NKO_NELLS.html
+      - text: "Imputation of missings"  
+        href: missing_imputation.html
+      - text: "Weighing data" 
+        href: weights.html
+      - text: "Regression analyses"  
+        href: single_regression.html
+      - text: "Meta-regression"
+        href: meta_analysis.html
+      
+        
+        # Other model
+    - text: "Final Report"
+      menu:
+      - text: "Introduction"
+        href: final_introduction.html 
+      - text: "Theory" 
+        href: final_theory.html
+      - text: "Data"
+        href: final_data.html
+      - text: "Descriptives"
+        href: descriptives.html
+      - text: "RSiena results" 
+        href: rsiena_results.html
+      - text: "Conclusion"
+        href: conclusion.html
+      - text: "Appendix A"
+        href: rsiena_results_twit.html
+      - text: "Appendix B"
+        href: appendixb.html
+      -  
+  right:
+  - icon: fab fa-github
+    href: https://github.com/apeelen/climatechange
+output:
+  html_document:
+    theme: flatly
+    highlight: default
+    toc:  true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: yes
+    css: tweaks.css

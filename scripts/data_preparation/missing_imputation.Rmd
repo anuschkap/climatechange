@@ -1,0 +1,101 @@
+---
+title: "Untitled"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+install.packages("mice")
+library(mice)
+install.packages("miceadds")
+library(miceadds)
+```
+
+```{r}
+# Try this out with the dpes datafile
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/dpes2021sel.RData")
+
+```
+
+```{r}
+
+attributes(dpes2021sel$urban)
+#Urban now has a category missing, but I want to substitute those so have to make that missing
+dpes2021sel$urban[dpes2021sel$urban=="missing"] <- NA
+table(dpes2021sel$urban, useNA = "always")
+
+attributes(dpes2021sel$sex) #Sex is factor
+attributes(dpes2021sel$educ_cat) #Education as well
+attributes(dpes2021sel$ch_attend) # Church attend as well
+attributes(dpes2021sel$N92) #Income is categorical here, so indeed also factor
+
+md.pattern(dpes2021sel)
+
+
+```
+
+```{r}
+# we do not have real patterns. thus MCAR. This is only seldom the case!!
+
+# lets impute
+names(cv_total)
+
+# We do not want to use id id2 and wave to predict the other variables thus we need to tell mice in
+# the predictorMatrix argument. Easiest way is to first estimate and then correct.
+
+imp <- mice(data = dpes2021sel, method = c("", "", "", "", "",   "logreg", "polyreg", "polyreg", "polr", "polyreg", "",  "pmm", "polyreg"))
+attributes(imp)
+pred <- imp$pred
+pred[, "RNR"] <- 0
+pred[, "V001"] <- 0
+pred[, "cchange_prob"] <- 0
+pred[, "cc_measures"] <- 0
+pred[, "cc_cause"] <- 0
+
+pred
+
+imp <- mice(dpes2021sel, m=5, maxit=5, printFlag = F, predictorMatrix = pred)
+
+imp$method
+
+
+?mice
+
+# let us also use a seed, so we have the same data in class.
+imp <- mice(data = cv_total, method = c("", "", "cart", "logreg", "polr", "cart", "", ""), pred = pred,
+    seed = 45622)
+
+summary(cv_total)
+summary(complete(imp))
+
+plot(imp)
+
+#How I did it
+imp <- mice(dpes2021sel, m=5, maxit=5, printFlag = F, predictorMatrix = pred)
+
+pred <-imp$pred
+pred[, "RNR"] <- 0
+pred[, "V001"] <- 0
+pred[, "cchange_prob"] <- 0
+pred[, "cc_measures"] <- 0
+pred[, "cc_cause"] <- 0
+
+plot(imp)
+
+imp$data
+imp$chainMean
+stripplot(imp) #Doesn't show anything
+
+imp <- mice(data = dpes2021sel, method = c("", "", "", "", "",   "logreg", "polyreg", "polyreg", "polr", "polyreg", "",  "pmm", "polyreg"))
+
+save.data( imp, , type="Rdata", path=getwd(), row.names=FALSE, na=NULL,
+      suffix=NULL, suffix_space="__", index=FALSE, systime=FALSE, ...)
+
+```
+```{r}
+# Try to save this, but doesn't work
+write.mice.imputation(mi.res=imp, name= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/dpes_imp.RData", include.varnames=TRUE,
+      long=TRUE, mids2spss=TRUE, spss.dec=",", dattype=NULL)
+```
+

@@ -9,8 +9,9 @@ In this datascripts I want to practice applying weights with the anesrake packag
 ```{r}
 #install.packages("anesrake")
 library(anesrake)
-library(haven)
 library(readxl)
+library(tidyverse)
+
 
 ```
 
@@ -26,8 +27,115 @@ weights <- read_excel("/Users/anuschka/Documents/climatechange/climatechange/dat
 # The variables that I will use to weigh the data have to have the same coding as the original variables (in this case of the dpes datafile)
 weights$sex <- weights$male / weights$total_pop
 
+weights$sex <- factor(c("1", "2"))
+
+weights$sex <- NA
+
+weights$sex <- factor(weights$sex, 
+                      levels= c("Male", "Female"))
 
 
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/dpes2021sel.RData")
+
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.34, 0.17, 0.49)
+
+targets <- list(sex, urban)
+names(targets) <- c("sex", "urban")
+
+dpes2021sel$caseid <- 1:length(dpes2021sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+class(dpes2021sel$urban)
+dpes2021sel$urban <- as.numeric(dpes2021sel$urban)
+dpes2021sel$sex <- as.numeric(dpes2021sel$sex)
+
+anesrakefinder(targets, dpes2021sel, choosemethod = "total")
+
+outsave <- anesrake(targets, dpes2021sel, caseid = dpes2021sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+dpes2021sel$weightvec  <- unlist(outsave[1])
+n  <- length(dpes2021sel$sex)
+
+# weighting loss
+((sum(dpes2021sel$weightvec ^ 2) / (sum(dpes2021sel$weightvec)) ^ 2) * n) - 1
+
+library(weights)
+
+unweighted <-  wpct(dpes2021sel$cc_measures)
+weighted  <-  wpct(dpes2021sel$cc_measures, dpes2021sel$weightvec)
+tab  <- data.frame(unweighted, weighted)
+tab # No difference at all, see how this is with the other variable
+
+unweighted <-  wpct(dpes2021sel$cc_cause)
+weighted  <-  wpct(dpes2021sel$cc_cause, dpes2021sel$weightvec)
+tab  <- data.frame(unweighted, weighted)
+tab # Also almost no differences (rounded to 3 decimals everything is the same)
+
+# And now try this for a different dataset
+
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2004sel")
+
+
+library(here)
+here()
+here::i_am("scripts/analysis/single_regression.Rmd")
+load(here("./data/all_waves", "eb2004sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.41, 0.18, 0.42)
+marstat <- c('1', '2')
+marstat <- c(0.58, 0.42)
+
+targets <- list(sex, urban, marstat)
+names(targets) <- c("sex", "urban", "marstat")
+
+eb2004sel$caseid <- 1:length(eb2004sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+class(dpes2021sel$urban)
+eb2004sel$urban <- as.numeric(eb2004sel$urban)
+eb2004sel$sex <- as.numeric(eb2004sel$sex)
+eb2004sel$marstat <- as.numeric(eb2004sel$marstat)
+
+anesrakefinder(targets, eb2004sel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb2004sel, caseid = eb2004sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2004sel$weightvec  <- unlist(outsave[1])
+n  <- length(eb2004sel$sex)
+
+# weighting loss
+((sum(eb2004sel$weightvec ^ 2) / (sum(eb2004sel$weightvec)) ^ 2) * n) - 1
+
+library(weights)
+
+unweighted <-  wpct(eb2004sel$pers_effort)
+weighted  <-  wpct(eb2004sel$pers_effort, eb2004sel$weightvec)
+tab  <- data.frame(unweighted, weighted)
+tab # No difference at all, see how this is with the other variable
+
+# Also still have to check age, but then I can't include age linearly?
+eb2004_mis <- eb2004sel %>% drop_na()
+
+library(gamlss)
+g <- gamlss(eb2004sel$pers_effort ~ eb2004sel$urban, data=eb2004_mis, weights = eb2004sel$weightvec)
+g_unweigh <- gamlss(eb2004sel$pers_effort ~ eb2004sel$urban, data=eb2004_mis)
+summary(g)
+summary(g_unweigh)
 
 ```
 
