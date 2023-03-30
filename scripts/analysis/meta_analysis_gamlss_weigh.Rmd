@@ -4,7 +4,7 @@ author: "Anuschka Peelen"
 date: "`r Sys.Date()`"
 output: html_document
 ---
-
+# weighed gamlss
 
 ```{r}
 rm(list=ls())
@@ -38,7 +38,7 @@ summary(intercept.gen)
 ```{r}
 # With the final data
 # This method is not for multiple regression
-load(here("./data/meta_analysis", "total_reg_results.RData"))
+load(here("./data/meta_analysis", "total_reg_results_gam_w.RData"))
 
 ?metagen
 
@@ -122,9 +122,9 @@ png <- forest(model_step_1_att, colout = colour.palette, col = "#ACBFD6", annota
 ```
 
 # Time effect 
-png(file = "/Users/anuschka/Documents/forestplot_neg_to_pos.png", width = 2800, height = 2400, res = 300)
+png(file = "/Users/anuschka/Documents/forestplot_neg_to_pos_weight.png", width = 2800, height = 2400, res = 300)
 
-png <- forest(model_step_1_att, colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitudes, ilab.xpos = -2, xlim = c(-1, 1))
+png <- forest(model_step_1_att, colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat , ilab.xpos = -2, xlim = c(-1, 1))
 
 dev.off()
 

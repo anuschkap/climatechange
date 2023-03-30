@@ -141,7 +141,7 @@ for (var in mis_vars) {
 #Let's first save the prepped data. 
 save(evssel, file="/Users/anuschka/Documents/climatechange/climatechange//data/final_data/evssel.Rdata")
 
-evssel <- evssel %>% select(stdyno_w, S001, S002EVS, S006, S017, S018, S020, climate5, sex, X002, age, edu_yrs, isced,  religious, lrplace, income, income_quart, marstat,  X023, X023R, X047CS, X047_EVS, X047R_EVS) %>% 
+evssel <- evssel %>% select(stdyno_w, S001, S002EVS, S006, S017, S018, S020, climate5, sex, X002, age, edu_yrs, isced,  religious, lrplace, income, income_quart, marstat, weightvec, X023, X023R, X047CS, X047_EVS, X047R_EVS) %>% 
         dplyr::rename(surveyyear = S020)
 
 save(evssel, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/evssel.Rdata")
@@ -318,9 +318,9 @@ load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess20
 load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess16sel.Rdata")
 
 #Select the variables that I want to keep
-ess16sel <- ess16sel %>% select(name, essround, proddate, idno, worry, cause, pers_resp, sex, eduyrs, isced,urban, ch_attend, income, income_quart, yrbrn, lrscale, age, marstat, brncntr)
+ess16sel <- ess16sel %>% select(name, essround, proddate, idno, worry, cause, pers_resp, sex, eduyrs, isced,urban, ch_attend, income, income_quart, yrbrn, lrscale, age, marstat, brncntr, weightvec)
                                 
-ess20sel <- ess20sel %>% select(name, essround, proddate, idno, worry, cause, pers_resp, sex, eduyrs, isced,urban, ch_attend, income, income_quart, yrbrn, lrscale, age, marstat, brncntr)
+ess20sel <- ess20sel %>% select(name, essround, proddate, idno, worry, cause, pers_resp, sex, eduyrs, isced,urban, ch_attend, income, income_quart, yrbrn, lrscale, age, marstat, brncntr, weightvec)
 
 #First check whether the levels/attributes of variables are the same
 attributes(ess16sel$worry)
@@ -627,11 +627,11 @@ load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp9
 load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp00sel.Rdata")
 load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp10sel.Rdata")
 
-issp93sel <- issp93sel %>% select(V1, worry, lifeharm, willing_price, willing_tax, willing_living, do_right, progharm, econprotect, people_decide, bus_decide, eduyrs, isced, sex, lrscale, urban, ch_attend, income, income_quart, age, marstat)
+issp93sel <- issp93sel %>% select(V1, worry, lifeharm, willing_price, willing_tax, willing_living, do_right, progharm, econprotect, people_decide, bus_decide, eduyrs, isced, sex, lrscale, urban, ch_attend, income, income_quart, age, marstat, weightvec)
                                   
-issp00sel <- issp00sel %>% select(V1, worry, lifeharm, willing_price, willing_tax, willing_living, do_right, progharm, econprotect, people_decide, bus_decide, exag, moreimp, othersame, country_effort, growharm, eduyrs, isced, sex, lrscale, urban, ch_attend, income_a, income, income_quart, age, marstat)
+issp00sel <- issp00sel %>% select(V1, worry, lifeharm, willing_price, willing_tax, willing_living, do_right, progharm, econprotect, people_decide, bus_decide, exag, moreimp, othersame, country_effort, growharm, eduyrs, isced, sex, lrscale, urban, ch_attend, income_a, income, income_quart, age, marstat, weightvec)
 
-issp10sel <- issp10sel %>% select(studyno, worry, lifeharm, willing_price, willing_tax, willing_living, do_right, progharm, econprotect, people_decide, bus_decide, exag, moreimp, othersame, country_effort, growharm, eduyrs, isced, sex, lrscale, urban, ch_attend, income, income_quart, NL_INC, age, marstat) 
+issp10sel <- issp10sel %>% select(studyno, worry, lifeharm, willing_price, willing_tax, willing_living, do_right, progharm, econprotect, people_decide, bus_decide, exag, moreimp, othersame, country_effort, growharm, eduyrs, isced, sex, lrscale, urban, ch_attend, income, income_quart, NL_INC, age, marstat, weightvec) 
 
 issp93sel <- issp93sel %>% rename(studyno = V1)
 issp00sel <- issp00sel %>% rename(studyno = V1)
@@ -646,12 +646,12 @@ issptotal <- plyr::rbind.fill(issp93sel, issp00sel, issp10sel)
 
 table(issptotal$bus_decide, useNA = "always")
 
-issptotal$surveyyear[issptotal$V1==2450] <- 1993
-issptotal$surveyyear[issptotal$V1==3440] <- 2000
+issptotal$surveyyear[issptotal$studyno==2450] <- 1993
+issptotal$surveyyear[issptotal$studyno==3440] <- 2000
 issptotal$surveyyear[issptotal$studyno=="GESIS Data Archive Study Number ZA5500"] <- 2010
 
 # Change order of variables
-issptotal <- issptotal %>% select(surveyyear, worry:growharm, income_a, studyno, NL_INC)
+issptotal <- issptotal %>% select(surveyyear, worry:growharm, income_a, studyno, NL_INC, weightvec)
 
 save(issptotal, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/issptotal.Rdata")
 ```

@@ -9,15 +9,14 @@ In this datascripts I want to practice applying weights with the anesrake packag
 ```{r}
 #install.packages("anesrake")
 library(anesrake)
-library(readxl)
 library(tidyverse)
 
+rm(list = ls())
 
 ```
 
 ```{r}
 # Load the datasets
-load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/dpes2021sel.RData")
 weights <- read_excel("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/weigh_data.xlsx")
 
 ```
@@ -125,18 +124,1148 @@ library(weights)
 
 unweighted <-  wpct(eb2004sel$pers_effort)
 weighted  <-  wpct(eb2004sel$pers_effort, eb2004sel$weightvec)
+u <- wpct(eb2004sel$env_quallife)
+w <- wpct(eb2004sel$env_quallife, eb2004sel$weightvec)
+
+eb2004sel$env_quallife_weight <- w
+
 tab  <- data.frame(unweighted, weighted)
 tab # No difference at all, see how this is with the other variable
 
-# Also still have to check age, but then I can't include age linearly?
-eb2004_mis <- eb2004sel %>% drop_na()
+model1 <- lm(env_quallife ~ sex + urban + marstat, weights = eb2004sel$weightvec, data = eb2004sel)
+summary(model1)
 
-library(gamlss)
-g <- gamlss(eb2004sel$pers_effort ~ eb2004sel$urban, data=eb2004_mis, weights = eb2004sel$weightvec)
-g_unweigh <- gamlss(eb2004sel$pers_effort ~ eb2004sel$urban, data=eb2004_mis)
-summary(g)
-summary(g_unweigh)
+model2 <- lm(env_quallife ~ sex + urban + marstat, data = eb2004sel)
+summary(model2)
 
 ```
 
+```{r}
+#Create a weight variable for each dataset, which I can later use in the regression analyses to weigh the data with
+here::i_am("scripts/analysis/single_regression.Rmd")
+load(here("./data/all_waves", "issp93sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+
+attributes(issp93sel$age)
+issp93sel$age_cat[issp93sel$age >=15 & issp93sel$age <= 30] <- 1
+issp93sel$age_cat[issp93sel$age >=31 & issp93sel$age <= 45] <- 2
+issp93sel$age_cat[issp93sel$age >=46 & issp93sel$age <= 60] <- 3
+issp93sel$age_cat[issp93sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.25, 0.24, 0.17, 0.17)
+
+targets <- list(sex, age_cat)
+names(targets) <- c("sex", "age_cat")
+
+issp93sel$caseid <- 1:length(issp93sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+issp93sel$sex <- as.numeric(issp93sel$sex)
+
+anesrakefinder(targets, issp93sel, choosemethod = "total")
+
+outsave <- anesrake(targets, issp93sel, caseid = issp93sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+issp93sel$weightvec  <- unlist(outsave[1])
+
+save(issp93sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp93sel.Rdata")
+
+# Now for 2000
+load(here("./data/all_waves", "issp00sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+
+attributes(issp00sel$age)
+issp00sel$age_cat[issp00sel$age >=15 & issp00sel$age <= 30] <- 1
+issp00sel$age_cat[issp00sel$age >=31 & issp00sel$age <= 45] <- 2
+issp00sel$age_cat[issp00sel$age >=46 & issp00sel$age <= 60] <- 3
+issp00sel$age_cat[issp00sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.21, 0.24, 0.19, 0.17)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.42, 0.17, 0.41)
+marstat <- c('1', '2')
+marstat <- c(0.59, 0.41)
+
+targets <- list(sex, age_cat, urban, marstat)
+names(targets) <- c("sex", "age_cat", "urban", "marstat")
+
+issp00sel$caseid <- 1:length(issp00sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+issp00sel$sex <- as.numeric(issp00sel$sex)
+issp00sel$urban <- as.numeric(issp00sel$urban)
+issp00sel$marstat <- as.numeric(issp00sel$marstat)
+
+anesrakefinder(targets, issp00sel, choosemethod = "total")
+
+outsave <- anesrake(targets, issp00sel, caseid = issp00sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+issp00sel$weightvec  <- unlist(outsave[1])
+
+save(issp00sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp00sel.Rdata")
+
+# And lastly for 2010
+load(here("./data/all_waves", "issp10sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+
+attributes(issp10sel$age)
+issp10sel$age_cat[issp10sel$age >=15 & issp10sel$age <= 30] <- 1
+issp10sel$age_cat[issp10sel$age >=31 & issp10sel$age <= 45] <- 2
+issp10sel$age_cat[issp10sel$age >=46 & issp10sel$age <= 60] <- 3
+issp10sel$age_cat[issp10sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.19, 0.21, 0.21, 0.20)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.38, 0.18, 0.44)
+marstat <- c('1', '2')
+marstat <- c(0.55, 0.45)
+
+targets <- list(sex, age_cat, urban, marstat)
+names(targets) <- c("sex", "age_cat", "urban", "marstat")
+
+issp10sel$caseid <- 1:length(issp10sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+issp10sel$sex <- as.numeric(issp10sel$sex)
+issp10sel$urban <- as.numeric(issp10sel$urban)
+issp10sel$marstat <- as.numeric(issp10sel$marstat)
+
+anesrakefinder(targets, issp10sel, choosemethod = "total")
+
+outsave <- anesrake(targets, issp10sel, caseid = issp10sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+issp10sel$weightvec  <- unlist(outsave[1])
+
+save(issp10sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp10sel.Rdata")
+
+
+
+
+```
+
+```{r}
+# And now for ESS
+load(here("./data/all_waves", "ess16sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.50, 0.50)
+
+attributes(ess16sel$age)
+ess16sel$age_cat[ess16sel$age >=15 & ess16sel$age <= 30] <- 1
+ess16sel$age_cat[ess16sel$age >=31 & ess16sel$age <= 45] <- 2
+ess16sel$age_cat[ess16sel$age >=46 & ess16sel$age <= 60] <- 3
+ess16sel$age_cat[ess16sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.20, 0.18, 0.22, 0.23)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.35, 0.17, 0.48)
+marstat <- c('1', '2')
+marstat <- c(0.53, 0.47)
+
+targets <- list(sex, age_cat, urban)
+names(targets) <- c("sex", "age_cat", "urban")
+
+ess16sel$caseid <- 1:length(ess16sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+ess16sel$sex <- as.numeric(ess16sel$sex)
+ess16sel$urban <- as.numeric(ess16sel$urban)
+
+
+anesrakefinder(targets, ess16sel, choosemethod = "total")
+
+outsave <- anesrake(targets, ess16sel, caseid = ess16sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+ess16sel$weightvec  <- unlist(outsave[1])
+
+save(ess16sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess16sel.Rdata")
+
+#And for ess2020
+load(here("./data/all_waves", "ess20sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.50, 0.50)
+
+attributes(ess20sel$age)
+ess20sel$age_cat[ess20sel$age >=15 & ess20sel$age <= 30] <- 1
+ess20sel$age_cat[ess20sel$age >=31 & ess20sel$age <= 45] <- 2
+ess20sel$age_cat[ess20sel$age >=46 & ess20sel$age <= 60] <- 3
+ess20sel$age_cat[ess20sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.20, 0.18, 0.21, 0.25)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.34, 0.17, 0.49)
+
+targets <- list(sex, age_cat, urban)
+names(targets) <- c("sex", "age_cat", "urban")
+
+ess20sel$caseid <- 1:length(ess20sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+ess20sel$sex <- as.numeric(ess20sel$sex)
+ess20sel$urban <- as.numeric(ess20sel$urban)
+
+anesrakefinder(targets, ess20sel, choosemethod = "total")
+
+outsave <- anesrake(targets, ess20sel, caseid = ess20sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+ess20sel$weightvec  <- unlist(outsave[1])
+
+save(ess20sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess20sel.Rdata")
+
+
+```
+
+```{r}
+# Then the EVS, which I have to split up
+load(here("./data/final_data", "evssel.RData"))
+
+evs90 <- subset(evssel, surveyyear == 1990)
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+
+attributes(evs90$age)
+evs90$age_cat[evs90$age >=15 & evs90$age <= 30] <- 1
+evs90$age_cat[evs90$age >=31 & evs90$age <= 45] <- 2
+evs90$age_cat[evs90$age >=46 & evs90$age <= 60] <- 3
+evs90$age_cat[evs90$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.25, 0.24, 0.16, 0.16)
+
+targets <- list(sex, age_cat)
+names(targets) <- c("sex", "age_cat")
+
+evs90$caseid <- 1:length(evs90$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+evs90$sex <- as.numeric(evs90$sex)
+
+anesrakefinder(targets, evs90, choosemethod = "total")
+
+outsave <- anesrake(targets, evs90, caseid = evs90$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+evs90$weightvec  <- unlist(outsave[1])
+
+# 1999
+
+evs99 <- subset(evssel, surveyyear == 1999)
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+
+attributes(evs99$age)
+evs99$age_cat[evs99$age >=15 & evs99$age <= 30] <- 1
+evs99$age_cat[evs99$age >=31 & evs99$age <= 45] <- 2
+evs99$age_cat[evs99$age >=46 & evs99$age <= 60] <- 3
+evs99$age_cat[evs99$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.21, 0.24, 0.19, 0.17)
+
+marstat <- c('1', '2')
+marstat <- c(0.59, 0.41)
+
+targets <- list(sex, age_cat, marstat)
+names(targets) <- c("sex", "age_cat", "marstat")
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+evs99$sex <- as.numeric(evs99$sex)
+evs99$marstat <- as.numeric(evs99$marstat)
+
+evs99$caseid <- 1:length(evs99$sex)
+
+anesrakefinder(targets, evs99, choosemethod = "total")
+
+outsave <- anesrake(targets, evs99, caseid = evs99$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+evs99$weightvec  <- unlist(outsave[1])
+
+# And lastly in 2008
+evs2008 <- subset(evssel, surveyyear == 2008)
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+
+attributes(evs2008$age)
+evs2008$age_cat[evs2008$age >=15 & evs2008$age <= 30] <- 1
+evs2008$age_cat[evs2008$age >=31 & evs2008$age <= 45] <- 2
+evs2008$age_cat[evs2008$age >=46 & evs2008$age <= 60] <- 3
+evs2008$age_cat[evs2008$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.19, 0.22, 0.21, 0.19)
+
+marstat <- c('1', '2')
+marstat <- c(0.56, 0.44)
+
+targets <- list(sex, age_cat, marstat)
+names(targets) <- c("sex", "age_cat", "marstat")
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+evs2008$sex <- as.numeric(evs2008$sex)
+evs2008$marstat <- as.numeric(evs2008$marstat)
+
+evs2008$caseid <- 1:length(evs2008$sex)
+
+anesrakefinder(targets, evs2008, choosemethod = "total")
+
+outsave <- anesrake(targets, evs2008, caseid = evs2008$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+evs2008$weightvec  <- unlist(outsave[1])
+
+#Turn marital status back to original 
+evs90$marstat <- as.factor(evs90$marstat)
+evs99$marstat <- as.factor(evs99$marstat)
+evs2008$marstat <- as.factor(evs2008$marstat)
+
+evssel <- dplyr::bind_rows(evs90, evs99, evs2008)
+
+#Save the total to which now the weights are added per year
+save(evssel, file="/Users/anuschka/Documents/climatechange/climatechange//data/final_data/evssel.Rdata")
+
+```
+
+```{r}
+# I & O Research
+# And lastly for 2010
+load(here("./data/all_waves", "io2019sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.50, 0.50)
+
+attributes(io2019sel$age)
+io2019sel$age_cat[io2019sel$age >=15 & io2019sel$age <= 30] <- 1
+io2019sel$age_cat[io2019sel$age >=31 & io2019sel$age <= 45] <- 2
+io2019sel$age_cat[io2019sel$age >=46 & io2019sel$age <= 60] <- 3
+io2019sel$age_cat[io2019sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.20, 0.18, 0.22, 0.24)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.34, 0.17, 0.49)
+marstat <- c('1', '2')
+marstat <- c(0.52, 0.48)
+
+targets <- list(sex, age_cat, urban, marstat)
+names(targets) <- c("sex", "age_cat", "urban", "marstat")
+
+io2019sel$caseid <- 1:length(io2019sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+io2019sel$sex <- as.numeric(io2019sel$sex)
+io2019sel$urban <- as.numeric(io2019sel$urban)
+io2019sel$marstat <- as.numeric(io2019sel$marstat)
+
+anesrakefinder(targets, io2019sel, choosemethod = "total")
+
+outsave <- anesrake(targets, io2019sel, caseid = io2019sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+io2019sel$weightvec  <- unlist(outsave[1])
+
+save(io2019sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2019sel.Rdata")
+
+# Io2020
+
+load(here("./data/all_waves", "io2020sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.50, 0.50)
+
+attributes(io2020sel$age)
+io2020sel$age_cat[io2020sel$age >=15 & io2020sel$age <= 30] <- 1
+io2020sel$age_cat[io2020sel$age >=31 & io2020sel$age <= 45] <- 2
+io2020sel$age_cat[io2020sel$age >=46 & io2020sel$age <= 60] <- 3
+io2020sel$age_cat[io2020sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.20, 0.18, 0.21, 0.25)
+
+marstat <- c('1', '2')
+marstat <- c(0.52, 0.48)
+
+targets <- list(sex, age_cat, marstat)
+names(targets) <- c("sex", "age_cat", "marstat")
+
+io2020sel$caseid <- 1:length(io2020sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+io2020sel$sex <- as.numeric(io2020sel$sex)
+io2020sel$marstat <- as.numeric(io2020sel$marstat)
+
+anesrakefinder(targets, io2020sel, choosemethod = "total")
+
+outsave <- anesrake(targets, io2020sel, caseid = io2020sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+io2020sel$weightvec  <- unlist(outsave[1])
+
+save(io2020sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2020sel.Rdata")
+
+#Io 2022
+# Io2022
+
+load(here("./data/all_waves", "io2022sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.50, 0.50)
+
+attributes(io2022sel$age)
+io2022sel$age_cat[io2022sel$age >=15 & io2022sel$age <= 30] <- 1
+io2022sel$age_cat[io2022sel$age >=31 & io2022sel$age <= 45] <- 2
+io2022sel$age_cat[io2022sel$age >=46 & io2022sel$age <= 60] <- 3
+io2022sel$age_cat[io2022sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.20, 0.18, 0.21, 0.25)
+
+marstat <- c('1', '2')
+marstat <- c(0.51, 0.49)
+
+targets <- list(sex, age_cat, marstat)
+names(targets) <- c("sex", "age_cat", "marstat")
+
+io2022sel$caseid <- 1:length(io2022sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+io2022sel$sex <- as.numeric(io2022sel$sex)
+io2022sel$marstat <- as.numeric(io2022sel$marstat)
+
+anesrakefinder(targets, io2022sel, choosemethod = "total")
+
+outsave <- anesrake(targets, io2022sel, caseid = io2022sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+io2022sel$weightvec  <- unlist(outsave[1])
+
+save(io2022sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2022sel.Rdata")
+
+```
+
+```{r}
+#Lastly Eurobarometer
+load(here("./data/all_waves", "eb1986sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+
+attributes(eb1986sel$age)
+eb1986sel$age_cat[eb1986sel$age >=15 & eb1986sel$age <= 30] <- 1
+eb1986sel$age_cat[eb1986sel$age >=31 & eb1986sel$age <= 45] <- 2
+eb1986sel$age_cat[eb1986sel$age >=46 & eb1986sel$age <= 60] <- 3
+eb1986sel$age_cat[eb1986sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.25, 0.24, 0.16, 0.16)
+
+targets <- list(sex, age_cat)
+names(targets) <- c("sex", "age_cat")
+
+eb1986sel$caseid <- 1:length(eb1986sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb1986sel$sex <- as.numeric(eb1986sel$sex)
+
+anesrakefinder(targets, eb1986sel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb1986sel, caseid = eb1986sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb1986sel$weightvec  <- unlist(outsave[1])
+
+save(eb1986sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb1986sel.Rdata")
+
+
+# Eb 1992
+#And for eb1992
+load(here("./data/all_waves", "eb1992sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+
+attributes(eb1992sel$age)
+eb1992sel$age_cat[eb1992sel$age >=15 & eb1992sel$age <= 30] <- 1
+eb1992sel$age_cat[eb1992sel$age >=31 & eb1992sel$age <= 45] <- 2
+eb1992sel$age_cat[eb1992sel$age >=46 & eb1992sel$age <= 60] <- 3
+eb1992sel$age_cat[eb1992sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.25, 0.24, 0.24, 0.16)
+
+targets <- list(sex, age_cat)
+names(targets) <- c("sex", "age_cat")
+
+eb1992sel$caseid <- 1:length(eb1992sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb1992sel$sex <- as.numeric(eb1992sel$sex)
+
+anesrakefinder(targets, eb1992sel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb1992sel, caseid = eb1992sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb1992sel$weightvec  <- unlist(outsave[1])
+
+save(eb1992sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb1992sel.Rdata")
+
+# Eb 1995
+#And for eb1995
+load(here("./data/all_waves", "eb1995sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+
+attributes(eb1995sel$age)
+eb1995sel$age_cat[eb1995sel$age >=15 & eb1995sel$age <= 30] <- 1
+eb1995sel$age_cat[eb1995sel$age >=31 & eb1995sel$age <= 45] <- 2
+eb1995sel$age_cat[eb1995sel$age >=46 & eb1995sel$age <= 60] <- 3
+eb1995sel$age_cat[eb1995sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.24, 0.24, 0.18, 0.17)
+
+marstat <- c('1', '2')
+marstat <- c(0.6, 0.4)
+
+targets <- list(sex, age_cat, marstat)
+names(targets) <- c("sex", "age_cat", "marstat")
+
+eb1995sel$caseid <- 1:length(eb1995sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb1995sel$sex <- as.numeric(eb1995sel$sex)
+eb1995sel$marstat <- as.numeric(eb1995sel$marstat)
+
+anesrakefinder(targets, eb1995sel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb1995sel, caseid = eb1995sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb1995sel$weightvec  <- unlist(outsave[1])
+
+save(eb1995sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb1995sel.Rdata")
+
+# 2004
+load(here("./data/all_waves", "eb2004sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+
+attributes(eb2004sel$age)
+eb2004sel$age_cat[eb2004sel$age >=15 & eb2004sel$age <= 30] <- 1
+eb2004sel$age_cat[eb2004sel$age >=31 & eb2004sel$age <= 45] <- 2
+eb2004sel$age_cat[eb2004sel$age >=46 & eb2004sel$age <= 60] <- 3
+eb2004sel$age_cat[eb2004sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.20, 0.24, 0.20, 0.18)
+
+marstat <- c('1', '2')
+marstat <- c(0.58, 0.42)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.41, 0.18, 0.42)
+
+targets <- list(sex, age_cat, marstat, urban)
+names(targets) <- c("sex", "age_cat", "marstat", "urban")
+
+eb2004sel$caseid <- 1:length(eb2004sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2004sel$sex <- as.numeric(eb2004sel$sex)
+eb2004sel$marstat <- as.numeric(eb2004sel$marstat)
+eb2004sel$urban <- as.numeric(eb2004sel$urban)
+
+anesrakefinder(targets, eb2004sel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb2004sel, caseid = eb2004sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2004sel$weightvec  <- unlist(outsave[1])
+
+save(eb2004sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2004sel.Rdata")
+
+# 2007
+load(here("./data/all_waves", "eb2007sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+
+attributes(eb2007sel$age)
+eb2007sel$age_cat[eb2007sel$age >=15 & eb2007sel$age <= 30] <- 1
+eb2007sel$age_cat[eb2007sel$age >=31 & eb2007sel$age <= 45] <- 2
+eb2007sel$age_cat[eb2007sel$age >=46 & eb2007sel$age <= 60] <- 3
+eb2007sel$age_cat[eb2007sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.19, 0.23, 0.21, 0.19)
+
+marstat <- c('1', '2')
+marstat <- c(0.56, 0.43)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.40, 0.18, 0.42)
+
+targets <- list(sex, age_cat, marstat, urban)
+names(targets) <- c("sex", "age_cat", "marstat", "urban")
+
+eb2007sel$caseid <- 1:length(eb2007sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2007sel$sex <- as.numeric(eb2007sel$sex)
+eb2007sel$marstat <- as.numeric(eb2007sel$marstat)
+eb2007sel$urban <- as.numeric(eb2007sel$urban)
+
+anesrakefinder(targets, eb2007sel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb2007sel, caseid = eb2007sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2007sel$weightvec  <- unlist(outsave[1])
+
+save(eb2007sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2007sel.Rdata")
+
+# 2008
+load(here("./data/all_waves", "eb2008sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+
+attributes(eb2008sel$age)
+eb2008sel$age_cat[eb2008sel$age >=15 & eb2008sel$age <= 30] <- 1
+eb2008sel$age_cat[eb2008sel$age >=31 & eb2008sel$age <= 45] <- 2
+eb2008sel$age_cat[eb2008sel$age >=46 & eb2008sel$age <= 60] <- 3
+eb2008sel$age_cat[eb2008sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.19, 0.22, 0.21, 0.19)
+
+marstat <- c('1', '2')
+marstat <- c(0.56, 0.44)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.39, 0.18, 0.42)
+
+targets <- list(sex, age_cat, marstat, urban)
+names(targets) <- c("sex", "age_cat", "marstat", "urban")
+
+eb2008sel$caseid <- 1:length(eb2008sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2008sel$sex <- as.numeric(eb2008sel$sex)
+eb2008sel$marstat <- as.numeric(eb2008sel$marstat)
+eb2008sel$urban <- as.numeric(eb2008sel$urban)
+
+anesrakefinder(targets, eb2008sel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb2008sel, caseid = eb2008sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2008sel$weightvec  <- unlist(outsave[1])
+
+save(eb2008sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2008sel.Rdata")
+
+# 2009
+load(here("./data/all_waves", "eb2009asel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+
+attributes(eb2009asel$age)
+eb2009asel$age_cat[eb2009asel$age >=15 & eb2009asel$age <= 30] <- 1
+eb2009asel$age_cat[eb2009asel$age >=31 & eb2009asel$age <= 45] <- 2
+eb2009asel$age_cat[eb2009asel$age >=46 & eb2009asel$age <= 60] <- 3
+eb2009asel$age_cat[eb2009asel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.19, 0.22, 0.21, 0.20)
+
+marstat <- c('1', '2')
+marstat <- c(0.56, 0.44)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.39, 0.18, 0.43)
+
+targets <- list(sex, age_cat, marstat, urban)
+names(targets) <- c("sex", "age_cat", "marstat", "urban")
+
+eb2009asel$caseid <- 1:length(eb2009asel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2009asel$sex <- as.numeric(eb2009asel$sex)
+eb2009asel$marstat <- as.numeric(eb2009asel$marstat)
+eb2009asel$urban <- as.numeric(eb2009asel$urban)
+
+anesrakefinder(targets, eb2009asel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb2009asel, caseid = eb2009asel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2009asel$weightvec  <- unlist(outsave[1])
+
+save(eb2009asel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2009asel.Rdata")
+
+# 2009b
+load(here("./data/all_waves", "eb2009bsel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+
+attributes(eb2009bsel$age)
+eb2009bsel$age_cat[eb2009bsel$age >=15 & eb2009bsel$age <= 30] <- 1
+eb2009bsel$age_cat[eb2009bsel$age >=31 & eb2009bsel$age <= 45] <- 2
+eb2009bsel$age_cat[eb2009bsel$age >=46 & eb2009bsel$age <= 60] <- 3
+eb2009bsel$age_cat[eb2009bsel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.19, 0.22, 0.21, 0.20)
+
+marstat <- c('1', '2')
+marstat <- c(0.56, 0.44)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.39, 0.18, 0.43)
+
+targets <- list(sex, age_cat, marstat, urban)
+names(targets) <- c("sex", "age_cat", "marstat", "urban")
+
+eb2009bsel$caseid <- 1:length(eb2009bsel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2009bsel$sex <- as.numeric(eb2009bsel$sex)
+eb2009bsel$marstat <- as.numeric(eb2009bsel$marstat)
+eb2009bsel$urban <- as.numeric(eb2009bsel$urban)
+
+anesrakefinder(targets, eb2009bsel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb2009bsel, caseid = eb2009bsel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2009bsel$weightvec  <- unlist(outsave[1])
+
+save(eb2009bsel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2009bsel.Rdata")
+
+# 2011
+load(here("./data/all_waves", "eb2011asel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+
+attributes(eb2011asel$age)
+eb2011asel$age_cat[eb2011asel$age >=15 & eb2011asel$age <= 30] <- 1
+eb2011asel$age_cat[eb2011asel$age >=31 & eb2011asel$age <= 45] <- 2
+eb2011asel$age_cat[eb2011asel$age >=46 & eb2011asel$age <= 60] <- 3
+eb2011asel$age_cat[eb2011asel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.20, 0.21, 0.21, 0.21)
+
+marstat <- c('1', '2')
+marstat <- c(0.55, 0.45)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.38, 0.18, 0.44)
+
+targets <- list(sex, age_cat, marstat, urban)
+names(targets) <- c("sex", "age_cat", "marstat", "urban")
+
+eb2011asel$caseid <- 1:length(eb2011asel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2011asel$sex <- as.numeric(eb2011asel$sex)
+eb2011asel$marstat <- as.numeric(eb2011asel$marstat)
+eb2011asel$urban <- as.numeric(eb2011asel$urban)
+
+anesrakefinder(targets, eb2011asel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb2011asel, caseid = eb2011asel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2011asel$weightvec  <- unlist(outsave[1])
+
+save(eb2011asel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2011asel.Rdata")
+
+#2011b
+load(here("./data/all_waves", "eb2011bsel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.49, 0.51)
+
+attributes(eb2011bsel$age)
+eb2011bsel$age_cat[eb2011bsel$age >=15 & eb2011bsel$age <= 30] <- 1
+eb2011bsel$age_cat[eb2011bsel$age >=31 & eb2011bsel$age <= 45] <- 2
+eb2011bsel$age_cat[eb2011bsel$age >=46 & eb2011bsel$age <= 60] <- 3
+eb2011bsel$age_cat[eb2011bsel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.20, 0.21, 0.21, 0.21)
+
+marstat <- c('1', '2')
+marstat <- c(0.55, 0.45)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.38, 0.18, 0.44)
+
+targets <- list(sex, age_cat, marstat, urban)
+names(targets) <- c("sex", "age_cat", "marstat", "urban")
+
+eb2011bsel$caseid <- 1:length(eb2011bsel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2011bsel$sex <- as.numeric(eb2011bsel$sex)
+eb2011bsel$marstat <- as.numeric(eb2011bsel$marstat)
+eb2011bsel$urban <- as.numeric(eb2011bsel$urban)
+
+anesrakefinder(targets, eb2011bsel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb2011bsel, caseid = eb2011bsel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2011bsel$weightvec  <- unlist(outsave[1])
+
+save(eb2011bsel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2011bsel.Rdata")
+
+# 2013
+load(here("./data/all_waves", "eb2013sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.50, 0.50)
+
+attributes(eb2013sel$age)
+eb2013sel$age_cat[eb2013sel$age >=15 & eb2013sel$age <= 30] <- 1
+eb2013sel$age_cat[eb2013sel$age >=31 & eb2013sel$age <= 45] <- 2
+eb2013sel$age_cat[eb2013sel$age >=46 & eb2013sel$age <= 60] <- 3
+eb2013sel$age_cat[eb2013sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.20, 0.20, 0.21, 0.22)
+
+marstat <- c('1', '2')
+marstat <- c(0.54, 0.46)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.37, 0.18, 0.45)
+
+targets <- list(sex, age_cat, marstat, urban)
+names(targets) <- c("sex", "age_cat", "marstat", "urban")
+
+eb2013sel$caseid <- 1:length(eb2013sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2013sel$sex <- as.numeric(eb2013sel$sex)
+eb2013sel$marstat <- as.numeric(eb2013sel$marstat)
+eb2013sel$urban <- as.numeric(eb2013sel$urban)
+
+anesrakefinder(targets, eb2013sel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb2013sel, caseid = eb2013sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2013sel$weightvec  <- unlist(outsave[1])
+
+save(eb2013sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2013sel.Rdata")
+
+# 2014
+load(here("./data/all_waves", "eb2014sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.50, 0.50)
+
+attributes(eb2014sel$age)
+eb2014sel$age_cat[eb2014sel$age >=15 & eb2014sel$age <= 30] <- 1
+eb2014sel$age_cat[eb2014sel$age >=31 & eb2014sel$age <= 45] <- 2
+eb2014sel$age_cat[eb2014sel$age >=46 & eb2014sel$age <= 60] <- 3
+eb2014sel$age_cat[eb2014sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.20, 0.20, 0.22, 0.22)
+
+marstat <- c('1', '2')
+marstat <- c(0.54, 0.46)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.37, 0.18, 0.45)
+
+targets <- list(sex, age_cat, marstat, urban)
+names(targets) <- c("sex", "age_cat", "marstat", "urban")
+
+eb2014sel$caseid <- 1:length(eb2014sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2014sel$sex <- as.numeric(eb2014sel$sex)
+eb2014sel$marstat <- as.numeric(eb2014sel$marstat)
+eb2014sel$urban <- as.numeric(eb2014sel$urban)
+
+anesrakefinder(targets, eb2014sel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb2014sel, caseid = eb2014sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2014sel$weightvec  <- unlist(outsave[1])
+
+save(eb2014sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2014sel.Rdata")
+
+# 2015
+load(here("./data/all_waves", "eb2015sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.50, 0.50)
+
+attributes(eb2015sel$age)
+eb2015sel$age_cat[eb2015sel$age >=15 & eb2015sel$age <= 30] <- 1
+eb2015sel$age_cat[eb2015sel$age >=31 & eb2015sel$age <= 45] <- 2
+eb2015sel$age_cat[eb2015sel$age >=46 & eb2015sel$age <= 60] <- 3
+eb2015sel$age_cat[eb2015sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.20, 0.20, 0.22, 0.22)
+
+marstat <- c('1', '2')
+marstat <- c(0.54, 0.46)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.37, 0.18, 0.45)
+
+targets <- list(sex, age_cat, marstat, urban)
+names(targets) <- c("sex", "age_cat", "marstat", "urban")
+
+eb2015sel$caseid <- 1:length(eb2015sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2015sel$sex <- as.numeric(eb2015sel$sex)
+eb2015sel$marstat <- as.numeric(eb2015sel$marstat)
+eb2015sel$urban <- as.numeric(eb2015sel$urban)
+
+anesrakefinder(targets, eb2015sel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb2015sel, caseid = eb2015sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2015sel$weightvec  <- unlist(outsave[1])
+
+save(eb2015sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2015sel.Rdata")
+
+#2017a
+load(here("./data/all_waves", "eb2017asel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.50, 0.50)
+
+attributes(eb2017asel$age)
+eb2017asel$age_cat[eb2017asel$age >=15 & eb2017asel$age <= 30] <- 1
+eb2017asel$age_cat[eb2017asel$age >=31 & eb2017asel$age <= 45] <- 2
+eb2017asel$age_cat[eb2017asel$age >=46 & eb2017asel$age <= 60] <- 3
+eb2017asel$age_cat[eb2017asel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.20, 0.19, 0.22, 0.23)
+
+marstat <- c('1', '2')
+marstat <- c(0.53, 0.47)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.35, 0.17, 0.48)
+
+targets <- list(sex, age_cat, marstat, urban)
+names(targets) <- c("sex", "age_cat", "marstat", "urban")
+
+eb2017asel$caseid <- 1:length(eb2017asel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2017asel$sex <- as.numeric(eb2017asel$sex)
+eb2017asel$marstat <- as.numeric(eb2017asel$marstat)
+eb2017asel$urban <- as.numeric(eb2017asel$urban)
+
+anesrakefinder(targets, eb2017asel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb2017asel, caseid = eb2017asel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2017asel$weightvec  <- unlist(outsave[1])
+
+save(eb2017asel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2017asel.Rdata")
+
+#2017b
+load(here("./data/all_waves", "eb2017bsel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.50, 0.50)
+
+attributes(eb2017bsel$age)
+eb2017bsel$age_cat[eb2017bsel$age >=15 & eb2017bsel$age <= 30] <- 1
+eb2017bsel$age_cat[eb2017bsel$age >=31 & eb2017bsel$age <= 45] <- 2
+eb2017bsel$age_cat[eb2017bsel$age >=46 & eb2017bsel$age <= 60] <- 3
+eb2017bsel$age_cat[eb2017bsel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.20, 0.19, 0.22, 0.23)
+
+marstat <- c('1', '2')
+marstat <- c(0.53, 0.47)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.35, 0.17, 0.48)
+
+targets <- list(sex, age_cat, marstat, urban)
+names(targets) <- c("sex", "age_cat", "marstat", "urban")
+
+eb2017bsel$caseid <- 1:length(eb2017bsel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2017bsel$sex <- as.numeric(eb2017bsel$sex)
+eb2017bsel$marstat <- as.numeric(eb2017bsel$marstat)
+eb2017bsel$urban <- as.numeric(eb2017bsel$urban)
+
+anesrakefinder(targets, eb2017bsel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb2017bsel, caseid = eb2017bsel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2017bsel$weightvec  <- unlist(outsave[1])
+
+save(eb2017bsel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2017bsel.Rdata")
+
+#2021
+load(here("./data/all_waves", "eb2021sel.RData"))
+
+sex <- c('Male', 'Female')
+sex <- c(0.50, 0.50)
+
+attributes(eb2021sel$age)
+eb2021sel$age_cat[eb2021sel$age >=15 & eb2021sel$age <= 30] <- 1
+eb2021sel$age_cat[eb2021sel$age >=31 & eb2021sel$age <= 45] <- 2
+eb2021sel$age_cat[eb2021sel$age >=46 & eb2021sel$age <= 60] <- 3
+eb2021sel$age_cat[eb2021sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.20, 0.18, 0.21, 0.25)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.34, 0.17, 0.49)
+
+targets <- list(sex, age_cat, urban)
+names(targets) <- c("sex", "age_cat", "urban")
+
+eb2021sel$caseid <- 1:length(eb2021sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2021sel$sex <- as.numeric(eb2021sel$sex)
+eb2021sel$urban <- as.numeric(eb2021sel$urban)
+
+anesrakefinder(targets, eb2021sel, choosemethod = "total")
+
+outsave <- anesrake(targets, eb2021sel, caseid = eb2021sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2021sel$weightvec  <- unlist(outsave[1])
+
+save(eb2021sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2021sel.Rdata")
+
+
+```
 
