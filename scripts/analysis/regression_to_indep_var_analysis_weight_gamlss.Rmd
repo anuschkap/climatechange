@@ -1,0 +1,1056 @@
+---
+title: "Untitled"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+For the weighted gamlss regressions - independent vars & interaction with time
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(gamlss)
+```
+
+```{r}
+# Of course this also has to be done for the other lists of the other models
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_preds_w.RData")
+
+# This does mean that the estimates of the sigma are in a different place
+sum <- summary(ess_list_preds[[1]])
+
+
+# Store the results in a new dataframe
+ess_indep_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(ess_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(ess_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(ess_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_urban_est <- sum[[5]]
+  mu_urban_sd <- sum[[5,2]]
+  mu_income_est <- sum[[7]]
+  mu_income_sd <- sum[[7,2]]
+  mu_age_est <- sum[[8]]
+  mu_age_sd <- sum[[8,2]]
+  mu_lr_est <- sum[[9]]
+  mu_lr_sd <- sum[[9,1]]
+  
+  # Variance
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_est <- sum[[14]]
+  sig_isced_sd <- sum[[14,2]]
+  sig_urban_est <- sum[[15]]
+  sig_urban_sd <- sum[[15,2]]
+  sig_income_est <- sum[[17]]
+  sig_income_sd <- sum[[17,2]]
+  sig_age_est <- sum[[18]]
+  sig_age_sd <- sum[[18,2]]
+  sig_lr_est <- sum[[19]]
+  sig_lr_sd <- sum[[19,1]]
+
+  
+  # Put the results 
+  ess_indep_preds_df <- rbind(ess_indep_preds_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_urban_est, mu_urban_sd, mu_income_est, mu_income_sd, mu_age_est, mu_age_sd, mu_lr_est, mu_lr_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_urban_est, sig_urban_sd, sig_income_est, sig_income_sd, sig_age_est, sig_age_sd, sig_lr_est, sig_lr_sd))
+}
+
+save(ess_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/ess_indep_var_df_w.RData")
+
+```
+
+
+```{r}
+# Now the same for the EVS
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/evs_list_preds_w.RData")
+
+sum <- summary(evs_list_preds[[1]])
+
+
+# Store the results in a new dataframe
+evs_indep_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(evs_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(evs_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(evs_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_income_est <- sum[[9]]
+  mu_income_sd <- sum[[9,2]]
+  mu_age_est <- sum[[11]]
+  mu_age_sd <- sum[[11,2]]
+  mu_lr_est <- sum[[10]]
+  mu_lr_sd <- sum[[10,1]]
+  
+  # Variance
+  sig_sex_est <- sum[[14]]
+  sig_sex_sd <- sum[[14,2]]
+  sig_isced_est <- sum[[15]]
+  sig_isced_sd <- sum[[15,2]]
+  sig_income_est <- sum[[20]]
+  sig_income_sd <- sum[[20,2]]
+  sig_age_est <- sum[[22]]
+  sig_age_sd <- sum[[22,2]]
+  sig_lr_est <- sum[[21]]
+  sig_lr_sd <- sum[[21,1]]
+
+  
+  # Put the results 
+  evs_indep_preds_df <- rbind(evs_indep_preds_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_income_est, mu_income_sd, mu_age_est, mu_age_sd, mu_lr_est, mu_lr_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_income_est, sig_income_sd, sig_age_est, sig_age_sd, sig_lr_est, sig_lr_sd))
+}
+
+save(evs_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/evs_indep_var_df_w.RData")
+```
+
+
+```{r}
+# Now for I&O research
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/io_list_preds_w.RData")
+
+sum <- summary(io_list_preds[[1]])
+
+
+# Store the results in a new dataframe
+io_indep_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(io_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(io_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(io_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_income_est <- sum[[6]]
+  mu_income_sd <- sum[[6,2]]
+  mu_age_est <- sum[[5]]
+  mu_age_sd <- sum[[5,2]]
+  mu_lr_est <- sum[[7]]
+  mu_lr_sd <- sum[[7,1]]
+  
+  # Variance
+  sig_sex_est <- sum[[10]]
+  sig_sex_sd <- sum[[10,2]]
+  sig_isced_est <- sum[[11]]
+  sig_isced_sd <- sum[[11,2]]
+  sig_income_est <- sum[[13]]
+  sig_income_sd <- sum[[13,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  sig_lr_est <- sum[[14]]
+  sig_lr_sd <- sum[[14,1]]
+
+  
+  # Put the results 
+  io_indep_preds_df <- rbind(io_indep_preds_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_income_est, mu_income_sd, mu_age_est, mu_age_sd, mu_lr_est, mu_lr_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_income_est, sig_income_sd, sig_age_est, sig_age_sd, sig_lr_est, sig_lr_sd))
+}
+
+save(io_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/io_indep_var_df_w.RData")
+
+```
+
+```{r}
+# Now for ISSP, which has to happen twice (bc 2 substs based on dependent vars)
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_preds_w.RData")
+
+sum <- summary(issp_list_preds[[1]])
+
+
+# Store the results in a new dataframe
+issp_indep_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(issp_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(issp_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(issp_list_preds[[i]])
+  
+  # Extract the intercept and standard deviatisspn for mu and sigma
+  mu_sex_est <- sum[[5]]
+  mu_sex_sd <- sum[[5,2]]
+  mu_isced_est <- sum[[3]]
+  mu_isced_sd <- sum[[3,2]]
+  mu_income_est <- sum[[9]]
+  mu_income_sd <- sum[[9,2]]
+  mu_age_est <- sum[[10]]
+  mu_age_sd <- sum[[10,2]]
+  mu_lr_est <- sum[[4]]
+  mu_lr_sd <- sum[[4,1]]
+  
+  # Variance
+  sig_sex_est <- sum[[15]]
+  sig_sex_sd <- sum[[15,2]]
+  sig_isced_est <- sum[[13]]
+  sig_isced_sd <- sum[[13,2]]
+  sig_income_est <- sum[[19]]
+  sig_income_sd <- sum[[19,2]]
+  sig_age_est <- sum[[20]]
+  sig_age_sd <- sum[[20,2]]
+  sig_lr_est <- sum[[14]]
+  sig_lr_sd <- sum[[14,1]]
+
+  
+  # Put the results 
+  issp_indep_preds_df <- rbind(issp_indep_preds_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_income_est, mu_income_sd, mu_age_est, mu_age_sd, mu_lr_est, mu_lr_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_income_est, sig_income_sd, sig_age_est, sig_age_sd, sig_lr_est, sig_lr_sd))
+}
+
+save(issp_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/issp_indep_var_df_w.RData")
+
+
+# For the other indep vars as well
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_preds_2_waves_w.RData")
+
+# This does mean that the estimates of the sigma are in a different place
+sum <- summary(issp_list_preds_2_waves[[1]])
+
+# Store the results in a new dataframe
+issp_2_indep_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(issp_list_preds_2_waves)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(issp_list_preds_2_waves[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(issp_list_preds_2_waves[[i]])
+  
+  # Extract the intercept and standard deviatissp_2n for mu and sigma
+  mu_sex_est <- sum[[5]]
+  mu_sex_sd <- sum[[5,2]]
+  mu_isced_est <- sum[[3]]
+  mu_isced_sd <- sum[[3,2]]
+  mu_income_est <- sum[[9]]
+  mu_income_sd <- sum[[9,2]]
+  mu_age_est <- sum[[10]]
+  mu_age_sd <- sum[[10,2]]
+  mu_lr_est <- sum[[4]]
+  mu_lr_sd <- sum[[4,1]]
+  
+  # Variance
+  sig_sex_est <- sum[[15]]
+  sig_sex_sd <- sum[[15,2]]
+  sig_isced_est <- sum[[13]]
+  sig_isced_sd <- sum[[13,2]]
+  sig_income_est <- sum[[19]]
+  sig_income_sd <- sum[[19,2]]
+  sig_age_est <- sum[[20]]
+  sig_age_sd <- sum[[20,2]]
+  sig_lr_est <- sum[[14]]
+  sig_lr_sd <- sum[[14,1]]
+
+  
+  # Put the results 
+  issp_2_indep_preds_df <- rbind(issp_2_indep_preds_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_income_est, mu_income_sd, mu_age_est, mu_age_sd, mu_lr_est, mu_lr_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_income_est, sig_income_sd, sig_age_est, sig_age_sd, sig_lr_est, sig_lr_sd))
+}
+
+save(issp_2_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/issp_2_indep_var_df_w.RData")
+```
+
+
+
+```{r}
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_1986_w.RData")
+
+# This does mean that the estimates of the sigma are in a different place
+sum <- summary(eb_list_preds_1986[[1]])
+
+
+# Store the results in a new dataframe
+eb_preds_1986_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_1986)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_preds_1986[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_preds_1986[[i]])
+  
+  # Extract info
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_income_est <- sum[[7]]
+  mu_income_sd <- sum[[7,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  mu_lr_est <- sum[[5]]
+  mu_lr_sd <- sum[[5,1]]
+  
+  # Variance
+  sig_sex_est <- sum[[12]]
+  sig_sex_sd <- sum[[12,2]]
+  sig_isced_est <- sum[[13]]
+  sig_isced_sd <- sum[[13,2]]
+  sig_income_est <- sum[[16]]
+  sig_income_sd <- sum[[16,2]]
+  sig_age_est <- sum[[15]]
+  sig_age_sd <- sum[[15,2]]
+  sig_lr_est <- sum[[14]]
+  sig_lr_sd <- sum[[14,1]]
+
+  # Put the results in a dataframe
+  eb_preds_1986_df <- rbind(eb_preds_1986_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_income_est, mu_income_sd, mu_age_est, mu_age_sd, mu_lr_est, mu_lr_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_income_est, sig_income_sd, sig_age_est, sig_age_sd, sig_lr_est, sig_lr_sd))
+}
+
+save(eb_preds_1986_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/eb_1986_indep_var_df_w.RData")
+
+```
+
+```{r}
+# For all the other eurobarometer waves, exactly the same needs to be done each time. Therefore I want to loop over these different lists. 
+
+# Now i want the same for the models with the predictors
+# First clear the environment because I don't want the empty lists iterated in the predictor loop
+rm(list=ls())
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2007_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2008_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2009_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2011_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_buyprod_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_cchange2_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_doprot_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_eff_daily_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_pers_imp_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_prsaction_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_quallife_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_doprot_city_w.RData")
+
+# First check where the sigma's are stored
+sum <- summary(eb_list_preds_2007[[1]]) # 8 and 9
+
+
+  # Store the results in a new dataframe
+eb_indep_preds_df <- data.frame(dep_var = character())
+
+# Get the lists from the environment
+lists <- ls()
+
+lists[[2]]
+
+# For some reason, the loop doesn't work anymore, so Ill have to do it one by one
+
+for (j in lists) { 
+  if(is.list(get(j))) { 
+    my_list <- get(j)
+
+
+# Loop over the list 
+for (i in seq_along(my_list)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(my_list[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(my_list[[i]])
+  
+  # Extract info
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_age_est <- sum[[5]]
+  mu_age_sd <- sum[[5,2]]
+  mu_urban1_est <- sum[[6]]
+  mu_urban1_sd <- sum[[6,2]]
+  mu_urban2_est <- sum[[7]]
+  mu_urban2_sd <- sum[[7,2]]
+  
+  # Variance
+  sig_sex_est <- sum[[10]]
+  sig_sex_sd <- sum[[10,2]]
+  sig_isced_est <- sum[[11]]
+  sig_isced_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  sig_urban1_est <- sum[[13]]
+  sig_urban1_sd <- sum[[13,2]]
+  sig_urban2_est <- sum[[14]]
+  sig_urban2_sd <- sum[[14,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_df <- rbind(eb_indep_preds_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_age_est, mu_age_sd, mu_urban1_est, mu_urban1_sd, mu_urban2_est, mu_urban2_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_age_est, sig_age_sd, sig_urban1_est, sig_urban2_sd, sig_urban2_est, sig_urban2_sd))
+    }
+  }
+}
+ 
+
+# Again, an error, but the output is correct
+save(eb_indep_preds_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/eb_indep_var_df_w.RData" )
+```
+
+```{r}
+# Extract the indep vars from the regressions Eurobarometer one by one
+
+  # Store the results in a new dataframe
+eb_indep_preds_2007_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_2007)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_preds_2007[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_preds_2007[[i]])
+  
+  # Extract info
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_age_est <- sum[[5]]
+  mu_age_sd <- sum[[5,2]]
+  mu_urban1_est <- sum[[6]]
+  mu_urban1_sd <- sum[[6,2]]
+  mu_urban2_est <- sum[[7]]
+  mu_urban2_sd <- sum[[7,2]]
+  
+  # Variance
+  sig_sex_est <- sum[[10]]
+  sig_sex_sd <- sum[[10,2]]
+  sig_isced_est <- sum[[11]]
+  sig_isced_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  sig_urban1_est <- sum[[13]]
+  sig_urban1_sd <- sum[[13,2]]
+  sig_urban2_est <- sum[[14]]
+  sig_urban2_sd <- sum[[14,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_2007_df <- rbind(eb_indep_preds_2007_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_age_est, mu_age_sd, mu_urban1_est, mu_urban1_sd, mu_urban2_est, mu_urban2_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_age_est, sig_age_sd, sig_urban1_est, sig_urban2_sd, sig_urban2_est, sig_urban2_sd))
+    }
+
+
+# 2008
+
+  # Store the results in a new dataframe
+eb_indep_preds_2008_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_2008)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_preds_2008[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_preds_2008[[i]])
+  
+  # Extract info
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_age_est <- sum[[5]]
+  mu_age_sd <- sum[[5,2]]
+  mu_urban1_est <- sum[[6]]
+  mu_urban1_sd <- sum[[6,2]]
+  mu_urban2_est <- sum[[7]]
+  mu_urban2_sd <- sum[[7,2]]
+  
+  # Variance
+  sig_sex_est <- sum[[10]]
+  sig_sex_sd <- sum[[10,2]]
+  sig_isced_est <- sum[[11]]
+  sig_isced_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  sig_urban1_est <- sum[[13]]
+  sig_urban1_sd <- sum[[13,2]]
+  sig_urban2_est <- sum[[14]]
+  sig_urban2_sd <- sum[[14,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_2008_df <- rbind(eb_indep_preds_2008_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_age_est, mu_age_sd, mu_urban1_est, mu_urban1_sd, mu_urban2_est, mu_urban2_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_age_est, sig_age_sd, sig_urban1_est, sig_urban2_sd, sig_urban2_est, sig_urban2_sd))
+    }
+
+
+  # Store the results in a new dataframe
+eb_indep_preds_2009_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_2009)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_preds_2009[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_preds_2009[[i]])
+  
+  # Extract info
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_age_est <- sum[[5]]
+  mu_age_sd <- sum[[5,2]]
+  mu_urban1_est <- sum[[6]]
+  mu_urban1_sd <- sum[[6,2]]
+  mu_urban2_est <- sum[[7]]
+  mu_urban2_sd <- sum[[7,2]]
+  
+  # Variance
+  sig_sex_est <- sum[[10]]
+  sig_sex_sd <- sum[[10,2]]
+  sig_isced_est <- sum[[11]]
+  sig_isced_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  sig_urban1_est <- sum[[13]]
+  sig_urban1_sd <- sum[[13,2]]
+  sig_urban2_est <- sum[[14]]
+  sig_urban2_sd <- sum[[14,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_2009_df <- rbind(eb_indep_preds_2009_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_age_est, mu_age_sd, mu_urban1_est, mu_urban1_sd, mu_urban2_est, mu_urban2_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_age_est, sig_age_sd, sig_urban1_est, sig_urban2_sd, sig_urban2_est, sig_urban2_sd))
+    }
+
+
+  # Store the results in a new dataframe
+eb_indep_preds_2011_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_2011)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_preds_2011[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_preds_2011[[i]])
+  
+  # Extract info
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_age_est <- sum[[5]]
+  mu_age_sd <- sum[[5,2]]
+  mu_urban1_est <- sum[[6]]
+  mu_urban1_sd <- sum[[6,2]]
+  mu_urban2_est <- sum[[7]]
+  mu_urban2_sd <- sum[[7,2]]
+  
+  # Variance
+  sig_sex_est <- sum[[10]]
+  sig_sex_sd <- sum[[10,2]]
+  sig_isced_est <- sum[[11]]
+  sig_isced_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  sig_urban1_est <- sum[[13]]
+  sig_urban1_sd <- sum[[13,2]]
+  sig_urban2_est <- sum[[14]]
+  sig_urban2_sd <- sum[[14,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_2011_df <- rbind(eb_indep_preds_2011_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_age_est, mu_age_sd, mu_urban1_est, mu_urban1_sd, mu_urban2_est, mu_urban2_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_age_est, sig_age_sd, sig_urban1_est, sig_urban2_sd, sig_urban2_est, sig_urban2_sd))
+    }
+
+
+
+  # Store the results in a new dataframe
+eb_indep_preds_buyprod_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_buyprod)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_preds_buyprod[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_preds_buyprod[[i]])
+  
+  # Extract info
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_age_est <- sum[[5]]
+  mu_age_sd <- sum[[5,2]]
+  mu_urban1_est <- sum[[6]]
+  mu_urban1_sd <- sum[[6,2]]
+  mu_urban2_est <- sum[[7]]
+  mu_urban2_sd <- sum[[7,2]]
+  
+  # Variance
+  sig_sex_est <- sum[[10]]
+  sig_sex_sd <- sum[[10,2]]
+  sig_isced_est <- sum[[11]]
+  sig_isced_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  sig_urban1_est <- sum[[13]]
+  sig_urban1_sd <- sum[[13,2]]
+  sig_urban2_est <- sum[[14]]
+  sig_urban2_sd <- sum[[14,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_buyprod_df <- rbind(eb_indep_preds_buyprod_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_age_est, mu_age_sd, mu_urban1_est, mu_urban1_sd, mu_urban2_est, mu_urban2_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_age_est, sig_age_sd, sig_urban1_est, sig_urban2_sd, sig_urban2_est, sig_urban2_sd))
+    }
+
+
+  # Store the results in a new dataframe
+eb_indep_preds_cchange2_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_cchange2)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_preds_cchange2[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_preds_cchange2[[i]])
+  
+  # Extract info
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_age_est <- sum[[5]]
+  mu_age_sd <- sum[[5,2]]
+  mu_urban1_est <- sum[[6]]
+  mu_urban1_sd <- sum[[6,2]]
+  mu_urban2_est <- sum[[7]]
+  mu_urban2_sd <- sum[[7,2]]
+  
+  # Variance
+  sig_sex_est <- sum[[10]]
+  sig_sex_sd <- sum[[10,2]]
+  sig_isced_est <- sum[[11]]
+  sig_isced_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  sig_urban1_est <- sum[[13]]
+  sig_urban1_sd <- sum[[13,2]]
+  sig_urban2_est <- sum[[14]]
+  sig_urban2_sd <- sum[[14,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_cchange2_df <- rbind(eb_indep_preds_cchange2_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_age_est, mu_age_sd, mu_urban1_est, mu_urban1_sd, mu_urban2_est, mu_urban2_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_age_est, sig_age_sd, sig_urban1_est, sig_urban2_sd, sig_urban2_est, sig_urban2_sd))
+    }
+
+  # Store the results in a new dataframe
+eb_indep_preds_doprot_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_doprot)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_preds_doprot[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_preds_doprot[[i]])
+  
+  # Extract info
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_age_est <- sum[[5]]
+  mu_age_sd <- sum[[5,2]]
+  mu_urban1_est <- sum[[6]]
+  mu_urban1_sd <- sum[[6,2]]
+  mu_urban2_est <- sum[[7]]
+  mu_urban2_sd <- sum[[7,2]]
+  
+  # Variance
+  sig_sex_est <- sum[[10]]
+  sig_sex_sd <- sum[[10,2]]
+  sig_isced_est <- sum[[11]]
+  sig_isced_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  sig_urban1_est <- sum[[13]]
+  sig_urban1_sd <- sum[[13,2]]
+  sig_urban2_est <- sum[[14]]
+  sig_urban2_sd <- sum[[14,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_doprot_df <- rbind(eb_indep_preds_doprot_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_age_est, mu_age_sd, mu_urban1_est, mu_urban1_sd, mu_urban2_est, mu_urban2_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_age_est, sig_age_sd, sig_urban1_est, sig_urban2_sd, sig_urban2_est, sig_urban2_sd))
+    }
+
+
+  # Store the results in a new dataframe
+eb_indep_preds_doprot_city_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_doprot_city)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_preds_doprot_city[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_preds_doprot_city[[i]])
+  
+  # Extract info
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_age_est <- sum[[5]]
+  mu_age_sd <- sum[[5,2]]
+  mu_urban1_est <- sum[[6]]
+  mu_urban1_sd <- sum[[6,2]]
+  mu_urban2_est <- sum[[7]]
+  mu_urban2_sd <- sum[[7,2]]
+  
+  # Variance
+  sig_sex_est <- sum[[10]]
+  sig_sex_sd <- sum[[10,2]]
+  sig_isced_est <- sum[[11]]
+  sig_isced_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  sig_urban1_est <- sum[[13]]
+  sig_urban1_sd <- sum[[13,2]]
+  sig_urban2_est <- sum[[14]]
+  sig_urban2_sd <- sum[[14,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_doprot_city_df <- rbind(eb_indep_preds_doprot_city_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_age_est, mu_age_sd, mu_urban1_est, mu_urban1_sd, mu_urban2_est, mu_urban2_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_age_est, sig_age_sd, sig_urban1_est, sig_urban2_sd, sig_urban2_est, sig_urban2_sd))
+    }
+
+  # Store the results in a new dataframe
+eb_indep_preds_eff_daily_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_eff_daily)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_preds_eff_daily[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_preds_eff_daily[[i]])
+  
+  # Extract info
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_age_est <- sum[[5]]
+  mu_age_sd <- sum[[5,2]]
+  mu_urban1_est <- sum[[6]]
+  mu_urban1_sd <- sum[[6,2]]
+  mu_urban2_est <- sum[[7]]
+  mu_urban2_sd <- sum[[7,2]]
+  
+  # Variance
+  sig_sex_est <- sum[[10]]
+  sig_sex_sd <- sum[[10,2]]
+  sig_isced_est <- sum[[11]]
+  sig_isced_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  sig_urban1_est <- sum[[13]]
+  sig_urban1_sd <- sum[[13,2]]
+  sig_urban2_est <- sum[[14]]
+  sig_urban2_sd <- sum[[14,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_eff_daily_df <- rbind(eb_indep_preds_eff_daily_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_age_est, mu_age_sd, mu_urban1_est, mu_urban1_sd, mu_urban2_est, mu_urban2_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_age_est, sig_age_sd, sig_urban1_est, sig_urban2_sd, sig_urban2_est, sig_urban2_sd))
+}
+
+  # Store the results in a new dataframe
+eb_indep_preds_pers_imp_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_pers_imp)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_preds_pers_imp[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_preds_pers_imp[[i]])
+  
+  # Extract info
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_age_est <- sum[[5]]
+  mu_age_sd <- sum[[5,2]]
+  mu_urban1_est <- sum[[6]]
+  mu_urban1_sd <- sum[[6,2]]
+  mu_urban2_est <- sum[[7]]
+  mu_urban2_sd <- sum[[7,2]]
+  
+  # Variance
+  sig_sex_est <- sum[[10]]
+  sig_sex_sd <- sum[[10,2]]
+  sig_isced_est <- sum[[11]]
+  sig_isced_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  sig_urban1_est <- sum[[13]]
+  sig_urban1_sd <- sum[[13,2]]
+  sig_urban2_est <- sum[[14]]
+  sig_urban2_sd <- sum[[14,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_pers_imp_df <- rbind(eb_indep_preds_pers_imp_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_age_est, mu_age_sd, mu_urban1_est, mu_urban1_sd, mu_urban2_est, mu_urban2_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_age_est, sig_age_sd, sig_urban1_est, sig_urban2_sd, sig_urban2_est, sig_urban2_sd))
+    }
+
+  # Store the results in a new dataframe
+eb_indep_preds_prsaction_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_prsaction)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_preds_prsaction[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_preds_prsaction[[i]])
+  
+  # Extract info
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_age_est <- sum[[5]]
+  mu_age_sd <- sum[[5,2]]
+  mu_urban1_est <- sum[[6]]
+  mu_urban1_sd <- sum[[6,2]]
+  mu_urban2_est <- sum[[7]]
+  mu_urban2_sd <- sum[[7,2]]
+  
+  # Variance
+  sig_sex_est <- sum[[10]]
+  sig_sex_sd <- sum[[10,2]]
+  sig_isced_est <- sum[[11]]
+  sig_isced_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  sig_urban1_est <- sum[[13]]
+  sig_urban1_sd <- sum[[13,2]]
+  sig_urban2_est <- sum[[14]]
+  sig_urban2_sd <- sum[[14,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_prsaction_df <- rbind(eb_indep_preds_prsaction_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_age_est, mu_age_sd, mu_urban1_est, mu_urban1_sd, mu_urban2_est, mu_urban2_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_age_est, sig_age_sd, sig_urban1_est, sig_urban2_sd, sig_urban2_est, sig_urban2_sd))
+}
+
+  # Store the results in a new dataframe
+eb_indep_preds_quallife_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_quallife)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_preds_quallife[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_preds_quallife[[i]])
+  
+  # Extract info
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_est <- sum[[4]]
+  mu_isced_sd <- sum[[4,2]]
+  mu_age_est <- sum[[5]]
+  mu_age_sd <- sum[[5,2]]
+  mu_urban1_est <- sum[[6]]
+  mu_urban1_sd <- sum[[6,2]]
+  mu_urban2_est <- sum[[7]]
+  mu_urban2_sd <- sum[[7,2]]
+  
+  # Variance
+  sig_sex_est <- sum[[10]]
+  sig_sex_sd <- sum[[10,2]]
+  sig_isced_est <- sum[[11]]
+  sig_isced_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  sig_urban1_est <- sum[[13]]
+  sig_urban1_sd <- sum[[13,2]]
+  sig_urban2_est <- sum[[14]]
+  sig_urban2_sd <- sum[[14,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_quallife_df <- rbind(eb_indep_preds_quallife_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_age_est, mu_age_sd, mu_urban1_est, mu_urban1_sd, mu_urban2_est, mu_urban2_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_age_est, sig_age_sd, sig_urban1_est, sig_urban2_sd, sig_urban2_est, sig_urban2_sd))
+    }
+
+eb_indep_preds_df <- rbind(eb_indep_preds_2007_df, eb_indep_preds_2008_df, eb_indep_preds_2009_df, eb_indep_preds_2011_df, eb_indep_preds_buyprod_df, eb_indep_preds_cchange2_df, eb_indep_preds_doprot_city_df, eb_indep_preds_doprot_df, eb_indep_preds_eff_daily_df, eb_indep_preds_pers_imp_df, eb_indep_preds_prsaction_df, eb_indep_preds_quallife_df)
+
+# Again, an error, but the output is correct
+save(eb_indep_preds_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/eb_indep_var_df_w.RData" )
+```
+
+
+
+```{r}
+# The final step is to merge all results into one dataframe
+rm(list=ls())
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/eb_indep_var_df_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/eb_1986_indep_var_df_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/ess_indep_var_df_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/evs_indep_var_df_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/io_indep_var_df_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/issp_2_indep_var_df_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/issp_indep_var_df_w.RData")
+
+library(plyr)
+library(dplyr)
+total_indep_var_results <- rbind.fill(eb_preds_1986_df, eb_indep_preds_df, ess_indep_preds_df, evs_indep_preds_df, io_indep_preds_df, issp_indep_preds_df, issp_2_indep_preds_df) 
+
+save(total_indep_var_results, file= "/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_indep_var_results.RData" )
+```
+
+```{r}
+load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results_gam_w.RData")
+
+
+# I also want to add a variable that describes whether the dependent variable is mostly of affective, behavioral or cognitive nature 
+
+# 2 variables that are called worry, not handy 
+total_reg_results$dep_var[total_reg_results$dep_var == "worry" & total_reg_results$data == "ISSP"] <- "worry_issp"
+
+total_reg_results$attitude_cat[total_reg_results$dep_var == "dodiff" 
+                               | total_reg_results$dep_var == "pers_resp"
+                               | total_reg_results$dep_var == "worry"
+                               | total_reg_results$dep_var == "worried"
+                               | total_reg_results$dep_var == "worry_future"
+                               | total_reg_results$dep_var == "frontrunner"
+                               | total_reg_results$dep_var == "min_contr"] <- "affective"
+total_reg_results$attitude_cat[total_reg_results$dep_var == "willing_price" 
+                               | total_reg_results$dep_var == "willing_tax"
+                               | total_reg_results$dep_var == "willing_living"
+                               | total_reg_results$dep_var == "do_right"
+                               | total_reg_results$dep_var == "people_decide"
+                               | total_reg_results$dep_var == "climate5"
+                               | total_reg_results$dep_var == "prsaction"
+                               | total_reg_results$dep_var == "cc_prsact"
+                               | total_reg_results$dep_var == "buyprod"] <- "behavioral"
+total_reg_results$attitude_cat[total_reg_results$dep_var == "worry_issp" 
+                               | total_reg_results$dep_var == "lifeharm"
+                               | total_reg_results$dep_var == "progharm"
+                               | total_reg_results$dep_var == "econprotect"
+                               | total_reg_results$dep_var == "growharm"
+                               | total_reg_results$dep_var == "bus_decide"
+                               | total_reg_results$dep_var == "moreimp"
+                               | total_reg_results$dep_var == "othersame"
+                               | total_reg_results$dep_var == "exag"
+                               | total_reg_results$dep_var == "country_effort" 
+                               | total_reg_results$dep_var == "cause"
+                               | total_reg_results$dep_var == "resp_citiz"
+                               | total_reg_results$dep_var == "dk_start"
+                               | total_reg_results$dep_var == "do_gov"
+                               | total_reg_results$dep_var == "buss_help"
+                               | total_reg_results$dep_var == "human_resp"
+                               | total_reg_results$dep_var == "env_ec_stat"
+                               | total_reg_results$dep_var == "env_prsimp"
+                                | total_reg_results$dep_var == "envp_eg"
+                               | total_reg_results$dep_var == "effr_eg"
+                               | total_reg_results$dep_var == "cchange"
+                               | total_reg_results$dep_var == "cchange2"
+                               | total_reg_results$dep_var == "cchangetot" 
+                               | total_reg_results$dep_var == "ccpercept"
+                               | total_reg_results$dep_var == "env_quallife"
+                               | total_reg_results$dep_var == "doprot_comp"
+                               | total_reg_results$dep_var == "doprot_region"
+                               | total_reg_results$dep_var == "doprot_natgov"
+                               | total_reg_results$dep_var == "doprot_city"
+                               | total_reg_results$dep_var == "doprot_citiz"
+                               | total_reg_results$dep_var == "doprot_eu"
+                              | total_reg_results$dep_var == "cc_unstop"
+                               | total_reg_results$dep_var == "cc_exag"
+                               | total_reg_results$dep_var == "cc_poseu"
+                               | total_reg_results$dep_var == "role_ind"
+                               | total_reg_results$dep_var == "big_pol"
+                               | total_reg_results$dep_var == "eff_daily"
+                               | total_reg_results$dep_var == "pers_imp"] <- "cognitive"
+
+save(total_reg_results, file= "/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results_gam_w.RData" )
+
+#Create a variable that indicates whether the dependent variable can be interpreted in 2 ways (ambiguous)
+
+
+total_reg_results$ambiguous[total_reg_results$dep_var != "dodiff" 
+                               | total_reg_results$dep_var != "frontrunner"
+                               | total_reg_results$dep_var != "min_contr"
+                               | total_reg_results$dep_var != "people_decide"
+                               | total_reg_results$dep_var != "econprotect"
+                               | total_reg_results$dep_var != "growharm"
+                               | total_reg_results$dep_var != "bus_decide"
+                            | total_reg_results$dep_var != "othersame"
+                            | total_reg_results$dep_var != "resp_citiz"
+                            | total_reg_results$dep_var != "dk_start"
+                            | total_reg_results$dep_var != "buss_help"
+                            | total_reg_results$dep_var != "envp_eg"
+                            | total_reg_results$dep_var != "effr_eg"
+                            | total_reg_results$dep_var != "env_quallife"
+                            | total_reg_results$dep_var != "cc_unstop"
+                            | total_reg_results$dep_var != "cc_poseu"
+                            | total_reg_results$dep_var != "big_pol"] <- "No"
+total_reg_results$ambiguous[total_reg_results$dep_var == "dodiff" 
+                               | total_reg_results$dep_var == "frontrunner"
+                               | total_reg_results$dep_var == "min_contr"
+                               | total_reg_results$dep_var == "people_decide"
+                               | total_reg_results$dep_var == "econprotect"
+                               | total_reg_results$dep_var == "growharm"
+                               | total_reg_results$dep_var == "bus_decide"
+                            | total_reg_results$dep_var == "othersame"
+                            | total_reg_results$dep_var == "resp_citiz"
+                            | total_reg_results$dep_var == "dk_start"
+                            | total_reg_results$dep_var == "buss_help"
+                            | total_reg_results$dep_var == "envp_eg"
+                            | total_reg_results$dep_var == "effr_eg"
+                            | total_reg_results$dep_var == "env_quallife"
+                            | total_reg_results$dep_var == "cc_unstop"
+                            | total_reg_results$dep_var == "cc_poseu"
+                            | total_reg_results$dep_var == "big_pol"] <- "Yes"
+
+table(total_reg_results$ambiguous, useNA = "always")
+save(total_reg_results, file= "/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results_gam_w.RData" )
+
+```
+

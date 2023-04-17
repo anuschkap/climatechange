@@ -19,12 +19,25 @@ library(here)
 library(here)
 here()
 here::i_am("scripts/analysis/single_regression.Rmd")
-load(here("./data/final_data", "esstotal.RData"))
-
 ```
 
 
 ```{r}
+library(sandwich)
+library(lmtest)
+
+vcov(model1, type = "se")
+summary(model1)
+
+
+```
+
+
+
+```{r}
+load(here("./data/final_data", "esstotal.RData"))
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/esstotal.RData")
+
 ess_complete <- esstotal %>% drop_na()
 ess_complete$time <- ess_complete$surveyyear - min(ess_complete$surveyyear)
 
@@ -53,11 +66,23 @@ summary(ess_list_empty[[2]]) # Sig neg effect on intercept, sig pos effect on va
 summary(ess_list_empty[[3]]) # Sig pos effect on intercept, sig neg effect on variance (pers_resp)
 # These scores are quite in line with theory --> we're more worried, but especially increase in polarization regarding the cause. 
 
+model1 <- ess_list_empty[[2]]
+
+
+
 save(ess_list_empty, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_empty_w.RData")
 
 ```
 
 We know that time is not measured exactly equally across waves: a wave in 2010 can be measures in march, in 2011 it can be august and in 2012 it can be march again. So, there will be measurement error if we would estimate it as continuous variable. That is an argument to use dummies. Theoretically, we indeed want to see whether there is a general increase or decline (continuous), but if we're interested in period effects it is insightful to see declines in certain years as well. 
+
+
+
+
+png(file = "/Users/anuschka/Documents/climatechange/climatechange/output/hetero_plot_ess.png", width = 2800, height = 2400, res = 300)
+png <- plot(model1, ts = "true")
+dev.off()
+
 
 
 ```{r}
@@ -101,7 +126,6 @@ ess_complete$lrscale_time <- ess_complete$lrscale * ess_complete$time
 ess_complete$sex_time <- ess_complete$sex:ess_complete$time
 ess_complete$sex_time <- interaction(ess_complete$sex, ess_complete$time)
 ess_complete(sex, time, i(sex, time, ref = TRUE))
-
 
 
 interactions <- c("age_time", "sex_time", "isced_time", "urban_time", "ch_attend_time", "income_time", "lrscale_time")
@@ -152,6 +176,8 @@ evs_list_empty <- list()
 
 summary(evs_list_empty[[1]]) #Sig pos effect of time on intercept
 
+model1 <- evs_list_empty[[1]]
+plot(model1, ts = "true")
 
 save(evs_list_empty, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/evs_list_empty_w.RData")
 
@@ -210,6 +236,12 @@ save(evs_list_interactions, file="/Users/anuschka/Documents/climatechange/climat
 
 ```
 
+png(file = "/Users/anuschka/Documents/climatechange/climatechange/output/hetero_plot_evs.png", width = 2800, height = 2400, res = 300)
+png <- plot(model1)
+dev.off()
+
+
+
 
 ```{r}
 load(here("./data/final_data", "io_total.RData"))
@@ -238,6 +270,8 @@ io_list_empty <- list()
 summary(io_list_empty[[1]]) #Sig pos effect of time on intercept, not on variance
 summary(io_list_empty[[2]])
 
+model1 <- io_list_empty[[1]]
+plot(model1, ts = "true")
 
 save(io_list_empty, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/io_list_empty_w.RData")
 
@@ -291,10 +325,16 @@ save(io_list_interactions, file="/Users/anuschka/Documents/climatechange/climate
 
 ```
 
+png(file = "/Users/anuschka/Documents/climatechange/climatechange/output/hetero_plot_io.png", width = 2800, height = 2400, res = 300)
+png <- plot(model1, ts = "true")
+dev.off()
 
 ```{r}
 load(here("./data/final_data", "issptotal.Rdata"))
 #load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/issptotal.RData")
+
+issptotal$surveyyear[is.na(issptotal$surveyyear)] <- "2010"
+issptotal$surveyyear <- as.numeric(issptotal$surveyyear)
 
 # The issp has variables that are asked in all three waves, and variables that are asked only in 2 waves. So I have to run the code on subsets of the data. First I estimate the models for the statements that are asked throughout the three waves
 issp_complete <- issptotal %>% dplyr::select(surveyyear:marstat, weightvec)
@@ -308,7 +348,7 @@ issp_complete$time <- issp_complete$surveyyear - min(issp_complete$surveyyear)
 # With the variables that are only asked 2 waves gamlss has trouble converging. So now run model with variables that are asked in all waves. 
 
 predictors <- c("time")
-deps <- c("worry", "lifeharm", "willing_price", "willing_tax", "willing_living", "do_right", "progharm", "econprotect", "people_decide", "bus_decide")
+deps <- c("worry", "lifeharm", "willing_price", "willing_tax", "willing_living", "do_right", "progharm", "econprotect", "people_decide")
 
 issp_list_empty <- list()
 
@@ -328,16 +368,15 @@ summary(issp_list_empty[[2]]) # Sig pos effect on intercept, not on variance
 summary(issp_list_empty[[3]]) # Sig pos effect on intercept, sig neg effect on variance (pers_resp)
 # These scores are quite in line with theory --> we're more worried, but especially increase in polarization regarding the cause. 
 
+model1 <- issp_list_empty[[1]]
+plot(model1, ts = "true")
+
 save(issp_list_empty, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_empty_w.RData")
 
 # Now with predictors
 predictors <- c("time", "isced", "lrscale", "sex", "urban", "ch_attend", "income_quart", "age")
 deps <- c("worry", "lifeharm", "willing_price", "willing_tax", "willing_living", "do_right", "progharm", "econprotect", "people_decide" )
-table(issp_complete$bus_decide, useNA = "always")
-# The problem is something with business decide in combination with the family = NO. Because it does work when I delete it. 
 
-
-attributes(issp_complete$bus_decide)
 issp_list_preds <- list()
 
 # Loop through each dependent variable
@@ -351,7 +390,7 @@ issp_list_preds <- list()
   issp_list_preds[[i]] <- issp_fit
 } 
 
-summary(issp_list_preds[[10]]) 
+summary(issp_list_preds[[9]]) 
 summary(issp_list_preds[[2]]) 
 summary(issp_list_preds[[3]]) 
 
@@ -366,8 +405,8 @@ issp_complete$lrscale_time <- issp_complete$lrscale * issp_complete$time
 issp_complete$urban_time <- as.numeric(issp_complete$urban) * issp_complete$time
 issp_complete$ch_attend_time <- issp_complete$ch_attend * issp_complete$time
 
-interactions <- c("age_time", "sex_time", "isced_time", "income_time", "lrscale_time", "ch_attend_time")
-#urban_time
+interactions <- c("age_time", "sex_time", "isced_time", "income_time", "lrscale_time", "ch_attend_time", "urban_time")
+
 
 issp_list_interactions <- list()
 
@@ -468,6 +507,10 @@ save(issp_list_interactions_2_waves, file="/Users/anuschka/Documents/climatechan
 
 ```
 
+png(file = "/Users/anuschka/Documents/climatechange/climatechange/output/hetero_plot_issp.png", width = 2800, height = 2400, res = 300)
+png <- plot(model1, ts = "true")
+dev.off()
+
 
 ```{r}
 # Now the most difficult one: Eurobarometer. No items are asked steadily throughout time, so have to work with a lot of subsets. 
@@ -503,6 +546,9 @@ eb_list_empty_1986 <- list()
 summary(eb_list_empty_1986[[1]]) 
 summary(eb_list_empty_1986[[2]])
 
+model1 <- eb_list_empty_1986[[1]]
+plot(model1, ts = "true")
+
 save(eb_list_empty_1986, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_1986_w.RData")
 
 # Model with predictors
@@ -534,10 +580,10 @@ eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$time
 eb_complete$isced_time <- eb_complete$isced * eb_complete$time
 eb_complete$income_time <- eb_complete$income_quart * eb_complete$time
 eb_complete$lrplace_time <- eb_complete$lrplace * eb_complete$time
-#eb_complete$urban_time <- as.numeric(eb_complete$urban) * eb_complete$time
+eb_complete$urban_time <- as.numeric(eb_complete$urban) * eb_complete$time
 
-interactions <- c("age_time", "sex_time", "isced_time", "income_time", "lrplace_time")
-# urban_time
+interactions <- c("age_time", "sex_time", "isced_time", "income_time", "lrplace_time", "urban_time")
+
 
 eb_list_interactions_1986 <- list()
 
@@ -558,6 +604,10 @@ save(eb_list_interactions_1986, file="/Users/anuschka/Documents/climatechange/cl
 
 
 ```
+
+png(file = "/Users/anuschka/Documents/climatechange/climatechange/output/hetero_plot_eb.png", width = 2800, height = 2400, res = 300)
+png <- plot(model1, ts = "true")
+dev.off()
 
 ```{r}
 # Now with the influence of environment on quality of life

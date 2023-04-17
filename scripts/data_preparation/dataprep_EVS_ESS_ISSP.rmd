@@ -338,6 +338,10 @@ table(esstotal$surveyyear, useNA = "always")
 
 save(esstotal, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/esstotal.Rdata")
 
+#esstotal$urban <- as.factor(esstotal$urban)
+#esstotal$urban <- revalue(esstotal$urban, c("1"="Low urbanity", "2"="Medium urbanity", "3"="High urbanity"))
+#esstotal$urban <- factor(esstotal$urban, levels=c("Low urbanity", "Medium urbanity", "High urbanity"), ordered=TRUE)
+
 ```
 
 
@@ -652,6 +656,11 @@ issptotal$surveyyear[issptotal$studyno=="GESIS Data Archive Study Number ZA5500"
 
 # Change order of variables
 issptotal <- issptotal %>% select(surveyyear, worry:growharm, income_a, studyno, NL_INC, weightvec)
+
+table(issptotal$urban, useNA = "always")
+issptotal$urban <- revalue(issptotal$urban, c("1"= "Low urbanity", "2"="Medium urbanity", "3" = "High urbanity"))
+issptotal$urban <- factor(issptotal$urban, levels=c("Low urbanity", "Medium urbanity", "High urbanity"), ordered=TRUE)
+
 
 save(issptotal, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/issptotal.Rdata")
 ```

@@ -10,28 +10,17 @@ In this datascripts I want to practice applying weights with the anesrake packag
 #install.packages("anesrake")
 library(anesrake)
 library(tidyverse)
+library(here)
+here()
+here::i_am("scripts/analysis/single_regression.Rmd")
 
 rm(list = ls())
 
 ```
 
-```{r}
-# Load the datasets
-weights <- read_excel("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/weigh_data.xlsx")
-
-```
-
 
 ```{r}
-# The variables that I will use to weigh the data have to have the same coding as the original variables (in this case of the dpes datafile)
-weights$sex <- weights$male / weights$total_pop
 
-weights$sex <- factor(c("1", "2"))
-
-weights$sex <- NA
-
-weights$sex <- factor(weights$sex, 
-                      levels= c("Male", "Female"))
 
 
 load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/dpes2021sel.RData")
@@ -83,9 +72,7 @@ tab # Also almost no differences (rounded to 3 decimals everything is the same)
 load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2004sel")
 
 
-library(here)
-here()
-here::i_am("scripts/analysis/single_regression.Rmd")
+
 load(here("./data/all_waves", "eb2004sel.RData"))
 
 sex <- c('Male', 'Female')
@@ -101,7 +88,6 @@ names(targets) <- c("sex", "urban", "marstat")
 eb2004sel$caseid <- 1:length(eb2004sel$sex)
 
 # To use anesrakefinder, the variables in the original dataset have to be numeric
-class(dpes2021sel$urban)
 eb2004sel$urban <- as.numeric(eb2004sel$urban)
 eb2004sel$sex <- as.numeric(eb2004sel$sex)
 eb2004sel$marstat <- as.numeric(eb2004sel$marstat)

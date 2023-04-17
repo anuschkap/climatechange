@@ -4,13 +4,14 @@ author: "Anuschka Peelen"
 date: "`r Sys.Date()`"
 output: html_document
 ---
-# weighed gamlss
+# weighed gamlss , indep var
 
 ```{r}
 rm(list=ls())
 library(meta)
 library(metafor)
 library(here)
+library(dplyr)
 here()
 here::i_am("scripts/analysis/meta_analysis_gamlss_weigh.Rmd")
 ```
@@ -18,64 +19,212 @@ here::i_am("scripts/analysis/meta_analysis_gamlss_weigh.Rmd")
 ```{r}
 # With the final data
 # This method is not for multiple regression
-load(here("./data/meta_analysis", "total_reg_results_gam_w.RData"))
+load(here("./climatechange/data/meta_analysis", "total_indep_var_results.RData"))
 load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results_gam_w.RData")
 
 ?metagen
 
-time_intercept_gen <- metagen(TE = mu_time,
-                 seTE = mu_time_sd,
-                 data = total_reg_results,
+# Effects of mu's 
+# Gender 
+gender_gen <- metagen(TE = mu_sex_est,
+                 seTE = mu_sex_sd,
+                 data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
                  method.tau = "REML",
                  hakn = TRUE)
 
-k <- summary(time_intercept_gen$random[8])
-time_effect_empty_reg <- metareg(time_intercept_gen, ~ total_reg_results$mean_year)
+summary(gender_gen)
 
-
-summary(time_effect_empty_reg)
-#Both first year and mean year are not significant
-
-# The overall effect is stored in the 
-g <- time_intercept_gen$random
-
-# This effect is not significant. What about the variance?
-
-time.variance.gen <- metagen(TE = sig_time,
-                 seTE = sig_time_sd,
-                 data = total_reg_results,
-                 intercept = "M",
+# Age 
+age_gen <- metagen(TE = mu_age_est,
+                 seTE = mu_age_sd,
+                 data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
                  method.tau = "REML",
                  hakn = TRUE)
 
-summary(time.variance.gen)
-time_variance_empty_reg <- metareg(time.variance.gen, ~ total_reg_results$mean_year)
-summary(time_variance_empty_reg)
+summary(age_gen)
 
-# The same applies to the models with variance: first and mean_year both aren't significant
-
-#Also not significant
-
-# How about the effects with predictor variables
-time_preds_gen <- metagen(TE = mu_time_pred,
-                 seTE = mu_time_sd_pred,
-                 data = total_reg_results,
-                 intercept = "M",
+# Educational level
+edu_gen <- metagen(TE = mu_isced_est,
+                 seTE = mu_isced_sd,
+                 data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
                  method.tau = "REML",
                  hakn = TRUE)
 
-summary(time_preds_gen)
-time_effect_preds_reg <- metareg(time_preds_gen, ~ total_reg_results$first_year)
-summary(time_effect_preds_reg)
+summary(edu_gen)
 
+# Now for variance
+# Gender
+gender_var_gen <- metagen(TE = sig_sex_est,
+                 seTE = sig_sex_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+summary(gender_var_gen)
+
+# Age
+
+age_var_gen <- metagen(TE = sig_age_est,
+                 seTE = sig_age_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+summary(age_var_gen)
+
+# Education
+
+edu_var_gen <- metagen(TE = sig_isced_est,
+                 seTE = sig_isced_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+summary(edu_var_gen)
+
+# Effects of first year on these effects
+load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results_gam_w.RData")
+year <- total_reg_results %>% dplyr::select(mean_year, dep_var)
+total_indep_var_results <- left_join(total_indep_var_results, year)
+
+gender_year  <- metareg(gender_gen, ~ total_indep_var_results$mean_year)
+summary(gender_year)
+
+age_year  <- metareg(age_gen, ~ total_indep_var_results$mean_year)
+summary(age_year)
+
+edu_year  <- metareg(edu_gen, ~ total_indep_var_results$mean_year)
+summary(edu_year)
+
+# Variance
+gender_year_v  <- metareg(gender_var_gen, ~ total_indep_var_results$mean_year)
+summary(gender_year_v)
+
+age_year_v  <- metareg(age_var_gen, ~ total_indep_var_results$mean_year)
+summary(age_year_v)
+
+edu_year_v  <- metareg(edu_var_gen, ~ total_indep_var_results$mean_year)
+summary(edu_year_v)
 
 ```
+
+
+```{r}
+# Do the same for the interaction effects (age, sex, isced and time)
+load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_inter_results.RData")
+
+# Effects of mu's 
+# Gender 
+gender_gen <- metagen(TE = mu_sex_est,
+                 seTE = mu_sex_sd,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+summary(gender_gen)
+
+# Age 
+age_gen <- metagen(TE = mu_age_est,
+                 seTE = mu_age_sd,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+summary(age_gen)
+
+# Educational level
+edu_gen <- metagen(TE = mu_isced_est,
+                 seTE = mu_isced_sd,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+summary(edu_gen)
+
+# Now for variance
+# Gender
+gender_var_gen <- metagen(TE = sig_sex_est,
+                 seTE = sig_sex_sd,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+summary(gender_var_gen)
+
+# Age
+
+age_var_gen <- metagen(TE = sig_age_est,
+                 seTE = sig_age_sd,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+summary(age_var_gen)
+
+# Education
+
+edu_var_gen <- metagen(TE = sig_isced_est,
+                 seTE = sig_isced_sd,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+summary(edu_var_gen)
+
+# Effects of first year on these effects
+load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results.RData")
+year <- total_reg_results %>% dplyr::select(first_year, dep_var)
+total_inter_results <- left_join(total_inter_results, year)
+
+gender_year  <- metareg(gender_gen, ~ total_inter_results$first_year)
+summary(gender_year)
+
+age_year  <- metareg(age_gen, ~ total_inter_results$first_year)
+summary(age_year)
+
+edu_year  <- metareg(edu_gen, ~ total_inter_results$first_year)
+summary(edu_year)
+
+# Variance
+gender_year_v  <- metareg(gender_var_gen, ~ total_inter_results$first_year)
+summary(gender_year_v)
+
+age_year_v  <- metareg(age_var_gen, ~ total_inter_results$first_year)
+summary(age_year_v)
+
+edu_year_v  <- metareg(edu_var_gen, ~ total_inter_results$first_year)
+summary(edu_year_v)
+
+```
+
+
+
+
+
 
 ```{r}
 # Step 1. Estimate the empty model without moderators to make the forest plots. 
@@ -106,9 +255,9 @@ png <- forest(model_step_1_att, colout = colour.palette, col = "#ACBFD6", annota
 ```
 
 # Time effect 
-png(file = "/Users/anuschka/Documents/climatechange/climatechange/output/forestplot_neg_to_pos_weight.png", width = 2800, height = 2400, res = 300)
+png(file = "/Users/anuschka/Documents/forestplot_neg_to_pos_weight.png", width = 2800, height = 2400, res = 300)
 
-png <- forest(model_step_1_att, colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat , ilab.xpos = -2, xlim = c(-1, 1), order = "yi")
+png <- forest(model_step_1_att, colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat , ilab.xpos = -2, xlim = c(-1, 1))
 
 dev.off()
 
@@ -126,11 +275,21 @@ model_step_1_var
 ```
 
 # Time variance plot
-png(file = "/Users/anuschka/Documents/climatechange/climatechange/output/forestplot_var_weight.png", width = 2800, height = 2400, res = 300)
+png(file = "/Users/anuschka/Documents/forestplot_var.png", width = 2800, height = 2400, res = 300)
 
-png <- forest(model_step_1_var, colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat, ilab.xpos = -2, xlim = c(-1, 1), oder = "yi")
+png <- forest(model_step_1_var, colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat, ilab.xpos = -2, xlim = c(-1, 1))
 
 dev.off()
+
+```{r}
+#Using the kable package to make a nice table
+library(kableExtra)
+
+
+
+
+
+```
 
 ```{r}
 #Step 2. Empty model with meta-level indicators
@@ -172,12 +331,12 @@ model_test_sub
 model_step_1_var_sub <- rma(yi = sig_time,
               sei = sig_time_sd,
               data = total_reg_sub,
-              method = "ML", 
+              method = "ML", #waarom ml niet reml?
               test = "knha")
 
 model_step_1_var_sub
 
-sub <- forest(model_step_1_var_sub, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_sub$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat, ilab.xpos = -2, xlim = c(-1, 1))
+sub <- forest(model_step_1_var_sub, colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_sub$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat, ilab.xpos = -2, xlim = c(-1, 1))
 
 sub <- forest(model_step_1_var_sub)
 
@@ -188,7 +347,7 @@ sub <- forest(model_step_1_var_sub)
 model_step_3_att <- rma(yi = mu_time_pred,
               sei = mu_time_sd_pred,
               data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous,
+              mods = ~ first_year + attitude_cat,
               method = "ML",
               test = "knha")
 
@@ -200,7 +359,7 @@ model_step_3_att
 model_step_3_var <- rma(yi = sig_time_pred,
               sei = sig_time_sd_pred,
               data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous,
+              mods = ~ first_year + attitude_cat,
               method = "ML",
               test = "knha")
 
@@ -212,20 +371,19 @@ model_step_3_var
 model_step_4_att <- rma(yi = mu_time_int,
               sei = mu_time_sd_int,
               data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous,
+              mods = ~ first_year + attitude_cat,
               method = "ML",
               test = "knha")
 
 model_step_4_att
 
 ```
-
 ```{r}
 # Step 4. Variance
 model_step_4_var <- rma(yi = sig_time_int,
               sei = sig_time_sd_int,
               data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous,
+              mods = ~ first_year + attitude_cat,
               method = "ML",
               test = "knha")
 
@@ -267,52 +425,6 @@ model
 # Still not significant, so that seems rather robust
 ```
 
-
-```{r}
-# Make forest plot in different style. 
-
-# Have to calculate the z in order to determine whether they are sig or not 
-total_reg_results$se <- sqrt(model_step_1_att$vi) / sqrt (model_step_1_att$k)
-total_reg_results$z <-  total_reg_results$mu_time / total_reg_results$se 
-
-# Create a variable that gives different colors to neg/pos/insig results
-total_reg_results$direct_color[total_reg_results$z > 1.96] <- "#50C878" # Emerald green positive
-total_reg_results$direct_color[total_reg_results$z < - 1.96] <- "#C70039"  # Negative red 
-total_reg_results$direct_color[total_reg_results$z < 1.96 & total_reg_results$z > -1.96] <- "#756C6F"  # Insignificant grey
-
-direct_colour_palette <- as.vector(total_reg_results$direct_color)
-
-png <- forest(model_step_1_att, colout = direct_colour_palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat, ilab.xpos = -2, xlim = c(-1, 1), order = "yi")
-
-
-library(ggplot2)
-
-ggplot(png)
-
-forest_data <- total_reg_results %>% select(dep_var, mu_time)
-
-
-
-g <- ggplot(data.frame(ci.lb=model_step_1_att$ci.lb, ci.ub=model_step_1_att$ci.ub, yi=model_step_1_att$yi, vi=model_step_1_att$vi), aes(x=yi, y=rownames(model_step_1_att$data$dep_var)), shape = 15, size = 3) +
-  geom_vline(xintercept=0, lty=2) +
-  geom_point(aes(color=direct_colour_palette)) +
-  scale_color_manual(values=direct_colour_palette) +
-  coord_flip() +
-  theme_classic() +
-  labs(title="Forest plot", x="Study effect size", y="Study")
-
-g
-
-
-
-```
-
-# Time effect 
-png(file = "/Users/anuschka/Documents/climatechange/climatechange/output/forestplot_neg_to_pos_weight_jochem_col.png", width = 2800, height = 2400, res = 300)
-
-png <- forest(model_step_1_att, colout = direct_colour_palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat, ilab.xpos = -2, xlim = c(-1, 1), order = "yi")
-
-dev.off()
 
 
 ```{r}

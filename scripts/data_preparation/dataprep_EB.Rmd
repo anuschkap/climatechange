@@ -102,7 +102,6 @@ eb1986sel <- eb1986sel %>% select(v1, v8, env_ec_stat, env_prsimp, sex, eduyrs_c
 
 save(eb1986sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb1986sel.Rdata")
 
-
 #Continue with 1992
 eb1992 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb1992.sav", use.value.labels = T,  to.data.frame = T)
 
@@ -119,9 +118,12 @@ eb1992sel <- eb1992sel %>%
      mutate_at(c("env_prsimp"), funs(recode(., `1` = 3, `2` = 2, `3` = 1)))
 eb1992sel$env_prsimp <- (eb1992sel$env_prsimp -1) * (4/2) + 1
 
+
+
 #Independent vars
 table(eb1992sel$v645, useNA = "always") #9 missings on urbanity.
 eb1992sel$urban <- revalue(eb1992sel$v645, c("RURAL AREA/VILLAGE"= "Low urbanity", "SMALL/MIDDLE TOWN"="Medium urbanity", "LARGE TOWN" = "High urbanity"))
+eb1992sel$urban <- factor(eb1992sel$urban, levels=c("Low urbanity", "Medium urbanity", "High urbanity"),  ed=TRUE)
 table(eb1992sel$v647, useNA = "always") 
 eb1992sel$ch_attend <- as.numeric(eb1992sel$v647)
 eb1992sel <- eb1992sel %>% 
@@ -218,6 +220,7 @@ table(eb1995sel$v354, useNA = "always") #No missings urbanity
 eb1995sel$urban <- revalue(eb1995sel$v354, c("Rural area or village"= "Low urbanity", "Small or middle size town"="Medium urbanity", "Large town" = "High urbanity"))
 table(eb1995sel$v355, useNA = "always") #199 missings  income, still in 12 cats. 
 eb1995sel$income <- as.numeric(eb1995sel$v355)
+
 
 mean(eb1995sel$income, na.rm=T)
 eb1995sel$income[is.na(eb1995sel$income)] <- 6.831
@@ -556,7 +559,7 @@ save(eb2009asel, file="/Users/anuschka/Documents/climatechange/climatechange/dat
 
 ```{r}
 eb2009_2 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2009_2.sav", use.value.labels = T,  to.data.frame = T)
-look_for(eb2009_2, "marital")
+
 
 eb2009bsel <- eb2009_2 %>% filter(v6=="The Netherlands") %>%
   select(v1, v8, v385, v364, v363, v374, v392, v393, v394, v395, v396, v397, v398, v399, v387, v388, v389, v390, v391, v438, v439, v440, v441, v442, v445, v279)
@@ -651,6 +654,7 @@ save(eb2009bsel, file="/Users/anuschka/Documents/climatechange/climatechange/dat
 
 ```{r}
 #2011 consists of 2 waves as well
+library(plyr)
 eb2011_1 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2011_1.sav", use.value.labels = T,  to.data.frame = T)
 
 eb2011asel <- eb2011_1 %>% filter(v6=="The Netherlands") %>%
@@ -800,7 +804,7 @@ save(eb2011bsel, file="/Users/anuschka/Documents/climatechange/climatechange/dat
 ```{r}
 #2013 
 eb2013 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2013.sav", use.value.labels = T,  to.data.frame = T)
-look_for(eb2013, "marital")
+
 
 eb2013sel <- eb2013 %>% filter(country=="NL - The Netherlands") %>%
   select(studyno1, w1, qa1a, qa5, qa2, qa1b_1, qa1t_1, d10, d7r1, d8, d11, d25)
@@ -863,7 +867,8 @@ lapply(eb2013sel, table, useNA = "always")
 # Again no numeric variables left where i need to replace the missings
 
 
-eb2013sel <- eb2013sel %>% select(studyno1, w1, cchange, cchange2, cchangetot, ccpercept, prsaction, eduyrs, isced, sex, age, urban, marstat) %>% 
+eb2013sel <- eb2013sel %>% select(studyno1, w1, cchange, cchange2, cchangetot, ccpercept, prsaction, eduyrs, isced, sex, age, urban, marstat) 
+#%>% 
   rename (v1 = studyno1, v8 = w1)
 
 save(eb2013sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2013sel.Rdata")
@@ -930,8 +935,7 @@ table(eb2014sel$marstat, useNA = "always" )
 
 # No missings that need substitution
 
-eb2014sel <-  eb2014sel %>% select(studyno1, w1, envp_eg, effr_eg, role_ind, big_pol, eff_daily, env_quallife, doprot_comp:doprot_eu, pers_imp, buyprod, eduyrs, isced, sex, age, urban, marstat) %>% 
-  rename(v1 = studyno1, v8 = w1)
+eb2014sel <-  eb2014sel %>% select(studyno1, w1, envp_eg, effr_eg, role_ind, big_pol, eff_daily, env_quallife, doprot_comp:doprot_eu, pers_imp, buyprod, eduyrs, isced, sex, age, urban, marstat) 
 
 save(eb2014sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2014sel.Rdata")
 ```
@@ -941,7 +945,6 @@ save(eb2014sel, file="/Users/anuschka/Documents/climatechange/climatechange/data
 #2015
 eb2015 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2015.sav", use.value.labels = T,  to.data.frame = T)
 
-look_for(eb2015, "marital")
 
 eb2015sel <- eb2015 %>% filter(country=="NL - The Netherlands") %>%
   select(studyno1, w1, w3a4a, qa1a, qa1b_1, qa1t_1, qa5, qa2, d1, d7r1, d8, d10, d11, d25)
@@ -1009,8 +1012,8 @@ for (var in mis_vars) {
   eb2015sel[is.na(eb2015sel[,var]), var] <- mean(eb2015sel[,var], na.rm = TRUE)
 }
 
-eb2015sel <- eb2015sel %>% select(studyno1, w1, cchange, cchange2, cchangetot, prsaction, ccpercept, eduyrs, isced, sex, age, lrplace, urban, marstat) %>% 
-  rename (v1 = studyno1, v8 = w1)
+eb2015sel <- eb2015sel %>% select(studyno1, w1, cchange, cchange2, cchangetot, prsaction, ccpercept, eduyrs, isced, sex, age, lrplace, urban, marstat) 
+
 
 save(eb2015sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2015sel.Rdata")
 ```
@@ -1092,8 +1095,9 @@ for (var in mis_vars) {
 }
 
 
-eb2017asel <- eb2017asel %>% select(studyno1, w1, cchange, cchange2, cchangetot, prsaction, ccpercept, eduyrs, isced, sex, age, lrplace, urban, marstat) %>% 
-  rename (v1 = studyno1, v8 = w1)
+eb2017asel <- eb2017asel %>% select(studyno1, w1, cchange, cchange2, cchangetot, prsaction, ccpercept, eduyrs, isced, sex, age, lrplace, urban, marstat) 
+#%>% 
+  #rename (v1 = studyno1, v8 = w1)
 
 save(eb2017asel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2017asel.Rdata")
 
@@ -1164,8 +1168,9 @@ for (var in mis_vars) {
 }
 
 
-eb2017bsel <- eb2017bsel %>% select(studyno1, w1, doprot_comp:doprot_eu, role_ind:eff_daily, eduyrs, isced, sex, age, urban, lrplace, marstat) %>% 
-  rename(v1 = studyno1, v8 = w1)
+eb2017bsel <- eb2017bsel %>% select(studyno1, w1, doprot_comp:doprot_eu, role_ind:eff_daily, eduyrs, isced, sex, age, urban, lrplace, marstat) 
+#%>% 
+ # rename(v1 = studyno1, v8 = w1)
 
 save(eb2017bsel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2017bsel.Rdata")
 ```
@@ -1241,7 +1246,8 @@ for (var in mis_vars) {
 }
 
 
-eb2021sel <- eb2021sel %>% select(studyno1, w1, cchange, cchange2, cchangetot, ccpercept, eduyrs, sex, age, urban, lrplace ) %>% rename(v1 = studyno1, v8 = w1)
+eb2021sel <- eb2021sel %>% select(studyno1, w1, cchange, cchange2, cchangetot, ccpercept, eduyrs, isced, sex, age, urban, lrplace, marstat ) 
+#%>% rename(v1 = studyno1, v8 = w1)
 
 save(eb2021sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2021sel.Rdata")
 ```
@@ -1327,6 +1333,12 @@ eb_tot <- plyr::rbind.fill(ebu2000, eb0010, ebtm15, eb17up)
 table(eb_tot$surveyyear)
 
 save(eb_tot, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/eb_tot.Rdata")
+
+library(plyr)
+eb_tot$urban <- revalue(eb_tot$urban, c("1"= "Low urbanity", "2"="Medium urbanity", "3" = "High urbanity"))
+eb_tot$urban <- factor(eb_tot$urban, levels=c("Low urbanity", "Medium urbanity", "High urbanity"), ordered=TRUE)
+table(eb_tot$urban, useNA = "always")
+
 ```
 
 
