@@ -17,65 +17,11 @@ here::i_am("scripts/analysis/meta_analysis_gamlss_weigh.Rmd")
 
 ```{r}
 # With the final data
-# This method is not for multiple regression
 load(here("./data/meta_analysis", "total_reg_results_gam_w.RData"))
 load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results_gam_w.RData")
-
-?metagen
-
-time_intercept_gen <- metagen(TE = mu_time,
-                 seTE = mu_time_sd,
-                 data = total_reg_results,
-                 fixed = FALSE,
-                 random = TRUE,
-                 method.tau = "REML",
-                 hakn = TRUE)
-
-k <- summary(time_intercept_gen$random[8])
-time_effect_empty_reg <- metareg(time_intercept_gen, ~ total_reg_results$mean_year)
-
-
-summary(time_effect_empty_reg)
-#Both first year and mean year are not significant
-
-# The overall effect is stored in the 
-g <- time_intercept_gen$random
-
-# This effect is not significant. What about the variance?
-
-time.variance.gen <- metagen(TE = sig_time,
-                 seTE = sig_time_sd,
-                 data = total_reg_results,
-                 intercept = "M",
-                 fixed = FALSE,
-                 random = TRUE,
-                 method.tau = "REML",
-                 hakn = TRUE)
-
-summary(time.variance.gen)
-time_variance_empty_reg <- metareg(time.variance.gen, ~ total_reg_results$mean_year)
-summary(time_variance_empty_reg)
-
-# The same applies to the models with variance: first and mean_year both aren't significant
-
-#Also not significant
-
-# How about the effects with predictor variables
-time_preds_gen <- metagen(TE = mu_time_pred,
-                 seTE = mu_time_sd_pred,
-                 data = total_reg_results,
-                 intercept = "M",
-                 fixed = FALSE,
-                 random = TRUE,
-                 method.tau = "REML",
-                 hakn = TRUE)
-
-summary(time_preds_gen)
-time_effect_preds_reg <- metareg(time_preds_gen, ~ total_reg_results$first_year)
-summary(time_effect_preds_reg)
-
-
 ```
+
+
 
 ```{r}
 # Step 1. Estimate the empty model without moderators to make the forest plots. 
@@ -142,7 +88,6 @@ model_step_2_att <- rma(yi = mu_time,
               test = "knha")
 
 model_step_2_att
-
 
 ```
 ```{r}
@@ -316,45 +261,146 @@ dev.off()
 
 
 ```{r}
-# Practice with kable package
-library(tidyverse)
-library(kableExtra)
-install.packages("modelsummary")
-library(modelsummary)
-library(broom)
-install.packages("apaTables")
-library(apaTables)
+# Run the meta-regressions on subsets of the data per attitude cat
+affective <- subset(total_reg_results, attitude_cat == "affective")
 
-dt <- mtcars[1:5, 1:6]
-kbl(dt)
+# See if there is an effect without the inclusion of meta-level variables
+aff_model <- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = affective,
+              method = "ML",
+              test = "knha")
 
-dt %>%
-  kbl(caption = "Table 1. Regression outputs") %>%
-  kable_classic(full_width = F, html_font = "Times")
+aff_model
 
+one <- summary(aff_model)
+one_df <- data.frame(matrix(ncol = 4, nrow = 1))
+colnames(one_df) <- c("Variable", "Estimate", "SE", "p")
 
-model <- as.data.frame(summary(model_step_1_att))
-model <- tidy(model)
-
-model <- tidy(summary(model_step_1_att))
-
+one_df$Variable <- "Affective Mu"
+one_df$Estimate <- one$b
+one_df$SE <- one$se
+one_df$p <- one$pval
 
 
+# This is significant: estimate 0.054, p-value = 0.02 
+# And for variance?
+aff_model_var <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = affective,
+              method = "ML",
+              test = "knha")
+
+aff_model_var
+# Not sig (p = 0.449)
+
+two <- summary(aff_model_var)
+two_df <- data.frame(matrix(ncol = 4, nrow = 1))
+colnames(two_df) <- c("Variable", "Estimate", "SE", "p")
+
+two_df$Variable <- "Affective Variance"
+two_df$Estimate <- two$b
+two_df$SE <- two$se
+two_df$p <- two$pval
+
+behavioral <- subset(total_reg_results, attitude_cat == "behavioral")
+
+
+beh_model <- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = behavioral,
+              method = "ML",
+              test = "knha")
+
+beh_model
+
+three <- summary(beh_model)
+three_df <- data.frame(matrix(ncol = 4, nrow = 1))
+colnames(three_df) <- c("Variable", "Estimate", "SE", "p")
+
+three_df$Variable <- "Behavioral Mu"
+three_df$Estimate <- three$b
+three_df$SE <- three$se
+three_df$p <- three$pval
+
+
+# This is significant: estimate -0.026, p-value = 0.0003 
+# And for variance?
+beh_model_var <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = behavioral,
+              method = "ML",
+              test = "knha")
+
+beh_model_var
+# Not sig (p = 0.109)
+
+four <- summary(beh_model_var)
+four_df <- data.frame(matrix(ncol = 4, nrow = 1))
+colnames(four_df) <- c("Variable", "Estimate", "SE", "p")
+
+four_df$Variable <- "Behavioral Variance"
+four_df$Estimate <- four$b
+four_df$SE <- four$se
+four_df$p <- four$pval
+
+
+cognitive <- subset(total_reg_results, attitude_cat == "cognitive")
+
+
+cog_model <- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = cognitive,
+              method = "ML",
+              test = "knha")
+
+cog_model
+
+five <- summary(cog_model)
+five_df <- data.frame(matrix(ncol = 4, nrow = 1))
+colnames(five_df) <- c("Variable", "Estimate", "SE", "p")
+
+five_df$Variable <- "Cognitive Mu"
+five_df$Estimate <- five$b
+five_df$SE <- five$se
+five_df$p <- five$pval
+
+
+# Not significant (p = 0.3915)
+# And for variance?
+cog_model_var <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = cognitive,
+              method = "ML",
+              test = "knha")
+
+cog_model_var
+
+# Sig (est = -0.019, p = 0.015)
+six <- summary(cog_model_var)
+six_df <- data.frame(matrix(ncol = 4, nrow = 1))
+colnames(six_df) <- c("Variable", "Estimate", "SE", "p")
+
+six_df$Variable <- "Cognitive Variance"
+six_df$Estimate <- six$b
+six_df$SE <- six$se
+six_df$p <- six$pval
+
+abc_model <- rbind(one_df, two_df, three_df, four_df, five_df, six_df)
+abc_model$Estimate <- as.numeric(abc_model$Estimate)
+
+abc_table <- kable(abc_model, format = "html", align = "l",
+      caption = "Appendix X. Meta-regression time-effect subsets affective, behavioral, cognitive", digits = 3) %>%
+  kable_classic_2(full_width = FALSE) 
 
 
 
-model %>% 
-  kbl(caption = "Table 1. Regression outputs") %>% 
-  kable_classic(full_width = F, html_font = "Times")
-
-
-regression_table <- data.frame(model = NA, I2 = NA)
-regression_table$model <- "Step 1 var"
-
-regression_table$I2 <- model_step_1_att$I2
-regression_table$intercept <- coef(model_step_1_att)["(Intercept"]
-
-
+%>%
+  save_kable("/Users/anuschka/Documents/climatechange/climatechange/output/weight_table.png")
 
 ```
+
+
+
+
 

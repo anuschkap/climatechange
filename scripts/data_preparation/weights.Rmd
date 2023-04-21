@@ -11,118 +11,11 @@ In this datascripts I want to practice applying weights with the anesrake packag
 library(anesrake)
 library(tidyverse)
 library(here)
+library(kableExtra) # needed later to make an example table that compares the proportions
 here()
 here::i_am("scripts/analysis/single_regression.Rmd")
 
 rm(list = ls())
-
-```
-
-
-```{r}
-
-
-
-load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/dpes2021sel.RData")
-
-sex <- c('Male', 'Female')
-sex <- c(0.49, 0.51)
-urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
-urban <- c(0.34, 0.17, 0.49)
-
-targets <- list(sex, urban)
-names(targets) <- c("sex", "urban")
-
-dpes2021sel$caseid <- 1:length(dpes2021sel$sex)
-
-# To use anesrakefinder, the variables in the original dataset have to be numeric
-class(dpes2021sel$urban)
-dpes2021sel$urban <- as.numeric(dpes2021sel$urban)
-dpes2021sel$sex <- as.numeric(dpes2021sel$sex)
-
-anesrakefinder(targets, dpes2021sel, choosemethod = "total")
-
-outsave <- anesrake(targets, dpes2021sel, caseid = dpes2021sel$caseid,
-  verbose= FALSE, cap = 5, choosemethod = "total",
-  type = "pctlim", pctlim = .05 , nlim = 5,
-  iterate = TRUE , force1 = TRUE)
-summary(outsave)
-
-dpes2021sel$weightvec  <- unlist(outsave[1])
-n  <- length(dpes2021sel$sex)
-
-# weighting loss
-((sum(dpes2021sel$weightvec ^ 2) / (sum(dpes2021sel$weightvec)) ^ 2) * n) - 1
-
-library(weights)
-
-unweighted <-  wpct(dpes2021sel$cc_measures)
-weighted  <-  wpct(dpes2021sel$cc_measures, dpes2021sel$weightvec)
-tab  <- data.frame(unweighted, weighted)
-tab # No difference at all, see how this is with the other variable
-
-unweighted <-  wpct(dpes2021sel$cc_cause)
-weighted  <-  wpct(dpes2021sel$cc_cause, dpes2021sel$weightvec)
-tab  <- data.frame(unweighted, weighted)
-tab # Also almost no differences (rounded to 3 decimals everything is the same)
-
-# And now try this for a different dataset
-
-
-load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2004sel")
-
-
-
-load(here("./data/all_waves", "eb2004sel.RData"))
-
-sex <- c('Male', 'Female')
-sex <- c(0.49, 0.51)
-urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
-urban <- c(0.41, 0.18, 0.42)
-marstat <- c('1', '2')
-marstat <- c(0.58, 0.42)
-
-targets <- list(sex, urban, marstat)
-names(targets) <- c("sex", "urban", "marstat")
-
-eb2004sel$caseid <- 1:length(eb2004sel$sex)
-
-# To use anesrakefinder, the variables in the original dataset have to be numeric
-eb2004sel$urban <- as.numeric(eb2004sel$urban)
-eb2004sel$sex <- as.numeric(eb2004sel$sex)
-eb2004sel$marstat <- as.numeric(eb2004sel$marstat)
-
-anesrakefinder(targets, eb2004sel, choosemethod = "total")
-
-outsave <- anesrake(targets, eb2004sel, caseid = eb2004sel$caseid,
-  verbose= FALSE, cap = 5, choosemethod = "total",
-  type = "pctlim", pctlim = .05 , nlim = 5,
-  iterate = TRUE , force1 = TRUE)
-summary(outsave)
-
-eb2004sel$weightvec  <- unlist(outsave[1])
-n  <- length(eb2004sel$sex)
-
-# weighting loss
-((sum(eb2004sel$weightvec ^ 2) / (sum(eb2004sel$weightvec)) ^ 2) * n) - 1
-
-library(weights)
-
-unweighted <-  wpct(eb2004sel$pers_effort)
-weighted  <-  wpct(eb2004sel$pers_effort, eb2004sel$weightvec)
-u <- wpct(eb2004sel$env_quallife)
-w <- wpct(eb2004sel$env_quallife, eb2004sel$weightvec)
-
-eb2004sel$env_quallife_weight <- w
-
-tab  <- data.frame(unweighted, weighted)
-tab # No difference at all, see how this is with the other variable
-
-model1 <- lm(env_quallife ~ sex + urban + marstat, weights = eb2004sel$weightvec, data = eb2004sel)
-summary(model1)
-
-model2 <- lm(env_quallife ~ sex + urban + marstat, data = eb2004sel)
-summary(model2)
 
 ```
 
@@ -205,6 +98,61 @@ issp00sel$weightvec  <- unlist(outsave[1])
 
 save(issp00sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp00sel.Rdata")
 
+```
+
+
+```{r}
+# Create a table that compares the weighted and unweighted proportions, using the ISSP 2000 as an example. 
+
+sex_unweight <- wpct(issp00sel$sex)
+sex_weight <- wpct(issp00sel$sex, issp00sel$weightvec)
+
+age_unweight <- wpct(issp00sel$age_cat)
+age_weight <- wpct(issp00sel$age_cat, issp00sel$weightvec)
+
+urban_unweight <- wpct(issp00sel$urban)
+urban_weight <- wpct(issp00sel$urban, issp00sel$weightvec)
+
+marstat_unweight <- wpct(issp00sel$marstat)
+marstat_weight <- wpct(issp00sel$marstat, issp00sel$weightvec)
+
+table_sex <- data.frame(Variable = c("Gender", ""),
+  Category = c("Male", "Female"),
+  Unweighted = paste(round(sex_unweight * 100, 1), "%"),
+  Weighted = paste(round(sex_weight * 100, 1), "%")
+)
+
+
+table_mar <- data.frame(Variable = c("Marital Status", ""),
+  Category = c("Living together", "Not living together"),
+  Unweighted = paste(round(marstat_unweight * 100, 1), "%"),
+  Weighted = paste(round(marstat_weight * 100, 1), "%")
+)
+
+table_urban <- data.frame(Variable = c("Urbanity", "", ""),
+  Category = c("Low urbanity", "Medium urbanity", "High urbanity"),
+  Unweighted = paste(round(urban_unweight * 100, 1), "%"),
+  Weighted = paste(round(urban_weight * 100, 1), "%")
+)
+
+table_age <- data.frame(Variable = c("Age category", "", "", ""),
+  Category = c("Under 30", "31 to 45", "46 to 61", "61 and older"),
+  Unweighted = paste(round(age_unweight * 100, 1), "%"),
+  Weighted = paste(round(age_weight * 100, 1), "%")
+)
+
+table_total <- rbind(table_sex, table_mar, table_urban, table_age)
+
+# Make and save the table
+weight_table <- kable(table_total, format = "html", align = "l",
+      caption = "Table 1. Proportions weighted and unweighted for ISSP 2000") %>%
+  kable_classic_2(full_width = FALSE) %>%
+  save_kable("/Users/anuschka/Documents/climatechange/climatechange/output/weight_table.png")
+
+```
+
+
+```{r}
 # And lastly for 2010
 load(here("./data/all_waves", "issp10sel.RData"))
 

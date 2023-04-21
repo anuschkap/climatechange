@@ -21,19 +21,6 @@ here()
 here::i_am("scripts/analysis/single_regression.Rmd")
 ```
 
-
-```{r}
-library(sandwich)
-library(lmtest)
-
-vcov(model1, type = "se")
-summary(model1)
-
-
-```
-
-
-
 ```{r}
 load(here("./data/final_data", "esstotal.RData"))
 load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/esstotal.RData")

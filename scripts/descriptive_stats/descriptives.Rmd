@@ -1,0 +1,253 @@
+---
+title: "Untitled"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+library(readxl)
+library(here)
+library(ggplot2)
+library(kableExtra)
+library(modelsummary)
+library(tidyverse)
+library(writexl)
+library(readxl)
+here()
+here::i_am("scripts/descriptive_stats/descriptives.Rmd")
+
+```
+
+# Make a ggplot that shows the years that each dataset covers
+```{r}
+datayear <- read_excel("/Users/anuschka/Documents/climatechange/climatechange/data/descriptives/dataset_year.xlsx")
+```
+
+```{r}
+color_scale <- c ("#1ABC9C", "#85C1E9" , "#EB984E", "#AF7AC5" , "#F1C40F")
+datayear$dataset <- factor(datayear$dataset, levels = c("I&O", "ESS", "ISSP", "EVS", "EB"))
+
+first_last_year <- datayear %>%
+  group_by(dataset) %>%
+  summarize(first_year = min(year),
+            last_year = max(year))
+
+yearplot <- ggplot(data = datayear, aes(x = year, y = dataset, color = dataset)) +
+  geom_line(size = 1) +
+  scale_color_manual(values = color_scale) +
+  labs(title = "Datasets by year",
+       x = "Year",
+       y = "Dataset") +
+  geom_point(data = first_last_year, x = first_last_year$first_year) + 
+  geom_point(data = first_last_year, x = first_last_year$last_year) + 
+  geom_text(data = first_last_year, x = first_last_year$first_year, label = first_last_year$first_year, vjust = -1) +
+  geom_text(data = first_last_year, x = first_last_year$last_year, label = first_last_year$last_year, vjust = -1) + 
+  theme_classic() +
+  guides(color = FALSE)
+
+ggsave("yearplot.png", width = 7, height = 5, path = "/Users/anuschka/Documents/climatechange/climatechange/output/yearplot.png")
+```
+
+# Write a loop for the standard deviations and then show two histograms
+
+```{r}
+rm(list=ls())
+
+load(here("./data/final_data", "eb_tot.RData"))
+load(here("./data/final_data", "io_total.RData"))
+
+eb_sel <- eb_tot %>% select(env_ec_stat, env_prsimp, env_quallife:cchangetot, doprot_city)
+io_sel <- io_total %>% select(worried:human_resp)
+
+
+datasets <- list(eb_sel, io_sel)
+
+std_deviations <- c()
+var_names <- c()
+
+for (i in 1:length(datasets)) {
+  for (j in 1:ncol(datasets[[i]])) {
+    # Check if variable is numeric
+    if (is.numeric(datasets[[i]][[j]])) {
+      # Calculate standard deviation and store in vector
+      std_dev <- sd(datasets[[i]][[j]], na.rm = TRUE)
+      std_deviations<- c(std_deviations, std_dev)
+      # Store variable name in vector
+      var_names <- c(var_names, colnames(datasets[[i]])[j])
+    }
+  }
+}
+
+
+low_std <- var_names[which.min(std_deviations)]
+high_std <- var_names[which.max(std_deviations)]
+
+low <- datasets[[1]][[low_std]]
+high <- datasets[[1]][[high_std]]
+
+
+hist(datasets[[1]][[low_std]], main = paste("Histogram of", low_std), xlab = "Answer scale", xlim = c(1, 5), col = "#82E0AA", plot = TRUE) 
+x <- seq(min(distance), max(distance), length = 40)
+f <- dnorm(x, mean = mean(distance), sd = sd(distance))
+lines(x, f, col = "red", lwd = 2)
+
+hist(eb_tot$doprot_region)
+hist(eb_tot$pers_effort)
+
+
+p <- ggplot(data = eb_tot, aes(x=x) ) +
+  geom_histogram( aes(x = cchangetot, y = after_stat(density)), fill="#69b3a2" ) +
+  geom_label( aes(x=3, y=0.25, label="Climate change is one of the main issues world"), color="#69b3a2") +
+  geom_histogram( aes(x = pers_effort, y = -after_stat(density)), fill= "#404080") +
+  geom_label( aes(x=3, y=-0.25, label="Willing to make personal effort"), color="#404080") +
+    xlab("Value of x") +
+   stat_function(
+    fun = dnorm, 
+    args = list(mean = mean(eb_tot$cchangetot), sd = sd(eb_tot$cchangetot))) +
+    stat_function(
+    fun = dnorm, 
+    args = list(mean = mean(eb_tot$pers_effort), sd = sd(eb_tot$pers_effort))) + 
+  theme_classic() 
+
+
+p
+
+
+p <- ggplot(data = eb_tot, aes(x=cchangetot) ) +
+  geom_histogram( aes(x = cchangetot, y = after_stat(density)), fill="#69b3a2", width = 1 ) +
+  geom_label( aes(x=3, y=3, label="Climate change is one of the main issues world"), color="#69b3a2") +
+  geom_histogram( aes(x = pers_effort, y = -after_stat(density)), fill= "#404080", width = 1) +
+  geom_label( aes(x=3, y=-3, label="Willing to make personal effort"), color="#404080") +
+    xlab("Value of x") +
+   stat_function(
+    fun = dnorm, 
+    args = list(mean = mean(eb_tot$cchangetot), sd = sd(eb_tot$cchangetot))) +
+    stat_function(
+    fun = dnorm, 
+    args = list(mean = mean(eb_tot$pers_effort), sd = sd(eb_tot$pers_effort))) + 
+  theme_classic() 
+
+p
+
+
+ggsave("p.png", width = 7, height = 5, path = "/Users/anuschka/Documents/climatechange/climatechange/output/histogram_double.png")
+
+?stat_function
+
+eb_sd <- eb_tot %>% 
+  group_by(surveyyear) %>% 
+  summarise(range_variable = range(doprot_region, na.rm = TRUE))
+
+```
+
+
+# Make a table of the GAMLSS regression output
+
+```{r}
+options(knitr.kable.NA = '')
+```
+
+
+```{r}
+# Illustrate the gamlss regressions by showing one from ISSP with kable extra
+load(here("./data/final_data/regression_outputs", "issp_list_empty_w.Rdata"))
+load(here("./data/final_data/regression_outputs", "issp_list_preds_w.Rdata"))
+load(here("./data/final_data/regression_outputs", "issp_list_interactions_w.Rdata"))
+
+# Use first variable, which is "worry"
+model_time_only <- summary(issp_list_empty[[1]])
+model_time_only_df <- as.data.frame(model_time_only)
+model_time_only_df$mu_sigma <- c("Mu", "", "Sigma", "")
+model_time_only_df$variables <- c("Intercept", "Time", "Intercept", "Time")
+model_time_only_df <- model_time_only_df %>% select(mu_sigma, variables, everything())
+rownames(model_time_only_df) <- NULL
+
+model_indep_df <- as.data.frame(summary(issp_list_preds[[1]]))
+model_indep_df$mu_sigma <- c("Mu", "", "", "", "", "", "", "", "", "", "Sigma", "", "", "", "", "", "", "", "", "")
+model_indep_df$variables <- c("Intercept", "Time", "Education", "Left right placement", "Gender", "Medium urbanity (ref = low)", "High urbanity", "Church attendance", "Income", "Age", "Intercept", "Time", "Education", "Left right placement", "Gender", "Medium urbanity (ref = low)", "High urbanity", "Church attendance", "Income", "Age")
+model_indep_df <- model_indep_df %>% select(mu_sigma, variables, everything())
+rownames(model_indep_df) <- NULL
+
+model_interact_df <- as.data.frame(summary(issp_list_interactions[[1]]))
+model_interact_df$mu_sigma <- c("Mu", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "Sigma", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "")
+model_interact_df$variables <- c("Intercept", "Time", "Education", "Left right placement", "Gender", "Medium urbanity (ref = low)", "High urbanity", "Church attendance", "Income", "Age", "Age time", "Gender time", "Education time", "Income time", "Left right placement time", "Church attendance time", "Urbanity time", "Intercept", "Time", "Education", "Left right placement", "Gender", "Medium urbanity (ref = low)", "High urbanity", "Church attendance", "Income", "Age", "Age time", "Gender time", "Education time", "Income time", "Left right placement time", "Church attendance time", "Urbanity time")
+model_interact_df <- model_interact_df %>% select(mu_sigma, variables, everything())
+rownames(model_interact_df) <- NULL
+
+# Difficult to columnbind them, because they're of different lengths (logically)
+df_list <- list(model_time_only_df, model_indep_df, model_interact_df)
+
+bind_cols_fill <- function(df_list) {
+
+  max_rows <- map_int(df_list, nrow) %>% max()
+  
+  map(df_list, function(df) {
+    if(nrow(df) == max_rows) return(df)
+    first <- names(df)[1] %>% sym()
+    df %>% add_row(!!first := rep(NA, max_rows - nrow(df)))
+  }) %>% bind_cols()
+}
+
+
+model_total <- bind_cols_fill(df_list)
+
+model_total[is.na(model_total)] <- ""
+
+# The dataframe is binded, the order is not totally how i want it. The data are now all centered at the top, but for the 
+# previous models, I need the data to be centered around the mu/intercept and sigma/intercept. Furthermore, some variables 
+# have a name that have special signs in them, which causes R not to recognize them. To make it easy, I quickly fix these 
+# things in Excel. I don't make any changes to the data
+write_xlsx(model_total, here("./data/descriptives/", "kable_model_total_gamlss.xlsx" ))
+
+model_new <- read_excel(here("./data/descriptives/", "kable_model_total_gamlss.xlsx" ))
+
+# I Want to round the numeric variables to 3 decimals
+model_new <- mutate_at(model_new, vars(-mu_sigma, -Variables), as.numeric)
+numeric_cols <- sapply(model_new, is.numeric)
+model_new[, numeric_cols] <- round(model_new[, numeric_cols], digits = 3)
+
+# There are some annoying variable names that R can't recognize because it has spacing, so rename the columns
+colnames(model_new) <- (c("mu_sigma", "Variables", "est_time", "std_err_time", "p_time", "est_indep", "std_err_indep", "p_indep", "est_inter", "std_error_inter", "p_inter", "p_text_time_only", "p_text_indep", "p_text_inter"))
+
+# Create a new variable to use stars instead of the full p-values in the table
+model_new$p_text_time_only <- case_when(
+  model_new$p_time >= 0.05 ~ "",
+model_new$p_time < 0.001 ~ "***",
+model_new$p_time < 0.01 ~ "**",
+model_new$p_time < 0.05 ~ "*"
+)
+
+model_new$p_text_indep <- case_when(
+  model_new$p_indep >= 0.05 ~ "",
+model_new$p_indep < 0.001 ~ "***",
+model_new$p_indep < 0.01 ~ "**",
+model_new$p_indep < 0.05 ~ "*"
+)
+
+model_new$p_text_inter <- case_when(
+  model_new$p_inter >= 0.05 ~ "",
+model_new$p_inter < 0.001 ~ "***",
+model_new$p_inter < 0.01 ~ "**",
+model_new$p_inter < 0.05 ~ "*"
+)
+
+# Now only select the variables that I want to show in the table
+model_new <- select(model_new, mu_sigma, Variables, est_time, std_err_time, p_text_time_only, est_indep, std_err_indep, p_text_indep, est_inter, std_error_inter, p_text_inter)
+
+# Make and save the table 
+kable(model_new, digits = 3, caption = "Table 2. GAMLSS model on worry ISSP (1993 - 2010)", 
+      col.names = c( "", "Variables", "Estimate", "Std. Error", "", "Estimate", "Std. Error", "", "Estimate", "Std. Error", "")) %>%
+  kable_classic_2(html_font = "Times", fixed_thead = T, full_width = F) %>%
+  add_header_above(c(" " = 2, "Time-only model" = 3, "Indepent var model" = 3, "Interaction model" = 3)) %>%
+   footnote(
+    general_title = "Note.",
+    general = "*** = p < 0.001, ** = p < 0.01, * = p < 0.05",
+    threeparttable = TRUE,
+    footnote_as_chunk = TRUE
+    ) %>%
+    save_kable("/Users/anuschka/Documents/climatechange/climatechange/output/gamlss_table.png")
+  
+```
+

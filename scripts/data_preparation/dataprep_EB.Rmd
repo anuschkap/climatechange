@@ -608,6 +608,7 @@ attributes(eb2009bsel$v391) #Citizens doing enough
 eb2009bsel$doprot_citiz <- as.numeric(eb2009bsel$v391)
 eb2009bsel$doprot_citiz <- (eb2009bsel$doprot_citiz -1) * (4/2) + 1
 
+
 #Independent variables 
 table(eb2009bsel$v439, useNA = "always") #2 missings.
 eb2009bsel$eduyrs <- as.numeric(as.character(eb2009bsel$v439)) #People who are still studying now have a missing
