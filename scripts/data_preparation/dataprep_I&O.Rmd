@@ -385,3 +385,19 @@ save(io_total, file = "/Users/anuschka/Documents/climatechange/climatechange/dat
 
 ```
 
+
+```{r}
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/io_total.Rdata")
+
+
+table(io_total$isced)
+io_total$isced_cat[io_total$isced <=2] <- "Basic"
+io_total$isced_cat[io_total$isced == 3 | io_total$isced == 4] <- "Intermediate"
+io_total$isced_cat[io_total$isced >=5] <- "Advanced"
+io_total$isced_cat <- factor(io_total$isced_cat, levels=c("Basic", "Intermediate", "Advanced"), ordered=TRUE)
+table(io_total$isced_cat)
+
+save(io_total, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/io_total.Rdata")
+
+```
+

@@ -1342,4 +1342,19 @@ table(eb_tot$urban, useNA = "always")
 
 ```
 
+```{r}
+# Change education/isced into three categories 
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/eb_tot.Rdata")
+
+
+table(eb_tot$isced)
+eb_tot$isced_cat[eb_tot$isced <=2] <- "Basic"
+eb_tot$isced_cat[eb_tot$isced == 3 | eb_tot$isced == 4] <- "Intermediate"
+eb_tot$isced_cat[eb_tot$isced >=5] <- "Advanced"
+eb_tot$isced_cat <- factor(eb_tot$isced_cat, levels=c("Basic", "Intermediate", "Advanced"), ordered=TRUE)
+table(eb_tot$isced_cat)
+
+save(eb_tot, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/eb_tot.Rdata")
+
+```
 

@@ -666,4 +666,44 @@ save(issptotal, file="/Users/anuschka/Documents/climatechange/climatechange/data
 ```
 
 
+```{r}
+# For the three datasets, change the isced into isced cat
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/evssel.Rdata")
+
+
+table(evssel$isced)
+evssel$isced_cat[evssel$isced <=2] <- "Basic"
+evssel$isced_cat[evssel$isced == 3 | evssel$isced == 4] <- "Intermediate"
+evssel$isced_cat[evssel$isced >=5] <- "Advanced"
+evssel$isced_cat <- factor(evssel$isced_cat, levels=c("Basic", "Intermediate", "Advanced"), ordered=TRUE)
+table(evssel$isced_cat)
+
+save(evssel, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/evssel.Rdata")
+
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/esstotal.Rdata")
+
+
+table(esstotal$isced)
+esstotal$isced_cat[esstotal$isced <=2] <- "Basic"
+esstotal$isced_cat[esstotal$isced == 3 | esstotal$isced == 4] <- "Intermediate"
+esstotal$isced_cat[esstotal$isced >=5] <- "Advanced"
+esstotal$isced_cat <- factor(esstotal$isced_cat, levels=c("Basic", "Intermediate", "Advanced"), ordered=TRUE)
+table(esstotal$isced_cat)
+
+save(esstotal, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/esstotal.Rdata")
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/issptotal.Rdata")
+
+
+table(issptotal$isced)
+issptotal$isced_cat[issptotal$isced <=2] <- "Basic"
+issptotal$isced_cat[issptotal$isced == 3 | issptotal$isced == 4] <- "Intermediate"
+issptotal$isced_cat[issptotal$isced >=5] <- "Advanced"
+issptotal$isced_cat <- factor(issptotal$isced_cat, levels=c("Basic", "Intermediate", "Advanced"), ordered=TRUE)
+table(issptotal$isced_cat)
+
+save(issptotal, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/issptotal.Rdata")
+
+```
 
