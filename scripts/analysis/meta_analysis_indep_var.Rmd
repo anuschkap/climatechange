@@ -17,12 +17,8 @@ here::i_am("scripts/analysis/meta_analysis_gamlss_weigh.Rmd")
 ```
 
 ```{r}
-# With the final data
-# This method is not for multiple regression
-load(here("./climatechange/data/meta_analysis", "total_indep_var_results.RData"))
-load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results_gam_w.RData")
-
-?metagen
+load(here("./data/meta_analysis", "total_indep_var_results_new.RData"))
+load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_indep_var_results_new.RData")
 
 # Effects of mu's 
 # Gender 
@@ -47,16 +43,26 @@ age_gen <- metagen(TE = mu_age_est,
 
 summary(age_gen)
 
-# Educational level
-edu_gen <- metagen(TE = mu_isced_est,
-                 seTE = mu_isced_sd,
+# Educational level. This is now a dummy so how do i have to do this?
+edu_med_gen <- metagen(TE = mu_isced_med_est,
+                 seTE = mu_isced_med_sd,
                  data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
                  method.tau = "REML",
                  hakn = TRUE)
 
-summary(edu_gen)
+summary(edu_med_gen)
+
+edu_high_gen <- metagen(TE = mu_isced_high_est,
+                 seTE = mu_isced_high_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+summary(edu_high_gen)
 
 # Now for variance
 # Gender
@@ -71,7 +77,6 @@ gender_var_gen <- metagen(TE = sig_sex_est,
 summary(gender_var_gen)
 
 # Age
-
 age_var_gen <- metagen(TE = sig_age_est,
                  seTE = sig_age_sd,
                  data = total_indep_var_results,
@@ -84,18 +89,28 @@ summary(age_var_gen)
 
 # Education
 
-edu_var_gen <- metagen(TE = sig_isced_est,
-                 seTE = sig_isced_sd,
+edu_var_med_gen <- metagen(TE = sig_isced_med_est,
+                 seTE = sig_isced_med_sd,
                  data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
                  method.tau = "REML",
                  hakn = TRUE)
 
-summary(edu_var_gen)
+summary(edu_var_med_gen)
+
+edu_var_high_gen <- metagen(TE = sig_isced_high_est,
+                 seTE = sig_isced_high_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+summary(edu_var_high_gen)
 
 # Effects of first year on these effects
-load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results_gam_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results_gam_w_new.RData")
 year <- total_reg_results %>% dplyr::select(mean_year, dep_var)
 total_indep_var_results <- left_join(total_indep_var_results, year)
 
@@ -105,8 +120,11 @@ summary(gender_year)
 age_year  <- metareg(age_gen, ~ total_indep_var_results$mean_year)
 summary(age_year)
 
-edu_year  <- metareg(edu_gen, ~ total_indep_var_results$mean_year)
-summary(edu_year)
+edu_med_year  <- metareg(edu_med_gen, ~ total_indep_var_results$mean_year)
+summary(edu_med_year)
+
+edu_high_year  <- metareg(edu_high_gen, ~ total_indep_var_results$mean_year)
+summary(edu_high_year)
 
 # Variance
 gender_year_v  <- metareg(gender_var_gen, ~ total_indep_var_results$mean_year)
@@ -115,19 +133,67 @@ summary(gender_year_v)
 age_year_v  <- metareg(age_var_gen, ~ total_indep_var_results$mean_year)
 summary(age_year_v)
 
-edu_year_v  <- metareg(edu_var_gen, ~ total_indep_var_results$mean_year)
-summary(edu_year_v)
+edu_med_year_v  <- metareg(edu_var_med_gen, ~ total_indep_var_results$mean_year)
+summary(edu_med_year_v)
+
+edu_high_year_v  <- metareg(edu_var_high_gen, ~ total_indep_var_results$mean_year)
+summary(edu_high_year_v)
+
+```
+
+```{r}
+#Prepare data to make a kable table
+mu_pool_indep <- data.frame(matrix(ncol = 4, nrow = 4))
+colnames(mu_pool_indep) <- c("mu_sigma_1", "variable_1", "pooled_1", "p_1")
+
+mu_pool_indep$variable_1 <- c("Gender", "Age", "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)")
+mu_pool_indep$mu_sigma_1 <- c("Mu", "", "", "")
+mu_pool_indep$pooled_1 <- c(gender_gen$TE.random, age_gen$TE.random, edu_med_gen$TE.random, edu_high_gen$TE.random)
+mu_pool_indep$p_1 <- c(gender_gen$pval.random, age_gen$pval.random, edu_med_gen$pval.random, edu_high_gen$pval.random)
+
+gender_gen$statistic.random # t of HK (random effects model)
+gender_gen$TE.random #effect size
+gender_gen$pval.random # p value
+
+# For the variance
+sigma_pool_indep <- data.frame(matrix(ncol = 4, nrow = 4))
+colnames(sigma_pool_indep) <- c("mu_sigma_1", "variable_1", "pooled_1", "p_1")
+
+sigma_pool_indep$variable_1 <- c("Gender", "Age", "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)")
+sigma_pool_indep$mu_sigma_1 <- c("Sigma", "", "", "")
+sigma_pool_indep$pooled_1 <- c(gender_var_gen$TE.random, age_var_gen$TE.random, edu_var_med_gen$TE.random, edu_var_high_gen$TE.random)
+sigma_pool_indep$p_1 <- c(gender_var_gen$pval.random, age_var_gen$pval.random, edu_var_med_gen$pval.random, edu_var_high_gen$pval.random)
+
+# The second part of the table consists of the estimates, standard error and p value of the mean year effect on the independent variables 
+mu_my <- data.frame(matrix(ncol = 5, nrow = 4))
+colnames(mu_my) <- c("mu_sigma_2", "variable_2", "estimate", "se", "p_2")
+mu_my$variable_2 <- c("Gender", "Age", "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)")
+mu_my$mu_sigma_2 <- c("Mu", "", "", "")
+mu_my$estimate <- c(as.numeric(gender_year$b[[2]]), as.numeric(age_year$b[[2]]), as.numeric(edu_med_year$b[[2]]), as.numeric(edu_high_year$b[[2]]))
+mu_my$se <- c(gender_year$se[[2]], age_year$se[[2]], edu_med_year$b[[2]], edu_high_year$b[[2]])
+mu_my$p_2 <- c(gender_year$pval[[2]], age_year$pval[[2]], edu_med_year$pval[[2]], edu_high_year$pval[[2]])
+
+#The same for the variance of course
+sigma_my <- data.frame(matrix(ncol = 5, nrow = 4))
+colnames(sigma_my) <- c("mu_sigma_2", "variable_2", "estimate", "se", "p_2")
+sigma_my$variable_2 <- c("Gender", "Age", "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)")
+sigma_my$mu_sigma_2 <- c("Sigma", "", "", "")
+sigma_my$estimate <- c(as.numeric(gender_year_v$b[[2]]), as.numeric(age_year_v$b[[2]]), as.numeric(edu_med_year_v$b[[2]]), as.numeric(edu_high_year_v$b[[2]]))
+sigma_my$se <- c(gender_year_v$se[[2]], age_year_v$se[[2]], edu_med_year_v$b[[2]], edu_high_year_v$b[[2]])
+sigma_my$p_2 <- c(gender_year_v$pval[[2]], age_year_v$pval[[2]], edu_med_year_v$pval[[2]], edu_high_year_v$pval[[2]])
 
 ```
 
 
+
+
 ```{r}
 # Do the same for the interaction effects (age, sex, isced and time)
-load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_inter_results.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_inter_results_new.RData")
 
 # Effects of mu's 
 # Gender 
-gender_gen <- metagen(TE = mu_sex_est,
+gender_inter_gen <- metagen(TE = mu_sex_est,
                  seTE = mu_sex_sd,
                  data = total_inter_results,
                  fixed = FALSE,
@@ -135,10 +201,10 @@ gender_gen <- metagen(TE = mu_sex_est,
                  method.tau = "REML",
                  hakn = TRUE)
 
-summary(gender_gen)
+summary(gender_inter_gen)
 
 # Age 
-age_gen <- metagen(TE = mu_age_est,
+age_inter_gen <- metagen(TE = mu_age_est,
                  seTE = mu_age_sd,
                  data = total_inter_results,
                  fixed = FALSE,
@@ -146,22 +212,32 @@ age_gen <- metagen(TE = mu_age_est,
                  method.tau = "REML",
                  hakn = TRUE)
 
-summary(age_gen)
+summary(age_inter_gen)
 
 # Educational level
-edu_gen <- metagen(TE = mu_isced_est,
-                 seTE = mu_isced_sd,
+edu_med_inter_gen <- metagen(TE = mu_isced_med_est,
+                 seTE = mu_isced_med_sd,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
                  method.tau = "REML",
                  hakn = TRUE)
 
-summary(edu_gen)
+summary(edu_med_inter_gen)
+
+edu_high_inter_gen <- metagen(TE = mu_isced_high_est,
+                 seTE = mu_isced_high_sd,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+summary(edu_high_inter_gen)
 
 # Now for variance
 # Gender
-gender_var_gen <- metagen(TE = sig_sex_est,
+gender_var_inter_gen <- metagen(TE = sig_sex_est,
                  seTE = sig_sex_sd,
                  data = total_inter_results,
                  fixed = FALSE,
@@ -169,11 +245,10 @@ gender_var_gen <- metagen(TE = sig_sex_est,
                  method.tau = "REML",
                  hakn = TRUE)
 
-summary(gender_var_gen)
+summary(gender_var_inter_gen)
 
 # Age
-
-age_var_gen <- metagen(TE = sig_age_est,
+age_var_inter_gen <- metagen(TE = sig_age_est,
                  seTE = sig_age_sd,
                  data = total_inter_results,
                  fixed = FALSE,
@@ -181,292 +256,102 @@ age_var_gen <- metagen(TE = sig_age_est,
                  method.tau = "REML",
                  hakn = TRUE)
 
-summary(age_var_gen)
+summary(age_var_inter_gen)
 
 # Education
 
-edu_var_gen <- metagen(TE = sig_isced_est,
-                 seTE = sig_isced_sd,
+edu_var_med_inter_gen <- metagen(TE = sig_isced_med_est,
+                 seTE = sig_isced_med_sd,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
                  method.tau = "REML",
                  hakn = TRUE)
 
-summary(edu_var_gen)
+summary(edu_var_med_inter_gen)
 
-# Effects of first year on these effects
-load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results.RData")
-year <- total_reg_results %>% dplyr::select(first_year, dep_var)
-total_inter_results <- left_join(total_inter_results, year)
+edu_var_high_inter_gen <- metagen(TE = sig_isced_high_est,
+                 seTE = sig_isced_high_sd,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
 
-gender_year  <- metareg(gender_gen, ~ total_inter_results$first_year)
-summary(gender_year)
-
-age_year  <- metareg(age_gen, ~ total_inter_results$first_year)
-summary(age_year)
-
-edu_year  <- metareg(edu_gen, ~ total_inter_results$first_year)
-summary(edu_year)
-
-# Variance
-gender_year_v  <- metareg(gender_var_gen, ~ total_inter_results$first_year)
-summary(gender_year_v)
-
-age_year_v  <- metareg(age_var_gen, ~ total_inter_results$first_year)
-summary(age_year_v)
-
-edu_year_v  <- metareg(edu_var_gen, ~ total_inter_results$first_year)
-summary(edu_year_v)
-
-```
-
-
-
-
-
-
-```{r}
-# Step 1. Estimate the empty model without moderators to make the forest plots. 
-model_step_1_att <- rma(yi = mu_time,
-              sei = mu_time_sd,
-              data = total_reg_results,
-              method = "ML",
-              test = "knha")
-
-model_step_1_att
-
-# I want to assign different colors to the different types of dependent variables, so that one can easily distinguish 
-# the types of attitudes by colors in the forest plot
-total_reg_results$colour <- NA
-total_reg_results$colour[total_reg_results$attitude_cat=="cognitive"] <- "#2980B9" # blue
-total_reg_results$colour[total_reg_results$attitude_cat=="affective"] <- "#CC5279" # pink
-total_reg_results$colour[total_reg_results$attitude_cat=="behavioral"] <- "#B0CC52" # green
-
-colour.palette <- as.vector(total_reg_results$colour)
-
-# Make a forest plot (has to be done outside codechunk, otherwise it doesn't save)
-# The argument order = "yi" puts the effects in order from negative to positive
-png <- forest(model_step_1_att, colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat, ilab.xpos = -2, xlim = c(-1, 1), order = "yi")
-
-# And this is how you order it per year
-png <- forest(model_step_1_att, colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat, ilab.xpos = -2, xlim = c(-1, 1), order = total_reg_results$mean_year)
-
-```
-
-# Time effect 
-png(file = "/Users/anuschka/Documents/forestplot_neg_to_pos_weight.png", width = 2800, height = 2400, res = 300)
-
-png <- forest(model_step_1_att, colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat , ilab.xpos = -2, xlim = c(-1, 1))
-
-dev.off()
-
-```{r}
-# Repeat step 1, but then for the polarization (variance)
-model_step_1_var <- rma(yi = sig_time,
-              sei = sig_time_sd,
-              data = total_reg_results,
-              method = "ML", #waarom ml niet reml?
-              test = "knha")
-
-model_step_1_var
-
-# And also make the forest plot for the variance
-```
-
-# Time variance plot
-png(file = "/Users/anuschka/Documents/forestplot_var.png", width = 2800, height = 2400, res = 300)
-
-png <- forest(model_step_1_var, colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat, ilab.xpos = -2, xlim = c(-1, 1))
-
-dev.off()
-
-```{r}
-#Using the kable package to make a nice table
-library(kableExtra)
-
-
-
-
+summary(edu_var_high_inter_gen)
 
 ```
 
 ```{r}
-#Step 2. Empty model with meta-level indicators
-model_step_2_att <- rma(yi = mu_time,
-              sei = mu_time_sd,
-              data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous,
-              method = "ML",
-              test = "knha")
+# Collect the input from this as well, to put in the table
+mu_pool_inter <- data.frame(matrix(ncol = 4, nrow = 4))
+colnames(mu_pool_inter) <- c("mu_sigma_3", "variable_3", "pooled_2", "p_3")
+mu_pool_inter$variable_3 <- c("Gender", "Age", "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)")
+mu_pool_inter$mu_sigma_3 <- c("Mu", "", "", "")
+mu_pool_inter$pooled_2 <- c(gender_inter_gen$TE.random, age_inter_gen$TE.random, edu_med_inter_gen$TE.random, edu_high_inter_gen$TE.random)
+mu_pool_inter$p_3 <- c(gender_inter_gen$pval.random, age_inter_gen$pval.random, edu_med_inter_gen$pval.random, edu_high_inter_gen$pval.random)
 
-model_step_2_att
+# For the variance
+sigma_pool_inter <- data.frame(matrix(ncol = 4, nrow = 4))
+colnames(sigma_pool_inter) <- c("mu_sigma_3", "variable_3", "pooled_2", "p_3")
+sigma_pool_inter$variable_3 <- c("Gender", "Age", "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)")
+sigma_pool_inter$mu_sigma_3 <- c("Sigma", "", "", "")
+sigma_pool_inter$pooled_2 <- c(gender_var_inter_gen$TE.random, age_var_inter_gen$TE.random, edu_var_med_inter_gen$TE.random, edu_var_high_inter_gen$TE.random)
+sigma_pool_inter$p_3 <- c(gender_var_inter_gen$pval.random, age_var_inter_gen$pval.random, edu_var_med_inter_gen$pval.random, edu_var_high_inter_gen$pval.random)
 
 
-```
-```{r}
-# Step 2 variance
-#Step 2. Empty model with meta-level indicators
-model_step_2_var <- rma(yi = sig_time,
-              sei = sig_time_sd,
-              data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous,
-              method = "ML",
-              test = "knha")
+#Bind all the mean attitudes results
+mean_indep <- cbind(mu_pool_indep, mu_my, mu_pool_inter)
+sigma_indep <- cbind(sigma_pool_indep, sigma_my, sigma_pool_inter)
+indep_total <- rbind(mean_indep, sigma_indep)
 
-model_step_2_var
+#Make stars of the p-values
+indep_total$p_text_1 <- case_when(
+indep_total$p_1 >= 0.05 ~ "",
+indep_total$p_1 < 0.001 ~ "***",
+indep_total$p_1 < 0.01 ~ "**",
+indep_total$p_1 < 0.05 ~ "*"
+)
 
-# Ambiguous yes is significant. That means that I have to test it without these variables
-total_reg_sub <- subset(total_reg_results, ambiguous == "No")
-# These are then 37 variables
-model_test_sub <- rma(yi = sig_time,
-              sei = sig_time_sd,
-              data = total_reg_sub,
-              mods = ~ mean_year + attitude_cat,
-              method = "ML",
-              test = "knha")
+indep_total$p_text_2 <- case_when(
+indep_total$p_2 >= 0.05 ~ "",
+indep_total$p_2 < 0.001 ~ "***",
+indep_total$p_2 < 0.01 ~ "**",
+indep_total$p_2 < 0.05 ~ "*"
+)
 
-model_test_sub
+indep_total$p_text_3 <- case_when(
+indep_total$p_3 >= 0.05 ~ "",
+indep_total$p_3 < 0.001 ~ "***",
+indep_total$p_3 < 0.01 ~ "**",
+indep_total$p_3 < 0.05 ~ "*"
+)
 
-model_step_1_var_sub <- rma(yi = sig_time,
-              sei = sig_time_sd,
-              data = total_reg_sub,
-              method = "ML", #waarom ml niet reml?
-              test = "knha")
+#Select only the variables that I want to present in the table
+indep_total <- select(indep_total, mu_sigma_1, variable_1, pooled_1, p_text_1, estimate, se, p_text_2, pooled_2, p_text_3)
 
-model_step_1_var_sub
-
-sub <- forest(model_step_1_var_sub, colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_sub$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat, ilab.xpos = -2, xlim = c(-1, 1))
-
-sub <- forest(model_step_1_var_sub)
-
-```
-
-```{r}
-# Step 3. Model with independent variables
-model_step_3_att <- rma(yi = mu_time_pred,
-              sei = mu_time_sd_pred,
-              data = total_reg_results,
-              mods = ~ first_year + attitude_cat,
-              method = "ML",
-              test = "knha")
-
-model_step_3_att
-```
-
-```{r}
-# Step 3. Variance
-model_step_3_var <- rma(yi = sig_time_pred,
-              sei = sig_time_sd_pred,
-              data = total_reg_results,
-              mods = ~ first_year + attitude_cat,
-              method = "ML",
-              test = "knha")
-
-model_step_3_var
-```
-
-```{r}
-# Step 4. Model with interactions
-model_step_4_att <- rma(yi = mu_time_int,
-              sei = mu_time_sd_int,
-              data = total_reg_results,
-              mods = ~ first_year + attitude_cat,
-              method = "ML",
-              test = "knha")
-
-model_step_4_att
-
-```
-```{r}
-# Step 4. Variance
-model_step_4_var <- rma(yi = sig_time_int,
-              sei = sig_time_sd_int,
-              data = total_reg_results,
-              mods = ~ first_year + attitude_cat,
-              method = "ML",
-              test = "knha")
-
-model_step_4_var
 ```
 
 
 ```{r}
-# Estimate the model while controlling for ambiguity of variables
-model_test_att <- rma(yi = mu_time,
-              sei = mu_time_sd,
-              data = total_reg_results,
-              mods = ~ first_year + attitude_cat + ambiguous,
-              method = "ML",
-              test = "knha")
-
-model_test_att
-
-# And run the model on a subset of the data without the ambiguous results
-total_reg_sub <- subset(total_reg_results, ambiguous == "No")
-# These are then 37 variables
-model_test_sub <- rma(yi = mu_time,
-              sei = mu_time_sd,
-              data = total_reg_sub,
-              mods = ~ first_year + attitude_cat,
-              method = "ML",
-              test = "knha")
-
-model_test_sub
-
-# See if there is an effect without the inclusion of meta-level variables
-model <- rma(yi = mu_time,
-              sei = mu_time_sd,
-              data = total_reg_sub,
-              method = "ML",
-              test = "knha")
-
-model
-# Still not significant, so that seems rather robust
+options(knitr.kable.NA = '')
 ```
-
-
 
 ```{r}
-# Practice with kable package
-library(tidyverse)
-library(kableExtra)
-install.packages("modelsummary")
-library(modelsummary)
-library(broom)
-install.packages("apaTables")
-library(apaTables)
-
-dt <- mtcars[1:5, 1:6]
-kbl(dt)
-
-dt %>%
-  kbl(caption = "Table 1. Regression outputs") %>%
-  kable_classic(full_width = F, html_font = "Times")
-
-
-model <- as.data.frame(summary(model_step_1_att))
-model <- tidy(model)
-
-model <- tidy(summary(model_step_1_att))
-
-
-
-
-
-
-model %>% 
-  kbl(caption = "Table 1. Regression outputs") %>% 
-  kable_classic(full_width = F, html_font = "Times")
-
-
-regression_table <- data.frame(model = NA, I2 = NA)
-regression_table$model <- "Step 1 var"
-
-regression_table$I2 <- model_step_1_att$I2
-regression_table$intercept <- coef(model_step_1_att)["(Intercept"]
-
-
-
+kable(indep_total, digits = 3, caption = "Table 4. Effects of independent variables on climate change attitudes and polarization", 
+      col.names = c( "", "Variables", "Pooled effect", "", "Estimate", "Std. Error", "", "Pooled effect", "")) %>%
+  kable_classic_2(html_font = "Times", fixed_thead = T, full_width = F) %>%
+  add_header_above(c(" " = 2, "Effects indep vars" = 2, "Mean year on indep vars" = 3, "Indep vars x time" = 2), align = "c") %>%
+   footnote(
+    general_title = "Note.",
+    general = "*** = p < 0.001, ** = p < 0.01, * = p < 0.05",
+    threeparttable = TRUE,
+    footnote_as_chunk = TRUE
+    )%>%
+    save_kable("/Users/anuschka/Documents/climatechange/climatechange/output/indep_var_table.png")
 ```
+
+
+
+
 

@@ -15,9 +15,8 @@ library(gamlss)
 
 ```{r}
 # Of course this also has to be done for the other lists of the other models
-load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_preds_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_preds_w_new.RData")
 
-# This does mean that the estimates of the sigma are in a different place
 sum <- summary(ess_list_preds[[1]])
 
 
@@ -36,31 +35,22 @@ for (i in seq_along(ess_list_preds)) {
   # Extract the intercept and standard deviation for mu and sigma
   mu_sex_est <- sum[[3]]
   mu_sex_sd <- sum[[3,2]]
-  mu_isced_est <- sum[[4]]
-  mu_isced_sd <- sum[[4,2]]
-  mu_urban_est <- sum[[5]]
-  mu_urban_sd <- sum[[5,2]]
-  mu_income_est <- sum[[7]]
-  mu_income_sd <- sum[[7,2]]
-  mu_age_est <- sum[[8]]
-  mu_age_sd <- sum[[8,2]]
-  mu_lr_est <- sum[[9]]
-  mu_lr_sd <- sum[[9,1]]
-  
-  # Variance
-  sig_sex_est <- sum[[13]]
-  sig_sex_sd <- sum[[13,2]]
-  sig_isced_est <- sum[[14]]
-  sig_isced_sd <- sum[[14,2]]
-  sig_urban_est <- sum[[15]]
-  sig_urban_sd <- sum[[15,2]]
-  sig_income_est <- sum[[17]]
-  sig_income_sd <- sum[[17,2]]
-  sig_age_est <- sum[[18]]
-  sig_age_sd <- sum[[18,2]]
-  sig_lr_est <- sum[[19]]
-  sig_lr_sd <- sum[[19,1]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
 
+    # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
   
   # Put the results 
   ess_indep_preds_df <- rbind(ess_indep_preds_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_est, mu_isced_sd, mu_urban_est, mu_urban_sd, mu_income_est, mu_income_sd, mu_age_est, mu_age_sd, mu_lr_est, mu_lr_sd, sig_sex_est, sig_sex_sd, sig_isced_est, sig_isced_sd, sig_urban_est, sig_urban_sd, sig_income_est, sig_income_sd, sig_age_est, sig_age_sd, sig_lr_est, sig_lr_sd))

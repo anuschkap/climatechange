@@ -263,7 +263,7 @@ dev.off()
 
 
 ```{r}
-# Run the meta-regressions on subsets of the data per attitude cat
+# Run the meta-regressions on subsets of the data per attitude cat, and make a table out of that 
 affective <- subset(total_reg_results, attitude_cat == "affective")
 
 # See if there is an effect without the inclusion of meta-level variables
@@ -279,7 +279,7 @@ one <- summary(aff_model)
 one_df <- data.frame(matrix(ncol = 4, nrow = 1))
 colnames(one_df) <- c("Variable", "Estimate", "SE", "p")
 
-one_df$Variable <- "Affective Mu"
+one_df$Variable <- "Affective Mean"
 one_df$Estimate <- one$b
 one_df$SE <- one$se
 one_df$p <- one$pval
@@ -320,7 +320,7 @@ three <- summary(beh_model)
 three_df <- data.frame(matrix(ncol = 4, nrow = 1))
 colnames(three_df) <- c("Variable", "Estimate", "SE", "p")
 
-three_df$Variable <- "Behavioral Mu"
+three_df$Variable <- "Behavioral Mean"
 three_df$Estimate <- three$b
 three_df$SE <- three$se
 three_df$p <- three$pval
@@ -362,7 +362,7 @@ five <- summary(cog_model)
 five_df <- data.frame(matrix(ncol = 4, nrow = 1))
 colnames(five_df) <- c("Variable", "Estimate", "SE", "p")
 
-five_df$Variable <- "Cognitive Mu"
+five_df$Variable <- "Cognitive Mean"
 five_df$Estimate <- five$b
 five_df$SE <- five$se
 five_df$p <- five$pval
@@ -391,16 +391,24 @@ six_df$p <- six$pval
 abc_model <- rbind(one_df, two_df, three_df, four_df, five_df, six_df)
 abc_model$Estimate <- as.numeric(abc_model$Estimate)
 
-abc_table <- kable(abc_model, format = "html", align = "l",
-      caption = "Appendix X. Meta-regression time-effect subsets affective, behavioral, cognitive", digits = 3) %>%
-  kable_classic_2(full_width = FALSE) 
+abc_model$p_text <- case_when(
+abc_model$p >= 0.05 ~ "",
+abc_model$p < 0.001 ~ "***",
+abc_model$p < 0.01 ~ "**",
+abc_model$p < 0.05 ~ "*"
+)
 
+abc_model <- select(abc_model, Variable, Estimate, SE, p_text)
 
-
-%>%
-  save_kable("/Users/anuschka/Documents/climatechange/climatechange/output/weight_table.png")
+kable(abc_model, format = "html", align = "l",
+      caption = "Appendix X. Meta-regression time-effect subsets affective, behavioral, cognitive", digits = 3, 
+      col.names = c("Variable", "Estimate", "Std. Error", "")) %>%
+  kable_classic_2(full_width = FALSE) %>%
+  save_kable("/Users/anuschka/Documents/climatechange/climatechange/output/appendix/abc_table.png")
 
 ```
+
+
 
 
 ```{r}
