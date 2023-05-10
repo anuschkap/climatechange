@@ -247,7 +247,7 @@ total_mean <- cbind(model_1_mean_df, model_2_mean_df, model_3_mean_df)
 # Now for the sigma
 model_1_var_df <- data.frame(matrix(ncol = 5, nrow = 7))
 colnames(model_1_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_1_var_df$Variable <- c("Intercept", "Var year", "Varitude behavioral (ref = aff)", "Varitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
+model_1_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
 model_1_var_df$`Mu/Sigma` <- c("Sigma", "", "", "", "", "", "")
 
 model_1_var_df$Estimate <- as.numeric(model_step_2_var$beta) #estimate
@@ -274,7 +274,7 @@ model_1_var_df <- rbind(model_1_var_df, model_1_fit)
 # Independent variable model 
 model_2_var_df <- data.frame(matrix(ncol = 5, nrow = 7))
 colnames(model_2_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_2_var_df$Variable <- c("Intercept", "Var year", "Varitude behavioral (ref = aff)", "Varitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
+model_2_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
 model_2_var_df$`Mu/Sigma` <- c("Sigma", "", "", "", "", "", "")
 
 model_2_var_df$Estimate <- as.numeric(model_step_3_var$beta) #estimate
@@ -301,7 +301,7 @@ model_2_var_df <- rbind(model_2_var_df, model_2_fit)
 #And the interaction model
 model_3_var_df <- data.frame(matrix(ncol = 5, nrow = 7))
 colnames(model_3_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_3_var_df$Variable <- c("Intercept", "Var year", "Varitude behavioral (ref = aff)", "Varitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
+model_3_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
 model_3_var_df$`Mu/Sigma` <- c("Sigma", "", "", "", "", "", "")
 
 model_3_var_df$Estimate <- as.numeric(model_step_4_var$beta) #estimate

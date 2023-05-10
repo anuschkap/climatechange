@@ -7,14 +7,13 @@ output: html_document
 
 ```{r}
 library(dplyr)
-library(readxl)
 library(here)
 library(ggplot2)
 library(kableExtra)
-library(modelsummary)
 library(tidyverse)
 library(writexl)
 library(readxl)
+library(gamlss)
 here()
 here::i_am("scripts/descriptive_stats/descriptives.Rmd")
 
@@ -57,62 +56,42 @@ rm(list=ls())
 
 load(here("./data/final_data", "eb_tot.RData"))
 load(here("./data/final_data", "io_total.RData"))
+load(here("./data/final_data", "esstotal.RData"))
+load(here("./data/final_data", "issptotal.RData"))
+load(here("./data/final_data", "evssel.RData"))
 
-eb_sel <- eb_tot %>% select(env_ec_stat, env_prsimp, env_quallife:cchangetot, doprot_city)
-io_sel <- io_total %>% select(worried:human_resp)
+eb_sel <- eb_tot %>% dplyr::select(env_ec_stat, env_prsimp, env_quallife:prsaction, doprot_city)
+io_sel <- io_total %>% dplyr::select(worried:human_resp)
+ess_sel <- esstotal %>% dplyr::select(worry:pers_resp)
+issp_sel <- issptotal %>% dplyr::select(worry:bus_decide)
+evs_sel <- evssel %>% dplyr::select(climate5)
 
-
-datasets <- list(eb_sel, io_sel)
+datasets <- list(eb_sel, io_sel, ess_sel, issp_sel, evs_sel)
 
 std_deviations <- c()
 var_names <- c()
 
 for (i in 1:length(datasets)) {
   for (j in 1:ncol(datasets[[i]])) {
-    # Check if variable is numeric
+    # Variable numeric (because all my dep vars should be)
     if (is.numeric(datasets[[i]][[j]])) {
-      # Calculate standard deviation and store in vector
+      # Calculate standard deviation 
       std_dev <- sd(datasets[[i]][[j]], na.rm = TRUE)
       std_deviations<- c(std_deviations, std_dev)
-      # Store variable name in vector
+      # Store variable name in vector, because I want to find out which variables have the highest/lowest stdev
       var_names <- c(var_names, colnames(datasets[[i]])[j])
     }
   }
 }
 
-
+#Give the name of the highest and lowest standard deviation
 low_std <- var_names[which.min(std_deviations)]
 high_std <- var_names[which.max(std_deviations)]
-
-low <- datasets[[1]][[low_std]]
-high <- datasets[[1]][[high_std]]
-
 
 hist(datasets[[1]][[low_std]], main = paste("Histogram of", low_std), xlab = "Answer scale", xlim = c(1, 5), col = "#82E0AA", plot = TRUE) 
 x <- seq(min(distance), max(distance), length = 40)
 f <- dnorm(x, mean = mean(distance), sd = sd(distance))
 lines(x, f, col = "red", lwd = 2)
-
-hist(eb_tot$doprot_region)
-hist(eb_tot$pers_effort)
-
-
-p <- ggplot(data = eb_tot, aes(x=x) ) +
-  geom_histogram( aes(x = cchangetot, y = after_stat(density)), fill="#69b3a2" ) +
-  geom_label( aes(x=3, y=0.25, label="Climate change is one of the main issues world"), color="#69b3a2") +
-  geom_histogram( aes(x = pers_effort, y = -after_stat(density)), fill= "#404080") +
-  geom_label( aes(x=3, y=-0.25, label="Willing to make personal effort"), color="#404080") +
-    xlab("Value of x") +
-   stat_function(
-    fun = dnorm, 
-    args = list(mean = mean(eb_tot$cchangetot), sd = sd(eb_tot$cchangetot))) +
-    stat_function(
-    fun = dnorm, 
-    args = list(mean = mean(eb_tot$pers_effort), sd = sd(eb_tot$pers_effort))) + 
-  theme_classic() 
-
-
-p
 
 
 p <- ggplot(data = eb_tot, aes(x=cchangetot) ) +
@@ -134,11 +113,7 @@ p
 
 ggsave("p.png", width = 7, height = 5, path = "/Users/anuschka/Documents/climatechange/climatechange/output/histogram_double.png")
 
-?stat_function
 
-eb_sd <- eb_tot %>% 
-  group_by(surveyyear) %>% 
-  summarise(range_variable = range(doprot_region, na.rm = TRUE))
 
 ```
 
@@ -153,27 +128,27 @@ options(knitr.kable.NA = '')
 ```{r}
 # Illustrate the gamlss regressions by showing one from ISSP with kable extra
 load(here("./data/final_data/regression_outputs", "issp_list_empty_w.Rdata"))
-load(here("./data/final_data/regression_outputs", "issp_list_preds_w.Rdata"))
-load(here("./data/final_data/regression_outputs", "issp_list_interactions_w.Rdata"))
+load(here("./data/final_data/regression_outputs", "issp_list_preds_w_new.Rdata"))
+load(here("./data/final_data/regression_outputs", "issp_list_interactions_w_new.Rdata"))
 
 # Use first variable, which is "worry"
 model_time_only <- summary(issp_list_empty[[1]])
 model_time_only_df <- as.data.frame(model_time_only)
 model_time_only_df$mu_sigma <- c("Mu", "", "Sigma", "")
 model_time_only_df$variables <- c("Intercept", "Time", "Intercept", "Time")
-model_time_only_df <- model_time_only_df %>% select(mu_sigma, variables, everything())
+model_time_only_df <- model_time_only_df %>% dplyr:: select(mu_sigma, variables, everything())
 rownames(model_time_only_df) <- NULL
 
 model_indep_df <- as.data.frame(summary(issp_list_preds[[1]]))
-model_indep_df$mu_sigma <- c("Mu", "", "", "", "", "", "", "", "", "", "Sigma", "", "", "", "", "", "", "", "", "")
-model_indep_df$variables <- c("Intercept", "Time", "Education", "Left right placement", "Gender", "Medium urbanity (ref = low)", "High urbanity", "Church attendance", "Income", "Age", "Intercept", "Time", "Education", "Left right placement", "Gender", "Medium urbanity (ref = low)", "High urbanity", "Church attendance", "Income", "Age")
-model_indep_df <- model_indep_df %>% select(mu_sigma, variables, everything())
+model_indep_df$mu_sigma <- c("Mu", "", "", "", "", "","Sigma", "", "", "", "", "")
+model_indep_df$variables <- c("Intercept", "Time", "Gender",  "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)", "Age", "Intercept", "Time", "Gender",  "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)", "Age")
+model_indep_df <- model_indep_df %>% dplyr::select(mu_sigma, variables, everything())
 rownames(model_indep_df) <- NULL
 
 model_interact_df <- as.data.frame(summary(issp_list_interactions[[1]]))
-model_interact_df$mu_sigma <- c("Mu", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "Sigma", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "")
-model_interact_df$variables <- c("Intercept", "Time", "Education", "Left right placement", "Gender", "Medium urbanity (ref = low)", "High urbanity", "Church attendance", "Income", "Age", "Age time", "Gender time", "Education time", "Income time", "Left right placement time", "Church attendance time", "Urbanity time", "Intercept", "Time", "Education", "Left right placement", "Gender", "Medium urbanity (ref = low)", "High urbanity", "Church attendance", "Income", "Age", "Age time", "Gender time", "Education time", "Income time", "Left right placement time", "Church attendance time", "Urbanity time")
-model_interact_df <- model_interact_df %>% select(mu_sigma, variables, everything())
+model_interact_df$mu_sigma <- c("Mu", "", "", "", "", "", "", "", "", "", "Sigma", "", "", "", "", "", "", "", "", "")
+model_interact_df$variables <- c("Intercept", "Time", "Gender",  "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)", "Age", "Age x time", "Gender x time", "Isced intermediate x time", "Isced advanced x time", "Intercept", "Time", "Gender",  "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)", "Age", "Age x time", "Gender x time", "Isced intermediate x time", "Isced advanced x time")
+model_interact_df <- model_interact_df %>% dplyr::select(mu_sigma, variables, everything())
 rownames(model_interact_df) <- NULL
 
 # Difficult to columnbind them, because they're of different lengths (logically)
@@ -234,7 +209,7 @@ model_new$p_inter < 0.05 ~ "*"
 )
 
 # Now only select the variables that I want to show in the table
-model_new <- select(model_new, mu_sigma, Variables, est_time, std_err_time, p_text_time_only, est_indep, std_err_indep, p_text_indep, est_inter, std_error_inter, p_text_inter)
+model_new <- dplyr::select(model_new, mu_sigma, Variables, est_time, std_err_time, p_text_time_only, est_indep, std_err_indep, p_text_indep, est_inter, std_error_inter, p_text_inter)
 
 # Make and save the table 
 kable(model_new, digits = 3, caption = "Table 2. GAMLSS model on worry ISSP (1993 - 2010)", 

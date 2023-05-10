@@ -328,7 +328,7 @@ indep_total$p_3 < 0.05 ~ "*"
 )
 
 #Select only the variables that I want to present in the table
-indep_total <- select(indep_total, mu_sigma_1, variable_1, pooled_1, p_text_1, estimate, se, p_text_2, pooled_2, p_text_3)
+indep_total <- dplyr::select(indep_total, mu_sigma_1, variable_1, pooled_1, p_text_1, estimate, se, p_text_2, pooled_2, p_text_3)
 
 ```
 
@@ -341,7 +341,7 @@ options(knitr.kable.NA = '')
 kable(indep_total, digits = 3, caption = "Table 4. Effects of independent variables on climate change attitudes and polarization", 
       col.names = c( "", "Variables", "Pooled effect", "", "Estimate", "Std. Error", "", "Pooled effect", "")) %>%
   kable_classic_2(html_font = "Times", fixed_thead = T, full_width = F) %>%
-  add_header_above(c(" " = 2, "Effects indep vars" = 2, "Mean year on indep vars" = 3, "Indep vars x time" = 2), align = "c") %>%
+  add_header_above(c(" " = 2, "Effects indep vars" = 2, "Mean year on indep vars" = 3, "Effects interaction" = 2), align = "c") %>%
    footnote(
     general_title = "Note.",
     general = "*** = p < 0.001, ** = p < 0.01, * = p < 0.05",

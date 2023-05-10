@@ -71,9 +71,9 @@ model_step_1_var
 ```
 
 # Time variance plot
-png(file = "/Users/anuschka/Documents/climatechange/climatechange/output/forestplot_var_weight.png", width = 2800, height = 2400, res = 300)
+png(file = "/Users/anuschka/Documents/climatechange/climatechange/output/forestplot_var_weight_year.png", width = 2800, height = 2400, res = 300)
 
-png <- forest(model_step_1_var, colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat, ilab.xpos = -2, xlim = c(-1, 1), oder = "yi")
+png <- forest(model_step_1_var, colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat, ilab.xpos = -2, xlim = c(-1, 1), order = "yi")
 
 dev.off()
 
@@ -102,32 +102,6 @@ model_step_2_var <- rma(yi = sig_time,
               test = "knha")
 
 model_step_2_var
-
-# Ambiguous yes is significant. That means that I have to test it without these variables
-total_reg_sub <- subset(total_reg_results, ambiguous == "No")
-# These are then 37 variables
-model_test_sub <- rma(yi = sig_time,
-              sei = sig_time_sd,
-              data = total_reg_sub,
-              mods = ~ mean_year + attitude_cat,
-              method = "ML",
-              test = "knha")
-
-model_test_sub
-
-model_step_1_var_sub <- rma(yi = sig_time,
-              sei = sig_time_sd,
-              data = total_reg_sub,
-              method = "ML", 
-              test = "knha")
-
-model_step_1_var_sub
-
-sub <- forest(model_step_1_var_sub, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_sub$dep_var, pch = 23,fonts = "Helvetica", cex = 0.5, mlab = "Pooled estimate", ilab = attitude_cat, ilab.xpos = -2, xlim = c(-1, 1))
-
-sub <- forest(model_step_1_var_sub)
-
-
 ```
 
 ```{r}
@@ -236,7 +210,7 @@ library(ggplot2)
 
 ggplot(png)
 
-forest_data <- total_reg_results %>% select(dep_var, mu_time)
+forest_data <- total_reg_results %>% dplyr::select(dep_var, mu_time)
 
 
 
@@ -505,7 +479,7 @@ total_mean <- cbind(model_1_mean_df, model_2_mean_df, model_3_mean_df)
 # Now for the sigma
 model_1_var_df <- data.frame(matrix(ncol = 5, nrow = 7))
 colnames(model_1_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_1_var_df$Variable <- c("Intercept", "Var year", "Varitude behavioral (ref = aff)", "Varitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
+model_1_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
 model_1_var_df$`Mu/Sigma` <- c("Sigma", "", "", "", "", "", "")
 
 model_1_var_df$Estimate <- as.numeric(model_step_2_var$beta) #estimate
@@ -532,7 +506,7 @@ model_1_var_df <- rbind(model_1_var_df, model_1_fit)
 # Independent variable model 
 model_2_var_df <- data.frame(matrix(ncol = 5, nrow = 7))
 colnames(model_2_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_2_var_df$Variable <- c("Intercept", "Var year", "Varitude behavioral (ref = aff)", "Varitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
+model_2_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
 model_2_var_df$`Mu/Sigma` <- c("Sigma", "", "", "", "", "", "")
 
 model_2_var_df$Estimate <- as.numeric(model_step_3_var$beta) #estimate
@@ -559,7 +533,7 @@ model_2_var_df <- rbind(model_2_var_df, model_2_fit)
 #And the interaction model
 model_3_var_df <- data.frame(matrix(ncol = 5, nrow = 7))
 colnames(model_3_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_3_var_df$Variable <- c("Intercept", "Var year", "Varitude behavioral (ref = aff)", "Varitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
+model_3_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
 model_3_var_df$`Mu/Sigma` <- c("Sigma", "", "", "", "", "", "")
 
 model_3_var_df$Estimate <- as.numeric(model_step_4_var$beta) #estimate
