@@ -1,0 +1,987 @@
+---
+title: "Untitled"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+For the weighted gamlss regressions
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(gamlss)
+```
+
+```{r}
+# First load the empty lists
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_empty_w.RData")
+
+# Store the results in a new dataframe
+ess_empty_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(ess_list_empty)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(ess_list_empty[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(ess_list_empty[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[3]]
+  sigma_sd <- sum[[3,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[4]]
+  sig_time_sd <- sum[[4,2]]
+  
+  # Put the results 
+  ess_empty_df <- rbind(ess_empty_df, data.frame(dep_var = dep_var, mu_intercept = mu_int, mu_sd = mu_sd, sigma_intercept = sigma_int, sigma_sd = sigma_sd, mu_time = mu_time, mu_time_sd = mu_time_sd, sig_time = sig_time, sig_time_sd = sig_time_sd))
+}
+
+# Of course this also has to be done for the other lists of the other models
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_preds_w_new.RData")
+
+# This does mean that the estimates of the sigma are in a different place
+sum <- summary(ess_list_preds[[1]])
+
+
+# Store the results in a new dataframe
+ess_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(ess_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(ess_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(ess_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[7]]
+  sigma_sd <- sum[[7,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[8]]
+  sig_time_sd <- sum[[8,2]]
+  
+  # Put the results 
+  ess_preds_df <- rbind(ess_preds_df, data.frame(dep_var = dep_var, mu_intercept_pred = mu_int, mu_sd_pred = mu_sd, sigma_intercept_pred = sigma_int, sigma_sd_pred = sigma_sd, mu_time_pred = mu_time, mu_time_sd_pred = mu_time_sd, sig_time_pred = sig_time, sig_time_sd_pred = sig_time_sd))
+}
+
+# And then for the interaction model
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_interactions_w_new.RData")
+
+sum <- summary(ess_list_interactions[[1]])
+
+
+# Store the results in a new dataframe
+ess_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the number of dep vars in the list
+for (i in seq_along(ess_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(ess_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(ess_list_interactions[[i]])
+  
+  # Extract the info I need from the summary
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[11]]
+  sigma_sd <- sum[[11,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[12]]
+  sig_time_sd <- sum[[12,2]]
+  
+  # Put the results in a dataframe
+  ess_interactions_df <- rbind(ess_interactions_df, data.frame(dep_var = dep_var, mu_intercept_int = mu_int, mu_sd_int = mu_sd, sigma_intercept_int = sigma_int, sigma_sd_int = sigma_sd, mu_time_int = mu_time, mu_time_sd_int = mu_time_sd, sig_time_int = sig_time, sig_time_sd_int = sig_time_sd))
+}
+
+ess_results_df <- left_join(ess_empty_df, ess_preds_df)
+ess_results_df <- left_join(ess_results_df, ess_interactions_df)
+ess_results_df$first_year <- 2016
+ess_results_df$mean_year <- 2018
+ess_results_df$data <- "ESS"
+
+save(ess_results_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_results_df_w_new.RData")
+
+```
+
+
+```{r}
+# Now the same for the EVS
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/evs_list_empty_w.RData")
+
+# Store the results in a new dataframe
+evs_empty_df <- data.frame(dep_var = character())
+
+# Loop over the list for all the dep vars
+for (i in seq_along(evs_list_empty)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(evs_list_empty[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(evs_list_empty[[i]])
+  
+  # Extract the info
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[3]]
+  sigma_sd <- sum[[3,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[4]]
+  sig_time_sd <- sum[[4,2]]
+  
+  # Put the results in a dataframe
+  evs_empty_df <- rbind(evs_empty_df, data.frame(dep_var = dep_var, mu_intercept = mu_int, mu_sd = mu_sd, sigma_intercept = sigma_int, sigma_sd = sigma_sd, mu_time = mu_time, mu_time_sd = mu_time_sd, sig_time = sig_time, sig_time_sd = sig_time_sd))
+}
+
+# And the predictor model
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/evs_list_preds_w_new.RData")
+
+# This does mean that the estimates of the sigma are in a different place
+sum <- summary(evs_list_preds[[1]])
+
+
+# Store the results in a new dataframe
+evs_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(evs_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(evs_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(evs_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[7]]
+  sigma_sd <- sum[[7,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[8]]
+  sig_time_sd <- sum[[8,2]]
+  
+  # Put the results 
+  evs_preds_df <- rbind(evs_preds_df, data.frame(dep_var = dep_var, mu_intercept_pred = mu_int, mu_sd_pred = mu_sd, sigma_intercept_pred = sigma_int, sigma_sd_pred = sigma_sd, mu_time_pred = mu_time, mu_time_sd_pred = mu_time_sd, sig_time_pred = sig_time, sig_time_sd_pred = sig_time_sd))
+}
+
+# And lastly the interaction model
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/evs_list_interactions_w_new.RData")
+
+sum <- summary(evs_list_interactions[[1]])
+
+
+# Store the results in a new dataframe
+evs_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the number of dep vars in the list
+for (i in seq_along(evs_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(evs_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(evs_list_interactions[[i]])
+  
+  # Extract the info I need from the summary
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[11]]
+  sigma_sd <- sum[[11,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[12]]
+  sig_time_sd <- sum[[12,2]]
+  
+  # Put the results in a dataframe
+  evs_interactions_df <- rbind(evs_interactions_df, data.frame(dep_var = dep_var, mu_intercept_int = mu_int, mu_sd_int = mu_sd, sigma_intercept_int = sigma_int, sigma_sd_int = sigma_sd, mu_time_int = mu_time, mu_time_sd_int = mu_time_sd, sig_time_int = sig_time, sig_time_sd_int = sig_time_sd))
+}
+
+# Merge the results
+evs_results_df <- left_join(evs_empty_df, evs_preds_df)
+evs_results_df <- left_join(evs_results_df, evs_interactions_df)
+evs_results_df$first_year <- 1990
+evs_results_df$mean_year <- 1999
+evs_results_df$data <- "EVS"
+
+save(evs_results_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/evs_results_df_w_new.RData")
+
+```
+
+
+```{r}
+# Now for I&O research
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/io_list_empty_w.RData")
+
+# Store the results in a new dataframe
+io_empty_df <- data.frame(dep_var = character())
+
+for (i in seq_along(io_list_empty)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(io_list_empty[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(io_list_empty[[i]])
+  
+  # Extract the info
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[3]]
+  sigma_sd <- sum[[3,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[4]]
+  sig_time_sd <- sum[[4,2]]
+  
+  # Put the results in a dataframe
+  io_empty_df <- rbind(io_empty_df, data.frame(dep_var = dep_var, mu_intercept = mu_int, mu_sd = mu_sd, sigma_intercept = sigma_int, sigma_sd = sigma_sd, mu_time = mu_time, mu_time_sd = mu_time_sd, sig_time = sig_time, sig_time_sd = sig_time_sd))
+}
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/io_list_preds_w.RData")
+
+# This does mean that the estimates of the sigma are in a different place
+sum <- summary(io_list_preds[[1]])
+
+
+# Store the results in a new dataframe
+io_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(io_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(io_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(io_list_preds[[i]])
+  
+  # Extract info
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[8]]
+  sigma_sd <- sum[[8,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[9]]
+  sig_time_sd <- sum[[9,2]]
+  
+  # Put the results in a dataframe
+  io_preds_df <- rbind(io_preds_df, data.frame(dep_var = dep_var, mu_intercept_pred = mu_int, mu_sd_pred = mu_sd, sigma_intercept_pred = sigma_int, sigma_sd_pred = sigma_sd, mu_time_pred = mu_time, mu_time_sd_pred = mu_time_sd, sig_time_pred = sig_time, sig_time_sd_pred = sig_time_sd))
+}
+
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/io_list_interactions_w.RData")
+
+sum <- summary(io_list_interactions[[1]])
+
+
+# Store the results in a new dataframe
+io_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the number of dep vars in the list
+for (i in seq_along(io_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(io_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(io_list_interactions[[i]])
+  
+  # Extract the info I need from the summary
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[13]]
+  sigma_sd <- sum[[13,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[14]]
+  sig_time_sd <- sum[[14,2]]
+  
+  # Put the results in a dataframe
+  io_interactions_df <- rbind(io_interactions_df, data.frame(dep_var = dep_var, mu_intercept_int = mu_int, mu_sd_int = mu_sd, sigma_intercept_int = sigma_int, sigma_sd_int = sigma_sd, mu_time_int = mu_time, mu_time_sd_int = mu_time_sd, sig_time_int = sig_time, sig_time_sd_int = sig_time_sd))
+}
+
+# Merge the results
+io_results_df <- left_join(io_empty_df, io_preds_df)
+io_results_df <- left_join(io_results_df, io_interactions_df)
+io_results_df$first_year <- 2019
+io_results_df$data <- "IO"
+
+save(io_results_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/io_results_df_w.RData")
+
+```
+
+```{r}
+# Now for ISSP, which has to happen twice (bc 2 substs based on dependent vars)
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_empty_w.RData")
+
+# Store the results in a new dataframe
+issp_empty_df <- data.frame(dep_var = character())
+
+# Loop over the list for all the dep vars
+for (i in seq_along(issp_list_empty)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(issp_list_empty[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(issp_list_empty[[i]])
+  
+  # Extract the info
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[3]]
+  sigma_sd <- sum[[3,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[4]]
+  sig_time_sd <- sum[[4,2]]
+  
+  # Put the results in a dataframe
+  issp_empty_df <- rbind(issp_empty_df, data.frame(dep_var = dep_var, mu_intercept = mu_int, mu_sd = mu_sd, sigma_intercept = sigma_int, sigma_sd = sigma_sd, mu_time = mu_time, mu_time_sd = mu_time_sd, sig_time = sig_time, sig_time_sd = sig_time_sd))
+}
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_preds_w.RData")
+
+# This does mean that the estimates of the sigma are in a different place
+sum <- summary(issp_list_preds[[1]])
+
+
+# Store the results in a new dataframe
+issp_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(issp_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(issp_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(issp_list_preds[[i]])
+  
+  # Extract info
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[11]]
+  sigma_sd <- sum[[11,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[12]]
+  sig_time_sd <- sum[[12,2]]
+  
+  # Put the results in a dataframe
+  issp_preds_df <- rbind(issp_preds_df, data.frame(dep_var = dep_var, mu_intercept_pred = mu_int, mu_sd_pred = mu_sd, sigma_intercept_pred = sigma_int, sigma_sd_pred = sigma_sd, mu_time_pred = mu_time, mu_time_sd_pred = mu_time_sd, sig_time_pred = sig_time, sig_time_sd_pred = sig_time_sd))
+}
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_interactions_w.RData")
+
+sum <- summary(issp_list_interactions[[1]])
+
+
+# Store the results in a new dataframe
+issp_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the number of dep vars in the list
+for (i in seq_along(issp_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(issp_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(issp_list_interactions[[i]])
+  
+  # Extract the info I need from the summary
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[18]]
+  sigma_sd <- sum[[18,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[19]]
+  sig_time_sd <- sum[[19,2]]
+  
+  # Put the results in a dataframe
+  issp_interactions_df <- rbind(issp_interactions_df, data.frame(dep_var = dep_var, mu_intercept_int = mu_int, mu_sd_int = mu_sd, sigma_intercept_int = sigma_int, sigma_sd_int = sigma_sd, mu_time_int = mu_time, mu_time_sd_int = mu_time_sd, sig_time_int = sig_time, sig_time_sd_int = sig_time_sd))
+}
+
+# Merge the results
+issp_results_df <- left_join(issp_empty_df, issp_preds_df)
+issp_results_df <- left_join(issp_results_df, issp_interactions_df)
+issp_results_df$first_year <- 1993
+issp_results_df$data <- "ISSP"
+
+save(issp_results_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_results_df_w.RData")
+
+
+# And with the second model
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_empty_2_waves_w.RData")
+
+# Store the results in a new dataframe
+issp_empty_2_df <- data.frame(dep_var = character())
+
+
+sum <- summary(issp_list_empty_2_waves[[1]])
+
+# Loop over the list for all the dep vars
+for (i in seq_along(issp_list_empty_2_waves)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(issp_list_empty_2_waves[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(issp_list_empty_2_waves[[i]])
+  
+  # Extract the info
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[3]]
+  sigma_sd <- sum[[3,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[4]]
+  sig_time_sd <- sum[[4,2]]
+  
+  # Put the results in a dataframe
+  issp_empty_2_df <- rbind(issp_empty_2_df, data.frame(dep_var = dep_var, mu_intercept = mu_int, mu_sd = mu_sd, sigma_intercept = sigma_int, sigma_sd = sigma_sd, mu_time = mu_time, mu_time_sd = mu_time_sd, sig_time = sig_time, sig_time_sd = sig_time_sd))
+}
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_preds_2_waves_w.RData")
+
+# This does mean that the estimates of the sigma are in a different place
+sum <- summary(issp_list_preds_2_waves[[1]])
+
+
+# Store the results in a new dataframe
+issp_preds_2_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(issp_list_preds_2_waves)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(issp_list_preds_2_waves[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(issp_list_preds_2_waves[[i]])
+  
+  # Extract info
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[11]]
+  sigma_sd <- sum[[11,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[12]]
+  sig_time_sd <- sum[[12,2]]
+  
+  # Put the results in a dataframe
+  issp_preds_2_df <- rbind(issp_preds_2_df, data.frame(dep_var = dep_var, mu_intercept_pred = mu_int, mu_sd_pred = mu_sd, sigma_intercept_pred = sigma_int, sigma_sd_pred = sigma_sd, mu_time_pred = mu_time, mu_time_sd_pred = mu_time_sd, sig_time_pred = sig_time, sig_time_sd_pred = sig_time_sd))
+}
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_interactions_2_waves_w.RData")
+
+
+# Store the results in a new dataframe
+issp_interactions_2_df <- data.frame(dep_var = character())
+
+# Loop over the number of dep vars in the list
+for (i in seq_along(issp_list_interactions_2_waves)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(issp_list_interactions_2_waves[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(issp_list_interactions_2_waves[[i]])
+  
+  # Extract the info I need from the summary
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[18]]
+  sigma_sd <- sum[[18,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[19]]
+  sig_time_sd <- sum[[19,2]]
+  
+  # Put the results in a dataframe
+  issp_interactions_2_df <- rbind(issp_interactions_2_df, data.frame(dep_var = dep_var, mu_intercept_int = mu_int, mu_sd_int = mu_sd, sigma_intercept_int = sigma_int, sigma_sd_int = sigma_sd, mu_time_int = mu_time, mu_time_sd_int = mu_time_sd, sig_time_int = sig_time, sig_time_sd_int = sig_time_sd))
+}
+
+# Merge the results
+issp_results_2_df <- left_join(issp_empty_2_df, issp_preds_2_df)
+issp_results_2_df <- left_join(issp_results_2_df, issp_interactions_2_df)
+issp_results_2_df$first_year <- 2000
+issp_results_2_df$data <- "ISSP"
+
+save(issp_results_2_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_results_2_df.RData")
+
+```
+
+
+```{r}
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_1986_w.RData")
+
+# Store the results in a new dataframe
+eb_empty_1986_df <- data.frame(dep_var = character())
+
+# Loop over the list for all the dep vars
+for (i in seq_along(eb_list_empty_1986)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_empty_1986[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_empty_1986[[i]])
+  
+  # Extract the info
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[3]]
+  sigma_sd <- sum[[3,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[4]]
+  sig_time_sd <- sum[[4,2]]
+  
+  # Put the results in a dataframe
+  eb_empty_1986_df <- rbind(eb_empty_1986_df, data.frame(dep_var = dep_var, mu_intercept = mu_int, mu_sd = mu_sd, sigma_intercept = sigma_int, sigma_sd = sigma_sd, mu_time = mu_time, mu_time_sd = mu_time_sd, sig_time = sig_time, sig_time_sd = sig_time_sd))
+}
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_1986_w.RData")
+
+# This does mean that the estimates of the sigma are in a different place
+sum <- summary(eb_list_preds_1986[[1]])
+
+
+# Store the results in a new dataframe
+eb_preds_1986_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_1986)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_preds_1986[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_preds_1986[[i]])
+  
+  # Extract info
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[10]]
+  sigma_sd <- sum[[10,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[11]]
+  sig_time_sd <- sum[[11,2]]
+  
+  # Put the results in a dataframe
+  eb_preds_1986_df <- rbind(eb_preds_1986_df, data.frame(dep_var = dep_var, mu_intercept_pred = mu_int, mu_sd_pred = mu_sd, sigma_intercept_pred = sigma_int, sigma_sd_pred = sigma_sd, mu_time_pred = mu_time, mu_time_sd_pred = mu_time_sd, sig_time_pred = sig_time, sig_time_sd_pred = sig_time_sd))
+}
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_1986_w.RData")
+
+sum <- summary(eb_list_interactions_1986[[1]])
+
+# Store the results in a new dataframe
+eb_interactions_1986_df <- data.frame(dep_var = character())
+
+# Loop over the number of dep vars in the list
+for (i in seq_along(eb_list_interactions_1986)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_interactions_1986[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_interactions_1986[[i]])
+  
+  # Extract the info I need from the summary
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[16]]
+  sigma_sd <- sum[[16,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[17]]
+  sig_time_sd <- sum[[17,2]]
+  
+  # Put the results in a dataframe
+  eb_interactions_1986_df <- rbind(eb_interactions_1986_df, data.frame(dep_var = dep_var, mu_intercept_int = mu_int, mu_sd_int = mu_sd, sigma_intercept_int = sigma_int, sigma_sd_int = sigma_sd, mu_time_int = mu_time, mu_time_sd_int = mu_time_sd, sig_time_int = sig_time, sig_time_sd_int = sig_time_sd))
+}
+
+# Merge the results
+eb_results_1986_df <- left_join(eb_empty_1986_df, eb_preds_1986_df)
+eb_results_1986_df <- left_join(eb_results_1986_df, eb_interactions_1986_df)
+eb_results_1986_df$first_year <- 1986
+eb_results_1986_df$data <- "EB"
+
+save(eb_results_1986_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_results_1986_df_w.RData")
+```
+
+```{r}
+# For all the other eurobarometer waves, exactly the same needs to be done each time. Therefore I want to loop over these different lists. 
+
+# First load all the eurobarometer lists with empty models in my environment
+rm(list=ls())
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2007_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2008_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2009_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2011_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_buyprod_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_cchange2_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_doprot_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_eff_daily_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_pers_imp_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_prsaction_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_quallife_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_doprot_city_w.RData")
+
+# Store the results in a new dataframe
+eb_results_df <- data.frame(dep_var = character())
+
+my_list[[1]]$mu.terms[[2]]
+
+# Get the lists from the environment
+lists <- ls()
+
+for (j in lists) { 
+  if(is.list(get(j))) { 
+    my_list <- get(j)
+
+# Loop over the list for all the dep vars
+for (i in seq_along(my_list)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(my_list[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(my_list[[i]])
+  
+  # Extract the info
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[3]]
+  sigma_sd <- sum[[3,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[4]]
+  sig_time_sd <- sum[[4,2]]
+  
+  # Put the results in a dataframe
+  eb_results_df <- rbind(eb_results_df, data.frame(dep_var = dep_var, mu_intercept = mu_int, mu_sd = mu_sd, sigma_intercept = sigma_int, sigma_sd = sigma_sd, mu_time = mu_time, mu_time_sd = mu_time_sd, sig_time = sig_time, sig_time_sd = sig_time_sd))
+    }
+  } 
+} 
+
+# It produces an error, but actually everything has worked as i wish?
+eb_results_empty_df <- eb_results_df
+
+# let's save it quickly
+save(eb_results_empty_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_results_empty_df_w.RData" )
+
+# And the numbers are indeed extracted correctly if i check this randomly
+sum <- summary(eb_list_empty_quallife[[1]])
+
+# Now i want the same for the models with the predictors
+# First clear the environment because I don't want the empty lists iterated in the predictor loop
+rm(list=ls())
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2007_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2008_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2009_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2011_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_buyprod_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_cchange2_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_doprot_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_eff_daily_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_pers_imp_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_prsaction_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_quallife_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_doprot_city_w.RData")
+
+# First check where the sigma's are stored
+sum <- summary(eb_list_preds_2007[[1]]) # 8 and 9
+
+
+
+# Store the results in a new dataframe
+eb_results_preds_df <- data.frame(dep_var = character())
+
+# Get the lists from the environment
+lists <- ls()
+
+for (j in lists) { 
+  if(is.list(get(j))) { 
+    my_list <- get(j)
+
+# Loop over the list 
+for (i in seq_along(my_list)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(my_list[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(my_list[[i]])
+  
+  # Extract info
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[8]]
+  sigma_sd <- sum[[8,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[9]]
+  sig_time_sd <- sum[[9,2]]
+  
+  # Put the results in a dataframe
+  eb_results_preds_df <- rbind(eb_results_preds_df, data.frame(dep_var = dep_var, mu_intercept_pred = mu_int, mu_sd_pred = mu_sd, sigma_intercept_pred = sigma_int, sigma_sd_pred = sigma_sd, mu_time_pred = mu_time, mu_time_sd_pred = mu_time_sd, sig_time_pred = sig_time, sig_time_sd_pred = sig_time_sd))
+    }
+  }
+} 
+
+# Again, an error, but the output is correct
+save(eb_results_preds_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_results_preds_df_w.RData" )
+
+# Lastly for the interaction models
+rm(list=ls())
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2007_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2008_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2009_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2011_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_buyprod_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_cchange2_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_doprot_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_eff_daily_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_pers_imp.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_prsaction_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_quallife_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_doprot_city_w.RData")
+
+sum <- summary(eb_list_interactions_2007[[1]]) # 12 and 13
+
+# Store the results in a new dataframe
+eb_results_interactions_df <- data.frame(dep_var = character())
+
+# Get the lists from the environment
+lists <- ls()
+
+for (j in lists) { 
+  if(is.list(get(j))) { 
+    my_list <- get(j)
+
+# Loop over the number of dep vars in the list
+for (i in seq_along(my_list)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(my_list[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(my_list[[i]])
+  
+  # Extract the info I need from the summary
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[12]]
+  sigma_sd <- sum[[12,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[13]]
+  sig_time_sd <- sum[[13,2]]
+  
+  # Put the results in a dataframe
+  eb_results_interactions_df <- rbind(eb_results_interactions_df, data.frame(dep_var = dep_var, mu_intercept_int = mu_int, mu_sd_int = mu_sd, sigma_intercept_int = sigma_int, sigma_sd_int = sigma_sd, mu_time_int = mu_time, mu_time_sd_int = mu_time_sd, sig_time_int = sig_time, sig_time_sd_int = sig_time_sd))
+    }
+  } 
+} 
+
+
+save(eb_results_interactions_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_results_interactions_df_w.RData" )
+
+# Make one dataframe of the three loops
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_results_empty_df_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_results_preds_df_w.RData")
+
+
+# Merge the results
+eb_results_df <- left_join(eb_results_empty_df, eb_results_preds_df)
+eb_results_df <- left_join(eb_results_df, eb_results_interactions_df)
+eb_results_df$data <- "EB"
+
+# This time, year is a bit more difficult, so I have to assign that per dep_var
+eb_results_df$first_year[eb_results_df$dep_var == "role_ind"] <- 2007
+eb_results_df$first_year[eb_results_df$dep_var == "big_pol"] <- 2007
+eb_results_df$first_year[eb_results_df$dep_var == "cc_unstop"] <- 2008
+eb_results_df$first_year[eb_results_df$dep_var == "cc_exag"] <- 2008
+eb_results_df$first_year[eb_results_df$dep_var == "cc_poseu"] <- 2008
+eb_results_df$first_year[eb_results_df$dep_var == "cc_prsact"] <- 2008
+eb_results_df$first_year[eb_results_df$dep_var == "cc_poseu"] <- 2008
+eb_results_df$first_year[eb_results_df$dep_var == "ccpercept"] <- 2009
+eb_results_df$first_year[eb_results_df$dep_var == "cchange"] <- 2009
+eb_results_df$first_year[eb_results_df$dep_var == "cchange2"] <- 2011
+eb_results_df$first_year[eb_results_df$dep_var == "cchangetot"] <- 2011
+eb_results_df$first_year[eb_results_df$dep_var == "envp_eg"] <- 2011
+eb_results_df$first_year[eb_results_df$dep_var == "effr_eg"] <- 2011
+eb_results_df$first_year[eb_results_df$dep_var == "buyprod"] <- 2007
+eb_results_df$first_year[eb_results_df$dep_var == "doprot_natgov"] <- 2009
+eb_results_df$first_year[eb_results_df$dep_var == "doprot_eu"] <- 2009
+eb_results_df$first_year[eb_results_df$dep_var == "doprot_region"] <- 2009
+eb_results_df$first_year[eb_results_df$dep_var == "doprot_comp"] <- 2009
+eb_results_df$first_year[eb_results_df$dep_var == "doprot_citiz"] <- 2009
+eb_results_df$first_year[eb_results_df$dep_var == "doprot_city"] <- 2014
+eb_results_df$first_year[eb_results_df$dep_var == "eff_daily"] <- 2007
+eb_results_df$first_year[eb_results_df$dep_var == "pers_imp"] <- 2009
+eb_results_df$first_year[eb_results_df$dep_var == "env_quallife"] <- 2004
+
+
+save(eb_results_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_results_df_w.RData" )
+```
+
+
+```{r}
+# The final step is to merge all results into one dataframe
+rm(list=ls())
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_results_df_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/evs_results_df_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/io_results_df_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_results_df_w.RData")
+#load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_results_2_df.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_results_1986_df_w.RData")
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_results_df_w.RData")
+
+
+total_reg_results <- rbind(eb_results_1986_df, eb_results_df, ess_results_df, evs_results_df, io_results_df, issp_results_df) #issp 2 not included here rn bc error
+
+save(total_reg_results, file= "/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results_gam_w.RData" )
+```
+
+```{r}
+load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results_gam_w.RData")
+
+
+# I also want to add a variable that describes whether the dependent variable is mostly of affective, behavioral or cognitive nature 
+
+# 2 variables that are called worry, not handy 
+total_reg_results$dep_var[total_reg_results$dep_var == "worry" & total_reg_results$data == "ISSP"] <- "worry_issp"
+
+total_reg_results$attitude_cat[total_reg_results$dep_var == "dodiff" 
+                               | total_reg_results$dep_var == "pers_resp"
+                               | total_reg_results$dep_var == "worry"
+                               | total_reg_results$dep_var == "worried"
+                               | total_reg_results$dep_var == "worry_future"
+                               | total_reg_results$dep_var == "frontrunner"
+                               | total_reg_results$dep_var == "min_contr"] <- "affective"
+total_reg_results$attitude_cat[total_reg_results$dep_var == "willing_price" 
+                               | total_reg_results$dep_var == "willing_tax"
+                               | total_reg_results$dep_var == "willing_living"
+                               | total_reg_results$dep_var == "do_right"
+                               | total_reg_results$dep_var == "people_decide"
+                               | total_reg_results$dep_var == "climate5"
+                               | total_reg_results$dep_var == "prsaction"
+                               | total_reg_results$dep_var == "cc_prsact"
+                               | total_reg_results$dep_var == "buyprod"] <- "behavioral"
+total_reg_results$attitude_cat[total_reg_results$dep_var == "worry_issp" 
+                               | total_reg_results$dep_var == "lifeharm"
+                               | total_reg_results$dep_var == "progharm"
+                               | total_reg_results$dep_var == "econprotect"
+                               | total_reg_results$dep_var == "growharm"
+                               | total_reg_results$dep_var == "bus_decide"
+                               | total_reg_results$dep_var == "moreimp"
+                               | total_reg_results$dep_var == "othersame"
+                               | total_reg_results$dep_var == "exag"
+                               | total_reg_results$dep_var == "country_effort" 
+                               | total_reg_results$dep_var == "cause"
+                               | total_reg_results$dep_var == "resp_citiz"
+                               | total_reg_results$dep_var == "dk_start"
+                               | total_reg_results$dep_var == "do_gov"
+                               | total_reg_results$dep_var == "buss_help"
+                               | total_reg_results$dep_var == "human_resp"
+                               | total_reg_results$dep_var == "env_ec_stat"
+                               | total_reg_results$dep_var == "env_prsimp"
+                                | total_reg_results$dep_var == "envp_eg"
+                               | total_reg_results$dep_var == "effr_eg"
+                               | total_reg_results$dep_var == "cchange"
+                               | total_reg_results$dep_var == "cchange2"
+                               | total_reg_results$dep_var == "cchangetot" 
+                               | total_reg_results$dep_var == "ccpercept"
+                               | total_reg_results$dep_var == "env_quallife"
+                               | total_reg_results$dep_var == "doprot_comp"
+                               | total_reg_results$dep_var == "doprot_region"
+                               | total_reg_results$dep_var == "doprot_natgov"
+                               | total_reg_results$dep_var == "doprot_city"
+                               | total_reg_results$dep_var == "doprot_citiz"
+                               | total_reg_results$dep_var == "doprot_eu"
+                              | total_reg_results$dep_var == "cc_unstop"
+                               | total_reg_results$dep_var == "cc_exag"
+                               | total_reg_results$dep_var == "cc_poseu"
+                               | total_reg_results$dep_var == "role_ind"
+                               | total_reg_results$dep_var == "big_pol"
+                               | total_reg_results$dep_var == "eff_daily"
+                               | total_reg_results$dep_var == "pers_imp"] <- "cognitive"
+
+save(total_reg_results, file= "/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results_gam_w.RData" )
+
+#Create a variable that indicates whether the dependent variable can be interpreted in 2 ways (ambiguous)
+
+
+total_reg_results$ambiguous[total_reg_results$dep_var != "dodiff" 
+                               | total_reg_results$dep_var != "frontrunner"
+                               | total_reg_results$dep_var != "min_contr"
+                               | total_reg_results$dep_var != "people_decide"
+                               | total_reg_results$dep_var != "econprotect"
+                               | total_reg_results$dep_var != "growharm"
+                               | total_reg_results$dep_var != "bus_decide"
+                            | total_reg_results$dep_var != "othersame"
+                            | total_reg_results$dep_var != "resp_citiz"
+                            | total_reg_results$dep_var != "dk_start"
+                            | total_reg_results$dep_var != "buss_help"
+                            | total_reg_results$dep_var != "envp_eg"
+                            | total_reg_results$dep_var != "effr_eg"
+                            | total_reg_results$dep_var != "env_quallife"
+                            | total_reg_results$dep_var != "cc_unstop"
+                            | total_reg_results$dep_var != "cc_poseu"
+                            | total_reg_results$dep_var != "big_pol"] <- "No"
+total_reg_results$ambiguous[total_reg_results$dep_var == "dodiff" 
+                               | total_reg_results$dep_var == "frontrunner"
+                               | total_reg_results$dep_var == "min_contr"
+                               | total_reg_results$dep_var == "people_decide"
+                               | total_reg_results$dep_var == "econprotect"
+                               | total_reg_results$dep_var == "growharm"
+                               | total_reg_results$dep_var == "bus_decide"
+                            | total_reg_results$dep_var == "othersame"
+                            | total_reg_results$dep_var == "resp_citiz"
+                            | total_reg_results$dep_var == "dk_start"
+                            | total_reg_results$dep_var == "buss_help"
+                            | total_reg_results$dep_var == "envp_eg"
+                            | total_reg_results$dep_var == "effr_eg"
+                            | total_reg_results$dep_var == "env_quallife"
+                            | total_reg_results$dep_var == "cc_unstop"
+                            | total_reg_results$dep_var == "cc_poseu"
+                            | total_reg_results$dep_var == "big_pol"] <- "Yes"
+
+table(total_reg_results$ambiguous, useNA = "always")
+save(total_reg_results, file= "/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results_gam_w.RData" )
+
+```
+

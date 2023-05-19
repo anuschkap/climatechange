@@ -1,0 +1,2699 @@
+---
+title: "Untitled"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+# Regressions in "pieces" 
+```{r}
+rm(list = ls())
+library(gamlss)
+library(tidyverse)
+library(dplyr)
+library(here)
+```
+
+
+```{r}
+#Try the same with the ESS survey
+library(here)
+here()
+here::i_am("scripts/analysis/single_regression_gw_py.Rmd")
+load(here("./data/final_data", "esstotal.RData"))
+
+```
+
+
+```{r}
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/esstotal.RData")
+
+
+
+ess_complete <- esstotal %>% drop_na()
+ess_complete$time <- ess_complete$surveyyear - min(ess_complete$surveyyear)
+
+# I want to build models. In the empty model, I only want to include time. This can of course be done in several ways. Let's first include it as a numeric variable and see what happens. 
+
+predictors <- c("time")
+deps <- c("worry", "cause", "pers_resp")
+
+
+ess_list_empty <- list()
+
+
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  ess_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = ess_complete, weights = weightvec)
+  
+  ess_list_empty[[i]] <- ess_fit
+} 
+
+summary(ess_list_empty[[1]]) #Sig pos effect of surveyyear on both intercept and variance (worry)
+summary(ess_list_empty[[2]]) # Sig neg effect on intercept, sig pos effect on variance (cause)
+summary(ess_list_empty[[3]]) # Sig pos effect on intercept, sig neg effect on variance (pers_resp)
+# These scores are quite in line with theory --> we're more worried, but especially increase in polarization regarding the cause. 
+
+save(ess_list_empty, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_empty_w.RData")
+
+```
+
+We know that time is not measured exactly equally across waves: a wave in 2010 can be measures in march, in 2011 it can be august and in 2012 it can be march again. So, there will be measurement error if we would estimate it as continuous variable. That is an argument to use dummies. Theoretically, we indeed want to see whether there is a general increase or decline (continuous), but if we're interested in period effects it is insightful to see declines in certain years as well. 
+
+
+```{r}
+#Estimate a second model with the indicators
+# Here I will use the factor variable of time to see what happens
+
+predictors <- c("time", "sex", "isced", "urban", "ch_attend", "income_quart", "age", "lrscale")
+deps <- c("worry", "cause", "pers_resp")
+
+ess_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  ess_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = ess_complete, weights = weightvec)
+  
+  ess_list_preds[[i]] <- ess_fit
+} 
+
+summary(ess_list_preds[[1]]) #For intercept, surveyyear is sig, gender, eduyrs, middle urbanity, age and lrscale. For variance only gender and income
+summary(ess_list_preds[[2]]) # Same effects regarding intercept, variance gender, income and lrscale
+summary(ess_list_preds[[3]]) # Intercept everything sig apart from urbanity, variance education, gender, income, lrscale 
+
+save(ess_list_preds, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_preds_w.RData")
+```
+
+
+```{r}
+#Now the last model with interaction of time on predictor variables
+ess_complete$age_time <- ess_complete$age * ess_complete$time
+ess_complete$sex_time <- as.numeric(ess_complete$sex) * ess_complete$time
+ess_complete$isced_time <- ess_complete$isced * ess_complete$time
+ess_complete$urban_time <- as.numeric(ess_complete$urban) * ess_complete$time
+ess_complete$ch_attend_time <- ess_complete$ch_attend * ess_complete$time
+ess_complete$income_time <- ess_complete$income_quart * ess_complete$time
+ess_complete$lrscale_time <- ess_complete$lrscale * ess_complete$time
+
+# Deze manieren om een interactie te maken met factor variabelen werkt niet
+ess_complete$sex_time <- ess_complete$sex:ess_complete$time
+ess_complete$sex_time <- interaction(ess_complete$sex, ess_complete$time)
+ess_complete(sex, time, i(sex, time, ref = TRUE))
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time", "ch_attend_time", "income_time", "lrscale_time")
+
+ess_list_interactions <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  ess_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = ess_complete, weights = weightvec)
+  
+  ess_list_interactions[[i]] <- ess_fit
+} 
+
+
+summary(ess_list_interactions[[1]]) 
+summary(ess_list_interactions[[2]]) 
+summary(ess_list_interactions[[3]])
+
+save(ess_list_interactions, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_interactions_w.RData")
+
+
+```
+
+
+```{r}
+load(here("./data/final_data", "evssel.RData"))
+
+evs_complete <- evssel %>% dplyr::select(surveyyear:marstat, weightvec)
+evs_complete <- evs_complete %>% drop_na()
+evs_complete$time <- evs_complete$surveyyear - min(evs_complete$surveyyear)
+
+evs_1 <- subset(evs_complete, surveyyear == 1990 | surveyyear == 1999)
+
+predictors <- c("time")
+deps <- c("climate5")
+
+evs_list_empty <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regrevsion
+  evs_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = evs_1, weights = weightvec)
+  
+  evs_list_empty[[i]] <- evs_fit
+} 
+
+summary(evs_list_empty[[1]]) #Sig pos effect of time on intercept
+
+
+save(evs_list_empty, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/evs_list_empty1.RData")
+
+
+# Second model with predictors
+
+predictors <- c("time", "sex", "isced", "religious", "income_quart", "lrplace", "age")
+deps <- c("climate5")
+
+evs_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  evs_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                    family=NO(mu.link = "identity", sigma.link = "identity"), data = evs_1, weights = weightvec)
+  
+  evs_list_preds[[i]] <- evs_fit
+} 
+
+summary(evs_list_preds[[1]]) #Sig pos effect of time on intercept
+
+
+save(evs_list_preds, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/evs_list_preds1.RData")
+
+
+# Third model with interactions
+
+evs_1$age_time <- evs_1$age * evs_1$time
+evs_1$sex_time <- as.numeric(evs_1$sex) * evs_1$time
+evs_1$isced_time <- evs_1$isced * evs_1$time
+evs_1$religious_time <- as.numeric(evs_1$religious) * evs_1$time
+evs_1$income_time <- evs_1$income_quart * evs_1$time
+evs_1$lrplace_time <- evs_1$lrplace * evs_1$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "religious_time", "income_time", "lrplace_time")
+
+evs_list_interactions <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  evs_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = evs_1, weights = weightvec)
+  
+  evs_list_interactions[[i]] <- evs_fit
+} 
+
+
+summary(evs_list_interactions[[1]]) 
+
+
+save(evs_list_interactions, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/evs_list_interactions1.RData")
+
+# Now the other waves
+
+evs_2 <- subset(evs_complete, surveyyear == 1999 | surveyyear == 2008)
+
+predictors <- c("time")
+deps <- c("climate5")
+
+evs_list_empty <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regrevsion
+  evs_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = evs_2, weights = weightvec)
+  
+  evs_list_empty[[i]] <- evs_fit
+} 
+
+summary(evs_list_empty[[1]]) #Sig pos effect of time on intercept
+
+
+save(evs_list_empty, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/evs_list_empty2.RData")
+
+
+# Second model with predictors
+
+predictors <- c("time", "sex", "isced", "religious", "income_quart", "lrplace", "age")
+deps <- c("climate5")
+
+evs_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  evs_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                    family=NO(mu.link = "identity", sigma.link = "identity"), data = evs_2, weights = weightvec)
+  
+  evs_list_preds[[i]] <- evs_fit
+} 
+
+summary(evs_list_preds[[1]]) 
+
+
+save(evs_list_preds, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/evs_list_preds2.RData")
+
+
+# Third model with interactions
+
+evs_2$age_time <- evs_2$age * evs_2$time
+evs_2$sex_time <- as.numeric(evs_2$sex) * evs_2$time
+evs_2$isced_time <- evs_2$isced * evs_2$time
+evs_2$religious_time <- as.numeric(evs_2$religious) * evs_2$time
+evs_2$income_time <- evs_2$income_quart * evs_2$time
+evs_2$lrplace_time <- evs_2$lrplace * evs_2$time
+
+interactions <- c("age_time", "sex_time", "isced_time", "religious_time", "income_time", "lrplace_time")
+
+evs_list_interactions <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  evs_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = evs_2, weights = weightvec)
+  
+  evs_list_interactions[[i]] <- evs_fit
+} 
+
+
+summary(evs_list_interactions[[1]]) 
+
+save(evs_list_interactions, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/evs_list_interactions2.RData")
+
+```
+
+
+```{r}
+load(here("./data/final_data", "io_total.RData"))
+io_complete <- io_total %>% dplyr::select(worried:surveyyear, weightvec)
+#Urban, IOINKOMEN, IOPOL has to go away
+io_complete = subset(io_complete, select = -c(urban,IOINKOMEN, IOPOL2017) )
+io_complete <- io_complete %>% drop_na()
+
+io_complete$time <- io_complete$surveyyear - min(io_complete$surveyyear)
+
+io_1 <- subset(io_complete, surveyyear == 2019 | surveyyear == 2020)
+
+predictors <- c("time")
+deps <- c("worried", "frontrunner", "worry_future", "resp_citiz", "dk_start", "do_gov", "buss_help", "min_contr", "human_resp")
+
+io_list_empty <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  io_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = io_1, weights = weightvec)
+  
+  io_list_empty[[i]] <- io_fit
+} 
+
+save(io_list_empty, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/io_list_empty1.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "income_quart", "lrplace")
+
+io_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  io_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = io_1, weights = weightvec)
+  
+  io_list_preds[[i]] <- io_fit
+} 
+
+summary(io_list_preds[[1]]) 
+
+save(io_list_preds, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/io_list_preds1.RData")
+
+# Model with interactions
+
+io_1$age_time <- io_1$age * io_1$time
+io_1$sex_time <- as.numeric(io_1$sex) * io_1$time
+io_1$isced_time <- io_1$isced * io_1$time
+io_1$income_time <- io_1$income_quart * io_1$time
+io_1$lrplace_time <- io_1$lrplace * io_1$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "income_time", "lrplace_time")
+
+io_list_interactions <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  io_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = io_1, weights = weightvec)
+  
+  io_list_interactions[[i]] <- io_fit
+} 
+
+
+summary(io_list_interactions[[1]]) 
+
+save(io_list_interactions, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/io_list_interactions1.RData")
+
+# The other waves
+io_2 <- subset(io_complete, surveyyear == 2020 | surveyyear == 2022)
+
+predictors <- c("time")
+deps <- c("worried", "frontrunner", "worry_future", "resp_citiz", "dk_start", "do_gov", "buss_help", "min_contr", "human_resp")
+
+io_list_empty <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  io_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = io_2, weights = weightvec)
+  
+  io_list_empty[[i]] <- io_fit
+} 
+
+save(io_list_empty, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/io_list_empty2.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "income_quart", "lrplace")
+
+io_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  io_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = io_2, weights = weightvec)
+  
+  io_list_preds[[i]] <- io_fit
+} 
+
+summary(io_list_preds[[1]]) 
+
+save(io_list_preds, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/io_list_preds2.RData")
+
+# Model with interactions
+
+io_2$age_time <- io_2$age * io_2$time
+io_2$sex_time <- as.numeric(io_2$sex) * io_2$time
+io_2$isced_time <- io_2$isced * io_2$time
+io_2$income_time <- io_2$income_quart * io_2$time
+io_2$lrplace_time <- io_2$lrplace * io_2$time
+
+interactions <- c("age_time", "sex_time", "isced_time", "income_time", "lrplace_time")
+
+io_list_interactions <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  io_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = io_2, weights = weightvec)
+  
+  io_list_interactions[[i]] <- io_fit
+} 
+
+
+summary(io_list_interactions[[1]]) 
+
+save(io_list_interactions, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/io_list_interactions2.RData")
+
+```
+
+
+```{r}
+load(here("./data/final_data", "issptotal.Rdata"))
+#load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/issptotal.RData")
+# Some statements are asked three waves, others only two
+
+issptotal$surveyyear[is.na(issptotal$surveyyear)] <- "2010"
+issptotal$surveyyear <- as.numeric(issptotal$surveyyear)
+
+# The issp has variables that are asked in all three waves, and variables that are asked only in 2 waves. So I have to run the code on subsets of the data. First I estimate the models for the statements that are asked throughout the three waves
+issp_complete <- issptotal %>% dplyr::select(surveyyear:marstat, weightvec)
+
+issp_complete <- issp_complete %>% drop_na()
+
+issp_complete$time <- issp_complete$surveyyear - min(issp_complete$surveyyear)
+
+issp_1 <- subset(issp_complete, surveyyear == 1993 | surveyyear == 2000)
+
+# I want to build models. In the empty model, I only want to include time. This can of course be done in several ways. Let's first include it as a numeric variable and see what happens. 
+
+# With the variables that are only asked 2 waves gamlss has trouble converging. So now run model with variables that are asked in all waves. 
+
+predictors <- c("time")
+deps <- c("worry", "lifeharm", "willing_price", "willing_tax", "willing_living", "do_right", "progharm", "econprotect", "people_decide")
+
+issp_list_empty <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  issp_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                     family=NO(mu.link = "identity", sigma.link = "identity"), data = issp_1, weights = weightvec)
+  
+  issp_list_empty[[i]] <- issp_fit
+} 
+
+save(issp_list_empty, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/issp_list_empty1.RData")
+
+# Now with predictors
+predictors <- c("time", "isced", "lrscale", "sex", "urban", "ch_attend", "income_quart", "age")
+deps <- c("worry", "lifeharm", "willing_price", "willing_tax", "willing_living", "do_right", "progharm", "econprotect", "people_decide" )
+
+issp_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  issp_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                      family=NO(mu.link = "identity", sigma.link = "identity"), data = issp_1, weights = weightvec)
+  
+  issp_list_preds[[i]] <- issp_fit
+} 
+
+summary(issp_list_preds[[9]]) 
+summary(issp_list_preds[[2]]) 
+summary(issp_list_preds[[3]]) 
+
+save(issp_list_preds, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/issp_list_preds1.RData")
+
+# And now interactions
+issp_1$age_time <- issp_1$age * issp_1$time
+issp_1$sex_time <- as.numeric(issp_1$sex) * issp_1$time
+issp_1$isced_time <- issp_1$isced * issp_1$time
+issp_1$income_time <- issp_1$income_quart * issp_1$time
+issp_1$lrscale_time <- issp_1$lrscale * issp_1$time
+issp_1$urban_time <- as.numeric(issp_1$urban) * issp_1$time
+issp_1$ch_attend_time <- issp_1$ch_attend * issp_1$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "income_time", "lrscale_time", "ch_attend_time", "urban_time")
+
+
+issp_list_interactions <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regressisspn
+  issp_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = issp_1, weights = weightvec)
+  
+  issp_list_interactions[[i]] <- issp_fit
+} 
+
+
+summary(issp_list_interactions[[1]]) 
+
+save(issp_list_interactions, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/issp_list_interactions1.RData")
+
+# Second part
+issp_2 <- subset(issp_complete, surveyyear == 2000 | surveyyear == 2010)
+
+predictors <- c("time")
+deps <- c("worry", "lifeharm", "willing_price", "willing_tax", "willing_living", "do_right", "progharm", "econprotect", "people_decide")
+
+issp_list_empty <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  issp_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                     family=NO(mu.link = "identity", sigma.link = "identity"), data = issp_2, weights = weightvec)
+  
+  issp_list_empty[[i]] <- issp_fit
+} 
+
+save(issp_list_empty, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/issp_list_empty2.RData")
+
+# Now with predictors
+predictors <- c("time", "isced", "lrscale", "sex", "urban", "ch_attend", "income_quart", "age")
+deps <- c("worry", "lifeharm", "willing_price", "willing_tax", "willing_living", "do_right", "progharm", "econprotect", "people_decide" )
+
+issp_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  issp_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                      family=NO(mu.link = "identity", sigma.link = "identity"), data = issp_2, weights = weightvec)
+  
+  issp_list_preds[[i]] <- issp_fit
+} 
+
+summary(issp_list_preds[[9]]) 
+summary(issp_list_preds[[2]]) 
+summary(issp_list_preds[[3]]) 
+
+save(issp_list_preds, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/issp_list_preds2.RData")
+
+# And now interactions
+issp_2$age_time <- issp_2$age * issp_2$time
+issp_2$sex_time <- as.numeric(issp_2$sex) * issp_2$time
+issp_2$isced_time <- issp_2$isced * issp_2$time
+issp_2$income_time <- issp_2$income_quart * issp_2$time
+issp_2$lrscale_time <- issp_2$lrscale * issp_2$time
+issp_2$urban_time <- as.numeric(issp_2$urban) * issp_2$time
+issp_2$ch_attend_time <- issp_2$ch_attend * issp_2$time
+
+interactions <- c("age_time", "sex_time", "isced_time", "income_time", "lrscale_time", "ch_attend_time", "urban_time")
+
+issp_list_interactions <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regressisspn
+  issp_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = issp_2, weights = weightvec)
+  
+  issp_list_interactions[[i]] <- issp_fit
+} 
+
+
+summary(issp_list_interactions[[1]]) 
+
+save(issp_list_interactions, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/issp_list_interactions2.RData")
+
+```
+
+
+```{r}
+# Now the most difficult one: Eurobarometer. No items are asked steadily throughout time, so have to work with a lot of subsets. 
+
+load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/eb_tot.RData")
+
+# first 1986 - 1995
+
+eb_complete <- eb_tot %>% dplyr::select(surveyyear, env_ec_stat, env_prsimp, sex, isced: urban, weightvec)
+# Religion is only asked in one wave
+
+eb_complete <- eb_complete %>% drop_na()
+
+eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+eb_1 <- subset(eb_complete, surveyyear == 1986 | surveyyear == 1992)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("env_ec_stat", "env_prsimp")
+
+eb_list_empty_1986 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_empty_1986[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_1986[[1]]) 
+summary(eb_list_empty_1986[[2]])
+
+save(eb_list_empty_1986, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/eb_list_empty_1986_1.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "lrplace", "age", "income_quart", "urban")
+deps <- c("env_ec_stat", "env_prsimp")
+
+eb_list_preds_1986 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_preds_1986[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_1986[[1]]) 
+summary(eb_list_preds_1986[[2]])
+
+save(eb_list_preds_1986, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/eb_list_preds_1986_1.RData")
+
+# And the model with interactions
+
+eb_1$age_time <- eb_1$age * eb_1$time
+eb_1$sex_time <- as.numeric(eb_1$sex) * eb_1$time
+eb_1$isced_time <- eb_1$isced * eb_1$time
+eb_1$income_time <- eb_1$income_quart * eb_1$time
+eb_1$lrplace_time <- eb_1$lrplace * eb_1$time
+eb_1$urban_time <- as.numeric(eb_1$urban) * eb_1$time
+
+interactions <- c("age_time", "sex_time", "isced_time", "income_time", "lrplace_time", "urban_time")
+
+eb_list_interactions_1986 <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_interactions_1986[[i]] <- eb_fit
+} 
+
+
+summary(eb_list_interactions_1986[[1]]) 
+summary(eb_list_interactions_1986[[2]])
+
+save(eb_list_interactions_1986, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/eb_list_interactions_1986_1.RData")
+
+# Second part
+eb_2 <- subset(eb_complete, surveyyear == 1992 | surveyyear == 1995)
+
+predictors <- c("time")
+deps <- c("env_ec_stat", "env_prsimp")
+
+eb_list_empty_1986 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_empty_1986[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_1986[[1]]) 
+summary(eb_list_empty_1986[[2]])
+
+save(eb_list_empty_1986, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/eb_list_empty_1986_2.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "lrplace", "age", "income_quart", "urban")
+deps <- c("env_ec_stat", "env_prsimp")
+
+eb_list_preds_1986 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_preds_1986[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_1986[[1]]) 
+summary(eb_list_preds_1986[[2]])
+
+save(eb_list_preds_1986, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/eb_list_preds_1986_2.RData")
+
+# And the model with interactions
+
+eb_2$age_time <- eb_2$age * eb_2$time
+eb_2$sex_time <- as.numeric(eb_2$sex) * eb_2$time
+eb_2$isced_time <- eb_2$isced * eb_2$time
+eb_2$income_time <- eb_2$income_quart * eb_2$time
+eb_2$lrplace_time <- eb_2$lrplace * eb_2$time
+eb_2$urban_time <- as.numeric(eb_2$urban) * eb_2$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "income_time", "lrplace_time", "urban_time")
+
+eb_list_interactions_1986 <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_interactions_1986[[i]] <- eb_fit
+} 
+
+
+summary(eb_list_interactions_1986[[1]]) 
+summary(eb_list_interactions_1986[[2]])
+
+save(eb_list_interactions_1986, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/eb_list_interactions_1986_2.RData")
+
+
+```
+
+```{r}
+# Now with the influence of environment on quality of life. This is asked 4 times, so I have to make 3 subsets. 
+
+eb_complete <- eb_tot %>% dplyr::select(surveyyear, env_quallife, sex, isced, urban, age, weightvec)
+# Lrplace and income are not asked in all waves
+
+eb_complete <- eb_complete %>% drop_na()
+
+eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+eb_1 <- subset(eb_complete, surveyyear == 2004 | surveyyear == 2007)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("env_quallife")
+
+eb_list_empty_quallife <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_empty_quallife[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_quallife[[1]]) 
+
+save(eb_list_empty_quallife, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/eb_list_empty_quallife1.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("env_quallife")
+
+eb_list_preds_quallife <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_preds_quallife[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_quallife[[1]]) 
+
+save(eb_list_preds_quallife, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/eb_list_preds_quallife1.RData")
+
+# And the model with interactions
+
+eb_1$age_time <- eb_1$age * eb_1$time
+eb_1$sex_time <- as.numeric(eb_1$sex) * eb_1$time
+eb_1$isced_time <- eb_1$isced * eb_1$time
+eb_1$urban_time <- as.numeric(eb_1$urban) * eb_1$time
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_quallife <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regressebn
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_interactions_quallife[[i]] <- eb_fit
+} 
+
+
+summary(eb_list_interactions_quallife[[1]]) 
+
+save(eb_list_interactions_quallife, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/eb_list_interactions_quallife1.RData")
+
+# Second part
+eb_2 <- subset(eb_complete, surveyyear == 2007 | surveyyear == 2011)
+
+predictors <- c("time")
+deps <- c("env_quallife")
+
+eb_list_empty_quallife <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_empty_quallife[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_quallife[[1]]) 
+
+save(eb_list_empty_quallife, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/eb_list_empty_quallife2.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("env_quallife")
+
+eb_list_preds_quallife <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_preds_quallife[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_quallife[[1]]) 
+
+save(eb_list_preds_quallife, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/eb_list_preds_quallife2.RData")
+
+# And the model with interactions
+
+eb_2$age_time <- eb_2$age * eb_2$time
+eb_2$sex_time <- as.numeric(eb_2$sex) * eb_2$time
+eb_2$isced_time <- eb_2$isced * eb_2$time
+eb_2$urban_time <- as.numeric(eb_2$urban) * eb_2$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_quallife <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regressebn
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_interactions_quallife[[i]] <- eb_fit
+} 
+
+
+summary(eb_list_interactions_quallife[[1]]) 
+
+save(eb_list_interactions_quallife, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/eb_list_interactions_quallife2.RData")
+
+# And the third set
+eb_3 <- subset(eb_complete, surveyyear == 2011 | surveyyear == 2014)
+
+
+predictors <- c("time")
+deps <- c("env_quallife")
+
+eb_list_empty_quallife <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_empty_quallife[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_quallife[[1]]) 
+
+save(eb_list_empty_quallife, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/eb_list_empty_quallife3.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("env_quallife")
+
+eb_list_preds_quallife <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_preds_quallife[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_quallife[[1]]) 
+
+save(eb_list_preds_quallife, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/eb_list_preds_quallife3.RData")
+
+# And the model with interactions
+
+eb_3$age_time <- eb_3$age * eb_3$time
+eb_3$sex_time <- as.numeric(eb_3$sex) * eb_3$time
+eb_3$isced_time <- eb_3$isced * eb_3$time
+eb_3$urban_time <- as.numeric(eb_3$urban) * eb_3$time
+
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_quallife <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regressebn
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_interactions_quallife[[i]] <- eb_fit
+} 
+
+
+summary(eb_list_interactions_quallife[[1]]) 
+
+save(eb_list_interactions_quallife, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/eb_list_interactions_quallife3.RData")
+
+```
+
+```{r}
+# Now 2 statements that are asked 4 times
+eb_complete <- eb_tot %>% dplyr::select(surveyyear, role_ind, big_pol, sex, isced, urban, age, weightvec)
+# Lrplace and income are not asked in all waves
+
+eb_complete <- eb_complete %>% drop_na()
+
+eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+eb_1 <- subset(eb_complete, surveyyear == 2007 | surveyyear == 2011)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("role_ind", "big_pol")
+
+eb_list_empty_2007 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_empty_2007[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_2007[[2]]) 
+
+save(eb_list_empty_2007, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2007_1.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("role_ind", "big_pol")
+
+eb_list_preds_2007 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_preds_2007[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_2007[[1]]) 
+
+save(eb_list_preds_2007, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2007_1.RData")
+
+# And the model with interactions
+
+eb_1$age_time <- eb_1$age * eb_1$time
+eb_1$sex_time <- as.numeric(eb_1$sex) * eb_1$time
+eb_1$isced_time <- eb_1$isced * eb_1$time
+eb_1$urban_time <- as.numeric(eb_1$urban) * eb_1$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_2007 <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regressebn
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_interactions_2007[[i]] <- eb_fit
+} 
+
+
+summary(eb_list_interactions_2007[[1]]) 
+
+save(eb_list_interactions_2007, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2007_1.RData")
+
+# Second set
+eb_2 <- subset(eb_complete, surveyyear == 2011 | surveyyear == 2014)
+
+predictors <- c("time")
+deps <- c("role_ind", "big_pol")
+
+eb_list_empty_2007 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_empty_2007[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_2007[[2]]) 
+
+save(eb_list_empty_2007, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2007_2.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("role_ind", "big_pol")
+
+eb_list_preds_2007 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_preds_2007[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_2007[[1]]) 
+
+save(eb_list_preds_2007, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2007_2.RData")
+
+# And the model with interactions
+
+eb_2$age_time <- eb_2$age * eb_2$time
+eb_2$sex_time <- as.numeric(eb_2$sex) * eb_2$time
+eb_2$isced_time <- eb_2$isced * eb_2$time
+eb_2$urban_time <- as.numeric(eb_2$urban) * eb_2$time
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_2007 <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regressebn
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_interactions_2007[[i]] <- eb_fit
+} 
+
+
+summary(eb_list_interactions_2007[[1]]) 
+
+save(eb_list_interactions_2007, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2007_2.RData")
+
+# Third set
+eb_3 <- subset(eb_complete, surveyyear == 2014 | surveyyear == 2017)
+
+predictors <- c("time")
+deps <- c("role_ind", "big_pol")
+
+eb_list_empty_2007 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_empty_2007[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_2007[[2]]) 
+
+save(eb_list_empty_2007, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2007_3.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("role_ind", "big_pol")
+
+eb_list_preds_2007 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_preds_2007[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_2007[[1]]) 
+
+save(eb_list_preds_2007, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2007_3.RData")
+
+# And the model with interactions
+
+eb_3$age_time <- eb_3$age * eb_3$time
+eb_3$sex_time <- as.numeric(eb_3$sex) * eb_3$time
+eb_3$isced_time <- eb_3$isced * eb_3$time
+eb_3$urban_time <- as.numeric(eb_3$urban) * eb_3$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_2007 <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regressebn
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_interactions_2007[[i]] <- eb_fit
+} 
+
+
+summary(eb_list_interactions_2007[[1]]) 
+
+save(eb_list_interactions_2007, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2007_3.RData")
+
+
+```
+
+```{r}
+
+eb_complete <- eb_tot %>% dplyr::select(surveyyear, buyprod, sex, isced, urban, age, weightvec)
+# Lrplace and income are not asked in all waves
+
+eb_complete <- eb_complete %>% drop_na()
+
+eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+eb_1 <- subset(eb_complete, surveyyear == 2007| surveyyear == 2011)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("buyprod")
+
+eb_list_empty_buyprod <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_empty_buyprod[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_buyprod[[1]]) 
+
+save(eb_list_empty_buyprod, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_buyprod1.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("buyprod")
+
+eb_list_preds_buyprod <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_preds_buyprod[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_buyprod[[1]]) 
+
+save(eb_list_preds_buyprod, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_buyprod1.RData")
+
+# And the model with interactions
+
+eb_1$age_time <- eb_1$age * eb_1$time
+eb_1$sex_time <- as.numeric(eb_1$sex) * eb_1$time
+eb_1$isced_time <- eb_1$isced * eb_1$time
+eb_1$urban_time <- as.numeric(eb_1$urban) * eb_1$time
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_buyprod <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_interactions_buyprod[[i]] <- eb_fit
+} 
+
+
+summary(eb_list_interactions_buyprod[[1]]) 
+
+save(eb_list_interactions_buyprod, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_buyprod1.RData")
+
+# Second set
+
+eb_2 <- subset(eb_complete, surveyyear == 2011| surveyyear == 2014)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("buyprod")
+
+eb_list_empty_buyprod <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_empty_buyprod[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_buyprod[[1]]) 
+
+save(eb_list_empty_buyprod, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_buyprod2.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("buyprod")
+
+eb_list_preds_buyprod <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_preds_buyprod[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_buyprod[[1]]) 
+
+save(eb_list_preds_buyprod, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_buyprod2.RData")
+
+# And the model with interactions
+
+eb_2$age_time <- eb_2$age * eb_2$time
+eb_2$sex_time <- as.numeric(eb_2$sex) * eb_2$time
+eb_2$isced_time <- eb_2$isced * eb_2$time
+eb_2$urban_time <- as.numeric(eb_2$urban) * eb_2$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_buyprod <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_interactions_buyprod[[i]] <- eb_fit
+} 
+
+
+summary(eb_list_interactions_buyprod[[1]]) 
+
+save(eb_list_interactions_buyprod, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_buyprod2.RData")
+```
+
+
+```{r}
+
+eb_complete <- eb_tot %>% dplyr::select(surveyyear, eff_daily, sex, isced, urban, age, weightvec)
+# Lrplace and income are not asked in all waves
+
+eb_complete <- eb_complete %>% drop_na()
+
+eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+eb_1 <- subset(eb_complete, surveyyear == 2007 | surveyyear == 2011)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("eff_daily")
+
+eb_list_empty_eff_daily <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_empty_eff_daily[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_eff_daily[[1]]) 
+
+save(eb_list_empty_eff_daily, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_eff_daily1.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("eff_daily")
+
+eb_list_preds_eff_daily <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_preds_eff_daily[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_eff_daily[[1]]) 
+
+save(eb_list_preds_eff_daily, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_eff_daily1.RData")
+
+# And the model with interactions
+eb_1$age_time <- eb_1$age * eb_1$time
+eb_1$sex_time <- as.numeric(eb_1$sex) * eb_1$time
+eb_1$isced_time <- eb_1$isced * eb_1$time
+eb_1$urban_time <- as.numeric(eb_1$urban) * eb_1$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_eff_daily <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_interactions_eff_daily[[i]] <- eb_fit
+} 
+
+
+summary(eb_list_interactions_eff_daily[[1]]) 
+
+save(eb_list_interactions_eff_daily, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_eff_daily1.RData")
+
+# Second set
+eb_2 <- subset(eb_complete, surveyyear == 2011 | surveyyear == 2014)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("eff_daily")
+
+eb_list_empty_eff_daily <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_empty_eff_daily[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_eff_daily[[1]]) 
+
+save(eb_list_empty_eff_daily, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_eff_daily2.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("eff_daily")
+
+eb_list_preds_eff_daily <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_preds_eff_daily[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_eff_daily[[1]]) 
+
+save(eb_list_preds_eff_daily, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_eff_daily2.RData")
+
+# And the model with interactions
+eb_2$age_time <- eb_2$age * eb_2$time
+eb_2$sex_time <- as.numeric(eb_2$sex) * eb_2$time
+eb_2$isced_time <- eb_2$isced * eb_2$time
+eb_2$urban_time <- as.numeric(eb_2$urban) * eb_2$time
+
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_eff_daily <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_interactions_eff_daily[[i]] <- eb_fit
+} 
+
+
+summary(eb_list_interactions_eff_daily[[1]]) 
+
+save(eb_list_interactions_eff_daily, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_eff_daily2.RData")
+
+# Third set
+eb_3 <- subset(eb_complete, surveyyear == 2014 | surveyyear == 2017)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("eff_daily")
+
+eb_list_empty_eff_daily <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_empty_eff_daily[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_eff_daily[[1]]) 
+
+save(eb_list_empty_eff_daily, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_eff_daily3.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("eff_daily")
+
+eb_list_preds_eff_daily <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_preds_eff_daily[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_eff_daily[[1]]) 
+
+save(eb_list_preds_eff_daily, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_eff_daily3.RData")
+
+# And the model with interactions
+eb_3$age_time <- eb_3$age * eb_3$time
+eb_3$sex_time <- as.numeric(eb_3$sex) * eb_3$time
+eb_3$isced_time <- eb_3$isced * eb_3$time
+eb_3$urban_time <- as.numeric(eb_3$urban) * eb_3$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_eff_daily <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_interactions_eff_daily[[i]] <- eb_fit
+} 
+
+
+summary(eb_list_interactions_eff_daily[[1]]) 
+
+save(eb_list_interactions_eff_daily, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_eff_daily3.RData")
+
+```
+
+
+```{r}
+# Climate change perception asked in six waves, so have to use 5 subsets
+
+eb_complete <- eb_tot %>% dplyr::select(surveyyear, ccpercept, cchange, sex, isced, urban, age, weightvec)
+# Lrplace and income are not asked in all waves
+# eb_complete$surveyyear[is.na(eb_complete$surveyyear)] <- 2009
+
+eb_complete <- eb_complete %>% drop_na()
+
+eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+
+eb_1 <- subset(eb_complete, surveyyear == 2009 | surveyyear == 2011)
+# First empty model 
+predictors <- c("time")
+deps <- c("ccpercept", "cchange")
+
+eb_list_empty_2009 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_empty_2009[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_2009[[1]]) 
+
+save(eb_list_empty_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2009_1.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("ccpercept", "cchange")
+
+eb_list_preds_2009 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_preds_2009[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_2009[[1]]) 
+
+save(eb_list_preds_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2009_1.RData")
+
+# And the model with interactions
+eb_1$age_time <- eb_1$age * eb_1$time
+eb_1$sex_time <- as.numeric(eb_1$sex) * eb_1$time
+eb_1$isced_time <- eb_1$isced * eb_1$time
+eb_1$urban_time <- as.numeric(eb_1$urban) * eb_1$time
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_2009 <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_interactions_2009[[i]] <- eb_fit
+} 
+
+summary(eb_list_interactions_2009[[1]]) 
+
+save(eb_list_interactions_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2009_1.RData")
+
+# Second set 
+eb_2 <- subset(eb_complete, surveyyear == 2011 | surveyyear == 2013)
+# First empty model 
+predictors <- c("time")
+deps <- c("ccpercept", "cchange")
+
+eb_list_empty_2009 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_empty_2009[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_2009[[1]]) 
+
+save(eb_list_empty_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2009_2.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("ccpercept", "cchange")
+
+eb_list_preds_2009 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_preds_2009[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_2009[[1]]) 
+
+save(eb_list_preds_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2009_2.RData")
+
+# And the model with interactions
+eb_2$age_time <- eb_2$age * eb_2$time
+eb_2$sex_time <- as.numeric(eb_2$sex) * eb_2$time
+eb_2$isced_time <- eb_2$isced * eb_2$time
+eb_2$urban_time <- as.numeric(eb_2$urban) * eb_2$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_2009 <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_interactions_2009[[i]] <- eb_fit
+} 
+
+summary(eb_list_interactions_2009[[1]]) 
+
+save(eb_list_interactions_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2009_2.RData")
+
+# Third set 
+eb_3 <- subset(eb_complete, surveyyear == 2013 | surveyyear == 2015)
+# First empty model 
+predictors <- c("time")
+deps <- c("ccpercept", "cchange")
+
+eb_list_empty_2009 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_empty_2009[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_2009[[1]]) 
+
+save(eb_list_empty_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2009_3.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("ccpercept", "cchange")
+
+eb_list_preds_2009 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_preds_2009[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_2009[[1]]) 
+
+save(eb_list_preds_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2009_3.RData")
+
+# And the model with interactions
+eb_3$age_time <- eb_3$age * eb_3$time
+eb_3$sex_time <- as.numeric(eb_3$sex) * eb_3$time
+eb_3$isced_time <- eb_3$isced * eb_3$time
+eb_3$urban_time <- as.numeric(eb_3$urban) * eb_3$time
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_2009 <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_interactions_2009[[i]] <- eb_fit
+} 
+
+summary(eb_list_interactions_2009[[1]]) 
+
+save(eb_list_interactions_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2009_3.RData")
+
+# Fourth set
+eb_4 <- subset(eb_complete, surveyyear == 2015 | surveyyear == 2017)
+# First empty model 
+predictors <- c("time")
+deps <- c("ccpercept", "cchange")
+
+eb_list_empty_2009 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_4, weights = weightvec)
+  
+  eb_list_empty_2009[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_2009[[1]]) 
+
+save(eb_list_empty_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2009_4.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("ccpercept", "cchange")
+
+eb_list_preds_2009 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_4, weights = weightvec)
+  
+  eb_list_preds_2009[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_2009[[1]]) 
+
+save(eb_list_preds_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2009_4.RData")
+
+# And the model with interactions
+eb_4$age_time <- eb_4$age * eb_4$time
+eb_4$sex_time <- as.numeric(eb_4$sex) * eb_4$time
+eb_4$isced_time <- eb_4$isced * eb_4$time
+eb_4$urban_time <- as.numeric(eb_4$urban) * eb_4$time
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_2009 <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_4, weights = weightvec)
+  
+  eb_list_interactions_2009[[i]] <- eb_fit
+} 
+
+summary(eb_list_interactions_2009[[1]]) 
+
+save(eb_list_interactions_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2009_4.RData")
+
+# Fifth set
+eb_5 <- subset(eb_complete, surveyyear == 2017 | surveyyear == 2021)
+# First empty model 
+predictors <- c("time")
+deps <- c("ccpercept", "cchange")
+
+eb_list_empty_2009 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_5, weights = weightvec)
+  
+  eb_list_empty_2009[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_2009[[1]]) 
+
+save(eb_list_empty_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2009_5.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("ccpercept", "cchange")
+
+eb_list_preds_2009 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_5, weights = weightvec)
+  
+  eb_list_preds_2009[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_2009[[1]]) 
+
+save(eb_list_preds_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2009_5.RData")
+
+# And the model with interactions
+eb_5$age_time <- eb_5$age * eb_5$time
+eb_5$sex_time <- as.numeric(eb_5$sex) * eb_5$time
+eb_5$isced_time <- eb_5$isced * eb_5$time
+eb_5$urban_time <- as.numeric(eb_5$urban) * eb_5$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_2009 <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_5, weights = weightvec)
+  
+  eb_list_interactions_2009[[i]] <- eb_fit
+} 
+
+summary(eb_list_interactions_2009[[1]]) 
+
+save(eb_list_interactions_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2009_5.RData")
+```
+
+```{r}
+# Personal importance asked in 3 waves
+eb_complete <- eb_tot %>% dplyr::select(surveyyear, pers_imp, sex, isced, urban, age, weightvec)
+# Lrplace and income are not asked in all waves
+
+eb_complete <- eb_complete %>% drop_na()
+
+eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+eb_1 <- subset(eb_complete, surveyyear == 2009 | surveyyear == 2011)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("pers_imp")
+
+eb_list_empty_pers_imp <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_empty_pers_imp[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_pers_imp[[1]]) 
+
+save(eb_list_empty_pers_imp, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_pers_imp1.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("pers_imp")
+
+eb_list_preds_pers_imp <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_preds_pers_imp[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_pers_imp[[1]]) 
+
+save(eb_list_preds_pers_imp, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_pers_imp1.RData")
+
+# And the model with interactions
+eb_1$age_time <- eb_1$age * eb_1$time
+eb_1$sex_time <- as.numeric(eb_1$sex) * eb_1$time
+eb_1$isced_time <- eb_1$isced * eb_1$time
+eb_1$urban_time <- as.numeric(eb_1$urban) * eb_1$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_pers_imp <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_interactions_pers_imp[[i]] <- eb_fit
+} 
+
+summary(eb_list_interactions_pers_imp[[1]]) 
+
+save(eb_list_interactions_pers_imp, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_pers_imp1.RData")
+
+# Second set
+eb_2 <- subset(eb_complete, surveyyear == 2011 | surveyyear == 2014)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("pers_imp")
+
+eb_list_empty_pers_imp <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_empty_pers_imp[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_pers_imp[[1]]) 
+
+save(eb_list_empty_pers_imp, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_pers_imp2.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("pers_imp")
+
+eb_list_preds_pers_imp <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_preds_pers_imp[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_pers_imp[[1]]) 
+
+save(eb_list_preds_pers_imp, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_pers_imp2.RData")
+
+# And the model with interactions
+eb_2$age_time <- eb_2$age * eb_2$time
+eb_2$sex_time <- as.numeric(eb_2$sex) * eb_2$time
+eb_2$isced_time <- eb_2$isced * eb_2$time
+eb_2$urban_time <- as.numeric(eb_2$urban) * eb_2$time
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_pers_imp <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_interactions_pers_imp[[i]] <- eb_fit
+} 
+
+summary(eb_list_interactions_pers_imp[[1]]) 
+
+save(eb_list_interactions_pers_imp, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_pers_imp2.RData")
+
+```
+
+```{r}
+# Questions about who does enough asked in 3 waves
+eb_complete <- eb_tot %>% dplyr::select(surveyyear, doprot_natgov:doprot_citiz, sex, isced, urban, age, weightvec)
+# Lrplace and income are not asked in all waves
+
+eb_complete <- eb_complete %>% drop_na()
+
+eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+eb_1 <- subset(eb_complete, surveyyear == 2009 | surveyyear == 2014)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("doprot_natgov", "doprot_eu", "doprot_region", "doprot_comp", "doprot_citiz")
+
+eb_list_empty_doprot <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_empty_doprot[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_doprot[[1]]) 
+
+save(eb_list_empty_doprot, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_doprot1.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("doprot_natgov", "doprot_eu", "doprot_region", "doprot_comp", "doprot_citiz")
+
+eb_list_preds_doprot <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_preds_doprot[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_doprot[[1]]) 
+
+save(eb_list_preds_doprot, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_doprot1.RData")
+
+# And the model with interactions
+
+eb_1$age_time <- eb_1$age * eb_1$time
+eb_1$sex_time <- as.numeric(eb_1$sex) * eb_1$time
+eb_1$isced_time <- eb_1$isced * eb_1$time
+eb_1$urban_time <- as.numeric(eb_1$urban) * eb_1$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_doprot <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_interactions_doprot[[i]] <- eb_fit
+} 
+
+summary(eb_list_interactions_doprot[[1]]) 
+
+save(eb_list_interactions_doprot, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_doprot1.RData")
+
+# Second set
+eb_2 <- subset(eb_complete, surveyyear == 2014 | surveyyear == 2017)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("doprot_natgov", "doprot_eu", "doprot_region", "doprot_comp", "doprot_citiz")
+
+eb_list_empty_doprot <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_empty_doprot[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_doprot[[1]]) 
+
+save(eb_list_empty_doprot, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_doprot2.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("doprot_natgov", "doprot_eu", "doprot_region", "doprot_comp", "doprot_citiz")
+
+eb_list_preds_doprot <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_preds_doprot[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_doprot[[1]]) 
+
+save(eb_list_preds_doprot, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_doprot2.RData")
+
+# And the model with interactions
+
+eb_2$age_time <- eb_2$age * eb_2$time
+eb_2$sex_time <- as.numeric(eb_2$sex) * eb_2$time
+eb_2$isced_time <- eb_2$isced * eb_2$time
+eb_2$urban_time <- as.numeric(eb_2$urban) * eb_2$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_doprot <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_interactions_doprot[[i]] <- eb_fit
+} 
+
+summary(eb_list_interactions_doprot[[1]]) 
+
+save(eb_list_interactions_doprot, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_doprot2.RData")
+```
+
+
+```{r}
+# Questions about naming climate change a problem
+eb_complete <- eb_tot %>% dplyr::select(surveyyear, cchange2, cchangetot, sex, isced, urban, age, weightvec)
+# Lrplace and income are not asked in all waves
+
+eb_complete <- eb_complete %>% drop_na()
+
+eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+eb_1 <- subset(eb_complete, surveyyear == 2011 | surveyyear == 2013)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("cchange2", "cchangetot")
+
+eb_list_empty_cchange2 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_empty_cchange2[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_cchange2[[1]]) 
+
+save(eb_list_empty_cchange2, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_cchange2_1.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("cchange2", "cchangetot")
+
+eb_list_preds_cchange2 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_preds_cchange2[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_cchange[[1]]) 
+
+save(eb_list_preds_cchange2, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_cchange2_1.RData")
+
+# And the model with interactions
+
+eb_1$age_time <- eb_1$age * eb_1$time
+eb_1$sex_time <- as.numeric(eb_1$sex) * eb_1$time
+eb_1$isced_time <- eb_1$isced * eb_1$time
+eb_1$urban_time <- as.numeric(eb_1$urban) * eb_1$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_cchange2 <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_interactions_cchange2[[i]] <- eb_fit
+} 
+
+summary(eb_list_interactions_cchange2[[1]]) 
+
+save(eb_list_interactions_cchange2, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_cchange2_1.RData")
+
+# Second set
+eb_2 <- subset(eb_complete, surveyyear == 2013 | surveyyear == 2015)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("cchange2", "cchangetot")
+
+eb_list_empty_cchange2 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_empty_cchange2[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_cchange2[[1]]) 
+
+save(eb_list_empty_cchange2, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_cchange2_2.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("cchange2", "cchangetot")
+
+eb_list_preds_cchange2 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_preds_cchange2[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_cchange[[1]]) 
+
+save(eb_list_preds_cchange2, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_cchange2_2.RData")
+
+# And the model with interactions
+
+eb_2$age_time <- eb_2$age * eb_2$time
+eb_2$sex_time <- as.numeric(eb_2$sex) * eb_2$time
+eb_2$isced_time <- eb_2$isced * eb_2$time
+eb_2$urban_time <- as.numeric(eb_2$urban) * eb_2$time
+
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_cchange2 <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_interactions_cchange2[[i]] <- eb_fit
+} 
+
+summary(eb_list_interactions_cchange2[[1]]) 
+
+save(eb_list_interactions_cchange2, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_cchange2_2.RData")
+
+
+# Third set
+eb_3 <- subset(eb_complete, surveyyear == 2015 | surveyyear == 2017)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("cchange2", "cchangetot")
+
+eb_list_empty_cchange2 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_empty_cchange2[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_cchange2[[1]]) 
+
+save(eb_list_empty_cchange2, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_cchange2_3.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("cchange2", "cchangetot")
+
+eb_list_preds_cchange2 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_preds_cchange2[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_cchange[[1]]) 
+
+save(eb_list_preds_cchange2, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_cchange2_3.RData")
+
+# And the model with interactions
+
+eb_3$age_time <- eb_3$age * eb_3$time
+eb_3$sex_time <- as.numeric(eb_3$sex) * eb_3$time
+eb_3$isced_time <- eb_3$isced * eb_3$time
+eb_3$urban_time <- as.numeric(eb_3$urban) * eb_3$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_cchange2 <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_interactions_cchange2[[i]] <- eb_fit
+} 
+
+summary(eb_list_interactions_cchange2[[1]]) 
+
+save(eb_list_interactions_cchange2, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_cchange2_3.RData")
+
+
+# Fourth set
+eb_4 <- subset(eb_complete, surveyyear == 2017 | surveyyear == 2021)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("cchange2", "cchangetot")
+
+eb_list_empty_cchange2 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_4, weights = weightvec)
+  
+  eb_list_empty_cchange2[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_cchange2[[1]]) 
+
+save(eb_list_empty_cchange2, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_cchange2_4.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("cchange2", "cchangetot")
+
+eb_list_preds_cchange2 <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_4, weights = weightvec)
+  
+  eb_list_preds_cchange2[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_cchange[[1]]) 
+
+save(eb_list_preds_cchange2, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_cchange2_4.RData")
+
+# And the model with interactions
+
+eb_4$age_time <- eb_4$age * eb_4$time
+eb_4$sex_time <- as.numeric(eb_4$sex) * eb_4$time
+eb_4$isced_time <- eb_4$isced * eb_4$time
+eb_4$urban_time <- as.numeric(eb_4$urban) * eb_4$time
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_cchange2 <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_4, weights = weightvec)
+  
+  eb_list_interactions_cchange2[[i]] <- eb_fit
+} 
+
+summary(eb_list_interactions_cchange2[[1]]) 
+
+save(eb_list_interactions_cchange2, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_cchange2_4.RData")
+
+
+```
+
+```{r}
+# Question about personal action taken
+eb_complete <- eb_tot %>% dplyr::select(surveyyear, prsaction, sex, isced, urban, age, weightvec)
+# Lrplace and income are not asked in all waves
+
+eb_complete <- eb_complete %>% drop_na()
+
+eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+eb_1 <- subset(eb_complete, surveyyear == 2011 | surveyyear == 2013)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("prsaction")
+
+eb_list_empty_prsaction <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_empty_prsaction[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_prsaction[[1]]) 
+
+save(eb_list_empty_prsaction, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_prsaction1.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("prsaction")
+
+eb_list_preds_prsaction <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_preds_prsaction[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_prsaction[[1]]) 
+
+save(eb_list_preds_prsaction, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_prsaction1.RData")
+
+# And the model with interactions
+
+eb_1$age_time <- eb_1$age * eb_1$time
+eb_1$sex_time <- as.numeric(eb_1$sex) * eb_1$time
+eb_1$isced_time <- eb_1$isced * eb_1$time
+eb_1$urban_time <- as.numeric(eb_1$urban) * eb_1$time
+
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_prsaction <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_1, weights = weightvec)
+  
+  eb_list_interactions_prsaction[[i]] <- eb_fit
+} 
+
+summary(eb_list_interactions_prsaction[[1]]) 
+
+save(eb_list_interactions_prsaction, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_prsaction1.RData")
+
+# Second set
+eb_2 <- subset(eb_complete, surveyyear == 2013 | surveyyear == 2015)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("prsaction")
+
+eb_list_empty_prsaction <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_empty_prsaction[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_prsaction[[1]]) 
+
+save(eb_list_empty_prsaction, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_prsaction2.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("prsaction")
+
+eb_list_preds_prsaction <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_preds_prsaction[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_prsaction[[1]]) 
+
+save(eb_list_preds_prsaction, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_prsaction2.RData")
+
+# And the model with interactions
+
+eb_2$age_time <- eb_2$age * eb_2$time
+eb_2$sex_time <- as.numeric(eb_2$sex) * eb_2$time
+eb_2$isced_time <- eb_2$isced * eb_2$time
+eb_2$urban_time <- as.numeric(eb_2$urban) * eb_2$time
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_prsaction <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2, weights = weightvec)
+  
+  eb_list_interactions_prsaction[[i]] <- eb_fit
+} 
+
+summary(eb_list_interactions_prsaction[[1]]) 
+
+save(eb_list_interactions_prsaction, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_prsaction2.RData")
+
+# Third set
+eb_3 <- subset(eb_complete, surveyyear == 2015 | surveyyear == 2017)
+
+# First empty model 
+predictors <- c("time")
+deps <- c("prsaction")
+
+eb_list_empty_prsaction <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_empty_prsaction[[i]] <- eb_fit
+} 
+
+summary(eb_list_empty_prsaction[[1]]) 
+
+save(eb_list_empty_prsaction, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_prsaction3.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced", "age", "urban")
+deps <- c("prsaction")
+
+eb_list_preds_prsaction <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_preds_prsaction[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds_prsaction[[1]]) 
+
+save(eb_list_preds_prsaction, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_prsaction3.RData")
+
+# And the model with interactions
+
+eb_3$age_time <- eb_3$age * eb_3$time
+eb_3$sex_time <- as.numeric(eb_3$sex) * eb_3$time
+eb_3$isced_time <- eb_3$isced * eb_3$time
+eb_3$urban_time <- as.numeric(eb_3$urban) * eb_3$time
+
+interactions <- c("age_time", "sex_time", "isced_time", "urban_time")
+
+eb_list_interactions_prsaction <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_3, weights = weightvec)
+  
+  eb_list_interactions_prsaction[[i]] <- eb_fit
+} 
+
+summary(eb_list_interactions_prsaction[[1]]) 
+
+save(eb_list_interactions_prsaction, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_prsaction3.RData")
+
+```

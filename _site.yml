@@ -5,50 +5,46 @@ output_dir: "docs"
 exclude: 
   - "data"
   - "_test"
-bibliography: references.bib
 navbar:
   left:
     - icon: fa-home
       href: index.html
     - text: "Blog"
       href: blog.html
-    - text: "Scripts"
+    - text: "Scripts datapreparation"
       menu:
       - text: "Data preparation Eurobarometer"
         href: dataprep_EB.html
       - text: "Data preparation EVS, ESS, ISSP"
         href: dataprep_EVS_ESS_ISSP.html
       - text: "Data preparation I&O Research"  
-        href: dataprep_NKO_NELLS.html
-      - text: "Imputation of missings"  
-        href: missing_imputation.html
+        href: dataprep_I-O.html
       - text: "Weighing data" 
         href: weights.html
-      - text: "Regression analyses"  
-        href: single_regression.html
-      - text: "Meta-regression"
-        href: meta_analysis.html
-      
-        
-        # Other model
-    - text: "Final Report"
+      - text: "Left right placement"  
+        href: dataprep_polcat.html
+    - text: "Scripts descriptives and analysis"
       menu:
-      - text: "Introduction"
-        href: final_introduction.html 
-      - text: "Theory" 
-        href: final_theory.html
-      - text: "Data"
-        href: final_data.html
       - text: "Descriptives"
-        href: descriptives.html
-      - text: "RSiena results" 
-        href: rsiena_results.html
-      - text: "Conclusion"
-        href: conclusion.html
-      - text: "Appendix A"
-        href: rsiena_results_twit.html
-      - text: "Appendix B"
-        href: appendixb.html
+        href: descriptives.html 
+      - text: "Gamlss regressions weighted" 
+        href: single_regression_gamlss_weigh_new.html
+      - text: "Gamlss regression shorter time spans"
+        href: single_regression_gw_py_new.html
+      - text: "Extract coefficients gamlss regressions"
+        href: regression_to_meta_analysis_weight_gamlss_new.html
+      - text: "Extract coefficients shorter time spans" 
+        href: regression_to_meta_analysis_wg_waves_new.html
+      - text: "Extract coefficients independent var model"
+        href: regression_to_indep_var_analysis_weight_gamlss_new.html
+      - text: "Extract coefficients interaction model"
+        href: regression_to_interact_analysis_weight_gamlss_new.html
+      - text: "Meta-analysis weighted gamlss"
+        href: meta_analysis_gamlss_weigh.html
+      - text: "Meta-analysis independent variables"
+        href: meta_analysis_indep_var.html
+      - text: "Meta-analysis shorter time spans"
+        href: meta_analysis_gw_waves.html
       -  
   right:
   - icon: fab fa-github
