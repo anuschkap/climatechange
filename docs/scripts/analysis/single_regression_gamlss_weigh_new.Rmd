@@ -11,7 +11,7 @@ options(width = 100)
 colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
 ```
 
-In this script I use loops to perform gamlss regressions for all 52 attitudes. The lists that I will get as output are saved with all the information, after which - in another script - i will extract the raw effects sizes used as input for the meta-regressions
+In this script I use loops to perform gamlss regressions for all 52 attitudes. The lists that I will get as output are saved with all the information, after which - in another script - i will extract the raw effects sizes used as input for the meta-regressions. In this specific script, I will only include the effects of education and gender to test the idea of opposing effects of gender + education versus age. 
 
 ```{r}
 rm(list = ls())

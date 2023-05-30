@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 ```{r, echo=FALSE}
-knitr::opts_chunk$set(eval = FALSE)
+#knitr::opts_chunk$set(eval = FALSE)
 options(width = 100)
 colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
 ```
@@ -18,12 +18,13 @@ library(meta)
 library(metafor)
 library(here)
 library(dplyr)
+library(kableExtra)
 set.seed(1)
 here()
 here::i_am("scripts/analysis/meta_analysis_indep_var.Rmd")
 ```
 
-```{r}
+```{r, results='hide', warning=FALSE}
 load(here("./data/meta_analysis", "total_indep_var_results_new.RData"))
 
 # Effects of mu's 
@@ -49,7 +50,7 @@ age_gen <- metagen(TE = mu_age_est,
 
 summary(age_gen)
 
-# Educational level. This is now a dummy so how do i have to do this?
+# Educational level. 
 edu_med_gen <- metagen(TE = mu_isced_med_est,
                  seTE = mu_isced_med_sd,
                  data = total_indep_var_results,
@@ -115,231 +116,407 @@ edu_var_high_gen <- metagen(TE = sig_isced_high_est,
 
 summary(edu_var_high_gen)
 
-# Effects of first year on these effects
-load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results_gam_w_new.RData")
-year <- total_reg_results %>% dplyr::select(mean_year, dep_var)
-total_indep_var_results <- left_join(total_indep_var_results, year)
-
-gender_year  <- metareg(gender_gen, ~ total_indep_var_results$mean_year)
-summary(gender_year)
-
-age_year  <- metareg(age_gen, ~ total_indep_var_results$mean_year)
-summary(age_year)
-
-edu_med_year  <- metareg(edu_med_gen, ~ total_indep_var_results$mean_year)
-summary(edu_med_year)
-
-edu_high_year  <- metareg(edu_high_gen, ~ total_indep_var_results$mean_year)
-summary(edu_high_year)
-
-# Variance
-gender_year_v  <- metareg(gender_var_gen, ~ total_indep_var_results$mean_year)
-summary(gender_year_v)
-
-age_year_v  <- metareg(age_var_gen, ~ total_indep_var_results$mean_year)
-summary(age_year_v)
-
-edu_med_year_v  <- metareg(edu_var_med_gen, ~ total_indep_var_results$mean_year)
-summary(edu_med_year_v)
-
-edu_high_year_v  <- metareg(edu_var_high_gen, ~ total_indep_var_results$mean_year)
-summary(edu_high_year_v)
-
-```
-
-```{r}
-#Prepare data to make a kable table
-mu_pool_indep <- data.frame(matrix(ncol = 4, nrow = 4))
-colnames(mu_pool_indep) <- c("mu_sigma_1", "variable_1", "pooled_1", "p_1")
-
-mu_pool_indep$variable_1 <- c("Gender", "Age", "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)")
-mu_pool_indep$mu_sigma_1 <- c("Mu", "", "", "")
-mu_pool_indep$pooled_1 <- c(gender_gen$TE.random, age_gen$TE.random, edu_med_gen$TE.random, edu_high_gen$TE.random)
-mu_pool_indep$p_1 <- c(gender_gen$pval.random, age_gen$pval.random, edu_med_gen$pval.random, edu_high_gen$pval.random)
-
-gender_gen$statistic.random # t of HK (random effects model)
-gender_gen$TE.random #effect size
-gender_gen$pval.random # p value
-
-# For the variance
-sigma_pool_indep <- data.frame(matrix(ncol = 4, nrow = 4))
-colnames(sigma_pool_indep) <- c("mu_sigma_1", "variable_1", "pooled_1", "p_1")
-
-sigma_pool_indep$variable_1 <- c("Gender", "Age", "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)")
-sigma_pool_indep$mu_sigma_1 <- c("Sigma", "", "", "")
-sigma_pool_indep$pooled_1 <- c(gender_var_gen$TE.random, age_var_gen$TE.random, edu_var_med_gen$TE.random, edu_var_high_gen$TE.random)
-sigma_pool_indep$p_1 <- c(gender_var_gen$pval.random, age_var_gen$pval.random, edu_var_med_gen$pval.random, edu_var_high_gen$pval.random)
-
-# The second part of the table consists of the estimates, standard error and p value of the mean year effect on the independent variables 
-mu_my <- data.frame(matrix(ncol = 5, nrow = 4))
-colnames(mu_my) <- c("mu_sigma_2", "variable_2", "estimate", "se", "p_2")
-mu_my$variable_2 <- c("Gender", "Age", "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)")
-mu_my$mu_sigma_2 <- c("Mu", "", "", "")
-mu_my$estimate <- c(as.numeric(gender_year$b[[2]]), as.numeric(age_year$b[[2]]), as.numeric(edu_med_year$b[[2]]), as.numeric(edu_high_year$b[[2]]))
-mu_my$se <- c(gender_year$se[[2]], age_year$se[[2]], edu_med_year$b[[2]], edu_high_year$b[[2]])
-mu_my$p_2 <- c(gender_year$pval[[2]], age_year$pval[[2]], edu_med_year$pval[[2]], edu_high_year$pval[[2]])
-
-#The same for the variance of course
-sigma_my <- data.frame(matrix(ncol = 5, nrow = 4))
-colnames(sigma_my) <- c("mu_sigma_2", "variable_2", "estimate", "se", "p_2")
-sigma_my$variable_2 <- c("Gender", "Age", "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)")
-sigma_my$mu_sigma_2 <- c("Sigma", "", "", "")
-sigma_my$estimate <- c(as.numeric(gender_year_v$b[[2]]), as.numeric(age_year_v$b[[2]]), as.numeric(edu_med_year_v$b[[2]]), as.numeric(edu_high_year_v$b[[2]]))
-sigma_my$se <- c(gender_year_v$se[[2]], age_year_v$se[[2]], edu_med_year_v$b[[2]], edu_high_year_v$b[[2]])
-sigma_my$p_2 <- c(gender_year_v$pval[[2]], age_year_v$pval[[2]], edu_med_year_v$pval[[2]], edu_high_year_v$pval[[2]])
-
 ```
 
 
+```{r, results='hide', warning=FALSE}
+# Perform the meta-regression with meta-level variables on independent variables to see if there is something interesting
+
+# For this dataset, the meta-level variables were not created yet, so that's needed first
+total_indep_var_results$data[total_indep_var_results$dep_var=="climate5"] <- "EVS"
+total_indep_var_results$data[total_indep_var_results$dep_var=="cause" | total_indep_var_results$dep_var == "cause" | total_indep_var_results$dep_var == "worry"] <- "ESS"
+total_indep_var_results$data[total_indep_var_results$dep_var=="worried" | total_indep_var_results$dep_var == "frontrunner" | total_indep_var_results$dep_var == "worry_future" | total_indep_var_results$dep_var == "resp_citiz" | total_indep_var_results$dep_var == "dk_start" | total_indep_var_results$dep_var == "do_gov" | total_indep_var_results$dep_var == "buss_help" | total_indep_var_results$dep_var == "min_contr" | total_indep_var_results$dep_var == "human_resp"] <- "I&O"
+total_indep_var_results$data[total_indep_var_results$dep_var=="worry" | total_indep_var_results$dep_var == "lifeharm" | total_indep_var_results$dep_var == "progharm" | total_indep_var_results$dep_var == "econprotect" | total_indep_var_results$dep_var == "growharm" | total_indep_var_results$dep_var == "willing_price" | total_indep_var_results$dep_var == "willing_tax" | total_indep_var_results$dep_var == "willing_living" | total_indep_var_results$dep_var == "dodiff" | total_indep_var_results$dep_var=="do_right" | total_indep_var_results$dep_var == "people_decide" | total_indep_var_results$dep_var == "moreimp" | total_indep_var_results$dep_var == "othersame" | total_indep_var_results$dep_var == "exag" | total_indep_var_results$dep_var == "country_effort"]  <- "ISSP"
+total_indep_var_results$data[is.na(total_indep_var_results$data)] <- "EB"
+
+total_indep_var_results$dep_var[total_indep_var_results$dep_var == "worry" & total_indep_var_results$data == "ISSP"] <- "worry_issp"
+
+total_indep_var_results$attitude_cat[total_indep_var_results$dep_var == "dodiff" 
+                               | total_indep_var_results$dep_var == "pers_resp"
+                               | total_indep_var_results$dep_var == "worry"
+                               | total_indep_var_results$dep_var == "worried"
+                               | total_indep_var_results$dep_var == "worry_future"
+                               | total_indep_var_results$dep_var == "frontrunner"
+                               | total_indep_var_results$dep_var == "min_contr"] <- "affective"
+total_indep_var_results$attitude_cat[total_indep_var_results$dep_var == "willing_price" 
+                               | total_indep_var_results$dep_var == "willing_tax"
+                               | total_indep_var_results$dep_var == "willing_living"
+                               | total_indep_var_results$dep_var == "do_right"
+                               | total_indep_var_results$dep_var == "people_decide"
+                               | total_indep_var_results$dep_var == "climate5"
+                               | total_indep_var_results$dep_var == "prsaction"
+                               | total_indep_var_results$dep_var == "cc_prsact"
+                               | total_indep_var_results$dep_var == "buyprod"] <- "behavioral"
+total_indep_var_results$attitude_cat[total_indep_var_results$dep_var == "worry_issp" 
+                               | total_indep_var_results$dep_var == "lifeharm"
+                               | total_indep_var_results$dep_var == "progharm"
+                               | total_indep_var_results$dep_var == "econprotect"
+                               | total_indep_var_results$dep_var == "growharm"
+                               | total_indep_var_results$dep_var == "bus_decide"
+                               | total_indep_var_results$dep_var == "moreimp"
+                               | total_indep_var_results$dep_var == "othersame"
+                               | total_indep_var_results$dep_var == "exag"
+                               | total_indep_var_results$dep_var == "country_effort" 
+                               | total_indep_var_results$dep_var == "cause"
+                               | total_indep_var_results$dep_var == "resp_citiz"
+                               | total_indep_var_results$dep_var == "dk_start"
+                               | total_indep_var_results$dep_var == "do_gov"
+                               | total_indep_var_results$dep_var == "buss_help"
+                               | total_indep_var_results$dep_var == "human_resp"
+                               | total_indep_var_results$dep_var == "env_ec_stat"
+                               | total_indep_var_results$dep_var == "env_prsimp"
+                                | total_indep_var_results$dep_var == "envp_eg"
+                               | total_indep_var_results$dep_var == "effr_eg"
+                               | total_indep_var_results$dep_var == "cchange"
+                               | total_indep_var_results$dep_var == "cchange2"
+                               | total_indep_var_results$dep_var == "cchangetot" 
+                               | total_indep_var_results$dep_var == "ccpercept"
+                               | total_indep_var_results$dep_var == "env_quallife"
+                               | total_indep_var_results$dep_var == "doprot_comp"
+                               | total_indep_var_results$dep_var == "doprot_region"
+                               | total_indep_var_results$dep_var == "doprot_natgov"
+                               | total_indep_var_results$dep_var == "doprot_city"
+                               | total_indep_var_results$dep_var == "doprot_citiz"
+                               | total_indep_var_results$dep_var == "doprot_eu"
+                              | total_indep_var_results$dep_var == "cc_unstop"
+                               | total_indep_var_results$dep_var == "cc_exag"
+                               | total_indep_var_results$dep_var == "cc_poseu"
+                               | total_indep_var_results$dep_var == "role_ind"
+                               | total_indep_var_results$dep_var == "big_pol"
+                               | total_indep_var_results$dep_var == "eff_daily"
+                               | total_indep_var_results$dep_var == "pers_imp"] <- "cognitive"
+
+#Create a variable that indicates whether the dependent variable can be interpreted in 2 ways (ambiguous)
+
+total_indep_var_results$ambiguous[total_indep_var_results$dep_var != "dodiff" 
+                               | total_indep_var_results$dep_var != "frontrunner"
+                               | total_indep_var_results$dep_var != "min_contr"
+                               | total_indep_var_results$dep_var != "people_decide"
+                               | total_indep_var_results$dep_var != "econprotect"
+                               | total_indep_var_results$dep_var != "growharm"
+                               | total_indep_var_results$dep_var != "bus_decide"
+                            | total_indep_var_results$dep_var != "othersame"
+                            | total_indep_var_results$dep_var != "resp_citiz"
+                            | total_indep_var_results$dep_var != "dk_start"
+                            | total_indep_var_results$dep_var != "buss_help"
+                            | total_indep_var_results$dep_var != "envp_eg"
+                            | total_indep_var_results$dep_var != "effr_eg"
+                            | total_indep_var_results$dep_var != "env_quallife"
+                            | total_indep_var_results$dep_var != "cc_unstop"
+                            | total_indep_var_results$dep_var != "cc_poseu"
+                            | total_indep_var_results$dep_var != "big_pol"] <- "No"
+total_indep_var_results$ambiguous[total_indep_var_results$dep_var == "dodiff" 
+                               | total_indep_var_results$dep_var == "frontrunner"
+                               | total_indep_var_results$dep_var == "min_contr"
+                               | total_indep_var_results$dep_var == "people_decide"
+                               | total_indep_var_results$dep_var == "econprotect"
+                               | total_indep_var_results$dep_var == "growharm"
+                               | total_indep_var_results$dep_var == "bus_decide"
+                            | total_indep_var_results$dep_var == "othersame"
+                            | total_indep_var_results$dep_var == "resp_citiz"
+                            | total_indep_var_results$dep_var == "dk_start"
+                            | total_indep_var_results$dep_var == "buss_help"
+                            | total_indep_var_results$dep_var == "envp_eg"
+                            | total_indep_var_results$dep_var == "effr_eg"
+                            | total_indep_var_results$dep_var == "env_quallife"
+                            | total_indep_var_results$dep_var == "cc_unstop"
+                            | total_indep_var_results$dep_var == "cc_poseu"
+                            | total_indep_var_results$dep_var == "big_pol"] <- "Yes"
+
+table(total_indep_var_results$ambiguous, useNA = "always")
+
+# Create a variable about whether 2008 (financial crisis) is included in the time span of the data set/vars 
+total_indep_var_results$fin_crisis[total_indep_var_results$data == "EB"] <- 1
+total_indep_var_results$fin_crisis[total_indep_var_results$data == "EVS"] <- 1
+total_indep_var_results$fin_crisis[total_indep_var_results$data == "ISSP"] <- 1
+total_indep_var_results$fin_crisis[total_indep_var_results$data == "ESS"] <- 0
+total_indep_var_results$fin_crisis[total_indep_var_results$data == "IO"] <- 0
+
+# And the same for covid-19
+total_indep_var_results$covid[total_indep_var_results$data == "EB"] <- 1
+total_indep_var_results$covid[total_indep_var_results$data == "EVS"] <- 0
+total_indep_var_results$covid[total_indep_var_results$data == "ISSP"] <- 0
+total_indep_var_results$covid[total_indep_var_results$data == "ESS"] <- 1
+total_indep_var_results$covid[total_indep_var_results$data == "IO"] <- 1
 
 
-```{r}
-# Do the same for the interaction effects (age, sex, isced and time)
-load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_inter_results_new.RData")
+# This time, year is a bit more difficult, so I have to assign that per dep_var
+# And the average year 
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "role_ind"] <- 2012
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "big_pol"] <- 2012
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "cc_unstop"] <- 2008
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "cc_exag"] <- 2008
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "cc_poseu"] <- 2008
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "cc_prsact"] <- 2008
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "cc_poseu"] <- 2008
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "ccpercept"] <- 2014
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "cchange"] <- 2015
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "cchange2"] <- 2015
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "cchangetot"] <- 2015
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "envp_eg"] <- 2013
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "effr_eg"] <- 2013
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "buyprod"] <- 2010
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "doprot_natgov"] <- 2013
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "doprot_eu"] <- 2013
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "doprot_region"] <- 2013
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "doprot_comp"] <- 2013
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "doprot_citiz"] <- 2013
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "doprot_city"] <- 2015
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "eff_daily"] <- 2012
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "pers_imp"] <- 2009
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "env_quallife"] <- 2009
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "env_ec_stat"] <- 1991
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "env_prsimp"] <- 1991
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "prsaction"] <- 2014
 
-# Effects of mu's 
-gender_int_eff <- metagen(TE = mu_sex_est_inter,
-                 seTE = mu_sex_sd_inter,
-                 data = total_inter_results,
-                 fixed = FALSE,
-                 random = TRUE,
-                 method.tau = "REML",
-                 hakn = TRUE)
 
-# Age 
-age_int_eff <- metagen(TE = mu_age_est_inter,
-                 seTE = mu_age_sd_inter,
-                 data = total_inter_results,
-                 fixed = FALSE,
-                 random = TRUE,
-                 method.tau = "REML",
-                 hakn = TRUE)
-
-# Educational level
-edu_med_int_eff <- metagen(TE = mu_isced_med_est_inter,
-                 seTE = mu_isced_med_sd_inter,
-                 data = total_inter_results,
-                 fixed = FALSE,
-                 random = TRUE,
-                 method.tau = "REML",
-                 hakn = TRUE)
-
-edu_high_int_eff <- metagen(TE = mu_isced_high_est_inter,
-                 seTE = mu_isced_high_sd_inter,
-                 data = total_inter_results,
-                 fixed = FALSE,
-                 random = TRUE,
-                 method.tau = "REML",
-                 hakn = TRUE)
-
-# Now for variance
-# Gender
-# Gender 
-gender_int_eff_var <- metagen(TE = sig_sex_est_inter,
-                 seTE = sig_sex_sd_inter,
-                 data = total_inter_results,
-                 fixed = FALSE,
-                 random = TRUE,
-                 method.tau = "REML",
-                 hakn = TRUE)
-
-# Age 
-age_int_eff_var <- metagen(TE = sig_age_est_inter,
-                 seTE = sig_age_sd_inter,
-                 data = total_inter_results,
-                 fixed = FALSE,
-                 random = TRUE,
-                 method.tau = "REML",
-                 hakn = TRUE)
-
-# Educational level
-edu_med_int_eff_var <- metagen(TE = sig_isced_med_est_inter,
-                 seTE = sig_isced_med_sd_inter,
-                 data = total_inter_results,
-                 fixed = FALSE,
-                 random = TRUE,
-                 method.tau = "REML",
-                 hakn = TRUE)
-
-edu_high_int_eff_var <- metagen(TE = sig_isced_high_est_inter,
-                 seTE = sig_isced_high_sd_inter,
-                 data = total_inter_results,
-                 fixed = FALSE,
-                 random = TRUE,
-                 method.tau = "REML",
-                 hakn = TRUE)
+total_indep_var_results$mean_year[total_indep_var_results$data == "I&O"] <- 2020
+total_indep_var_results$mean_year[total_indep_var_results$data == "EVS"] <- 1999
+total_indep_var_results$mean_year[total_indep_var_results$data == "ESS"] <- 2018
+# For the ISSP, have to specify it per dependent variable
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "exag"] <- 2005
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "moreimp"] <- 2005
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "othersame"] <- 2005
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "country_effort"] <- 2005
+total_indep_var_results$mean_year[total_indep_var_results$dep_var == "growharm"] <- 2005
+total_indep_var_results$mean_year[is.na(total_indep_var_results$mean_year)] <- 2002
 ```
 
-```{r}
-# Collect the input from this as well, to put in the table
-mu_pool_inter <- data.frame(matrix(ncol = 4, nrow = 4))
-colnames(mu_pool_inter) <- c("mu_sigma_3", "variable_3", "pooled_2", "p_3")
-mu_pool_inter$variable_3 <- c("Gender", "Age", "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)")
-mu_pool_inter$mu_sigma_3 <- c("Mu", "", "", "")
-mu_pool_inter$pooled_2 <- c(gender_inter_gen$TE.random, age_inter_gen$TE.random, edu_med_inter_gen$TE.random, edu_high_inter_gen$TE.random)
-mu_pool_inter$p_3 <- c(gender_inter_gen$pval.random, age_inter_gen$pval.random, edu_med_inter_gen$pval.random, edu_high_inter_gen$pval.random)
 
-# For the variance
-sigma_pool_inter <- data.frame(matrix(ncol = 4, nrow = 4))
-colnames(sigma_pool_inter) <- c("mu_sigma_3", "variable_3", "pooled_2", "p_3")
-sigma_pool_inter$variable_3 <- c("Gender", "Age", "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)")
-sigma_pool_inter$mu_sigma_3 <- c("Sigma", "", "", "")
-sigma_pool_inter$pooled_2 <- c(gender_var_inter_gen$TE.random, age_var_inter_gen$TE.random, edu_var_med_inter_gen$TE.random, edu_var_high_inter_gen$TE.random)
-sigma_pool_inter$p_3 <- c(gender_var_inter_gen$pval.random, age_var_inter_gen$pval.random, edu_var_med_inter_gen$pval.random, edu_var_high_inter_gen$pval.random)
+```{r, results='hide', warning=FALSE}
+m1_gender <- rma(yi = mu_sex_est,
+              sei = mu_sex_sd,
+              data = total_indep_var_results,
+              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              method = "REML",
+              test = "knha")
 
+m1_gender 
 
-#Bind all the mean attitudes results
-mean_indep <- cbind(mu_pool_indep, mu_my, mu_pool_inter)
-sigma_indep <- cbind(sigma_pool_indep, sigma_my, sigma_pool_inter)
-indep_total <- rbind(mean_indep, sigma_indep)
+m1_age <- rma(yi = mu_age_est,
+              sei = mu_age_sd,
+              data = total_indep_var_results,
+              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              method = "REML",
+              test = "knha")
 
-#Make stars of the p-values
-indep_total$p_text_1 <- case_when(
-indep_total$p_1 >= 0.05 ~ "",
-indep_total$p_1 < 0.001 ~ "***",
-indep_total$p_1 < 0.01 ~ "**",
-indep_total$p_1 < 0.05 ~ "*"
-)
+m1_age
 
-indep_total$p_text_2 <- case_when(
-indep_total$p_2 >= 0.05 ~ "",
-indep_total$p_2 < 0.001 ~ "***",
-indep_total$p_2 < 0.01 ~ "**",
-indep_total$p_2 < 0.05 ~ "*"
-)
+m1_isced_med <- rma(yi = mu_isced_med_est,
+              sei = mu_isced_med_sd,
+              data = total_indep_var_results,
+              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              method = "REML",
+              test = "knha")
 
-indep_total$p_text_3 <- case_when(
-indep_total$p_3 >= 0.05 ~ "",
-indep_total$p_3 < 0.001 ~ "***",
-indep_total$p_3 < 0.01 ~ "**",
-indep_total$p_3 < 0.05 ~ "*"
-)
+m1_isced_med
 
-#Select only the variables that I want to present in the table
-indep_total <- dplyr::select(indep_total, mu_sigma_1, variable_1, pooled_1, p_text_1, estimate, se, p_text_2, pooled_2, p_text_3)
+m1_isced_high <- rma(yi = mu_isced_high_est,
+              sei = mu_isced_high_sd,
+              data = total_indep_var_results,
+              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              method = "REML",
+              test = "knha")
+
+m1_isced_high
+
+# Same for variance/polarization
+m1_gender_var <- rma(yi = sig_sex_est,
+              sei = sig_sex_sd,
+              data = total_indep_var_results,
+              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              method = "REML",
+              test = "knha")
+
+m1_gender_var 
+
+m1_age_var <- rma(yi = sig_age_est,
+              sei = sig_age_sd,
+              data = total_indep_var_results,
+              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              method = "REML",
+              test = "knha")
+
+m1_age_var
+
+m1_isced_med_var <- rma(yi = sig_isced_med_est,
+              sei = sig_isced_med_sd,
+              data = total_indep_var_results,
+              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              method = "REML",
+              test = "knha")
+
+m1_isced_med_var
+
+m1_isced_high_var <- rma(yi = sig_isced_high_est,
+              sei = sig_isced_high_sd,
+              data = total_indep_var_results,
+              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              method = "REML",
+              test = "knha")
+
+m1_isced_high_var
 
 ```
 
-
-```{r}
+```{r, results='hide', warning=FALSE}
+# Run this piece of code so that in the Table beneath it will not show NAs
 options(knitr.kable.NA = '')
 ```
 
+
 ```{r}
-kable(indep_total, digits = 3, caption = "Table 4. Effects of independent variables on climate change attitudes and polarization", 
-      col.names = c( "", "Variables", "Pooled effect", "", "Estimate", "Std. Error", "", "Pooled effect", "")) %>%
+# Make a table of the above regression output
+indep_df <- data.frame(matrix(ncol = 14, nrow = 7))
+colnames(indep_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p", "Estimate_1", "SE_1", "p_1", "Estimate_2", "SE_2", "p_2", "Estimate_3", "SE_3", "p_3")
+indep_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
+indep_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "", "", "")
+
+indep_df$Estimate <- as.numeric(m1_gender$beta) #estimate
+indep_df$SE <- m1_gender$se #se indeed but as a row
+indep_df$p <- m1_gender$pval # same as for SE
+
+indep_df$Estimate_1 <- as.numeric(m1_age$beta) #estimate
+indep_df$SE_1 <- m1_age$se #se indeed but as a row
+indep_df$p_1 <- m1_age$pval # same as for SE
+
+indep_df$Estimate_2 <- as.numeric(m1_isced_med$beta) #estimate
+indep_df$SE_2 <- m1_isced_med$se #se indeed but as a row
+indep_df$p_2 <- m1_isced_med$pval # same as for SE
+
+indep_df$Estimate_3 <- as.numeric(m1_isced_high$beta) #estimate
+indep_df$SE_3 <- m1_isced_high$se #se indeed but as a row
+indep_df$p_3 <- m1_isced_high$pval # same as for SE
+
+indep_df$p_text <- case_when(
+indep_df$p >= 0.05 ~ "",
+indep_df$p < 0.001 ~ "***",
+indep_df$p < 0.01 ~ "**",
+indep_df$p < 0.05 ~ "*"
+)
+
+indep_df$p_text_1 <- case_when(
+indep_df$p_1 >= 0.05 ~ "",
+indep_df$p_1 < 0.001 ~ "***",
+indep_df$p_1 < 0.01 ~ "**",
+indep_df$p_1 < 0.05 ~ "*"
+)
+
+indep_df$p_text_2 <- case_when(
+indep_df$p_2 >= 0.05 ~ "",
+indep_df$p_2 < 0.001 ~ "***",
+indep_df$p_2 < 0.01 ~ "**",
+indep_df$p_2 < 0.05 ~ "*"
+)
+
+indep_df$p_text_3 <- case_when(
+indep_df$p_3 >= 0.05 ~ "",
+indep_df$p_3 < 0.001 ~ "***",
+indep_df$p_3 < 0.01 ~ "**",
+indep_df$p_3 < 0.05 ~ "*"
+)
+
+# I also want the R2, I2 and QE in the table
+model_1_fit  <- data.frame(matrix(ncol = 14, nrow = 3))
+colnames(model_1_fit) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p_text", "Estimate_1", "SE_1", "p_text_1", "Estimate_2", "SE_2", "p_text_2", "Estimate_3", "SE_3", "p_text_3")
+model_1_fit$Variable <- c("R2", "I2", "QE")
+model_1_fit$Estimate <- c(m1_gender$R2, m1_gender$I2, m1_gender$QE)
+model_1_fit$Estimate_1 <- c(m1_age$R2, m1_age$I2, m1_age$QE)
+model_1_fit$Estimate_2 <- c(m1_isced_med$R2, m1_isced_med$I2, m1_isced_med$QE)
+model_1_fit$Estimate_3 <- c(m1_isced_high$R2, m1_isced_high$I2, m1_isced_high$QE)
+
+indep_df <- select(indep_df, `Mu/Sigma`, Variable, Estimate, SE, p_text, Estimate_1, SE_1, p_text_1, Estimate_2, SE_2, p_text_2, Estimate_3, SE_3, p_text_3)
+indep_df <- rbind(indep_df, model_1_fit)
+
+# Variance
+indep_var_df <- data.frame(matrix(ncol = 14, nrow = 7))
+colnames(indep_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p", "Estimate_1", "SE_1", "p_1", "Estimate_2", "SE_2", "p_2", "Estimate_3", "SE_3", "p_3")
+indep_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
+indep_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "", "", "")
+
+indep_var_df$Estimate <- as.numeric(m1_gender_var$beta) #estimate
+indep_var_df$SE <- m1_gender_var$se #se indeed but as a row
+indep_var_df$p <- m1_gender_var$pval # same as for SE
+
+indep_var_df$Estimate_1 <- as.numeric(m1_age_var$beta) #estimate
+indep_var_df$SE_1 <- m1_age_var$se #se indeed but as a row
+indep_var_df$p_1 <- m1_age_var$pval # same as for SE
+
+indep_var_df$Estimate_2 <- as.numeric(m1_isced_med_var$beta) #estimate
+indep_var_df$SE_2 <- m1_isced_med_var$se #se indeed but as a row
+indep_var_df$p_2 <- m1_isced_med_var$pval # same as for SE
+
+indep_var_df$Estimate_3 <- as.numeric(m1_isced_high_var$beta) #estimate
+indep_var_df$SE_3 <- m1_isced_high_var$se #se indeed but as a row
+indep_var_df$p_3 <- m1_isced_high_var$pval # same as for SE
+
+indep_var_df$p_text <- case_when(
+indep_var_df$p >= 0.05 ~ "",
+indep_var_df$p < 0.001 ~ "***",
+indep_var_df$p < 0.01 ~ "**",
+indep_var_df$p < 0.05 ~ "*"
+)
+
+indep_var_df$p_text_1 <- case_when(
+indep_var_df$p_1 >= 0.05 ~ "",
+indep_var_df$p_1 < 0.001 ~ "***",
+indep_var_df$p_1 < 0.01 ~ "**",
+indep_var_df$p_1 < 0.05 ~ "*"
+)
+
+indep_var_df$p_text_2 <- case_when(
+indep_var_df$p_2 >= 0.05 ~ "",
+indep_var_df$p_2 < 0.001 ~ "***",
+indep_var_df$p_2 < 0.01 ~ "**",
+indep_var_df$p_2 < 0.05 ~ "*"
+)
+
+indep_var_df$p_text_3 <- case_when(
+indep_var_df$p_3 >= 0.05 ~ "",
+indep_var_df$p_3 < 0.001 ~ "***",
+indep_var_df$p_3 < 0.01 ~ "**",
+indep_var_df$p_3 < 0.05 ~ "*"
+)
+
+# I also want the R2, I2 and QE in the table
+model_1_fit_var  <- data.frame(matrix(ncol = 14, nrow = 3))
+colnames(model_1_fit_var) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p_text", "Estimate_1", "SE_1", "p_text_1", "Estimate_2", "SE_2", "p_text_2", "Estimate_3", "SE_3", "p_text_3")
+model_1_fit_var$Variable <- c("R2", "I2", "QE")
+model_1_fit_var$Estimate <- c(m1_gender_var$R2, m1_gender_var$I2, m1_gender_var$QE)
+model_1_fit_var$Estimate_1 <- c(m1_age_var$R2, m1_age_var$I2, m1_age_var$QE)
+model_1_fit_var$Estimate_2 <- c(m1_isced_med_var$R2, m1_isced_med_var$I2, m1_isced_med_var$QE)
+model_1_fit_var$Estimate_3 <- c(m1_isced_high_var$R2, m1_isced_high_var$I2, m1_isced_high_var$QE)
+
+indep_var_df <- select(indep_var_df, `Mu/Sigma`, Variable, Estimate, SE, p_text, Estimate_1, SE_1, p_text_1, Estimate_2, SE_2, p_text_2, Estimate_3, SE_3, p_text_3)
+indep_var_df <- rbind(indep_var_df, model_1_fit_var)
+
+#Now a total dataframe with both models together, and then make some changes before making the table 
+indep_df_total <- rbind(indep_df, indep_var_df)
+
+indep_df_total <- mutate_at(indep_df_total, vars(-`Mu/Sigma`, -Variable, -p_text, -p_text_1, -p_text_2, -p_text_3), as.numeric)
+numeric_cols <- sapply(indep_df_total, is.numeric)
+indep_df_total[, numeric_cols] <- round(indep_df_total[, numeric_cols], digits = 3)
+
+kable(indep_df_total, digits = 3, caption = "Appendix E. Meta-regression on climate change attitudes and polarization", 
+      col.names = c( "", "Variables", "Estimate", "Std. Error", "", "Estimate", "Std. Error", "", "Estimate", "Std. Error", "", "Estimate", "Std. Error", "")) %>%
   kable_classic_2(html_font = "Times", fixed_thead = T, full_width = F) %>%
-  add_header_above(c(" " = 2, "Effects indep vars" = 2, "Mean year on indep vars" = 3, "Effects interaction" = 2), align = "c") %>%
+  add_header_above(c(" " = 2, "Gender" = 3, "Age" = 3, "Isced intermediate (ref=basic)" = 3, "Isced advanced (ref=basic)" = 3)) %>%
    footnote(
     general_title = "Note.",
     general = "*** = p < 0.001, ** = p < 0.01, * = p < 0.05",
     threeparttable = TRUE,
     footnote_as_chunk = TRUE
-    )%>%
-    save_kable("/Users/anuschka/Documents/climatechange/climatechange/output/indep_var_table.png")
+    ) #%>%
+    #save_kable("/Users/anuschka/Documents/climatechange/climatechange/output/meta_regression_indepvar_table.html")
+
+
 ```
 
 
 
 
 
+
+
+
+`

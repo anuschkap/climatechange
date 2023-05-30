@@ -222,6 +222,16 @@ model_step_2_att <- rma(yi = mu_time,
               test = "knha")
 
 model_step_2_att
+
+# Check if the effects of attitude_cat are significant when other variables are not included
+model_step_2_att_cat <- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_reg_results,
+              mods = ~ attitude_cat,
+              method = "REML",
+              test = "knha")
+
+model_step_2_att_cat # No, not significant
 ```
 
 
@@ -236,6 +246,17 @@ model_step_2_var <- rma(yi = sig_time,
               test = "knha")
 
 model_step_2_var
+
+# Attitude cat significant without the other variables?
+model_step_2_var_cat <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_reg_results,
+              mods = ~ attitude_cat, 
+              method = "REML",
+              test = "knha")
+
+model_step_2_var_cat
+
 ```
 
 ```{r, results='hide', warning=FALSE}
@@ -468,17 +489,19 @@ total_meta <- mutate_at(total_meta, vars(est_empty, se_empty, est_indep, se_inde
 numeric_cols <- sapply(total_meta, is.numeric)
 total_meta[, numeric_cols] <- round(total_meta[, numeric_cols], digits = 3)
 
+# Delete the interaction model
+total_meta <- dplyr::select(total_meta, mu_sigma, variable_empty, est_empty, se_empty, p_text_empty, est_indep, se_indep, p_text_indep)
+
 kable(total_meta, digits = 3, caption = "Table 3. Meta-regression on climate change attitudes and polarization", 
-      col.names = c( "", "Variables", "Estimate", "Std. Error", "", "Estimate", "Std. Error", "", "Estimate", "Std. Error", "")) %>%
+      col.names = c( "", "Variables", "Estimate", "Std. Error", "", "Estimate", "Std. Error", "")) %>%
   kable_classic_2(html_font = "Times", fixed_thead = T, full_width = F) %>%
-  add_header_above(c(" " = 2, "Time-only model" = 3, "Indepent var model" = 3, "Interaction model" = 3)) %>%
+  add_header_above(c(" " = 2, "Time-only model" = 3, "Indepent var model" = 3)) %>%
    footnote(
     general_title = "Note.",
     general = "*** = p < 0.001, ** = p < 0.01, * = p < 0.05",
     threeparttable = TRUE,
     footnote_as_chunk = TRUE
-    )
-#%>%
+    )#%>%
     #save_kable("/Users/anuschka/Documents/climatechange/climatechange/output/meta_regression_table.html")
 ```
 

@@ -45,7 +45,7 @@ navbar:
         href: meta_analysis_indep_var.html
       - text: "Meta-analysis shorter time spans"
         href: meta_analysis_gw_waves.html
-      -  
+      -
   right:
   - icon: fab fa-github
     href: https://github.com/apeelen/climatechange

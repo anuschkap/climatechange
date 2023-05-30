@@ -22,6 +22,8 @@ library(tidyverse)
 library(writexl)
 library(readxl)
 library(gamlss)
+library(metafor)
+library(meta)
 here()
 here::i_am("scripts/descriptive_stats/descriptives.Rmd")
 ```
@@ -35,6 +37,11 @@ datayear <- read_excel("/Users/anuschka/Documents/climatechange/climatechange/da
 ```{r, warning=FALSE, fig.show='asis'}
 color_scale <- c ("#1ABC9C", "#85C1E9" , "#EB984E", "#AF7AC5" , "#F1C40F")
 datayear$dataset <- factor(datayear$dataset, levels = c("I&O", "ESS", "ISSP", "EVS", "EB"))
+datayear$color[datayear$dataset == "I&O"] <- "#1ABC9C"
+datayear$color[datayear$dataset == "ESS"] <- "#85C1E9"
+datayear$color[datayear$dataset == "ISSP"] <- "#EB984E"
+datayear$color[datayear$dataset == "EVS"] <- "#AF7AC5"
+datayear$color[datayear$dataset == "EB"] <- "#F1C40F"
 
 first_last_year <- datayear %>%
   group_by(dataset) %>%
@@ -44,9 +51,9 @@ first_last_year <- datayear %>%
 yearplot <- ggplot(data = datayear, aes(x = year, y = dataset, color = dataset)) +
   geom_line(size = 1) +
   scale_color_manual(values = color_scale) +
-  labs(title = "Datasets by year",
-       x = "Year",
+  labs(x = "Year",
        y = "Dataset") +
+  geom_point(data = datayear, aes(x = year), color = datayear$color, size = 2) +
   geom_point(data = first_last_year, x = first_last_year$first_year) + 
   geom_point(data = first_last_year, x = first_last_year$last_year) + 
   geom_text(data = first_last_year, x = first_last_year$first_year, label = first_last_year$first_year, vjust = -1) +
@@ -572,5 +579,193 @@ kable(model_new, digits = 3, caption = "Table 3. All pooled effects mean attitud
     ) 
 #%>%
     #save_kable("/Users/anuschka/Documents/climatechange/climatechange/output/pooled_effects_table.html")
+```
+
+## Appendix D. Pooled effects age-only vs gender and education-only model
+
+```{r, warning=FALSE}
+rm(list=ls())
+set.seed(1) #(as I am performing analyses with a random aspect)
+load(here("./data/meta_analysis", "total_indep_var_results_new_edugen.RData"))
+
+# The models in which I only included education and gender 
+m2_att <- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_indep_var_results,
+              method = "REML",
+              test = "knha")
+
+# Gender 
+gender_gen <- metagen(TE = mu_sex_est,
+                 seTE = mu_sex_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+# Educational level. This is now a dummy
+edu_med_gen <- metagen(TE = mu_isced_med_est,
+                 seTE = mu_isced_med_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+edu_high_gen <- metagen(TE = mu_isced_high_est,
+                 seTE = mu_isced_high_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+# Extract all the data from the models and put them in a dataframe that will later be the input of the kable table
+three_df <- data.frame(matrix(ncol = 6, nrow = 4))
+colnames(three_df) <- c("mu_sigma_1", "age_educ_1", "Variable_1", "Estimate_1", "SE_1", "p_1")
+three_df$mu_sigma_1 <- c("Mean attitudes", "", "", "")
+three_df$age_educ_1 <- c("Gender and education", "", "", "")
+three_df$Variable_1 <- c("Time", "Gender", "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)")
+three_df$Estimate_1 <- c(as.numeric(m2_att$b), gender_gen$TE.random,edu_med_gen$TE.random, edu_high_gen$TE.random)
+three_df$SE_1 <- c(m2_att$se, gender_gen$seTE.random, edu_med_gen$seTE.random, edu_high_gen$seTE.random)
+three_df$p_1 <- c(m2_att$pval, gender_gen$pval.random, edu_med_gen$pval.random, edu_high_gen$pval.random)                       
+                       
+# The same for variance
+m2_var <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_indep_var_results,
+              method = "REML",
+              test = "knha")
+
+# Gender
+gender_var_gen <- metagen(TE = sig_sex_est,
+                 seTE = sig_sex_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+# Education
+edu_var_med_gen <- metagen(TE = sig_isced_med_est,
+                 seTE = sig_isced_med_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+edu_var_high_gen <- metagen(TE = sig_isced_high_est,
+                 seTE = sig_isced_high_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+four_df <- data.frame(matrix(ncol = 6, nrow = 4))
+colnames(four_df) <- c("mu_sigma_1", "age_educ_1", "Variable_1", "Estimate_1", "SE_1", "p_1")
+four_df$mu_sigma_1 <- c("Polarization attitudes", "", "", "")
+four_df$age_educ_1 <- c("Gender and education", "", "", "")
+four_df$Variable_1 <- c("Time", "Gender", "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)")
+four_df$Estimate_1 <- c(as.numeric(m2_var$b), gender_var_gen$TE.random, edu_var_med_gen$TE.random, edu_var_high_gen$TE.random)
+four_df$SE_1 <- c(m2_att$se, gender_var_gen$seTE.random, edu_var_med_gen$seTE.random, edu_var_high_gen$seTE.random)
+four_df$p_1 <- c(m2_att$pval, gender_var_gen$pval.random, edu_var_med_gen$pval.random, edu_var_high_gen$pval.random)
+
+```
+
+
+```{r, warning=FALSE}
+rm(total_indep_var_results)
+# Do the same, but then for the models with only age included
+load(here("./data/meta_analysis", "total_indep_var_results_new_age.RData"))
+total_indep_var_results_age <- as.data.frame(total_indep_var_results)
+
+# The models in which I only included education and gender 
+m2_att_age <- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_indep_var_results_age,
+              method = "REML",
+              test = "knha")
+
+# Age
+age_gen <- metagen(TE = mu_age_est,
+                 seTE = mu_age_sd,
+                 data = total_indep_var_results_age,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+# Extract all the data from the models and put them in a dataframe that will later be the input of the kable table
+five_df <- data.frame(matrix(ncol = 6, nrow = 2))
+colnames(five_df) <- c("mu_sigma_1", "age_educ_1", "Variable_1", "Estimate_1", "SE_1", "p_1")
+five_df$mu_sigma_1 <- c("", "")
+five_df$age_educ_1 <- c("Age", "")
+five_df$Variable_1 <- c("Time", "Age")
+five_df$Estimate_1 <- c(as.numeric(m2_att_age$b), age_gen$TE.random)
+five_df$SE_1 <- c(m2_att_age$se, age_gen$seTE.random)
+five_df$p_1 <- c(m2_att_age$pval, age_gen$pval.random)                       
+                       
+# The same for variance
+m2_var_age <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_indep_var_results_age,
+              method = "REML",
+              test = "knha")
+
+# Gender
+age_var_gen <- metagen(TE = sig_age_est,
+                 seTE = sig_age_sd,
+                 data = total_indep_var_results_age,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE)
+
+six_df <- data.frame(matrix(ncol = 6, nrow = 2))
+colnames(six_df) <- c("mu_sigma_1", "age_educ_1", "Variable_1", "Estimate_1", "SE_1", "p_1")
+six_df$mu_sigma_1 <- c("", "")
+six_df$age_educ_1 <- c("Age", "")
+six_df$Variable_1 <- c("Time", "Age")
+six_df$Estimate_1 <- c(as.numeric(m2_var_age$b), age_var_gen$TE.random)
+six_df$SE_1 <- c(m2_var_age$se, age_var_gen$seTE.random)
+six_df$p_1 <- c(m2_var_age$pval, age_var_gen$pval.random)
+
+# The order I want in the tables is three -> five -> four -> six
+total_df <- rbind(three_df, five_df, four_df, six_df)
+
+# I Want to round the numeric variables to 3 decimals
+total_df <- mutate_at(total_df, vars(-mu_sigma_1, -Variable_1, -age_educ_1), as.numeric)
+numeric_cols <- sapply(total_df, is.numeric)
+total_df[, numeric_cols] <- round(total_df[, numeric_cols], digits = 3)
+
+# Create a new variable to use stars instead of the full p-values in the table
+total_df$p_text_1 <- case_when(
+  total_df$p_1 >= 0.05 ~ "",
+total_df$p_1 < 0.001 ~ "***",
+total_df$p_1 < 0.01 ~ "**",
+total_df$p_1 < 0.05 ~ "*"
+)
+
+# Now only select the variables that I want to show in the table
+total_df <- dplyr::select(total_df, mu_sigma_1, age_educ_1, Variable_1, Estimate_1, SE_1, p_text_1)
+
+# Make and save the table as html file
+kable(total_df, digits = 3, caption = "Appendix D. Pooled effects mean attitudes and polarization age, education and gender.", 
+      col.names = c( "", "", "Variables", "Estimate", "Std. Error", "")) %>%
+  kable_classic_2(html_font = "Times", fixed_thead = T, full_width = F) %>%
+  add_header_above(c(" " = 3, "Indepent var model" = 3)) %>%
+   footnote(
+    general_title = "Note.",
+    general = "*** = p < 0.001, ** = p < 0.01, * = p < 0.05",
+    threeparttable = TRUE,
+    footnote_as_chunk = TRUE
+    )
+#%>%
+ #   save_kable("/Users/anuschka/Documents/climatechange/climatechange/output/appendix/pooled_effects_edugenage.html")
+
+
 ```
 

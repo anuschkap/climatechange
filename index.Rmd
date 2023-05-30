@@ -36,8 +36,6 @@ klippy::klippy(tooltip_message = 'Click to copy', tooltip_success = 'Done')
 
 ::: columns
 ::: {.column width="50%"}
-# Trends in climate change
-
 Last compiled on `r format(Sys.time(), '%B, %Y')`
 
 \*\* <br>
@@ -51,10 +49,10 @@ Last compiled on `r format(Sys.time(), '%B, %Y')`
 :::
 
 
-## Welcome
+## Welcome {-}
 Welcome to the replication website that comes with the article on climate change attitudes and polarization, based on my thesis. 
 
-## How to use this website
+## How to use this website {-}
 
 In the top menu, you can navigate through different parts of this project. Under "scripts" you will find all the scripts to replicate the data preparation and analyses of this thesis yourself. Under "blog" you will find the blog post accompanying this thesis (in Dutch). 
 
