@@ -7,6 +7,7 @@ output: html_document
 
 ```{r, echo=FALSE}
 #knitr::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(number_sections = FALSE)
 options(width = 100)
 colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
 ```
@@ -25,7 +26,7 @@ set.seed(1)
 here::i_am("scripts/analysis/meta_analysis_gamlss_weigh.Rmd")
 ```
 
-## Forest plots 
+## Forest plots {-}
 
 ```{r, results='hide', warning=FALSE}
 # With the final data
@@ -210,7 +211,7 @@ addpoly.rma(cog_model_var, row = -4, mlab = "Cognitive pooled", col = "#2980B9")
 
 dev.off()
 
-## Step 2 until 4 meta-regression 
+## Step 2 until 4 meta-regression {-}
 
 ```{r, results='hide', warning=FALSE}
 #Step 2. Empty model with meta-level indicators
@@ -307,7 +308,7 @@ model_step_4_var <- rma(yi = sig_time_int,
 model_step_4_var
 ```
 
-## Put the results in kable table 
+## Put the results in kable table {-}
 
 ```{r}
 options(knitr.kable.NA = '')
@@ -485,7 +486,11 @@ colnames(total_meta) <- c("mu_sigma", "variable_empty", "est_empty", "se_empty",
 rownames(total_meta) <- NULL
 total_meta <- dplyr::select(total_meta, mu_sigma, variable_empty, est_empty, se_empty, p_text_empty, est_indep, se_indep, p_text_indep, est_inter, se_inter, p_text_inter)
 
-total_meta <- mutate_at(total_meta, vars(est_empty, se_empty, est_indep, se_indep, est_inter, se_inter), as.numeric)
+
+
+total_meta <- dplyr::mutate(total_meta, across(.cols=c(est_empty, se_empty, est_indep, se_indep, est_inter, se_inter), .fns= as.numeric))
+
+
 numeric_cols <- sapply(total_meta, is.numeric)
 total_meta[, numeric_cols] <- round(total_meta[, numeric_cols], digits = 3)
 

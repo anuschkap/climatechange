@@ -26,7 +26,7 @@ here()
 here::i_am("scripts/analysis/single_regression.Rmd")
 ```
 
-## ISSP
+## ISSP {-}
 
 ```{r}
 #Create a weight variable for each dataset, which I can later use in the regression analyses to weigh the data with
@@ -216,7 +216,7 @@ issp10sel$weightvec  <- unlist(outsave[1])
 save(issp10sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp10sel.Rdata")
 ```
 
-## ESS
+## ESS {-}
 
 ```{r}
 # And now for ESS, repeat the same measure
@@ -303,7 +303,7 @@ ess20sel$weightvec  <- unlist(outsave[1])
 save(ess20sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess20sel.Rdata")
 ```
 
-## EVS
+## EVS {-}
 
 ```{r}
 # Then the EVS, which I have to split up because I use the compiled dataset
@@ -425,7 +425,7 @@ evssel <- dplyr::bind_rows(evs90, evs99, evs2008)
 save(evssel, file="/Users/anuschka/Documents/climatechange/climatechange//data/final_data/evssel.Rdata")
 ```
 
-## I&O research
+## I&O research {-}
 
 ```{r}
 # I & O Research
@@ -557,7 +557,7 @@ save(io2022sel, file="/Users/anuschka/Documents/climatechange/climatechange/data
 
 ```
 
-## EB
+## EB {-}
 
 ```{r}
 #Lastly Eurobarometer, which has a lot of waves and thus a lot of repetition. Still it is difficult to write a loop, as targetweights differ each year. So Im just repeating the script many times. 

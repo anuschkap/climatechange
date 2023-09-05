@@ -9,15 +9,16 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="by: Anuschka Peelen" />
+<meta name="author" content="Anuschka Peelen" />
 
+<meta name="date" content="2023-09-05" />
 
-<title>Climate change attitudes and polarization</title>
+<title>Data preparation left-right placement expert data</title>
 
 <script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -30,13 +31,14 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<script src="site_libs/clipboard-1.7.1/clipboard.min.js"></script>
-<link href="site_libs/primer-tooltips-1.4.0/build.css" rel="stylesheet" />
-<link href="site_libs/klippy-0.0.0.9500/css/klippy.min.css" rel="stylesheet" />
-<script src="site_libs/klippy-0.0.0.9500/js/klippy.min.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -62,8 +64,14 @@ if (window.hljs) {
 
 
 
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
 
 
+<link rel="stylesheet" href="tweaks.css" type="text/css" />
 
 
 
@@ -222,7 +230,73 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
 
 
 
@@ -232,6 +306,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -338,52 +422,81 @@ $(document).ready(function () {
 
 <div id="header">
 
-
-
-<h1 class="title toc-ignore">Climate change attitudes and
-polarization</h1>
-<h4 class="author">by: Anuschka Peelen</h4>
-
-</div>
-
-
-<script>
-  addClassKlippyTo("pre.r, pre.markdown");
-  addKlippy('right', 'top', 'auto', '1', 'Copy code', 'Copied!');
-</script>
-<script>
-  addClassKlippyTo("pre.r, pre.markdown");
-  addKlippy('left', 'top', '#8B0000', '1', 'Copy code', 'Copied!');
-</script>
-<script>
-  addClassKlippyTo("pre.r, pre.markdown");
-  addKlippy('left', 'top', 'auto', '1', 'Click to copy', 'Done');
-</script>
-<hr />
-<div class="columns">
-<div class="column" style="width:50%;">
-<p>Last compiled on september, 2023</p>
-<p>** <br></p>
-<hr />
-</div><div class="column" style="width:50%;">
-
-</div>
-</div>
-<div id="welcome" class="section level2 unnumbered">
-<h2 class="unnumbered">Welcome</h2>
-<p>Welcome to the replication website that comes with the article on
-climate change attitudes and polarization, based on my thesis.</p>
-</div>
-<div id="how-to-use-this-website" class="section level2 unnumbered">
-<h2 class="unnumbered">How to use this website</h2>
-<p>In the top menu, you can navigate through different parts of this
-project. Under “scripts” you will find all the scripts to replicate the
-data preparation and analyses of this thesis yourself. Under “blog” you
-will find the blog post accompanying this thesis (in Dutch).</p>
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
 </div>
 
 
 
+<h1 class="title toc-ignore">Data preparation left-right placement
+expert data</h1>
+<h4 class="author">Anuschka Peelen</h4>
+<h4 class="date">2023-09-05</h4>
+
+</div>
+
+
+<p>In this script, I recode expert data of CHES and POPPA to be able to
+use as a substitute for left-right placement of the I&amp;O research
+data. In the end, I have not used this variable in my thesis, but I
+still refer to it in the script for I&amp;O research and it can still be
+used in a later stadium (to include political placement).</p>
+<pre class="r"><code>#Load the data of poppa
+pop &lt;- read_dta(&quot;/Users/anuschka/Documents/gesis_dir/poppa/expert_data_stata.dta&quot;)
+
+#Select only the Netherlands and general left-right placement
+popsel &lt;- pop %&gt;% filter(country_id==19) %&gt;%
+  select(nr_experts, party, lroverall) %&gt;%
+  dplyr::rename(party_name = party) 
+
+popsel$party_name &lt;- revalue(popsel$party_name, c(&quot;50Plus&quot;= &quot;50PLUS&quot;))
+
+#Do the same for the CHES data
+ches &lt;- read_dta(&quot;/Users/anuschka/Documents/gesis_dir/ches/ches2019.dta&quot;)
+dutch &lt;- 1001:1051  #Dutch party ids
+ches &lt;- ches[ches$party_id %in% dutch, ] 
+
+ches &lt;- ches %&gt;% select(party, party_name, lrgen) 
+ches$party_name &lt;- revalue(ches$party_name, c(&quot;PVdD&quot; = &quot;PvdD&quot;))
+
+names(ches) &lt;- names(popsel) #namen gelijk maken
+
+#Combine the two
+expert &lt;- rbind(ches, popsel)
+expert &lt;- na.omit(expert)
+
+# Calculate the mean left-right placement of these columns of experts
+expert2 &lt;- expert %&gt;% #Maar deze wel
+  group_by(party_name) %&gt;%
+  summarise_at(vars(lroverall), list(lroverall_mean = mean), na.rm=T) 
+
+save(expert, file = &quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/expert.RData&quot;)
+
+# Test it on a dataset that later on was no longer part of my thesis
+load(&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/dpes2021sel.RData&quot;)
+
+unique(dpes2021sel$party_name)
+
+dpes2021sel$party_name &lt;- as.character(dpes2021sel$party_name)
+unique(dpes2021sel$party_name2)
+unique(expert2$party_name)
+
+dpes2021sel %&gt;% 
+  left_join(expert2, by=&quot;party_name&quot;) -&gt; dpes2021seltest
+
+save(expert2, file = &quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/expert.RData&quot;)</code></pre>
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRhdGEgcHJlcGFyYXRpb24gbGVmdC1yaWdodCBwbGFjZW1lbnQgZXhwZXJ0IGRhdGEiDQphdXRob3I6ICJBbnVzY2hrYSBQZWVsZW4iDQpkYXRlOiAiYHIgU3lzLkRhdGUoKWAiDQpvdXRwdXQ6IGh0bWxfZG9jdW1lbnQNCi0tLQ0KDQpgYGB7ciwgZWNobz1GQUxTRX0NCmtuaXRyOjpvcHRzX2NodW5rJHNldChldmFsID0gRkFMU0UpDQpvcHRpb25zKHdpZHRoID0gMTAwKQ0KY29sb3JpemUgPC0gZnVuY3Rpb24oeCwgY29sb3IpIHtzcHJpbnRmKCI8c3BhbiBzdHlsZT0nY29sb3I6ICVzOyc+JXM8L3NwYW4+IiwgY29sb3IsIHgpIH0NCmBgYA0KDQpJbiB0aGlzIHNjcmlwdCwgSSByZWNvZGUgZXhwZXJ0IGRhdGEgb2YgQ0hFUyBhbmQgUE9QUEEgdG8gYmUgYWJsZSB0byB1c2UgYXMgYSBzdWJzdGl0dXRlIGZvciBsZWZ0LXJpZ2h0IHBsYWNlbWVudCBvZiB0aGUgSSZPIHJlc2VhcmNoIGRhdGEuIEluIHRoZSBlbmQsIEkgaGF2ZSBub3QgdXNlZCB0aGlzIHZhcmlhYmxlIGluIG15IHRoZXNpcywgYnV0IEkgc3RpbGwgcmVmZXIgdG8gaXQgaW4gdGhlIHNjcmlwdCBmb3IgSSZPIHJlc2VhcmNoIGFuZCBpdCBjYW4gc3RpbGwgYmUgdXNlZCBpbiBhIGxhdGVyIHN0YWRpdW0gKHRvIGluY2x1ZGUgcG9saXRpY2FsIHBsYWNlbWVudCkuDQoNCmBgYHtyfQ0KI0xvYWQgdGhlIGRhdGEgb2YgcG9wcGENCnBvcCA8LSByZWFkX2R0YSgiL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9nZXNpc19kaXIvcG9wcGEvZXhwZXJ0X2RhdGFfc3RhdGEuZHRhIikNCg0KI1NlbGVjdCBvbmx5IHRoZSBOZXRoZXJsYW5kcyBhbmQgZ2VuZXJhbCBsZWZ0LXJpZ2h0IHBsYWNlbWVudA0KcG9wc2VsIDwtIHBvcCAlPiUgZmlsdGVyKGNvdW50cnlfaWQ9PTE5KSAlPiUNCiAgc2VsZWN0KG5yX2V4cGVydHMsIHBhcnR5LCBscm92ZXJhbGwpICU+JQ0KICBkcGx5cjo6cmVuYW1lKHBhcnR5X25hbWUgPSBwYXJ0eSkgDQoNCnBvcHNlbCRwYXJ0eV9uYW1lIDwtIHJldmFsdWUocG9wc2VsJHBhcnR5X25hbWUsIGMoIjUwUGx1cyI9ICI1MFBMVVMiKSkNCg0KI0RvIHRoZSBzYW1lIGZvciB0aGUgQ0hFUyBkYXRhDQpjaGVzIDwtIHJlYWRfZHRhKCIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2dlc2lzX2Rpci9jaGVzL2NoZXMyMDE5LmR0YSIpDQpkdXRjaCA8LSAxMDAxOjEwNTEgICNEdXRjaCBwYXJ0eSBpZHMNCmNoZXMgPC0gY2hlc1tjaGVzJHBhcnR5X2lkICVpbiUgZHV0Y2gsIF0gDQoNCmNoZXMgPC0gY2hlcyAlPiUgc2VsZWN0KHBhcnR5LCBwYXJ0eV9uYW1lLCBscmdlbikgDQpjaGVzJHBhcnR5X25hbWUgPC0gcmV2YWx1ZShjaGVzJHBhcnR5X25hbWUsIGMoIlBWZEQiID0gIlB2ZEQiKSkNCg0KbmFtZXMoY2hlcykgPC0gbmFtZXMocG9wc2VsKSAjbmFtZW4gZ2VsaWprIG1ha2VuDQoNCiNDb21iaW5lIHRoZSB0d28NCmV4cGVydCA8LSByYmluZChjaGVzLCBwb3BzZWwpDQpleHBlcnQgPC0gbmEub21pdChleHBlcnQpDQoNCiMgQ2FsY3VsYXRlIHRoZSBtZWFuIGxlZnQtcmlnaHQgcGxhY2VtZW50IG9mIHRoZXNlIGNvbHVtbnMgb2YgZXhwZXJ0cw0KZXhwZXJ0MiA8LSBleHBlcnQgJT4lICNNYWFyIGRlemUgd2VsDQogIGdyb3VwX2J5KHBhcnR5X25hbWUpICU+JQ0KICBzdW1tYXJpc2VfYXQodmFycyhscm92ZXJhbGwpLCBsaXN0KGxyb3ZlcmFsbF9tZWFuID0gbWVhbiksIG5hLnJtPVQpIA0KDQpzYXZlKGV4cGVydCwgZmlsZSA9ICIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9leHBlcnQuUkRhdGEiKQ0KDQojIFRlc3QgaXQgb24gYSBkYXRhc2V0IHRoYXQgbGF0ZXIgb24gd2FzIG5vIGxvbmdlciBwYXJ0IG9mIG15IHRoZXNpcw0KbG9hZCgiL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL2RwZXMyMDIxc2VsLlJEYXRhIikNCg0KdW5pcXVlKGRwZXMyMDIxc2VsJHBhcnR5X25hbWUpDQoNCmRwZXMyMDIxc2VsJHBhcnR5X25hbWUgPC0gYXMuY2hhcmFjdGVyKGRwZXMyMDIxc2VsJHBhcnR5X25hbWUpDQp1bmlxdWUoZHBlczIwMjFzZWwkcGFydHlfbmFtZTIpDQp1bmlxdWUoZXhwZXJ0MiRwYXJ0eV9uYW1lKQ0KDQpkcGVzMjAyMXNlbCAlPiUgDQogIGxlZnRfam9pbihleHBlcnQyLCBieT0icGFydHlfbmFtZSIpIC0+IGRwZXMyMDIxc2VsdGVzdA0KDQpzYXZlKGV4cGVydDIsIGZpbGUgPSAiL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9hbGxfd2F2ZXMvZXhwZXJ0LlJEYXRhIikNCmBgYA0KDQo=</div>
+
+
+</div>
+</div>
 
 </div>
 
@@ -415,7 +528,42 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("dataprep_polcat.Rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

@@ -23,7 +23,7 @@ library(plyr)
 library(dplyr)
 ```
 
-## 2019
+## 2019 {-}
 
 ```{r}
 #Load the datafiles one by one
@@ -149,7 +149,7 @@ save(io2019sel, file = "/Users/anuschka/Documents/climatechange/climatechange/da
 load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2019sel.RData")
 ```
 
-## 2020
+## 2020 {-}
 
 ```{r}
 #Do the same for 2020
@@ -243,7 +243,7 @@ io2020sel <- io2020sel %>%
 save(io2020sel, file = "/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2020sel.RData")
 ```
 
-## 2022
+## 2022 {-}
 
 ```{r}
 #And the last wave of 2022
@@ -336,7 +336,7 @@ io2022sel <- io2022sel %>%
 save(io2022sel, file = "/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2022sel.RData")
 ```
 
-## Merging all datasets
+## Merging all datasets {-}
 
 ```{r}
 #Check whether variables have the same level before merging

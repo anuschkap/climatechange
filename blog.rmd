@@ -180,7 +180,8 @@ cog_model_var <- rma(yi = sig_time,
 ```
 
 ```{r, echo=FALSE}
-{png <- forest(model_step_1_var, annotate =  TRUE, header = "Polarisatie in houdingen ten aanzien van klimaat", pch = 23, fonts = "Times", ylim = c(-6, 0), cex = 1, addfit = FALSE, width = 5)
+
+{png <- forest(model_step_1_var, at=c(-0.1, 0, 0.1), annotate =  TRUE, header = "Polarisatie in houdingen ten aanzien van klimaat", pch = 23, fonts = "Times", ylim = c(-6, 0), cex = 1, addfit = FALSE, width = 5)
 
 addpoly.rma(model_step_1_var, row = -6, mlab = "Totaal", col = "#ACBFD6")
 addpoly.rma(aff_model_var, row = -3, mlab = "Affectief", col = "#CC5279")

@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Anuschka Peelen" />
+
+<meta name="date" content="2023-09-05" />
+
+<title>Extract coefficients of independent variable models - age</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="tweaks.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="blog.html">Blog</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Scripts datapreparation
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="dataprep_EB.html">Data preparation Eurobarometer</a>
+    </li>
+    <li>
+      <a href="dataprep_EVS_ESS_ISSP.html">Data preparation EVS, ESS, ISSP</a>
+    </li>
+    <li>
+      <a href="dataprep_I-O.html">Data preparation I&amp;O Research</a>
+    </li>
+    <li>
+      <a href="weights.html">Weighing data</a>
+    </li>
+    <li>
+      <a href="dataprep_polcat.html">Left right placement</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Scripts descriptives and analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="descriptives.html">Descriptives</a>
+    </li>
+    <li>
+      <a href="single_regression_gamlss_weigh_new.html">Gamlss regressions weighted</a>
+    </li>
+    <li>
+      <a href="single_regression_gw_py_new.html">Gamlss regression shorter time spans</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_weight_gamlss_new.html">Extract coefficients gamlss regressions</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_wg_waves_new.html">Extract coefficients shorter time spans</a>
+    </li>
+    <li>
+      <a href="regression_to_indep_var_analysis_weight_gamlss_new.html">Extract coefficients independent var model</a>
+    </li>
+    <li>
+      <a href="regression_to_interact_analysis_weight_gamlss_new.html">Extract coefficients interaction model</a>
+    </li>
+    <li>
+      <a href="meta_analysis_gamlss_weigh.html">Meta-analysis weighted gamlss</a>
+    </li>
+    <li>
+      <a href="meta_analysis_indep_var.html">Meta-analysis independent variables</a>
+    </li>
+    <li>
+      <a href="meta_analysis_gw_waves.html">Meta-analysis shorter time spans</a>
+    </li>
+    <li>
+      <a></a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/apeelen/climatechange">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Extract coefficients of independent
+variable models - age</h1>
+<h4 class="author">Anuschka Peelen</h4>
+<h4 class="date">2023-09-05</h4>
+
+</div>
+
+
+<p>In this script I extract the coefficients for gender, age and
+education and put them in a dataset together, to use them as input for
+the meta-regression. In this script, I only select the coefficients of
+age, as I use the models without gender and education as a predictor
+variable.</p>
+<pre class="r"><code>rm(list=ls())
+library(tidyverse)
+library(dplyr)
+library(gamlss)</code></pre>
+<div id="ess" class="section level2 unnumbered">
+<h2 class="unnumbered">ESS</h2>
+<pre class="r"><code>load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;ess_list_preds_w_new_age.RData&quot;))
+
+# Store the results in a new dataframe
+ess_indep_preds_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(ess_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(ess_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(ess_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+    mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+
+  # Put the results 
+  ess_indep_preds_df &lt;- rbind(ess_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+}
+
+save(ess_indep_preds_df, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/ess_indep_var_df_w_new_age.RData&quot;)</code></pre>
+</div>
+<div id="evs" class="section level2 unnumbered">
+<h2 class="unnumbered">EVS</h2>
+<pre class="r"><code># Now the same for the EVS
+rm(list=ls())
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;evs_list_preds_w_new_age.RData&quot;))
+
+# Store the results in a new dataframe
+evs_indep_preds_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(evs_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(evs_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(evs_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+    mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+  
+  # Put the results 
+  evs_indep_preds_df &lt;- rbind(evs_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+}
+
+save(evs_indep_preds_df, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/evs_indep_var_df_w_new_age.RData&quot;)</code></pre>
+<pre class="r"><code># Now for I&amp;O research
+rm(list=ls())
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;io_list_preds_w_new_age.RData&quot;))
+
+# Store the results in a new dataframe
+io_indep_preds_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(io_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(io_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(io_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+
+  
+  # Put the results 
+  io_indep_preds_df &lt;- rbind(io_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+}
+
+save(io_indep_preds_df, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/io_indep_var_df_w_new_age.RData&quot;)</code></pre>
+</div>
+<div id="issp" class="section level2 unnumbered">
+<h2 class="unnumbered">ISSP</h2>
+<pre class="r"><code># Now for ISSP, which has to happen twice (bc 2 substs based on dependent vars)
+rm(list=ls())
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;issp_list_preds_w_new_age.RData&quot;))
+
+# Store the results in a new dataframe
+issp_indep_preds_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(issp_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(issp_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(issp_list_preds[[i]])
+  
+  # Extract the intercept and standard deviatisspn for mu and sigma
+    mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+  
+  # Put the results 
+  issp_indep_preds_df &lt;- rbind(issp_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+}
+
+save(issp_indep_preds_df, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/issp_indep_var_df_w_new_age.RData&quot;)
+
+# For the other indep vars as well
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;issp_list_preds_2_waves_w_new_age.RData&quot;))
+
+# Store the results in a new dataframe
+issp_2_indep_preds_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(issp_list_preds_2_waves)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(issp_list_preds_2_waves[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(issp_list_preds_2_waves[[i]])
+  
+  # Extract the intercept and standard deviatissp_2n for mu and sigma
+    mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+
+  
+  # Put the results 
+  issp_2_indep_preds_df &lt;- rbind(issp_2_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+}
+
+save(issp_2_indep_preds_df, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/issp_2_indep_var_df_w_new_age.RData&quot;)</code></pre>
+</div>
+<div id="eb" class="section level2 unnumbered">
+<h2 class="unnumbered">EB</h2>
+<pre class="r"><code># For all the eurobarometer waves, exactly the same needs to be done each time. Therefore I want to loop over these waves
+# For some reason this didn&#39;t work anymore later on, so I run them by one by one in the code below
+rm(list=ls())
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;eb_list_preds_1986_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;eb_list_preds_2007_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;eb_list_preds_2008_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;eb_list_preds_2009_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;eb_list_preds_2011_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;eb_list_preds_buyprod_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;eb_list_preds_cchange2_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;eb_list_preds_doprot_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;eb_list_preds_eff_daily_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;eb_list_preds_pers_imp_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;eb_list_preds_prsaction_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;eb_list_preds_quallife_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;eb_list_preds_doprot_city_w_new_age.RData&quot;))</code></pre>
+<pre class="r"><code># Extract the indep vars from the regressions Eurobarometer one by one
+eb_indep_preds_1986_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_1986)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(eb_list_preds_1986[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(eb_list_preds_1986[[i]])
+  
+  # Extract info
+    mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+  
+  # Put the results in a dataframe
+  eb_indep_preds_1986_df &lt;- rbind(eb_indep_preds_1986_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+    }</code></pre>
+<pre class="r"><code># Store the results in a new dataframe
+eb_indep_preds_2007_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_2007)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(eb_list_preds_2007[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(eb_list_preds_2007[[i]])
+  
+  # Extract info
+    mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+
+  # Put the results in a dataframe
+  eb_indep_preds_2007_df &lt;- rbind(eb_indep_preds_2007_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+    }</code></pre>
+<pre class="r"><code># 2008
+
+  # Store the results in a new dataframe
+eb_indep_preds_2008_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_2008)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(eb_list_preds_2008[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(eb_list_preds_2008[[i]])
+  
+  # Extract info
+    mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+
+  # Put the results in a dataframe
+  eb_indep_preds_2008_df &lt;- rbind(eb_indep_preds_2008_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+    }</code></pre>
+<pre class="r"><code># Store the results in a new dataframe
+eb_indep_preds_2009_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_2009)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(eb_list_preds_2009[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(eb_list_preds_2009[[i]])
+  
+  # Extract info
+    mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+
+  # Put the results in a dataframe
+  eb_indep_preds_2009_df &lt;- rbind(eb_indep_preds_2009_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+    }</code></pre>
+<pre class="r"><code># Store the results in a new dataframe
+eb_indep_preds_2011_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_2011)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(eb_list_preds_2011[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(eb_list_preds_2011[[i]])
+  
+  # Extract info
+    mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_2011_df &lt;- rbind(eb_indep_preds_2011_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+    }</code></pre>
+<pre class="r"><code># Store the results in a new dataframe
+eb_indep_preds_buyprod_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_buyprod)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(eb_list_preds_buyprod[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(eb_list_preds_buyprod[[i]])
+  
+  # Extract info
+    mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_buyprod_df &lt;- rbind(eb_indep_preds_buyprod_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+    }</code></pre>
+<pre class="r"><code># Store the results in a new dataframe
+eb_indep_preds_cchange2_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_cchange2)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(eb_list_preds_cchange2[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(eb_list_preds_cchange2[[i]])
+  
+  # Extract info
+    mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_cchange2_df &lt;- rbind(eb_indep_preds_cchange2_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+    }</code></pre>
+<pre class="r"><code># Store the results in a new dataframe
+eb_indep_preds_doprot_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_doprot)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(eb_list_preds_doprot[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(eb_list_preds_doprot[[i]])
+  
+  # Extract info
+    mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_doprot_df &lt;- rbind(eb_indep_preds_doprot_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+    }</code></pre>
+<pre class="r"><code># Store the results in a new dataframe
+eb_indep_preds_doprot_city_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_doprot_city)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(eb_list_preds_doprot_city[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(eb_list_preds_doprot_city[[i]])
+  
+  # Extract info
+    mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_doprot_city_df &lt;- rbind(eb_indep_preds_doprot_city_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+    }</code></pre>
+<pre class="r"><code># Store the results in a new dataframe
+eb_indep_preds_eff_daily_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_eff_daily)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(eb_list_preds_eff_daily[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(eb_list_preds_eff_daily[[i]])
+  
+  # Extract info
+    mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_eff_daily_df &lt;- rbind(eb_indep_preds_eff_daily_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+}</code></pre>
+<pre class="r"><code># Store the results in a new dataframe
+eb_indep_preds_pers_imp_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_pers_imp)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(eb_list_preds_pers_imp[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(eb_list_preds_pers_imp[[i]])
+  
+  # Extract info
+    mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_pers_imp_df &lt;- rbind(eb_indep_preds_pers_imp_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+    }
+
+  # Store the results in a new dataframe
+eb_indep_preds_prsaction_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_prsaction)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(eb_list_preds_prsaction[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(eb_list_preds_prsaction[[i]])
+  
+  # Extract info
+    mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_preds_prsaction_df &lt;- rbind(eb_indep_preds_prsaction_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+}</code></pre>
+<pre class="r"><code># Store the results in a new dataframe
+eb_indep_preds_quallife_df &lt;- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds_quallife)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var &lt;- as.character(eb_list_preds_quallife[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum &lt;- summary(eb_list_preds_quallife[[i]])
+  
+  # Extract info
+  mu_time &lt;- sum [[2]]
+  mu_time_sd &lt;- sum[[2,2]]
+  mu_age_est &lt;- sum[[3]]
+  mu_age_sd &lt;- sum[[3,2]]
+
+    # Variance
+  sig_time &lt;- sum[[5]]
+  sig_time_sd &lt;- sum[[5,2]]
+  sig_age_est &lt;- sum[[6]]
+  sig_age_sd &lt;- sum[[6,2]]
+
+  # Put the results in a dataframe
+  eb_indep_preds_quallife_df &lt;- rbind(eb_indep_preds_quallife_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
+    }
+
+eb_indep_preds_df &lt;- rbind(eb_indep_preds_1986_df, eb_indep_preds_2007_df, eb_indep_preds_2008_df, eb_indep_preds_2009_df, eb_indep_preds_2011_df, eb_indep_preds_buyprod_df, eb_indep_preds_cchange2_df, eb_indep_preds_doprot_city_df, eb_indep_preds_doprot_df, eb_indep_preds_eff_daily_df, eb_indep_preds_pers_imp_df, eb_indep_preds_prsaction_df, eb_indep_preds_quallife_df)
+
+save(eb_indep_preds_df, file= &quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/eb_indep_var_df_w_new_age.RData&quot; )</code></pre>
+<pre class="r"><code># The final step is to merge all results into one dataframe
+rm(list=ls())
+load(here(&quot;./data/final_data/indep_var&quot;, &quot;eb_indep_var_df_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/indep_var&quot;, &quot;ess_indep_var_df_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/indep_var&quot;, &quot;evs_indep_var_df_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/indep_var&quot;, &quot;io_indep_var_df_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/indep_var&quot;, &quot;issp_2_indep_var_df_w_new_age.RData&quot;))
+load(here(&quot;./data/final_data/indep_var&quot;, &quot;issp_indep_var_df_w_new_age.RData&quot;))
+
+library(plyr) # I load the packages here so that they don&#39;t conflict with the here() package
+library(dplyr)
+total_indep_var_results &lt;- rbind.fill(eb_indep_preds_df, ess_indep_preds_df, evs_indep_preds_df, io_indep_preds_df, issp_indep_preds_df, issp_2_indep_preds_df) 
+
+save(total_indep_var_results, file= &quot;/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_indep_var_results_new_age.RData&quot; )</code></pre>
+</div>
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkV4dHJhY3QgY29lZmZpY2llbnRzIG9mIGluZGVwZW5kZW50IHZhcmlhYmxlIG1vZGVscyAtIGFnZSINCmF1dGhvcjogIkFudXNjaGthIFBlZWxlbiINCmRhdGU6ICJgciBTeXMuRGF0ZSgpYCINCm91dHB1dDogaHRtbF9kb2N1bWVudA0KLS0tDQoNCmBgYHtyLCBlY2hvPUZBTFNFfQ0Ka25pdHI6Om9wdHNfY2h1bmskc2V0KGV2YWwgPSBGQUxTRSkNCmtuaXRyOjpvcHRzX2NodW5rJHNldChudW1iZXJfc2VjdGlvbnMgPSBGQUxTRSkNCm9wdGlvbnMod2lkdGggPSAxMDApDQpjb2xvcml6ZSA8LSBmdW5jdGlvbih4LCBjb2xvcikge3NwcmludGYoIjxzcGFuIHN0eWxlPSdjb2xvcjogJXM7Jz4lczwvc3Bhbj4iLCBjb2xvciwgeCkgfQ0KYGBgDQoNCkluIHRoaXMgc2NyaXB0IEkgZXh0cmFjdCB0aGUgY29lZmZpY2llbnRzIGZvciBnZW5kZXIsIGFnZSBhbmQgZWR1Y2F0aW9uIGFuZCBwdXQgdGhlbSBpbiBhIGRhdGFzZXQgdG9nZXRoZXIsIHRvIHVzZSB0aGVtIGFzIGlucHV0IGZvciB0aGUgbWV0YS1yZWdyZXNzaW9uLiBJbiB0aGlzIHNjcmlwdCwgSSBvbmx5IHNlbGVjdCB0aGUgY29lZmZpY2llbnRzIG9mIGFnZSwgYXMgSSB1c2UgdGhlIG1vZGVscyB3aXRob3V0IGdlbmRlciBhbmQgZWR1Y2F0aW9uIGFzIGEgcHJlZGljdG9yIHZhcmlhYmxlLiANCg0KYGBge3J9DQpybShsaXN0PWxzKCkpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KGdhbWxzcykNCmBgYA0KDQojIyBFU1Mgey19DQoNCmBgYHtyfQ0KbG9hZChoZXJlKCIuL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMiLCAiZXNzX2xpc3RfcHJlZHNfd19uZXdfYWdlLlJEYXRhIikpDQoNCiMgU3RvcmUgdGhlIHJlc3VsdHMgaW4gYSBuZXcgZGF0YWZyYW1lDQplc3NfaW5kZXBfcHJlZHNfZGYgPC0gZGF0YS5mcmFtZShkZXBfdmFyID0gY2hhcmFjdGVyKCkpDQoNCiMgTG9vcCBvdmVyIHRoZSBsaXN0IG9mIG1vZGVscw0KZm9yIChpIGluIHNlcV9hbG9uZyhlc3NfbGlzdF9wcmVkcykpIHsNCg0KICAjIEV4dHJhY3QgdGhlIGRlcGVuZGVudCB2YXJpYWJsZSBzbyB0aGF0IHdlIGtub3cgZm9yIHdoaWNoIGRlcCB2YXIgdGhlIGVmZmVjdHMgYXJlDQogIGRlcF92YXIgPC0gYXMuY2hhcmFjdGVyKGVzc19saXN0X3ByZWRzW1tpXV0kbXUudGVybXNbWzJdXSkNCiAgDQogICAgIyBTdW1tYXJpemUgdGhlIG1vZGVsDQogIHN1bSA8LSBzdW1tYXJ5KGVzc19saXN0X3ByZWRzW1tpXV0pDQogIA0KICAjIEV4dHJhY3QgdGhlIGludGVyY2VwdCBhbmQgc3RhbmRhcmQgZGV2aWF0aW9uIGZvciBtdSBhbmQgc2lnbWENCiAgICBtdV90aW1lIDwtIHN1bSBbWzJdXQ0KICBtdV90aW1lX3NkIDwtIHN1bVtbMiwyXV0NCiAgbXVfYWdlX2VzdCA8LSBzdW1bWzNdXQ0KICBtdV9hZ2Vfc2QgPC0gc3VtW1szLDJdXQ0KDQogICAgIyBWYXJpYW5jZQ0KICBzaWdfdGltZSA8LSBzdW1bWzVdXQ0KICBzaWdfdGltZV9zZCA8LSBzdW1bWzUsMl1dDQogIHNpZ19hZ2VfZXN0IDwtIHN1bVtbNl1dDQogIHNpZ19hZ2Vfc2QgPC0gc3VtW1s2LDJdXQ0KDQogICMgUHV0IHRoZSByZXN1bHRzIA0KICBlc3NfaW5kZXBfcHJlZHNfZGYgPC0gcmJpbmQoZXNzX2luZGVwX3ByZWRzX2RmLCBkYXRhLmZyYW1lKGRlcF92YXIgPSBkZXBfdmFyLCBtdV90aW1lLCBtdV90aW1lX3NkLCBtdV9hZ2VfZXN0LCBtdV9hZ2Vfc2QsIHNpZ190aW1lLCBzaWdfdGltZV9zZCwgc2lnX2FnZV9lc3QsIHNpZ19hZ2Vfc2QpKQ0KfQ0KDQpzYXZlKGVzc19pbmRlcF9wcmVkc19kZiwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL2luZGVwX3Zhci9lc3NfaW5kZXBfdmFyX2RmX3dfbmV3X2FnZS5SRGF0YSIpDQoNCmBgYA0KDQojIyBFVlMgey19DQoNCmBgYHtyfQ0KIyBOb3cgdGhlIHNhbWUgZm9yIHRoZSBFVlMNCnJtKGxpc3Q9bHMoKSkNCmxvYWQoaGVyZSgiLi9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzIiwgImV2c19saXN0X3ByZWRzX3dfbmV3X2FnZS5SRGF0YSIpKQ0KDQojIFN0b3JlIHRoZSByZXN1bHRzIGluIGEgbmV3IGRhdGFmcmFtZQ0KZXZzX2luZGVwX3ByZWRzX2RmIDwtIGRhdGEuZnJhbWUoZGVwX3ZhciA9IGNoYXJhY3RlcigpKQ0KDQojIExvb3Agb3ZlciB0aGUgbGlzdCBvZiBtb2RlbHMNCmZvciAoaSBpbiBzZXFfYWxvbmcoZXZzX2xpc3RfcHJlZHMpKSB7DQoNCiAgIyBFeHRyYWN0IHRoZSBkZXBlbmRlbnQgdmFyaWFibGUgc28gdGhhdCB3ZSBrbm93IGZvciB3aGljaCBkZXAgdmFyIHRoZSBlZmZlY3RzIGFyZQ0KICBkZXBfdmFyIDwtIGFzLmNoYXJhY3RlcihldnNfbGlzdF9wcmVkc1tbaV1dJG11LnRlcm1zW1syXV0pDQogIA0KICAgICMgU3VtbWFyaXplIHRoZSBtb2RlbA0KICBzdW0gPC0gc3VtbWFyeShldnNfbGlzdF9wcmVkc1tbaV1dKQ0KICANCiAgIyBFeHRyYWN0IHRoZSBpbnRlcmNlcHQgYW5kIHN0YW5kYXJkIGRldmlhdGlvbiBmb3IgbXUgYW5kIHNpZ21hDQogICAgbXVfdGltZSA8LSBzdW0gW1syXV0NCiAgbXVfdGltZV9zZCA8LSBzdW1bWzIsMl1dDQogIG11X2FnZV9lc3QgPC0gc3VtW1szXV0NCiAgbXVfYWdlX3NkIDwtIHN1bVtbMywyXV0NCg0KICAgICMgVmFyaWFuY2UNCiAgc2lnX3RpbWUgPC0gc3VtW1s1XV0NCiAgc2lnX3RpbWVfc2QgPC0gc3VtW1s1LDJdXQ0KICBzaWdfYWdlX2VzdCA8LSBzdW1bWzZdXQ0KICBzaWdfYWdlX3NkIDwtIHN1bVtbNiwyXV0NCiAgDQogICMgUHV0IHRoZSByZXN1bHRzIA0KICBldnNfaW5kZXBfcHJlZHNfZGYgPC0gcmJpbmQoZXZzX2luZGVwX3ByZWRzX2RmLCBkYXRhLmZyYW1lKGRlcF92YXIgPSBkZXBfdmFyLCBtdV90aW1lLCBtdV90aW1lX3NkLCBtdV9hZ2VfZXN0LCBtdV9hZ2Vfc2QsIHNpZ190aW1lLCBzaWdfdGltZV9zZCwgc2lnX2FnZV9lc3QsIHNpZ19hZ2Vfc2QpKQ0KfQ0KDQpzYXZlKGV2c19pbmRlcF9wcmVkc19kZiwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL2luZGVwX3Zhci9ldnNfaW5kZXBfdmFyX2RmX3dfbmV3X2FnZS5SRGF0YSIpDQpgYGANCg0KDQpgYGB7cn0NCiMgTm93IGZvciBJJk8gcmVzZWFyY2gNCnJtKGxpc3Q9bHMoKSkNCmxvYWQoaGVyZSgiLi9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzIiwgImlvX2xpc3RfcHJlZHNfd19uZXdfYWdlLlJEYXRhIikpDQoNCiMgU3RvcmUgdGhlIHJlc3VsdHMgaW4gYSBuZXcgZGF0YWZyYW1lDQppb19pbmRlcF9wcmVkc19kZiA8LSBkYXRhLmZyYW1lKGRlcF92YXIgPSBjaGFyYWN0ZXIoKSkNCg0KIyBMb29wIG92ZXIgdGhlIGxpc3Qgb2YgbW9kZWxzDQpmb3IgKGkgaW4gc2VxX2Fsb25nKGlvX2xpc3RfcHJlZHMpKSB7DQoNCiAgIyBFeHRyYWN0IHRoZSBkZXBlbmRlbnQgdmFyaWFibGUgc28gdGhhdCB3ZSBrbm93IGZvciB3aGljaCBkZXAgdmFyIHRoZSBlZmZlY3RzIGFyZQ0KICBkZXBfdmFyIDwtIGFzLmNoYXJhY3Rlcihpb19saXN0X3ByZWRzW1tpXV0kbXUudGVybXNbWzJdXSkNCiAgDQogICAgIyBTdW1tYXJpemUgdGhlIG1vZGVsDQogIHN1bSA8LSBzdW1tYXJ5KGlvX2xpc3RfcHJlZHNbW2ldXSkNCiAgDQogICMgRXh0cmFjdCB0aGUgaW50ZXJjZXB0IGFuZCBzdGFuZGFyZCBkZXZpYXRpb24gZm9yIG11IGFuZCBzaWdtYQ0KICBtdV90aW1lIDwtIHN1bSBbWzJdXQ0KICBtdV90aW1lX3NkIDwtIHN1bVtbMiwyXV0NCiAgbXVfYWdlX2VzdCA8LSBzdW1bWzNdXQ0KICBtdV9hZ2Vfc2QgPC0gc3VtW1szLDJdXQ0KDQogICAgIyBWYXJpYW5jZQ0KICBzaWdfdGltZSA8LSBzdW1bWzVdXQ0KICBzaWdfdGltZV9zZCA8LSBzdW1bWzUsMl1dDQogIHNpZ19hZ2VfZXN0IDwtIHN1bVtbNl1dDQogIHNpZ19hZ2Vfc2QgPC0gc3VtW1s2LDJdXQ0KDQogIA0KICAjIFB1dCB0aGUgcmVzdWx0cyANCiAgaW9faW5kZXBfcHJlZHNfZGYgPC0gcmJpbmQoaW9faW5kZXBfcHJlZHNfZGYsIGRhdGEuZnJhbWUoZGVwX3ZhciA9IGRlcF92YXIsIG11X3RpbWUsIG11X3RpbWVfc2QsIG11X2FnZV9lc3QsIG11X2FnZV9zZCwgc2lnX3RpbWUsIHNpZ190aW1lX3NkLCBzaWdfYWdlX2VzdCwgc2lnX2FnZV9zZCkpDQp9DQoNCnNhdmUoaW9faW5kZXBfcHJlZHNfZGYsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9pbmRlcF92YXIvaW9faW5kZXBfdmFyX2RmX3dfbmV3X2FnZS5SRGF0YSIpDQpgYGANCg0KIyMgSVNTUCB7LX0NCg0KYGBge3J9DQojIE5vdyBmb3IgSVNTUCwgd2hpY2ggaGFzIHRvIGhhcHBlbiB0d2ljZSAoYmMgMiBzdWJzdHMgYmFzZWQgb24gZGVwZW5kZW50IHZhcnMpDQpybShsaXN0PWxzKCkpDQpsb2FkKGhlcmUoIi4vZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cyIsICJpc3NwX2xpc3RfcHJlZHNfd19uZXdfYWdlLlJEYXRhIikpDQoNCiMgU3RvcmUgdGhlIHJlc3VsdHMgaW4gYSBuZXcgZGF0YWZyYW1lDQppc3NwX2luZGVwX3ByZWRzX2RmIDwtIGRhdGEuZnJhbWUoZGVwX3ZhciA9IGNoYXJhY3RlcigpKQ0KDQojIExvb3Agb3ZlciB0aGUgbGlzdCBvZiBtb2RlbHMNCmZvciAoaSBpbiBzZXFfYWxvbmcoaXNzcF9saXN0X3ByZWRzKSkgew0KDQogICMgRXh0cmFjdCB0aGUgZGVwZW5kZW50IHZhcmlhYmxlIHNvIHRoYXQgd2Uga25vdyBmb3Igd2hpY2ggZGVwIHZhciB0aGUgZWZmZWN0cyBhcmUNCiAgZGVwX3ZhciA8LSBhcy5jaGFyYWN0ZXIoaXNzcF9saXN0X3ByZWRzW1tpXV0kbXUudGVybXNbWzJdXSkNCiAgDQogICAgIyBTdW1tYXJpemUgdGhlIG1vZGVsDQogIHN1bSA8LSBzdW1tYXJ5KGlzc3BfbGlzdF9wcmVkc1tbaV1dKQ0KICANCiAgIyBFeHRyYWN0IHRoZSBpbnRlcmNlcHQgYW5kIHN0YW5kYXJkIGRldmlhdGlzc3BuIGZvciBtdSBhbmQgc2lnbWENCiAgICBtdV90aW1lIDwtIHN1bSBbWzJdXQ0KICBtdV90aW1lX3NkIDwtIHN1bVtbMiwyXV0NCiAgbXVfYWdlX2VzdCA8LSBzdW1bWzNdXQ0KICBtdV9hZ2Vfc2QgPC0gc3VtW1szLDJdXQ0KDQogICAgIyBWYXJpYW5jZQ0KICBzaWdfdGltZSA8LSBzdW1bWzVdXQ0KICBzaWdfdGltZV9zZCA8LSBzdW1bWzUsMl1dDQogIHNpZ19hZ2VfZXN0IDwtIHN1bVtbNl1dDQogIHNpZ19hZ2Vfc2QgPC0gc3VtW1s2LDJdXQ0KICANCiAgIyBQdXQgdGhlIHJlc3VsdHMgDQogIGlzc3BfaW5kZXBfcHJlZHNfZGYgPC0gcmJpbmQoaXNzcF9pbmRlcF9wcmVkc19kZiwgZGF0YS5mcmFtZShkZXBfdmFyID0gZGVwX3ZhciwgbXVfdGltZSwgbXVfdGltZV9zZCwgbXVfYWdlX2VzdCwgbXVfYWdlX3NkLCBzaWdfdGltZSwgc2lnX3RpbWVfc2QsIHNpZ19hZ2VfZXN0LCBzaWdfYWdlX3NkKSkNCn0NCg0Kc2F2ZShpc3NwX2luZGVwX3ByZWRzX2RmLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvaW5kZXBfdmFyL2lzc3BfaW5kZXBfdmFyX2RmX3dfbmV3X2FnZS5SRGF0YSIpDQoNCiMgRm9yIHRoZSBvdGhlciBpbmRlcCB2YXJzIGFzIHdlbGwNCmxvYWQoaGVyZSgiLi9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzIiwgImlzc3BfbGlzdF9wcmVkc18yX3dhdmVzX3dfbmV3X2FnZS5SRGF0YSIpKQ0KDQojIFN0b3JlIHRoZSByZXN1bHRzIGluIGEgbmV3IGRhdGFmcmFtZQ0KaXNzcF8yX2luZGVwX3ByZWRzX2RmIDwtIGRhdGEuZnJhbWUoZGVwX3ZhciA9IGNoYXJhY3RlcigpKQ0KDQojIExvb3Agb3ZlciB0aGUgbGlzdCBvZiBtb2RlbHMNCmZvciAoaSBpbiBzZXFfYWxvbmcoaXNzcF9saXN0X3ByZWRzXzJfd2F2ZXMpKSB7DQoNCiAgIyBFeHRyYWN0IHRoZSBkZXBlbmRlbnQgdmFyaWFibGUgc28gdGhhdCB3ZSBrbm93IGZvciB3aGljaCBkZXAgdmFyIHRoZSBlZmZlY3RzIGFyZQ0KICBkZXBfdmFyIDwtIGFzLmNoYXJhY3Rlcihpc3NwX2xpc3RfcHJlZHNfMl93YXZlc1tbaV1dJG11LnRlcm1zW1syXV0pDQogIA0KICAgICMgU3VtbWFyaXplIHRoZSBtb2RlbA0KICBzdW0gPC0gc3VtbWFyeShpc3NwX2xpc3RfcHJlZHNfMl93YXZlc1tbaV1dKQ0KICANCiAgIyBFeHRyYWN0IHRoZSBpbnRlcmNlcHQgYW5kIHN0YW5kYXJkIGRldmlhdGlzc3BfMm4gZm9yIG11IGFuZCBzaWdtYQ0KICAgIG11X3RpbWUgPC0gc3VtIFtbMl1dDQogIG11X3RpbWVfc2QgPC0gc3VtW1syLDJdXQ0KICBtdV9hZ2VfZXN0IDwtIHN1bVtbM11dDQogIG11X2FnZV9zZCA8LSBzdW1bWzMsMl1dDQoNCiAgICAjIFZhcmlhbmNlDQogIHNpZ190aW1lIDwtIHN1bVtbNV1dDQogIHNpZ190aW1lX3NkIDwtIHN1bVtbNSwyXV0NCiAgc2lnX2FnZV9lc3QgPC0gc3VtW1s2XV0NCiAgc2lnX2FnZV9zZCA8LSBzdW1bWzYsMl1dDQoNCiAgDQogICMgUHV0IHRoZSByZXN1bHRzIA0KICBpc3NwXzJfaW5kZXBfcHJlZHNfZGYgPC0gcmJpbmQoaXNzcF8yX2luZGVwX3ByZWRzX2RmLCBkYXRhLmZyYW1lKGRlcF92YXIgPSBkZXBfdmFyLCBtdV90aW1lLCBtdV90aW1lX3NkLCBtdV9hZ2VfZXN0LCBtdV9hZ2Vfc2QsIHNpZ190aW1lLCBzaWdfdGltZV9zZCwgc2lnX2FnZV9lc3QsIHNpZ19hZ2Vfc2QpKQ0KfQ0KDQpzYXZlKGlzc3BfMl9pbmRlcF9wcmVkc19kZiwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL2luZGVwX3Zhci9pc3NwXzJfaW5kZXBfdmFyX2RmX3dfbmV3X2FnZS5SRGF0YSIpDQpgYGANCg0KIyMgRUIgey19DQpgYGB7cn0NCiMgRm9yIGFsbCB0aGUgZXVyb2Jhcm9tZXRlciB3YXZlcywgZXhhY3RseSB0aGUgc2FtZSBuZWVkcyB0byBiZSBkb25lIGVhY2ggdGltZS4gVGhlcmVmb3JlIEkgd2FudCB0byBsb29wIG92ZXIgdGhlc2Ugd2F2ZXMNCiMgRm9yIHNvbWUgcmVhc29uIHRoaXMgZGlkbid0IHdvcmsgYW55bW9yZSBsYXRlciBvbiwgc28gSSBydW4gdGhlbSBieSBvbmUgYnkgb25lIGluIHRoZSBjb2RlIGJlbG93DQpybShsaXN0PWxzKCkpDQpsb2FkKGhlcmUoIi4vZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cyIsICJlYl9saXN0X3ByZWRzXzE5ODZfd19uZXdfYWdlLlJEYXRhIikpDQpsb2FkKGhlcmUoIi4vZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cyIsICJlYl9saXN0X3ByZWRzXzIwMDdfd19uZXdfYWdlLlJEYXRhIikpDQpsb2FkKGhlcmUoIi4vZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cyIsICJlYl9saXN0X3ByZWRzXzIwMDhfd19uZXdfYWdlLlJEYXRhIikpDQpsb2FkKGhlcmUoIi4vZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cyIsICJlYl9saXN0X3ByZWRzXzIwMDlfd19uZXdfYWdlLlJEYXRhIikpDQpsb2FkKGhlcmUoIi4vZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cyIsICJlYl9saXN0X3ByZWRzXzIwMTFfd19uZXdfYWdlLlJEYXRhIikpDQpsb2FkKGhlcmUoIi4vZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cyIsICJlYl9saXN0X3ByZWRzX2J1eXByb2Rfd19uZXdfYWdlLlJEYXRhIikpDQpsb2FkKGhlcmUoIi4vZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cyIsICJlYl9saXN0X3ByZWRzX2NjaGFuZ2UyX3dfbmV3X2FnZS5SRGF0YSIpKQ0KbG9hZChoZXJlKCIuL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMiLCAiZWJfbGlzdF9wcmVkc19kb3Byb3Rfd19uZXdfYWdlLlJEYXRhIikpDQpsb2FkKGhlcmUoIi4vZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cyIsICJlYl9saXN0X3ByZWRzX2VmZl9kYWlseV93X25ld19hZ2UuUkRhdGEiKSkNCmxvYWQoaGVyZSgiLi9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzIiwgImViX2xpc3RfcHJlZHNfcGVyc19pbXBfd19uZXdfYWdlLlJEYXRhIikpDQpsb2FkKGhlcmUoIi4vZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cyIsICJlYl9saXN0X3ByZWRzX3Byc2FjdGlvbl93X25ld19hZ2UuUkRhdGEiKSkNCmxvYWQoaGVyZSgiLi9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzIiwgImViX2xpc3RfcHJlZHNfcXVhbGxpZmVfd19uZXdfYWdlLlJEYXRhIikpDQpsb2FkKGhlcmUoIi4vZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cyIsICJlYl9saXN0X3ByZWRzX2RvcHJvdF9jaXR5X3dfbmV3X2FnZS5SRGF0YSIpKQ0KYGBgDQoNCmBgYHtyfQ0KIyBFeHRyYWN0IHRoZSBpbmRlcCB2YXJzIGZyb20gdGhlIHJlZ3Jlc3Npb25zIEV1cm9iYXJvbWV0ZXIgb25lIGJ5IG9uZQ0KZWJfaW5kZXBfcHJlZHNfMTk4Nl9kZiA8LSBkYXRhLmZyYW1lKGRlcF92YXIgPSBjaGFyYWN0ZXIoKSkNCg0KIyBMb29wIG92ZXIgdGhlIGxpc3QgDQpmb3IgKGkgaW4gc2VxX2Fsb25nKGViX2xpc3RfcHJlZHNfMTk4NikpIHsNCg0KICAjIEV4dHJhY3QgdGhlIGRlcGVuZGVudCB2YXJpYWJsZSBzbyB0aGF0IHdlIGtub3cgZm9yIHdoaWNoIGRlcCB2YXIgdGhlIGVmZmVjdHMgYXJlDQogIGRlcF92YXIgPC0gYXMuY2hhcmFjdGVyKGViX2xpc3RfcHJlZHNfMTk4NltbaV1dJG11LnRlcm1zW1syXV0pDQogIA0KICAgICMgU3VtbWFyaXplIHRoZSBtb2RlbA0KICBzdW0gPC0gc3VtbWFyeShlYl9saXN0X3ByZWRzXzE5ODZbW2ldXSkNCiAgDQogICMgRXh0cmFjdCBpbmZvDQogICAgbXVfdGltZSA8LSBzdW0gW1syXV0NCiAgbXVfdGltZV9zZCA8LSBzdW1bWzIsMl1dDQogIG11X2FnZV9lc3QgPC0gc3VtW1szXV0NCiAgbXVfYWdlX3NkIDwtIHN1bVtbMywyXV0NCg0KICAgICMgVmFyaWFuY2UNCiAgc2lnX3RpbWUgPC0gc3VtW1s1XV0NCiAgc2lnX3RpbWVfc2QgPC0gc3VtW1s1LDJdXQ0KICBzaWdfYWdlX2VzdCA8LSBzdW1bWzZdXQ0KICBzaWdfYWdlX3NkIDwtIHN1bVtbNiwyXV0NCiAgDQogICMgUHV0IHRoZSByZXN1bHRzIGluIGEgZGF0YWZyYW1lDQogIGViX2luZGVwX3ByZWRzXzE5ODZfZGYgPC0gcmJpbmQoZWJfaW5kZXBfcHJlZHNfMTk4Nl9kZiwgZGF0YS5mcmFtZShkZXBfdmFyID0gZGVwX3ZhciwgbXVfdGltZSwgbXVfdGltZV9zZCwgbXVfYWdlX2VzdCwgbXVfYWdlX3NkLCBzaWdfdGltZSwgc2lnX3RpbWVfc2QsIHNpZ19hZ2VfZXN0LCBzaWdfYWdlX3NkKSkNCiAgICB9DQpgYGANCg0KDQpgYGB7cn0NCiMgU3RvcmUgdGhlIHJlc3VsdHMgaW4gYSBuZXcgZGF0YWZyYW1lDQplYl9pbmRlcF9wcmVkc18yMDA3X2RmIDwtIGRhdGEuZnJhbWUoZGVwX3ZhciA9IGNoYXJhY3RlcigpKQ0KDQojIExvb3Agb3ZlciB0aGUgbGlzdCANCmZvciAoaSBpbiBzZXFfYWxvbmcoZWJfbGlzdF9wcmVkc18yMDA3KSkgew0KDQogICMgRXh0cmFjdCB0aGUgZGVwZW5kZW50IHZhcmlhYmxlIHNvIHRoYXQgd2Uga25vdyBmb3Igd2hpY2ggZGVwIHZhciB0aGUgZWZmZWN0cyBhcmUNCiAgZGVwX3ZhciA8LSBhcy5jaGFyYWN0ZXIoZWJfbGlzdF9wcmVkc18yMDA3W1tpXV0kbXUudGVybXNbWzJdXSkNCiAgDQogICAgIyBTdW1tYXJpemUgdGhlIG1vZGVsDQogIHN1bSA8LSBzdW1tYXJ5KGViX2xpc3RfcHJlZHNfMjAwN1tbaV1dKQ0KICANCiAgIyBFeHRyYWN0IGluZm8NCiAgICBtdV90aW1lIDwtIHN1bSBbWzJdXQ0KICBtdV90aW1lX3NkIDwtIHN1bVtbMiwyXV0NCiAgbXVfYWdlX2VzdCA8LSBzdW1bWzNdXQ0KICBtdV9hZ2Vfc2QgPC0gc3VtW1szLDJdXQ0KDQogICAgIyBWYXJpYW5jZQ0KICBzaWdfdGltZSA8LSBzdW1bWzVdXQ0KICBzaWdfdGltZV9zZCA8LSBzdW1bWzUsMl1dDQogIHNpZ19hZ2VfZXN0IDwtIHN1bVtbNl1dDQogIHNpZ19hZ2Vfc2QgPC0gc3VtW1s2LDJdXQ0KDQogICMgUHV0IHRoZSByZXN1bHRzIGluIGEgZGF0YWZyYW1lDQogIGViX2luZGVwX3ByZWRzXzIwMDdfZGYgPC0gcmJpbmQoZWJfaW5kZXBfcHJlZHNfMjAwN19kZiwgZGF0YS5mcmFtZShkZXBfdmFyID0gZGVwX3ZhciwgbXVfdGltZSwgbXVfdGltZV9zZCwgbXVfYWdlX2VzdCwgbXVfYWdlX3NkLCBzaWdfdGltZSwgc2lnX3RpbWVfc2QsIHNpZ19hZ2VfZXN0LCBzaWdfYWdlX3NkKSkNCiAgICB9DQpgYGANCg0KDQpgYGB7cn0NCiMgMjAwOA0KDQogICMgU3RvcmUgdGhlIHJlc3VsdHMgaW4gYSBuZXcgZGF0YWZyYW1lDQplYl9pbmRlcF9wcmVkc18yMDA4X2RmIDwtIGRhdGEuZnJhbWUoZGVwX3ZhciA9IGNoYXJhY3RlcigpKQ0KDQojIExvb3Agb3ZlciB0aGUgbGlzdCANCmZvciAoaSBpbiBzZXFfYWxvbmcoZWJfbGlzdF9wcmVkc18yMDA4KSkgew0KDQogICMgRXh0cmFjdCB0aGUgZGVwZW5kZW50IHZhcmlhYmxlIHNvIHRoYXQgd2Uga25vdyBmb3Igd2hpY2ggZGVwIHZhciB0aGUgZWZmZWN0cyBhcmUNCiAgZGVwX3ZhciA8LSBhcy5jaGFyYWN0ZXIoZWJfbGlzdF9wcmVkc18yMDA4W1tpXV0kbXUudGVybXNbWzJdXSkNCiAgDQogICAgIyBTdW1tYXJpemUgdGhlIG1vZGVsDQogIHN1bSA8LSBzdW1tYXJ5KGViX2xpc3RfcHJlZHNfMjAwOFtbaV1dKQ0KICANCiAgIyBFeHRyYWN0IGluZm8NCiAgICBtdV90aW1lIDwtIHN1bSBbWzJdXQ0KICBtdV90aW1lX3NkIDwtIHN1bVtbMiwyXV0NCiAgbXVfYWdlX2VzdCA8LSBzdW1bWzNdXQ0KICBtdV9hZ2Vfc2QgPC0gc3VtW1szLDJdXQ0KDQogICAgIyBWYXJpYW5jZQ0KICBzaWdfdGltZSA8LSBzdW1bWzVdXQ0KICBzaWdfdGltZV9zZCA8LSBzdW1bWzUsMl1dDQogIHNpZ19hZ2VfZXN0IDwtIHN1bVtbNl1dDQogIHNpZ19hZ2Vfc2QgPC0gc3VtW1s2LDJdXQ0KDQogICMgUHV0IHRoZSByZXN1bHRzIGluIGEgZGF0YWZyYW1lDQogIGViX2luZGVwX3ByZWRzXzIwMDhfZGYgPC0gcmJpbmQoZWJfaW5kZXBfcHJlZHNfMjAwOF9kZiwgZGF0YS5mcmFtZShkZXBfdmFyID0gZGVwX3ZhciwgbXVfdGltZSwgbXVfdGltZV9zZCwgbXVfYWdlX2VzdCwgbXVfYWdlX3NkLCBzaWdfdGltZSwgc2lnX3RpbWVfc2QsIHNpZ19hZ2VfZXN0LCBzaWdfYWdlX3NkKSkNCiAgICB9DQpgYGANCg0KDQpgYGB7cn0NCiMgU3RvcmUgdGhlIHJlc3VsdHMgaW4gYSBuZXcgZGF0YWZyYW1lDQplYl9pbmRlcF9wcmVkc18yMDA5X2RmIDwtIGRhdGEuZnJhbWUoZGVwX3ZhciA9IGNoYXJhY3RlcigpKQ0KDQojIExvb3Agb3ZlciB0aGUgbGlzdCANCmZvciAoaSBpbiBzZXFfYWxvbmcoZWJfbGlzdF9wcmVkc18yMDA5KSkgew0KDQogICMgRXh0cmFjdCB0aGUgZGVwZW5kZW50IHZhcmlhYmxlIHNvIHRoYXQgd2Uga25vdyBmb3Igd2hpY2ggZGVwIHZhciB0aGUgZWZmZWN0cyBhcmUNCiAgZGVwX3ZhciA8LSBhcy5jaGFyYWN0ZXIoZWJfbGlzdF9wcmVkc18yMDA5W1tpXV0kbXUudGVybXNbWzJdXSkNCiAgDQogICAgIyBTdW1tYXJpemUgdGhlIG1vZGVsDQogIHN1bSA8LSBzdW1tYXJ5KGViX2xpc3RfcHJlZHNfMjAwOVtbaV1dKQ0KICANCiAgIyBFeHRyYWN0IGluZm8NCiAgICBtdV90aW1lIDwtIHN1bSBbWzJdXQ0KICBtdV90aW1lX3NkIDwtIHN1bVtbMiwyXV0NCiAgbXVfYWdlX2VzdCA8LSBzdW1bWzNdXQ0KICBtdV9hZ2Vfc2QgPC0gc3VtW1szLDJdXQ0KDQogICAgIyBWYXJpYW5jZQ0KICBzaWdfdGltZSA8LSBzdW1bWzVdXQ0KICBzaWdfdGltZV9zZCA8LSBzdW1bWzUsMl1dDQogIHNpZ19hZ2VfZXN0IDwtIHN1bVtbNl1dDQogIHNpZ19hZ2Vfc2QgPC0gc3VtW1s2LDJdXQ0KDQogICMgUHV0IHRoZSByZXN1bHRzIGluIGEgZGF0YWZyYW1lDQogIGViX2luZGVwX3ByZWRzXzIwMDlfZGYgPC0gcmJpbmQoZWJfaW5kZXBfcHJlZHNfMjAwOV9kZiwgZGF0YS5mcmFtZShkZXBfdmFyID0gZGVwX3ZhciwgbXVfdGltZSwgbXVfdGltZV9zZCwgbXVfYWdlX2VzdCwgbXVfYWdlX3NkLCBzaWdfdGltZSwgc2lnX3RpbWVfc2QsIHNpZ19hZ2VfZXN0LCBzaWdfYWdlX3NkKSkNCiAgICB9DQpgYGANCg0KDQpgYGB7cn0NCiMgU3RvcmUgdGhlIHJlc3VsdHMgaW4gYSBuZXcgZGF0YWZyYW1lDQplYl9pbmRlcF9wcmVkc18yMDExX2RmIDwtIGRhdGEuZnJhbWUoZGVwX3ZhciA9IGNoYXJhY3RlcigpKQ0KDQojIExvb3Agb3ZlciB0aGUgbGlzdCANCmZvciAoaSBpbiBzZXFfYWxvbmcoZWJfbGlzdF9wcmVkc18yMDExKSkgew0KDQogICMgRXh0cmFjdCB0aGUgZGVwZW5kZW50IHZhcmlhYmxlIHNvIHRoYXQgd2Uga25vdyBmb3Igd2hpY2ggZGVwIHZhciB0aGUgZWZmZWN0cyBhcmUNCiAgZGVwX3ZhciA8LSBhcy5jaGFyYWN0ZXIoZWJfbGlzdF9wcmVkc18yMDExW1tpXV0kbXUudGVybXNbWzJdXSkNCiAgDQogICAgIyBTdW1tYXJpemUgdGhlIG1vZGVsDQogIHN1bSA8LSBzdW1tYXJ5KGViX2xpc3RfcHJlZHNfMjAxMVtbaV1dKQ0KICANCiAgIyBFeHRyYWN0IGluZm8NCiAgICBtdV90aW1lIDwtIHN1bSBbWzJdXQ0KICBtdV90aW1lX3NkIDwtIHN1bVtbMiwyXV0NCiAgbXVfYWdlX2VzdCA8LSBzdW1bWzNdXQ0KICBtdV9hZ2Vfc2QgPC0gc3VtW1szLDJdXQ0KDQogICAgIyBWYXJpYW5jZQ0KICBzaWdfdGltZSA8LSBzdW1bWzVdXQ0KICBzaWdfdGltZV9zZCA8LSBzdW1bWzUsMl1dDQogIHNpZ19hZ2VfZXN0IDwtIHN1bVtbNl1dDQogIHNpZ19hZ2Vfc2QgPC0gc3VtW1s2LDJdXQ0KDQoNCiAgIyBQdXQgdGhlIHJlc3VsdHMgaW4gYSBkYXRhZnJhbWUNCiAgZWJfaW5kZXBfcHJlZHNfMjAxMV9kZiA8LSByYmluZChlYl9pbmRlcF9wcmVkc18yMDExX2RmLCBkYXRhLmZyYW1lKGRlcF92YXIgPSBkZXBfdmFyLCBtdV90aW1lLCBtdV90aW1lX3NkLCBtdV9hZ2VfZXN0LCBtdV9hZ2Vfc2QsIHNpZ190aW1lLCBzaWdfdGltZV9zZCwgc2lnX2FnZV9lc3QsIHNpZ19hZ2Vfc2QpKQ0KICAgIH0NCmBgYA0KDQoNCmBgYHtyfQ0KIyBTdG9yZSB0aGUgcmVzdWx0cyBpbiBhIG5ldyBkYXRhZnJhbWUNCmViX2luZGVwX3ByZWRzX2J1eXByb2RfZGYgPC0gZGF0YS5mcmFtZShkZXBfdmFyID0gY2hhcmFjdGVyKCkpDQoNCiMgTG9vcCBvdmVyIHRoZSBsaXN0IA0KZm9yIChpIGluIHNlcV9hbG9uZyhlYl9saXN0X3ByZWRzX2J1eXByb2QpKSB7DQoNCiAgIyBFeHRyYWN0IHRoZSBkZXBlbmRlbnQgdmFyaWFibGUgc28gdGhhdCB3ZSBrbm93IGZvciB3aGljaCBkZXAgdmFyIHRoZSBlZmZlY3RzIGFyZQ0KICBkZXBfdmFyIDwtIGFzLmNoYXJhY3RlcihlYl9saXN0X3ByZWRzX2J1eXByb2RbW2ldXSRtdS50ZXJtc1tbMl1dKQ0KICANCiAgICAjIFN1bW1hcml6ZSB0aGUgbW9kZWwNCiAgc3VtIDwtIHN1bW1hcnkoZWJfbGlzdF9wcmVkc19idXlwcm9kW1tpXV0pDQogIA0KICAjIEV4dHJhY3QgaW5mbw0KICAgIG11X3RpbWUgPC0gc3VtIFtbMl1dDQogIG11X3RpbWVfc2QgPC0gc3VtW1syLDJdXQ0KICBtdV9hZ2VfZXN0IDwtIHN1bVtbM11dDQogIG11X2FnZV9zZCA8LSBzdW1bWzMsMl1dDQoNCiAgICAjIFZhcmlhbmNlDQogIHNpZ190aW1lIDwtIHN1bVtbNV1dDQogIHNpZ190aW1lX3NkIDwtIHN1bVtbNSwyXV0NCiAgc2lnX2FnZV9lc3QgPC0gc3VtW1s2XV0NCiAgc2lnX2FnZV9zZCA8LSBzdW1bWzYsMl1dDQoNCg0KICAjIFB1dCB0aGUgcmVzdWx0cyBpbiBhIGRhdGFmcmFtZQ0KICBlYl9pbmRlcF9wcmVkc19idXlwcm9kX2RmIDwtIHJiaW5kKGViX2luZGVwX3ByZWRzX2J1eXByb2RfZGYsIGRhdGEuZnJhbWUoZGVwX3ZhciA9IGRlcF92YXIsIG11X3RpbWUsIG11X3RpbWVfc2QsIG11X2FnZV9lc3QsIG11X2FnZV9zZCwgc2lnX3RpbWUsIHNpZ190aW1lX3NkLCBzaWdfYWdlX2VzdCwgc2lnX2FnZV9zZCkpDQogICAgfQ0KYGBgDQoNCg0KYGBge3J9DQojIFN0b3JlIHRoZSByZXN1bHRzIGluIGEgbmV3IGRhdGFmcmFtZQ0KZWJfaW5kZXBfcHJlZHNfY2NoYW5nZTJfZGYgPC0gZGF0YS5mcmFtZShkZXBfdmFyID0gY2hhcmFjdGVyKCkpDQoNCiMgTG9vcCBvdmVyIHRoZSBsaXN0IA0KZm9yIChpIGluIHNlcV9hbG9uZyhlYl9saXN0X3ByZWRzX2NjaGFuZ2UyKSkgew0KDQogICMgRXh0cmFjdCB0aGUgZGVwZW5kZW50IHZhcmlhYmxlIHNvIHRoYXQgd2Uga25vdyBmb3Igd2hpY2ggZGVwIHZhciB0aGUgZWZmZWN0cyBhcmUNCiAgZGVwX3ZhciA8LSBhcy5jaGFyYWN0ZXIoZWJfbGlzdF9wcmVkc19jY2hhbmdlMltbaV1dJG11LnRlcm1zW1syXV0pDQogIA0KICAgICMgU3VtbWFyaXplIHRoZSBtb2RlbA0KICBzdW0gPC0gc3VtbWFyeShlYl9saXN0X3ByZWRzX2NjaGFuZ2UyW1tpXV0pDQogIA0KICAjIEV4dHJhY3QgaW5mbw0KICAgIG11X3RpbWUgPC0gc3VtIFtbMl1dDQogIG11X3RpbWVfc2QgPC0gc3VtW1syLDJdXQ0KICBtdV9hZ2VfZXN0IDwtIHN1bVtbM11dDQogIG11X2FnZV9zZCA8LSBzdW1bWzMsMl1dDQoNCiAgICAjIFZhcmlhbmNlDQogIHNpZ190aW1lIDwtIHN1bVtbNV1dDQogIHNpZ190aW1lX3NkIDwtIHN1bVtbNSwyXV0NCiAgc2lnX2FnZV9lc3QgPC0gc3VtW1s2XV0NCiAgc2lnX2FnZV9zZCA8LSBzdW1bWzYsMl1dDQoNCg0KICAjIFB1dCB0aGUgcmVzdWx0cyBpbiBhIGRhdGFmcmFtZQ0KICBlYl9pbmRlcF9wcmVkc19jY2hhbmdlMl9kZiA8LSByYmluZChlYl9pbmRlcF9wcmVkc19jY2hhbmdlMl9kZiwgZGF0YS5mcmFtZShkZXBfdmFyID0gZGVwX3ZhciwgbXVfdGltZSwgbXVfdGltZV9zZCwgbXVfYWdlX2VzdCwgbXVfYWdlX3NkLCBzaWdfdGltZSwgc2lnX3RpbWVfc2QsIHNpZ19hZ2VfZXN0LCBzaWdfYWdlX3NkKSkNCiAgICB9DQpgYGANCg0KDQpgYGB7cn0NCiMgU3RvcmUgdGhlIHJlc3VsdHMgaW4gYSBuZXcgZGF0YWZyYW1lDQplYl9pbmRlcF9wcmVkc19kb3Byb3RfZGYgPC0gZGF0YS5mcmFtZShkZXBfdmFyID0gY2hhcmFjdGVyKCkpDQoNCiMgTG9vcCBvdmVyIHRoZSBsaXN0IA0KZm9yIChpIGluIHNlcV9hbG9uZyhlYl9saXN0X3ByZWRzX2RvcHJvdCkpIHsNCg0KICAjIEV4dHJhY3QgdGhlIGRlcGVuZGVudCB2YXJpYWJsZSBzbyB0aGF0IHdlIGtub3cgZm9yIHdoaWNoIGRlcCB2YXIgdGhlIGVmZmVjdHMgYXJlDQogIGRlcF92YXIgPC0gYXMuY2hhcmFjdGVyKGViX2xpc3RfcHJlZHNfZG9wcm90W1tpXV0kbXUudGVybXNbWzJdXSkNCiAgDQogICAgIyBTdW1tYXJpemUgdGhlIG1vZGVsDQogIHN1bSA8LSBzdW1tYXJ5KGViX2xpc3RfcHJlZHNfZG9wcm90W1tpXV0pDQogIA0KICAjIEV4dHJhY3QgaW5mbw0KICAgIG11X3RpbWUgPC0gc3VtIFtbMl1dDQogIG11X3RpbWVfc2QgPC0gc3VtW1syLDJdXQ0KICBtdV9hZ2VfZXN0IDwtIHN1bVtbM11dDQogIG11X2FnZV9zZCA8LSBzdW1bWzMsMl1dDQoNCiAgICAjIFZhcmlhbmNlDQogIHNpZ190aW1lIDwtIHN1bVtbNV1dDQogIHNpZ190aW1lX3NkIDwtIHN1bVtbNSwyXV0NCiAgc2lnX2FnZV9lc3QgPC0gc3VtW1s2XV0NCiAgc2lnX2FnZV9zZCA8LSBzdW1bWzYsMl1dDQoNCg0KICAjIFB1dCB0aGUgcmVzdWx0cyBpbiBhIGRhdGFmcmFtZQ0KICBlYl9pbmRlcF9wcmVkc19kb3Byb3RfZGYgPC0gcmJpbmQoZWJfaW5kZXBfcHJlZHNfZG9wcm90X2RmLCBkYXRhLmZyYW1lKGRlcF92YXIgPSBkZXBfdmFyLCBtdV90aW1lLCBtdV90aW1lX3NkLCBtdV9hZ2VfZXN0LCBtdV9hZ2Vfc2QsIHNpZ190aW1lLCBzaWdfdGltZV9zZCwgc2lnX2FnZV9lc3QsIHNpZ19hZ2Vfc2QpKQ0KICAgIH0NCmBgYA0KDQoNCmBgYHtyfQ0KIyBTdG9yZSB0aGUgcmVzdWx0cyBpbiBhIG5ldyBkYXRhZnJhbWUNCmViX2luZGVwX3ByZWRzX2RvcHJvdF9jaXR5X2RmIDwtIGRhdGEuZnJhbWUoZGVwX3ZhciA9IGNoYXJhY3RlcigpKQ0KDQojIExvb3Agb3ZlciB0aGUgbGlzdCANCmZvciAoaSBpbiBzZXFfYWxvbmcoZWJfbGlzdF9wcmVkc19kb3Byb3RfY2l0eSkpIHsNCg0KICAjIEV4dHJhY3QgdGhlIGRlcGVuZGVudCB2YXJpYWJsZSBzbyB0aGF0IHdlIGtub3cgZm9yIHdoaWNoIGRlcCB2YXIgdGhlIGVmZmVjdHMgYXJlDQogIGRlcF92YXIgPC0gYXMuY2hhcmFjdGVyKGViX2xpc3RfcHJlZHNfZG9wcm90X2NpdHlbW2ldXSRtdS50ZXJtc1tbMl1dKQ0KICANCiAgICAjIFN1bW1hcml6ZSB0aGUgbW9kZWwNCiAgc3VtIDwtIHN1bW1hcnkoZWJfbGlzdF9wcmVkc19kb3Byb3RfY2l0eVtbaV1dKQ0KICANCiAgIyBFeHRyYWN0IGluZm8NCiAgICBtdV90aW1lIDwtIHN1bSBbWzJdXQ0KICBtdV90aW1lX3NkIDwtIHN1bVtbMiwyXV0NCiAgbXVfYWdlX2VzdCA8LSBzdW1bWzNdXQ0KICBtdV9hZ2Vfc2QgPC0gc3VtW1szLDJdXQ0KDQogICAgIyBWYXJpYW5jZQ0KICBzaWdfdGltZSA8LSBzdW1bWzVdXQ0KICBzaWdfdGltZV9zZCA8LSBzdW1bWzUsMl1dDQogIHNpZ19hZ2VfZXN0IDwtIHN1bVtbNl1dDQogIHNpZ19hZ2Vfc2QgPC0gc3VtW1s2LDJdXQ0KDQoNCiAgIyBQdXQgdGhlIHJlc3VsdHMgaW4gYSBkYXRhZnJhbWUNCiAgZWJfaW5kZXBfcHJlZHNfZG9wcm90X2NpdHlfZGYgPC0gcmJpbmQoZWJfaW5kZXBfcHJlZHNfZG9wcm90X2NpdHlfZGYsIGRhdGEuZnJhbWUoZGVwX3ZhciA9IGRlcF92YXIsIG11X3RpbWUsIG11X3RpbWVfc2QsIG11X2FnZV9lc3QsIG11X2FnZV9zZCwgc2lnX3RpbWUsIHNpZ190aW1lX3NkLCBzaWdfYWdlX2VzdCwgc2lnX2FnZV9zZCkpDQogICAgfQ0KYGBgDQoNCg0KYGBge3J9DQojIFN0b3JlIHRoZSByZXN1bHRzIGluIGEgbmV3IGRhdGFmcmFtZQ0KZWJfaW5kZXBfcHJlZHNfZWZmX2RhaWx5X2RmIDwtIGRhdGEuZnJhbWUoZGVwX3ZhciA9IGNoYXJhY3RlcigpKQ0KDQojIExvb3Agb3ZlciB0aGUgbGlzdCANCmZvciAoaSBpbiBzZXFfYWxvbmcoZWJfbGlzdF9wcmVkc19lZmZfZGFpbHkpKSB7DQoNCiAgIyBFeHRyYWN0IHRoZSBkZXBlbmRlbnQgdmFyaWFibGUgc28gdGhhdCB3ZSBrbm93IGZvciB3aGljaCBkZXAgdmFyIHRoZSBlZmZlY3RzIGFyZQ0KICBkZXBfdmFyIDwtIGFzLmNoYXJhY3RlcihlYl9saXN0X3ByZWRzX2VmZl9kYWlseVtbaV1dJG11LnRlcm1zW1syXV0pDQogIA0KICAgICMgU3VtbWFyaXplIHRoZSBtb2RlbA0KICBzdW0gPC0gc3VtbWFyeShlYl9saXN0X3ByZWRzX2VmZl9kYWlseVtbaV1dKQ0KICANCiAgIyBFeHRyYWN0IGluZm8NCiAgICBtdV90aW1lIDwtIHN1bSBbWzJdXQ0KICBtdV90aW1lX3NkIDwtIHN1bVtbMiwyXV0NCiAgbXVfYWdlX2VzdCA8LSBzdW1bWzNdXQ0KICBtdV9hZ2Vfc2QgPC0gc3VtW1szLDJdXQ0KDQogICAgIyBWYXJpYW5jZQ0KICBzaWdfdGltZSA8LSBzdW1bWzVdXQ0KICBzaWdfdGltZV9zZCA8LSBzdW1bWzUsMl1dDQogIHNpZ19hZ2VfZXN0IDwtIHN1bVtbNl1dDQogIHNpZ19hZ2Vfc2QgPC0gc3VtW1s2LDJdXQ0KDQoNCiAgIyBQdXQgdGhlIHJlc3VsdHMgaW4gYSBkYXRhZnJhbWUNCiAgZWJfaW5kZXBfcHJlZHNfZWZmX2RhaWx5X2RmIDwtIHJiaW5kKGViX2luZGVwX3ByZWRzX2VmZl9kYWlseV9kZiwgZGF0YS5mcmFtZShkZXBfdmFyID0gZGVwX3ZhciwgbXVfdGltZSwgbXVfdGltZV9zZCwgbXVfYWdlX2VzdCwgbXVfYWdlX3NkLCBzaWdfdGltZSwgc2lnX3RpbWVfc2QsIHNpZ19hZ2VfZXN0LCBzaWdfYWdlX3NkKSkNCn0NCmBgYA0KDQoNCmBgYHtyfQ0KIyBTdG9yZSB0aGUgcmVzdWx0cyBpbiBhIG5ldyBkYXRhZnJhbWUNCmViX2luZGVwX3ByZWRzX3BlcnNfaW1wX2RmIDwtIGRhdGEuZnJhbWUoZGVwX3ZhciA9IGNoYXJhY3RlcigpKQ0KDQojIExvb3Agb3ZlciB0aGUgbGlzdCANCmZvciAoaSBpbiBzZXFfYWxvbmcoZWJfbGlzdF9wcmVkc19wZXJzX2ltcCkpIHsNCg0KICAjIEV4dHJhY3QgdGhlIGRlcGVuZGVudCB2YXJpYWJsZSBzbyB0aGF0IHdlIGtub3cgZm9yIHdoaWNoIGRlcCB2YXIgdGhlIGVmZmVjdHMgYXJlDQogIGRlcF92YXIgPC0gYXMuY2hhcmFjdGVyKGViX2xpc3RfcHJlZHNfcGVyc19pbXBbW2ldXSRtdS50ZXJtc1tbMl1dKQ0KICANCiAgICAjIFN1bW1hcml6ZSB0aGUgbW9kZWwNCiAgc3VtIDwtIHN1bW1hcnkoZWJfbGlzdF9wcmVkc19wZXJzX2ltcFtbaV1dKQ0KICANCiAgIyBFeHRyYWN0IGluZm8NCiAgICBtdV90aW1lIDwtIHN1bSBbWzJdXQ0KICBtdV90aW1lX3NkIDwtIHN1bVtbMiwyXV0NCiAgbXVfYWdlX2VzdCA8LSBzdW1bWzNdXQ0KICBtdV9hZ2Vfc2QgPC0gc3VtW1szLDJdXQ0KDQogICAgIyBWYXJpYW5jZQ0KICBzaWdfdGltZSA8LSBzdW1bWzVdXQ0KICBzaWdfdGltZV9zZCA8LSBzdW1bWzUsMl1dDQogIHNpZ19hZ2VfZXN0IDwtIHN1bVtbNl1dDQogIHNpZ19hZ2Vfc2QgPC0gc3VtW1s2LDJdXQ0KDQoNCiAgIyBQdXQgdGhlIHJlc3VsdHMgaW4gYSBkYXRhZnJhbWUNCiAgZWJfaW5kZXBfcHJlZHNfcGVyc19pbXBfZGYgPC0gcmJpbmQoZWJfaW5kZXBfcHJlZHNfcGVyc19pbXBfZGYsIGRhdGEuZnJhbWUoZGVwX3ZhciA9IGRlcF92YXIsIG11X3RpbWUsIG11X3RpbWVfc2QsIG11X2FnZV9lc3QsIG11X2FnZV9zZCwgc2lnX3RpbWUsIHNpZ190aW1lX3NkLCBzaWdfYWdlX2VzdCwgc2lnX2FnZV9zZCkpDQogICAgfQ0KDQogICMgU3RvcmUgdGhlIHJlc3VsdHMgaW4gYSBuZXcgZGF0YWZyYW1lDQplYl9pbmRlcF9wcmVkc19wcnNhY3Rpb25fZGYgPC0gZGF0YS5mcmFtZShkZXBfdmFyID0gY2hhcmFjdGVyKCkpDQoNCiMgTG9vcCBvdmVyIHRoZSBsaXN0IA0KZm9yIChpIGluIHNlcV9hbG9uZyhlYl9saXN0X3ByZWRzX3Byc2FjdGlvbikpIHsNCg0KICAjIEV4dHJhY3QgdGhlIGRlcGVuZGVudCB2YXJpYWJsZSBzbyB0aGF0IHdlIGtub3cgZm9yIHdoaWNoIGRlcCB2YXIgdGhlIGVmZmVjdHMgYXJlDQogIGRlcF92YXIgPC0gYXMuY2hhcmFjdGVyKGViX2xpc3RfcHJlZHNfcHJzYWN0aW9uW1tpXV0kbXUudGVybXNbWzJdXSkNCiAgDQogICAgIyBTdW1tYXJpemUgdGhlIG1vZGVsDQogIHN1bSA8LSBzdW1tYXJ5KGViX2xpc3RfcHJlZHNfcHJzYWN0aW9uW1tpXV0pDQogIA0KICAjIEV4dHJhY3QgaW5mbw0KICAgIG11X3RpbWUgPC0gc3VtIFtbMl1dDQogIG11X3RpbWVfc2QgPC0gc3VtW1syLDJdXQ0KICBtdV9hZ2VfZXN0IDwtIHN1bVtbM11dDQogIG11X2FnZV9zZCA8LSBzdW1bWzMsMl1dDQoNCiAgICAjIFZhcmlhbmNlDQogIHNpZ190aW1lIDwtIHN1bVtbNV1dDQogIHNpZ190aW1lX3NkIDwtIHN1bVtbNSwyXV0NCiAgc2lnX2FnZV9lc3QgPC0gc3VtW1s2XV0NCiAgc2lnX2FnZV9zZCA8LSBzdW1bWzYsMl1dDQoNCg0KICAjIFB1dCB0aGUgcmVzdWx0cyBpbiBhIGRhdGFmcmFtZQ0KICBlYl9pbmRlcF9wcmVkc19wcnNhY3Rpb25fZGYgPC0gcmJpbmQoZWJfaW5kZXBfcHJlZHNfcHJzYWN0aW9uX2RmLCBkYXRhLmZyYW1lKGRlcF92YXIgPSBkZXBfdmFyLCBtdV90aW1lLCBtdV90aW1lX3NkLCBtdV9hZ2VfZXN0LCBtdV9hZ2Vfc2QsIHNpZ190aW1lLCBzaWdfdGltZV9zZCwgc2lnX2FnZV9lc3QsIHNpZ19hZ2Vfc2QpKQ0KfQ0KYGBgDQoNCg0KYGBge3J9DQojIFN0b3JlIHRoZSByZXN1bHRzIGluIGEgbmV3IGRhdGFmcmFtZQ0KZWJfaW5kZXBfcHJlZHNfcXVhbGxpZmVfZGYgPC0gZGF0YS5mcmFtZShkZXBfdmFyID0gY2hhcmFjdGVyKCkpDQoNCiMgTG9vcCBvdmVyIHRoZSBsaXN0IA0KZm9yIChpIGluIHNlcV9hbG9uZyhlYl9saXN0X3ByZWRzX3F1YWxsaWZlKSkgew0KDQogICMgRXh0cmFjdCB0aGUgZGVwZW5kZW50IHZhcmlhYmxlIHNvIHRoYXQgd2Uga25vdyBmb3Igd2hpY2ggZGVwIHZhciB0aGUgZWZmZWN0cyBhcmUNCiAgZGVwX3ZhciA8LSBhcy5jaGFyYWN0ZXIoZWJfbGlzdF9wcmVkc19xdWFsbGlmZVtbaV1dJG11LnRlcm1zW1syXV0pDQogIA0KICAgICMgU3VtbWFyaXplIHRoZSBtb2RlbA0KICBzdW0gPC0gc3VtbWFyeShlYl9saXN0X3ByZWRzX3F1YWxsaWZlW1tpXV0pDQogIA0KICAjIEV4dHJhY3QgaW5mbw0KICBtdV90aW1lIDwtIHN1bSBbWzJdXQ0KICBtdV90aW1lX3NkIDwtIHN1bVtbMiwyXV0NCiAgbXVfYWdlX2VzdCA8LSBzdW1bWzNdXQ0KICBtdV9hZ2Vfc2QgPC0gc3VtW1szLDJdXQ0KDQogICAgIyBWYXJpYW5jZQ0KICBzaWdfdGltZSA8LSBzdW1bWzVdXQ0KICBzaWdfdGltZV9zZCA8LSBzdW1bWzUsMl1dDQogIHNpZ19hZ2VfZXN0IDwtIHN1bVtbNl1dDQogIHNpZ19hZ2Vfc2QgPC0gc3VtW1s2LDJdXQ0KDQogICMgUHV0IHRoZSByZXN1bHRzIGluIGEgZGF0YWZyYW1lDQogIGViX2luZGVwX3ByZWRzX3F1YWxsaWZlX2RmIDwtIHJiaW5kKGViX2luZGVwX3ByZWRzX3F1YWxsaWZlX2RmLCBkYXRhLmZyYW1lKGRlcF92YXIgPSBkZXBfdmFyLCBtdV90aW1lLCBtdV90aW1lX3NkLCBtdV9hZ2VfZXN0LCBtdV9hZ2Vfc2QsIHNpZ190aW1lLCBzaWdfdGltZV9zZCwgc2lnX2FnZV9lc3QsIHNpZ19hZ2Vfc2QpKQ0KICAgIH0NCg0KZWJfaW5kZXBfcHJlZHNfZGYgPC0gcmJpbmQoZWJfaW5kZXBfcHJlZHNfMTk4Nl9kZiwgZWJfaW5kZXBfcHJlZHNfMjAwN19kZiwgZWJfaW5kZXBfcHJlZHNfMjAwOF9kZiwgZWJfaW5kZXBfcHJlZHNfMjAwOV9kZiwgZWJfaW5kZXBfcHJlZHNfMjAxMV9kZiwgZWJfaW5kZXBfcHJlZHNfYnV5cHJvZF9kZiwgZWJfaW5kZXBfcHJlZHNfY2NoYW5nZTJfZGYsIGViX2luZGVwX3ByZWRzX2RvcHJvdF9jaXR5X2RmLCBlYl9pbmRlcF9wcmVkc19kb3Byb3RfZGYsIGViX2luZGVwX3ByZWRzX2VmZl9kYWlseV9kZiwgZWJfaW5kZXBfcHJlZHNfcGVyc19pbXBfZGYsIGViX2luZGVwX3ByZWRzX3Byc2FjdGlvbl9kZiwgZWJfaW5kZXBfcHJlZHNfcXVhbGxpZmVfZGYpDQoNCnNhdmUoZWJfaW5kZXBfcHJlZHNfZGYsIGZpbGU9ICIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvaW5kZXBfdmFyL2ViX2luZGVwX3Zhcl9kZl93X25ld19hZ2UuUkRhdGEiICkNCmBgYA0KDQoNCg0KYGBge3J9DQojIFRoZSBmaW5hbCBzdGVwIGlzIHRvIG1lcmdlIGFsbCByZXN1bHRzIGludG8gb25lIGRhdGFmcmFtZQ0Kcm0obGlzdD1scygpKQ0KbG9hZChoZXJlKCIuL2RhdGEvZmluYWxfZGF0YS9pbmRlcF92YXIiLCAiZWJfaW5kZXBfdmFyX2RmX3dfbmV3X2FnZS5SRGF0YSIpKQ0KbG9hZChoZXJlKCIuL2RhdGEvZmluYWxfZGF0YS9pbmRlcF92YXIiLCAiZXNzX2luZGVwX3Zhcl9kZl93X25ld19hZ2UuUkRhdGEiKSkNCmxvYWQoaGVyZSgiLi9kYXRhL2ZpbmFsX2RhdGEvaW5kZXBfdmFyIiwgImV2c19pbmRlcF92YXJfZGZfd19uZXdfYWdlLlJEYXRhIikpDQpsb2FkKGhlcmUoIi4vZGF0YS9maW5hbF9kYXRhL2luZGVwX3ZhciIsICJpb19pbmRlcF92YXJfZGZfd19uZXdfYWdlLlJEYXRhIikpDQpsb2FkKGhlcmUoIi4vZGF0YS9maW5hbF9kYXRhL2luZGVwX3ZhciIsICJpc3NwXzJfaW5kZXBfdmFyX2RmX3dfbmV3X2FnZS5SRGF0YSIpKQ0KbG9hZChoZXJlKCIuL2RhdGEvZmluYWxfZGF0YS9pbmRlcF92YXIiLCAiaXNzcF9pbmRlcF92YXJfZGZfd19uZXdfYWdlLlJEYXRhIikpDQoNCmxpYnJhcnkocGx5cikgIyBJIGxvYWQgdGhlIHBhY2thZ2VzIGhlcmUgc28gdGhhdCB0aGV5IGRvbid0IGNvbmZsaWN0IHdpdGggdGhlIGhlcmUoKSBwYWNrYWdlDQpsaWJyYXJ5KGRwbHlyKQ0KdG90YWxfaW5kZXBfdmFyX3Jlc3VsdHMgPC0gcmJpbmQuZmlsbChlYl9pbmRlcF9wcmVkc19kZiwgZXNzX2luZGVwX3ByZWRzX2RmLCBldnNfaW5kZXBfcHJlZHNfZGYsIGlvX2luZGVwX3ByZWRzX2RmLCBpc3NwX2luZGVwX3ByZWRzX2RmLCBpc3NwXzJfaW5kZXBfcHJlZHNfZGYpIA0KDQpzYXZlKHRvdGFsX2luZGVwX3Zhcl9yZXN1bHRzLCBmaWxlPSAiL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9tZXRhX2FuYWx5c2lzL3RvdGFsX2luZGVwX3Zhcl9yZXN1bHRzX25ld19hZ2UuUkRhdGEiICkNCmBgYA0KDQo=</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("regression_to_indep_var_analysis_weight_gamlss_new_age.Rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

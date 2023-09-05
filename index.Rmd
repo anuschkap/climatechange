@@ -7,9 +7,10 @@ output: rmarkdown::html_document
 ---
 
 ```{r, install remotely, globalsettings, echo=FALSE, warning=FALSE, results='hide', eval=FALSE}
-install.packages("remotes")
-remotes::install_github("rlesur/klippy")
-install.packages("servr")
+#install.packages("remotes")
+#remotes::install_github("rlesur/klippy")
+
+#install.packages("servr")
 library(servr)
 servr::httw()
 ```

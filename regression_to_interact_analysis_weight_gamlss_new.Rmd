@@ -1,0 +1,1129 @@
+---
+title: "Extract coefficients of interaction models"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(number_sections = FALSE)
+options(width = 100)
+colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
+```
+
+In this script I extract the coefficients for gender, age and education and their interaction variables and put them in a dataset together, to use them as input for the meta-regression.
+
+```{r}
+rm(list=ls())
+library(tidyverse)
+library(dplyr)
+library(gamlss)
+```
+
+# ESS {-}
+
+```{r}
+load(here("./data/final_data/regression_outputs", "ess_list_interactions_w_new.RData"))
+
+# Store the results in a new dataframe
+ess_inter_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(ess_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(ess_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(ess_list_interactions[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+   mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+  # Put the results 
+  ess_inter_preds_df <- rbind(ess_inter_preds_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+}
+
+save(ess_inter_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/ess_inter_var_new.RData")
+
+```
+
+## EVS {-}
+
+```{r}
+# Now the same for the EVS
+rm(list=ls())
+load(here("./data/final_data/regression_outputs", "evs_list_interactions_w_new.RData"))
+
+# Store the results in a new dataframe
+evs_indep_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(evs_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(evs_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(evs_list_interactions[[i]])
+  
+  # Extract the interaction effects for sex, education and age
+   mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+  # Put the results 
+  evs_indep_interactions_df <- rbind(evs_indep_interactions_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+}
+
+save(evs_indep_interactions_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/evs_inter_var_new.RData")
+```
+
+## I&O Research {-}
+
+```{r}
+# Now for I&O research
+rm(list=ls())
+load(here("./data/final_data/regression_outputs", "io_list_interactions_w_new.RData"))
+
+# Store the results in a new dataframe
+io_indep_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(io_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(io_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(io_list_interactions[[i]])
+  
+   mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+  
+  # Put the results 
+  io_indep_interactions_df <- rbind(io_indep_interactions_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+}
+
+save(io_indep_interactions_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/io_inter_var_new.RData")
+
+```
+
+## ISSP {-}
+
+```{r}
+# Now for ISSP, which has to happen twice (bc 2 subsets based on dependent vars)
+rm(list=ls())
+load(here("./data/final_data/regression_outputs", "issp_list_interactions_w_new.RData"))
+
+# Store the results in a new dataframe
+issp_indep_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(issp_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(issp_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(issp_list_interactions[[i]])
+  
+  # Extract the intercept and standard deviatisspn for mu and sigma
+     mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+  
+  # Put the results 
+  issp_indep_interactions_df <- rbind(issp_indep_interactions_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+}
+
+save(issp_indep_interactions_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/issp_inter_var_new.RData")
+
+# For the other indep vars as well
+rm(list=ls())
+load(here("./data/final_data/regression_outputs", "issp_list_interactions_2_waves_w_new.RData"))
+
+# Store the results in a new dataframe
+issp_2_indep_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(issp_list_interactions_2_waves)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(issp_list_interactions_2_waves[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(issp_list_interactions_2_waves[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+     mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+  
+  # Put the results 
+  issp_2_indep_interactions_df <- rbind(issp_2_indep_interactions_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+}
+
+save(issp_2_indep_interactions_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/issp_2_inter_var_new.RData")
+```
+
+## EB {-}
+
+```{r}
+# Unfortunately, the loop I used in the other scripts does not seem to work for the interaction effects, so I need to do them one by one
+rm(list=ls())
+load(here("./data/final_data/regression_outputs", "eb_list_interactions_1986_w_new.RData"))
+
+# Store the results in a new dataframe
+eb_interactions_1986_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_interactions_1986)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_interactions_1986[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_interactions_1986[[i]])
+  
+  # Extract info
+     mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+
+  # Put the results in a dataframe
+  eb_interactions_1986_df <- rbind(eb_interactions_1986_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+}
+
+save(eb_interactions_1986_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/eb_1986_inter_var_new.RData")
+
+```
+
+```{r}
+# Extract the indep vars from the regressions Eurobarometer one by one
+load(here("./data/final_data/regression_outputs", "eb_list_interactions_2007_w_new.RData"))
+load(here("./data/final_data/regression_outputs", "eb_list_interactions_2008_w_new.RData"))
+load(here("./data/final_data/regression_outputs", "eb_list_interactions_2009_w_new.RData"))
+load(here("./data/final_data/regression_outputs", "eb_list_interactions_2011_w_new.RData"))
+load(here("./data/final_data/regression_outputs", "eb_list_interactions_buyprod_w_new.RData"))
+load(here("./data/final_data/regression_outputs", "eb_list_interactions_cchange2_w_new.RData"))
+load(here("./data/final_data/regression_outputs", "eb_list_interactions_doprot_w_new.RData"))
+load(here("./data/final_data/regression_outputs", "eb_list_interactions_eff_daily_w_new.RData"))
+load(here("./data/final_data/regression_outputs", "eb_list_interactions_pers_imp_w_new.RData"))
+load(here("./data/final_data/regression_outputs", "eb_list_interactions_prsaction_w_new.RData"))
+load(here("./data/final_data/regression_outputs", "eb_list_interactions_quallife_w_new.RData"))
+load(here("./data/final_data/regression_outputs", "eb_list_interactions_doprot_city_w_new.RData"))
+
+  # Store the results in a new dataframe
+eb_indep_interactions_2007_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_interactions_2007)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_interactions_2007[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_interactions_2007[[i]])
+  
+     mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_interactions_2007_df <- rbind(eb_indep_interactions_2007_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+    }
+```
+
+
+```{r}
+# 2008
+
+  # Store the results in a new dataframe
+eb_indep_interactions_2008_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_interactions_2008)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_interactions_2008[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_interactions_2008[[i]])
+  
+     mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_interactions_2008_df <- rbind(eb_indep_interactions_2008_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+    }
+```
+
+
+```{r}
+# Store the results in a new dataframe
+eb_indep_interactions_2009_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_interactions_2009)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_interactions_2009[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_interactions_2009[[i]])
+  
+     mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_interactions_2009_df <- rbind(eb_indep_interactions_2009_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+    }
+```
+
+
+```{r}
+# Store the results in a new dataframe
+eb_indep_interactions_2011_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_interactions_2011)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_interactions_2011[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_interactions_2011[[i]])
+  
+     mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_interactions_2011_df <- rbind(eb_indep_interactions_2011_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+    }
+```
+
+
+```{r}
+# Store the results in a new dataframe
+eb_indep_interactions_buyprod_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_interactions_buyprod)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_interactions_buyprod[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_interactions_buyprod[[i]])
+  
+     mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_interactions_buyprod_df <- rbind(eb_indep_interactions_buyprod_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+    }
+```
+
+
+```{r}
+# Store the results in a new dataframe
+eb_indep_interactions_cchange2_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_interactions_cchange2)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_interactions_cchange2[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_interactions_cchange2[[i]])
+  
+     mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_interactions_cchange2_df <- rbind(eb_indep_interactions_cchange2_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+    }
+```
+
+
+```{r}
+# Store the results in a new dataframe
+eb_indep_interactions_doprot_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_interactions_doprot)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_interactions_doprot[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_interactions_doprot[[i]])
+  
+     mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_interactions_doprot_df <- rbind(eb_indep_interactions_doprot_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+    }
+```
+
+
+```{r}
+# Store the results in a new dataframe
+eb_indep_interactions_doprot_city_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_interactions_doprot_city)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_interactions_doprot_city[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_interactions_doprot_city[[i]])
+  
+     mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_interactions_doprot_city_df <- rbind(eb_indep_interactions_doprot_city_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+    }
+```
+
+
+```{r}
+# Store the results in a new dataframe
+eb_indep_interactions_eff_daily_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_interactions_eff_daily)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_interactions_eff_daily[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_interactions_eff_daily[[i]])
+  
+     mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_interactions_eff_daily_df <- rbind(eb_indep_interactions_eff_daily_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+}
+```
+
+
+```{r}
+# Store the results in a new dataframe
+eb_indep_interactions_pers_imp_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_interactions_pers_imp)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_interactions_pers_imp[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_interactions_pers_imp[[i]])
+  
+     mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_interactions_pers_imp_df <- rbind(eb_indep_interactions_pers_imp_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+    }
+```
+
+
+```{r}
+# Store the results in a new dataframe
+eb_indep_interactions_prsaction_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_interactions_prsaction)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_interactions_prsaction[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_interactions_prsaction[[i]])
+  
+     mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_interactions_prsaction_df <- rbind(eb_indep_interactions_prsaction_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+}
+```
+
+
+```{r}
+# Store the results in a new dataframe
+eb_indep_interactions_quallife_df <- data.frame(dep_var = character())
+
+# Loop over the list 
+for (i in seq_along(eb_list_interactions_quallife)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_interactions_quallife[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(eb_list_interactions_quallife[[i]])
+  
+     mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+   mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+
+  # Variance
+  sig_sex_est <- sum[[9]]
+  sig_sex_sd <- sum[[9,2]]
+  sig_isced_med_est <- sum[[10]]
+  sig_isced_med_sd <- sum[[10,2]]
+  sig_isced_high_est <- sum[[11]]
+  sig_isced_high_sd <- sum[[11,2]]
+  sig_age_est <- sum[[12]]
+  sig_age_sd <- sum[[12,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+
+  # Put the results in a dataframe
+  eb_indep_interactions_quallife_df <- rbind(eb_indep_interactions_quallife_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+} 
+
+load(here("./data/final_data/indep_var", "eb_1986_inter_var_new.RData"))
+eb_indep_interactions_df <- rbind(eb_interactions_1986_df, eb_indep_interactions_2007_df, eb_indep_interactions_2008_df, eb_indep_interactions_2009_df, eb_indep_interactions_2011_df, eb_indep_interactions_buyprod_df, eb_indep_interactions_cchange2_df, eb_indep_interactions_doprot_city_df, eb_indep_interactions_doprot_df, eb_indep_interactions_eff_daily_df, eb_indep_interactions_pers_imp_df, eb_indep_interactions_prsaction_df, eb_indep_interactions_quallife_df)
+
+save(eb_indep_interactions_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/eb_inter_var_new.RData" )
+```
+
+## Merge everything into one dataset 
+
+```{r}
+# The final step is to merge all results into one dataframe
+rm(list=ls())
+load(here("./data/final_data/indep_var", "eb_inter_var_new.RData"))
+load(here("./data/final_data/indep_var", "ess_inter_var_new.RData"))
+load(here("./data/final_data/indep_var", "evs_inter_var_new.RData"))
+load(here("./data/final_data/indep_var", "io_inter_var_new.RData"))
+load(here("./data/final_data/indep_var", "issp_2_inter_var_new.RData"))
+load(here("./data/final_data/indep_var", "issp_inter_var_new.RData"))
+
+
+total_inter_results <- rbind(eb_indep_interactions_df, ess_inter_preds_df, evs_indep_interactions_df, io_indep_interactions_df, issp_indep_interactions_df, issp_2_indep_interactions_df) 
+
+save(total_inter_results, file= "/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_inter_results_new.RData" )
+```
+

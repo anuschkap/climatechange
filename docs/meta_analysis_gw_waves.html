@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Anuschka Peelen" />
+
+<meta name="date" content="2023-09-05" />
+
+<title>Appendix. Meta-regressions for gamlss with short time spans</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="tweaks.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="blog.html">Blog</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Scripts datapreparation
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="dataprep_EB.html">Data preparation Eurobarometer</a>
+    </li>
+    <li>
+      <a href="dataprep_EVS_ESS_ISSP.html">Data preparation EVS, ESS, ISSP</a>
+    </li>
+    <li>
+      <a href="dataprep_I-O.html">Data preparation I&amp;O Research</a>
+    </li>
+    <li>
+      <a href="weights.html">Weighing data</a>
+    </li>
+    <li>
+      <a href="dataprep_polcat.html">Left right placement</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Scripts descriptives and analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="descriptives.html">Descriptives</a>
+    </li>
+    <li>
+      <a href="single_regression_gamlss_weigh_new.html">Gamlss regressions weighted</a>
+    </li>
+    <li>
+      <a href="single_regression_gw_py_new.html">Gamlss regression shorter time spans</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_weight_gamlss_new.html">Extract coefficients gamlss regressions</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_wg_waves_new.html">Extract coefficients shorter time spans</a>
+    </li>
+    <li>
+      <a href="regression_to_indep_var_analysis_weight_gamlss_new.html">Extract coefficients independent var model</a>
+    </li>
+    <li>
+      <a href="regression_to_interact_analysis_weight_gamlss_new.html">Extract coefficients interaction model</a>
+    </li>
+    <li>
+      <a href="meta_analysis_gamlss_weigh.html">Meta-analysis weighted gamlss</a>
+    </li>
+    <li>
+      <a href="meta_analysis_indep_var.html">Meta-analysis independent variables</a>
+    </li>
+    <li>
+      <a href="meta_analysis_gw_waves.html">Meta-analysis shorter time spans</a>
+    </li>
+    <li>
+      <a></a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/apeelen/climatechange">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Appendix. Meta-regressions for gamlss with
+short time spans</h1>
+<h4 class="author">Anuschka Peelen</h4>
+<h4 class="date">2023-09-05</h4>
+
+</div>
+
+
+<p>In this script, I perform meta-analyses for the models with smaller
+time-spans, to put in the Appendix</p>
+<pre class="r"><code>rm(list=ls())
+library(meta)
+library(metafor)
+library(dplyr)
+library(here)
+library(kableExtra)
+set.seed(1)
+here()
+here::i_am(&quot;scripts/analysis/meta_analysis_gw_waves.Rmd&quot;)</code></pre>
+<pre class="r"><code># With the final data
+load(here(&quot;./data/meta_analysis&quot;, &quot;total_results_waves_new.RData&quot;))
+
+# Start with step 2 here, as I don&#39;t make forest plots for these models
+#Step 2. Empty model with meta-level indicators
+model_step_2_att &lt;- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_results_waves,
+              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              method = &quot;REML&quot;,
+              test = &quot;knha&quot;)
+
+model_step_2_att</code></pre>
+<pre class="r"><code># Step 2 variance
+#Step 2. Empty model with meta-level indicators
+model_step_2_var &lt;- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_results_waves,
+              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              method = &quot;REML&quot;,
+              test = &quot;knha&quot;)
+
+model_step_2_var</code></pre>
+<pre class="r"><code># Step 3. Model with independent variables
+model_step_3_att &lt;- rma(yi = mu_time_pred,
+              sei = mu_time_sd_pred,
+              data = total_results_waves,
+              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              method = &quot;REML&quot;,
+              test = &quot;knha&quot;)
+
+model_step_3_att</code></pre>
+<pre class="r"><code># Step 3. Variance
+model_step_3_var &lt;- rma(yi = sig_time_pred,
+              sei = sig_time_sd_pred,
+              data = total_results_waves,
+              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              method = &quot;REML&quot;,
+              test = &quot;knha&quot;)
+
+model_step_3_var</code></pre>
+<pre class="r"><code># Step 4. Model with interactions
+model_step_4_att &lt;- rma(yi = mu_time_int,
+              sei = mu_time_sd_int,
+              data = total_results_waves,
+              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              method = &quot;REML&quot;,
+              test = &quot;knha&quot;)
+
+model_step_4_att</code></pre>
+<pre class="r"><code># Step 4. Variance
+model_step_4_var &lt;- rma(yi = sig_time_int,
+              sei = sig_time_sd_int,
+              data = total_results_waves,
+              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              method = &quot;REML&quot;,
+              test = &quot;knha&quot;)
+
+model_step_4_var</code></pre>
+<pre class="r"><code>options(knitr.kable.NA = &#39;&#39;)</code></pre>
+<pre class="r"><code># Make a kable table of all the models 
+# First the mean attitudes, that i want in the table next to each other
+# Time effect only model
+model_1_mean_df &lt;- data.frame(matrix(ncol = 5, nrow = 7))
+colnames(model_1_mean_df) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;)
+model_1_mean_df$Variable &lt;- c(&quot;Intercept&quot;, &quot;Mean year&quot;, &quot;Attitude behavioral (ref = aff)&quot;, &quot;Attitude cognitive&quot;, &quot;Ambigious (ref = no)&quot;, &quot;Financial crisis&quot;, &quot;Covid-19&quot;)
+model_1_mean_df$`Mu/Sigma` &lt;- c(&quot;Mean attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+
+model_1_mean_df$Estimate &lt;- as.numeric(model_step_2_att$beta) #estimate
+model_1_mean_df$SE &lt;- model_step_2_att$se #se indeed but as a row
+model_1_mean_df$p &lt;- model_step_2_att$pval # same as for SE
+
+
+model_1_mean_df$p_text &lt;- case_when(
+model_1_mean_df$p &gt;= 0.05 ~ &quot;&quot;,
+model_1_mean_df$p &lt; 0.001 ~ &quot;***&quot;,
+model_1_mean_df$p &lt; 0.01 ~ &quot;**&quot;,
+model_1_mean_df$p &lt; 0.05 ~ &quot;*&quot;
+)
+
+# I also want the R2, I2 and QE in the table
+model_1_fit  &lt;- data.frame(matrix(ncol = 6, nrow = 3))
+colnames(model_1_fit) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;, &quot;p_text&quot;)
+model_1_fit$Variable &lt;- c(&quot;R2&quot;, &quot;I2&quot;, &quot;QE&quot;)
+model_1_fit$Estimate &lt;- c(model_step_2_att$R2, model_step_2_att$I2, model_step_2_att$QE)
+
+model_1_mean_df &lt;- rbind(model_1_mean_df, model_1_fit)
+
+
+# Independent variable model 
+model_2_mean_df &lt;- data.frame(matrix(ncol = 5, nrow = 7))
+colnames(model_2_mean_df) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;)
+model_2_mean_df$Variable &lt;- c(&quot;Intercept&quot;, &quot;Mean year&quot;, &quot;Attitude behavioral (ref = aff)&quot;, &quot;Attitude cognitive&quot;, &quot;Ambigious (ref = no)&quot;, &quot;Financial crisis&quot;, &quot;Covid-19&quot;)
+model_2_mean_df$`Mu/Sigma` &lt;- c(&quot;Mean attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+
+model_2_mean_df$Estimate &lt;- as.numeric(model_step_3_att$beta) #estimate
+model_2_mean_df$SE &lt;- model_step_3_att$se #se indeed but as a row
+model_2_mean_df$p &lt;- model_step_3_att$pval # same as for SE
+
+
+model_2_mean_df$p_text &lt;- case_when(
+model_2_mean_df$p &gt;= 0.05 ~ &quot;&quot;,
+model_2_mean_df$p &lt; 0.001 ~ &quot;***&quot;,
+model_2_mean_df$p &lt; 0.01 ~ &quot;**&quot;,
+model_2_mean_df$p &lt; 0.05 ~ &quot;*&quot;
+)
+
+# I also want the R2, I2 and QE in the table
+model_2_fit  &lt;- data.frame(matrix(ncol = 6, nrow = 3))
+colnames(model_2_fit) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;, &quot;p_text&quot;)
+model_2_fit$Variable &lt;- c(&quot;R2&quot;, &quot;I2&quot;, &quot;QE&quot;)
+model_2_fit$Estimate &lt;- c(model_step_3_att$R2, model_step_3_att$I2, model_step_3_att$QE)
+
+model_2_mean_df &lt;- rbind(model_2_mean_df, model_2_fit)
+
+
+#And the interaction model
+model_3_mean_df &lt;- data.frame(matrix(ncol = 5, nrow = 7))
+colnames(model_3_mean_df) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;)
+model_3_mean_df$Variable &lt;- c(&quot;Intercept&quot;, &quot;Mean year&quot;, &quot;Attitude behavioral (ref = aff)&quot;, &quot;Attitude cognitive&quot;, &quot;Ambigious (ref = no)&quot;, &quot;Financial crisis&quot;, &quot;Covid-19&quot;)
+model_3_mean_df$`Mu/Sigma` &lt;- c(&quot;Mean attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+
+model_3_mean_df$Estimate &lt;- as.numeric(model_step_4_att$beta) #estimate
+model_3_mean_df$SE &lt;- model_step_4_att$se #se indeed but as a row
+model_3_mean_df$p &lt;- model_step_4_att$pval # same as for SE
+
+
+model_3_mean_df$p_text &lt;- case_when(
+model_3_mean_df$p &gt;= 0.05 ~ &quot;&quot;,
+model_3_mean_df$p &lt; 0.001 ~ &quot;***&quot;,
+model_3_mean_df$p &lt; 0.01 ~ &quot;**&quot;,
+model_3_mean_df$p &lt; 0.05 ~ &quot;*&quot;
+)
+
+# I also want the R2, I2 and QE in the table
+model_3_fit  &lt;- data.frame(matrix(ncol = 6, nrow = 3))
+colnames(model_3_fit) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;, &quot;p_text&quot;)
+model_3_fit$Variable &lt;- c(&quot;R2&quot;, &quot;I2&quot;, &quot;QE&quot;)
+model_3_fit$Estimate &lt;- c(model_step_4_att$R2, model_step_4_att$I2, model_step_4_att$QE)
+
+model_3_mean_df &lt;- rbind(model_3_mean_df, model_3_fit)
+
+total_mean &lt;- cbind(model_1_mean_df, model_2_mean_df, model_3_mean_df)
+
+# Now for the sigma
+model_1_var_df &lt;- data.frame(matrix(ncol = 5, nrow = 7))
+colnames(model_1_var_df) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;)
+model_1_var_df$Variable &lt;- c(&quot;Intercept&quot;, &quot;Mean year&quot;, &quot;Attitude behavioral (ref = aff)&quot;, &quot;Attitude cognitive&quot;, &quot;Ambigious (ref = no)&quot;, &quot;Financial crisis&quot;, &quot;Covid-19&quot;)
+model_1_var_df$`Mu/Sigma` &lt;- c(&quot;Polarization in attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+
+model_1_var_df$Estimate &lt;- as.numeric(model_step_2_var$beta) #estimate
+model_1_var_df$SE &lt;- model_step_2_var$se #se indeed but as a row
+model_1_var_df$p &lt;- model_step_2_var$pval # same as for SE
+
+
+model_1_var_df$p_text &lt;- case_when(
+model_1_var_df$p &gt;= 0.05 ~ &quot;&quot;,
+model_1_var_df$p &lt; 0.001 ~ &quot;***&quot;,
+model_1_var_df$p &lt; 0.01 ~ &quot;**&quot;,
+model_1_var_df$p &lt; 0.05 ~ &quot;*&quot;
+)
+
+# I also want the R2, I2 and QE in the table
+model_1_fit  &lt;- data.frame(matrix(ncol = 6, nrow = 3))
+colnames(model_1_fit) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;, &quot;p_text&quot;)
+model_1_fit$Variable &lt;- c(&quot;R2&quot;, &quot;I2&quot;, &quot;QE&quot;)
+model_1_fit$Estimate &lt;- c(model_step_2_var$R2, model_step_2_var$I2, model_step_2_var$QE)
+
+model_1_var_df &lt;- rbind(model_1_var_df, model_1_fit)
+
+
+# Independent variable model 
+model_2_var_df &lt;- data.frame(matrix(ncol = 5, nrow = 7))
+colnames(model_2_var_df) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;)
+model_2_var_df$Variable &lt;- c(&quot;Intercept&quot;, &quot;Mean year&quot;, &quot;Attitude behavioral (ref = aff)&quot;, &quot;Attitude cognitive&quot;, &quot;Ambigious (ref = no)&quot;, &quot;Financial crisis&quot;, &quot;Covid-19&quot;)
+model_2_var_df$`Mu/Sigma` &lt;- c(&quot;Polarization in attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+
+model_2_var_df$Estimate &lt;- as.numeric(model_step_3_var$beta) #estimate
+model_2_var_df$SE &lt;- model_step_3_var$se #se indeed but as a row
+model_2_var_df$p &lt;- model_step_3_var$pval # same as for SE
+
+
+model_2_var_df$p_text &lt;- case_when(
+model_2_var_df$p &gt;= 0.05 ~ &quot;&quot;,
+model_2_var_df$p &lt; 0.001 ~ &quot;***&quot;,
+model_2_var_df$p &lt; 0.01 ~ &quot;**&quot;,
+model_2_var_df$p &lt; 0.05 ~ &quot;*&quot;
+)
+
+# I also want the R2, I2 and QE in the table
+model_2_fit  &lt;- data.frame(matrix(ncol = 6, nrow = 3))
+colnames(model_2_fit) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;, &quot;p_text&quot;)
+model_2_fit$Variable &lt;- c(&quot;R2&quot;, &quot;I2&quot;, &quot;QE&quot;)
+model_2_fit$Estimate &lt;- c(model_step_3_var$R2, model_step_3_var$I2, model_step_3_var$QE)
+
+model_2_var_df &lt;- rbind(model_2_var_df, model_2_fit)
+
+
+#And the interaction model
+model_3_var_df &lt;- data.frame(matrix(ncol = 5, nrow = 7))
+colnames(model_3_var_df) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;)
+model_3_var_df$Variable &lt;- c(&quot;Intercept&quot;, &quot;Mean year&quot;, &quot;Attitude behavioral (ref = aff)&quot;, &quot;Attitude cognitive&quot;, &quot;Ambigious (ref = no)&quot;, &quot;Financial crisis&quot;, &quot;Covid-19&quot;)
+model_3_var_df$`Mu/Sigma` &lt;- c(&quot;Polarization in attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+
+model_3_var_df$Estimate &lt;- as.numeric(model_step_4_var$beta) #estimate
+model_3_var_df$SE &lt;- model_step_4_var$se #se indeed but as a row
+model_3_var_df$p &lt;- model_step_4_var$pval # same as for SE
+
+model_3_var_df$p_text &lt;- case_when(
+model_3_var_df$p &gt;= 0.05 ~ &quot;&quot;,
+model_3_var_df$p &lt; 0.001 ~ &quot;***&quot;,
+model_3_var_df$p &lt; 0.01 ~ &quot;**&quot;,
+model_3_var_df$p &lt; 0.05 ~ &quot;*&quot;
+)
+
+# I also want the R2, I2 and QE in the table
+model_3_fit  &lt;- data.frame(matrix(ncol = 6, nrow = 3))
+colnames(model_3_fit) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;, &quot;p_text&quot;)
+model_3_fit$Variable &lt;- c(&quot;R2&quot;, &quot;I2&quot;, &quot;QE&quot;)
+model_3_fit$Estimate &lt;- c(model_step_4_var$R2, model_step_4_var$I2, model_step_4_var$QE)
+
+model_3_var_df &lt;- rbind(model_3_var_df, model_3_fit)
+
+total_var &lt;- cbind(model_1_var_df, model_2_var_df, model_3_var_df)
+
+#Now a total dataframe with both models together, and then make some changes before making the table
+total_meta &lt;- rbind(total_mean, total_var)
+colnames(total_meta) &lt;- c(&quot;mu_sigma&quot;, &quot;variable_empty&quot;, &quot;est_empty&quot;, &quot;se_empty&quot;, &quot;p_empty&quot;, &quot;p_text_empty&quot;, &quot;mu_sigma_indep&quot;, &quot;variable_indep&quot;, &quot;est_indep&quot;, &quot;se_indep&quot;, &quot;p_indep&quot;, &quot;p_text_indep&quot;, &quot;mu_sigma_inter&quot;, &quot;variable_inter&quot;, &quot;est_inter&quot;, &quot;se_inter&quot;, &quot;p_inter&quot;, &quot;p_text_inter&quot; )
+rownames(total_meta) &lt;- NULL
+total_meta &lt;- dplyr::select(total_meta, mu_sigma, variable_empty, est_empty, se_empty, p_text_empty, est_indep, se_indep, p_text_indep, est_inter, se_inter, p_text_inter)
+
+total_meta &lt;- dplyr::mutate(total_meta, across(.cols=c(est_empty, se_empty, est_indep, se_indep, est_inter, se_inter), .fns= as.numeric))
+numeric_cols &lt;- sapply(total_meta, is.numeric)
+total_meta[, numeric_cols] &lt;- round(total_meta[, numeric_cols], digits = 3)
+
+kable(total_meta, digits = 3, caption = &quot;Appendix X. Meta-regression on climate change attitudes and polarization per wave&quot;,
+      col.names = c( &quot;&quot;, &quot;Variables&quot;, &quot;Estimate&quot;, &quot;Std. Error&quot;, &quot;&quot;, &quot;Estimate&quot;, &quot;Std. Error&quot;, &quot;&quot;, &quot;Estimate&quot;, &quot;Std. Error&quot;, &quot;&quot;)) %&gt;%
+  kable_classic_2(html_font = &quot;Times&quot;, fixed_thead = T, full_width = F) %&gt;%
+  add_header_above(c(&quot; &quot; = 2, &quot;Time-only model&quot; = 3, &quot;Indepent var model&quot; = 3, &quot;Interaction model&quot; = 3)) %&gt;%
+   footnote(
+    general_title = &quot;Note.&quot;,
+    general = &quot;*** = p &lt; 0.001, ** = p &lt; 0.01, * = p &lt; 0.05&quot;,
+    threeparttable = TRUE,
+    footnote_as_chunk = TRUE
+    )</code></pre>
+<table class=" lightable-classic-2" style="font-family: Times; width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;">
+<caption>
+Appendix X. Meta-regression on climate change attitudes and polarization
+per wave
+</caption>
+<thead>
+<tr>
+<th style="empty-cells: hide;" colspan="2">
+</th>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">
+Time-only model
+</div>
+</th>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">
+Indepent var model
+</div>
+</th>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">
+Interaction model
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Variables
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Estimate
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Std. Error
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Estimate
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Std. Error
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Estimate
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Std. Error
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Mean attitudes
+</td>
+<td style="text-align:left;">
+Intercept
+</td>
+<td style="text-align:right;">
+7.366
+</td>
+<td style="text-align:right;">
+9.416
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+4.211
+</td>
+<td style="text-align:right;">
+10.083
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+8.078
+</td>
+<td style="text-align:right;">
+10.035
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Mean year
+</td>
+<td style="text-align:right;">
+-0.004
+</td>
+<td style="text-align:right;">
+0.005
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.002
+</td>
+<td style="text-align:right;">
+0.005
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.004
+</td>
+<td style="text-align:right;">
+0.005
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Attitude behavioral (ref = aff)
+</td>
+<td style="text-align:right;">
+-0.094
+</td>
+<td style="text-align:right;">
+0.113
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.058
+</td>
+<td style="text-align:right;">
+0.120
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.130
+</td>
+<td style="text-align:right;">
+0.134
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Attitude cognitive
+</td>
+<td style="text-align:right;">
+-0.034
+</td>
+<td style="text-align:right;">
+0.091
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.033
+</td>
+<td style="text-align:right;">
+0.097
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.002
+</td>
+<td style="text-align:right;">
+0.112
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Ambigious (ref = no)
+</td>
+<td style="text-align:right;">
+-0.004
+</td>
+<td style="text-align:right;">
+0.052
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.054
+</td>
+<td style="text-align:right;">
+0.055
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.047
+</td>
+<td style="text-align:right;">
+0.057
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Financial crisis
+</td>
+<td style="text-align:right;">
+-0.012
+</td>
+<td style="text-align:right;">
+0.056
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.035
+</td>
+<td style="text-align:right;">
+0.060
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.058
+</td>
+<td style="text-align:right;">
+0.058
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Covid-19
+</td>
+<td style="text-align:right;">
+0.010
+</td>
+<td style="text-align:right;">
+0.080
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.007
+</td>
+<td style="text-align:right;">
+0.085
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.036
+</td>
+<td style="text-align:right;">
+0.094
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+R2
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+I2
+</td>
+<td style="text-align:right;">
+99.819
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+99.843
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+90.625
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+QE
+</td>
+<td style="text-align:right;">
+7727.912
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+6892.289
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+341.895
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Polarization in attitudes
+</td>
+<td style="text-align:left;">
+Intercept
+</td>
+<td style="text-align:right;">
+1.159
+</td>
+<td style="text-align:right;">
+3.248
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+1.487
+</td>
+<td style="text-align:right;">
+3.019
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+4.115
+</td>
+<td style="text-align:right;">
+3.697
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Mean year
+</td>
+<td style="text-align:right;">
+-0.001
+</td>
+<td style="text-align:right;">
+0.002
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.001
+</td>
+<td style="text-align:right;">
+0.002
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.002
+</td>
+<td style="text-align:right;">
+0.002
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Attitude behavioral (ref = aff)
+</td>
+<td style="text-align:right;">
+-0.017
+</td>
+<td style="text-align:right;">
+0.039
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.017
+</td>
+<td style="text-align:right;">
+0.037
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.027
+</td>
+<td style="text-align:right;">
+0.054
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Attitude cognitive
+</td>
+<td style="text-align:right;">
+-0.038
+</td>
+<td style="text-align:right;">
+0.032
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.033
+</td>
+<td style="text-align:right;">
+0.030
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.020
+</td>
+<td style="text-align:right;">
+0.048
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Ambigious (ref = no)
+</td>
+<td style="text-align:right;">
+0.020
+</td>
+<td style="text-align:right;">
+0.018
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.017
+</td>
+<td style="text-align:right;">
+0.017
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.017
+</td>
+<td style="text-align:right;">
+0.022
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Financial crisis
+</td>
+<td style="text-align:right;">
+0.013
+</td>
+<td style="text-align:right;">
+0.019
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.010
+</td>
+<td style="text-align:right;">
+0.018
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.003
+</td>
+<td style="text-align:right;">
+0.021
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Covid-19
+</td>
+<td style="text-align:right;">
+-0.013
+</td>
+<td style="text-align:right;">
+0.028
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.013
+</td>
+<td style="text-align:right;">
+0.026
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.069
+</td>
+<td style="text-align:right;">
+0.040
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+R2
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.284
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+I2
+</td>
+<td style="text-align:right;">
+99.157
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+99.008
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+80.286
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+QE
+</td>
+<td style="text-align:right;">
+1262.460
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+952.840
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+241.261
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="padding: 0; " colspan="100%">
+<span style="font-style: italic;">Note.</span> <sup></sup> *** = p &lt;
+0.001, ** = p &lt; 0.01, * = p &lt; 0.05
+</td>
+</tr>
+</tfoot>
+</table>
+<pre class="r"><code>#%&gt;%
+ #   save_kable(&quot;/Users/anuschka/Documents/climatechange/climatechange/output/appendix/meta_regression_table_per_wave.html&quot;)</code></pre>
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkFwcGVuZGl4LiBNZXRhLXJlZ3Jlc3Npb25zIGZvciBnYW1sc3Mgd2l0aCBzaG9ydCB0aW1lIHNwYW5zIg0KYXV0aG9yOiAiQW51c2Noa2EgUGVlbGVuIg0KZGF0ZTogImByIFN5cy5EYXRlKClgIg0Kb3V0cHV0OiBodG1sX2RvY3VtZW50DQotLS0NCmBgYHtyLCBlY2hvPUZBTFNFfQ0KI2tuaXRyOjpvcHRzX2NodW5rJHNldChldmFsID0gRkFMU0UpDQprbml0cjo6b3B0c19jaHVuayRzZXQobnVtYmVyX3NlY3Rpb25zID0gRkFMU0UpDQpvcHRpb25zKHdpZHRoID0gMTAwKQ0KY29sb3JpemUgPC0gZnVuY3Rpb24oeCwgY29sb3IpIHtzcHJpbnRmKCI8c3BhbiBzdHlsZT0nY29sb3I6ICVzOyc+JXM8L3NwYW4+IiwgY29sb3IsIHgpIH0NCmBgYA0KDQpJbiB0aGlzIHNjcmlwdCwgSSBwZXJmb3JtIG1ldGEtYW5hbHlzZXMgZm9yIHRoZSBtb2RlbHMgd2l0aCBzbWFsbGVyIHRpbWUtc3BhbnMsIHRvIHB1dCBpbiB0aGUgQXBwZW5kaXgNCg0KYGBge3IsIHJlc3VsdHMgPSAnaGlkZScsIHdhcm5pbmc9RkFMU0UsIG1lc3NhZ2U9RkFMU0V9DQpybShsaXN0PWxzKCkpDQpsaWJyYXJ5KG1ldGEpDQpsaWJyYXJ5KG1ldGFmb3IpDQpsaWJyYXJ5KGRwbHlyKQ0KbGlicmFyeShoZXJlKQ0KbGlicmFyeShrYWJsZUV4dHJhKQ0Kc2V0LnNlZWQoMSkNCmhlcmUoKQ0KaGVyZTo6aV9hbSgic2NyaXB0cy9hbmFseXNpcy9tZXRhX2FuYWx5c2lzX2d3X3dhdmVzLlJtZCIpDQpgYGANCg0KYGBge3IsIHJlc3VsdHM9J2hpZGUnLCB3YXJuaW5nPUZBTFNFfQ0KIyBXaXRoIHRoZSBmaW5hbCBkYXRhDQpsb2FkKGhlcmUoIi4vZGF0YS9tZXRhX2FuYWx5c2lzIiwgInRvdGFsX3Jlc3VsdHNfd2F2ZXNfbmV3LlJEYXRhIikpDQoNCiMgU3RhcnQgd2l0aCBzdGVwIDIgaGVyZSwgYXMgSSBkb24ndCBtYWtlIGZvcmVzdCBwbG90cyBmb3IgdGhlc2UgbW9kZWxzDQojU3RlcCAyLiBFbXB0eSBtb2RlbCB3aXRoIG1ldGEtbGV2ZWwgaW5kaWNhdG9ycw0KbW9kZWxfc3RlcF8yX2F0dCA8LSBybWEoeWkgPSBtdV90aW1lLA0KICAgICAgICAgICAgICBzZWkgPSBtdV90aW1lX3NkLA0KICAgICAgICAgICAgICBkYXRhID0gdG90YWxfcmVzdWx0c193YXZlcywNCiAgICAgICAgICAgICAgbW9kcyA9IH4gbWVhbl95ZWFyICsgYXR0aXR1ZGVfY2F0ICsgYW1iaWd1b3VzICsgZmluX2NyaXNpcyArIGNvdmlkLA0KICAgICAgICAgICAgICBtZXRob2QgPSAiUkVNTCIsDQogICAgICAgICAgICAgIHRlc3QgPSAia25oYSIpDQoNCm1vZGVsX3N0ZXBfMl9hdHQNCmBgYA0KYGBge3IsIHJlc3VsdHM9J2hpZGUnLCB3YXJuaW5nPUZBTFNFfQ0KIyBTdGVwIDIgdmFyaWFuY2UNCiNTdGVwIDIuIEVtcHR5IG1vZGVsIHdpdGggbWV0YS1sZXZlbCBpbmRpY2F0b3JzDQptb2RlbF9zdGVwXzJfdmFyIDwtIHJtYSh5aSA9IHNpZ190aW1lLA0KICAgICAgICAgICAgICBzZWkgPSBzaWdfdGltZV9zZCwNCiAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX3Jlc3VsdHNfd2F2ZXMsDQogICAgICAgICAgICAgIG1vZHMgPSB+IG1lYW5feWVhciArIGF0dGl0dWRlX2NhdCArIGFtYmlndW91cyArIGZpbl9jcmlzaXMgKyBjb3ZpZCwNCiAgICAgICAgICAgICAgbWV0aG9kID0gIlJFTUwiLA0KICAgICAgICAgICAgICB0ZXN0ID0gImtuaGEiKQ0KDQptb2RlbF9zdGVwXzJfdmFyDQpgYGANCg0KYGBge3IsIHJlc3VsdHM9J2hpZGUnLCB3YXJuaW5nPUZBTFNFfQ0KIyBTdGVwIDMuIE1vZGVsIHdpdGggaW5kZXBlbmRlbnQgdmFyaWFibGVzDQptb2RlbF9zdGVwXzNfYXR0IDwtIHJtYSh5aSA9IG11X3RpbWVfcHJlZCwNCiAgICAgICAgICAgICAgc2VpID0gbXVfdGltZV9zZF9wcmVkLA0KICAgICAgICAgICAgICBkYXRhID0gdG90YWxfcmVzdWx0c193YXZlcywNCiAgICAgICAgICAgICAgbW9kcyA9IH4gbWVhbl95ZWFyICsgYXR0aXR1ZGVfY2F0ICsgYW1iaWd1b3VzICsgZmluX2NyaXNpcyArIGNvdmlkLA0KICAgICAgICAgICAgICBtZXRob2QgPSAiUkVNTCIsDQogICAgICAgICAgICAgIHRlc3QgPSAia25oYSIpDQoNCm1vZGVsX3N0ZXBfM19hdHQNCmBgYA0KDQpgYGB7ciwgcmVzdWx0cz0naGlkZScsIHdhcm5pbmc9RkFMU0V9DQojIFN0ZXAgMy4gVmFyaWFuY2UNCm1vZGVsX3N0ZXBfM192YXIgPC0gcm1hKHlpID0gc2lnX3RpbWVfcHJlZCwNCiAgICAgICAgICAgICAgc2VpID0gc2lnX3RpbWVfc2RfcHJlZCwNCiAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX3Jlc3VsdHNfd2F2ZXMsDQogICAgICAgICAgICAgIG1vZHMgPSB+IG1lYW5feWVhciArIGF0dGl0dWRlX2NhdCArIGFtYmlndW91cyArIGZpbl9jcmlzaXMgKyBjb3ZpZCwNCiAgICAgICAgICAgICAgbWV0aG9kID0gIlJFTUwiLA0KICAgICAgICAgICAgICB0ZXN0ID0gImtuaGEiKQ0KDQptb2RlbF9zdGVwXzNfdmFyDQpgYGANCg0KYGBge3IsIHJlc3VsdHM9J2hpZGUnLCB3YXJuaW5nPUZBTFNFfQ0KIyBTdGVwIDQuIE1vZGVsIHdpdGggaW50ZXJhY3Rpb25zDQptb2RlbF9zdGVwXzRfYXR0IDwtIHJtYSh5aSA9IG11X3RpbWVfaW50LA0KICAgICAgICAgICAgICBzZWkgPSBtdV90aW1lX3NkX2ludCwNCiAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX3Jlc3VsdHNfd2F2ZXMsDQogICAgICAgICAgICAgIG1vZHMgPSB+IG1lYW5feWVhciArIGF0dGl0dWRlX2NhdCArIGFtYmlndW91cyArIGZpbl9jcmlzaXMgKyBjb3ZpZCwNCiAgICAgICAgICAgICAgbWV0aG9kID0gIlJFTUwiLA0KICAgICAgICAgICAgICB0ZXN0ID0gImtuaGEiKQ0KDQptb2RlbF9zdGVwXzRfYXR0DQpgYGANCg0KYGBge3IsIHJlc3VsdHM9J2hpZGUnLCB3YXJuaW5nPUZBTFNFfQ0KIyBTdGVwIDQuIFZhcmlhbmNlDQptb2RlbF9zdGVwXzRfdmFyIDwtIHJtYSh5aSA9IHNpZ190aW1lX2ludCwNCiAgICAgICAgICAgICAgc2VpID0gc2lnX3RpbWVfc2RfaW50LA0KICAgICAgICAgICAgICBkYXRhID0gdG90YWxfcmVzdWx0c193YXZlcywNCiAgICAgICAgICAgICAgbW9kcyA9IH4gbWVhbl95ZWFyICsgYXR0aXR1ZGVfY2F0ICsgYW1iaWd1b3VzICsgZmluX2NyaXNpcyArIGNvdmlkLA0KICAgICAgICAgICAgICBtZXRob2QgPSAiUkVNTCIsDQogICAgICAgICAgICAgIHRlc3QgPSAia25oYSIpDQoNCm1vZGVsX3N0ZXBfNF92YXINCmBgYA0KDQpgYGB7cn0NCm9wdGlvbnMoa25pdHIua2FibGUuTkEgPSAnJykNCmBgYA0KDQpgYGB7cn0NCiMgTWFrZSBhIGthYmxlIHRhYmxlIG9mIGFsbCB0aGUgbW9kZWxzIA0KIyBGaXJzdCB0aGUgbWVhbiBhdHRpdHVkZXMsIHRoYXQgaSB3YW50IGluIHRoZSB0YWJsZSBuZXh0IHRvIGVhY2ggb3RoZXINCiMgVGltZSBlZmZlY3Qgb25seSBtb2RlbA0KbW9kZWxfMV9tZWFuX2RmIDwtIGRhdGEuZnJhbWUobWF0cml4KG5jb2wgPSA1LCBucm93ID0gNykpDQpjb2xuYW1lcyhtb2RlbF8xX21lYW5fZGYpIDwtIGMoIk11L1NpZ21hIiwgIlZhcmlhYmxlIiwgIkVzdGltYXRlIiwgIlNFIiwgInAiKQ0KbW9kZWxfMV9tZWFuX2RmJFZhcmlhYmxlIDwtIGMoIkludGVyY2VwdCIsICJNZWFuIHllYXIiLCAiQXR0aXR1ZGUgYmVoYXZpb3JhbCAocmVmID0gYWZmKSIsICJBdHRpdHVkZSBjb2duaXRpdmUiLCAiQW1iaWdpb3VzIChyZWYgPSBubykiLCAiRmluYW5jaWFsIGNyaXNpcyIsICJDb3ZpZC0xOSIpDQptb2RlbF8xX21lYW5fZGYkYE11L1NpZ21hYCA8LSBjKCJNZWFuIGF0dGl0dWRlcyIsICIiLCAiIiwgIiIsICIiLCAiIiwgIiIpDQoNCm1vZGVsXzFfbWVhbl9kZiRFc3RpbWF0ZSA8LSBhcy5udW1lcmljKG1vZGVsX3N0ZXBfMl9hdHQkYmV0YSkgI2VzdGltYXRlDQptb2RlbF8xX21lYW5fZGYkU0UgPC0gbW9kZWxfc3RlcF8yX2F0dCRzZSAjc2UgaW5kZWVkIGJ1dCBhcyBhIHJvdw0KbW9kZWxfMV9tZWFuX2RmJHAgPC0gbW9kZWxfc3RlcF8yX2F0dCRwdmFsICMgc2FtZSBhcyBmb3IgU0UNCg0KDQptb2RlbF8xX21lYW5fZGYkcF90ZXh0IDwtIGNhc2Vfd2hlbigNCm1vZGVsXzFfbWVhbl9kZiRwID49IDAuMDUgfiAiIiwNCm1vZGVsXzFfbWVhbl9kZiRwIDwgMC4wMDEgfiAiKioqIiwNCm1vZGVsXzFfbWVhbl9kZiRwIDwgMC4wMSB+ICIqKiIsDQptb2RlbF8xX21lYW5fZGYkcCA8IDAuMDUgfiAiKiINCikNCg0KIyBJIGFsc28gd2FudCB0aGUgUjIsIEkyIGFuZCBRRSBpbiB0aGUgdGFibGUNCm1vZGVsXzFfZml0ICA8LSBkYXRhLmZyYW1lKG1hdHJpeChuY29sID0gNiwgbnJvdyA9IDMpKQ0KY29sbmFtZXMobW9kZWxfMV9maXQpIDwtIGMoIk11L1NpZ21hIiwgIlZhcmlhYmxlIiwgIkVzdGltYXRlIiwgIlNFIiwgInAiLCAicF90ZXh0IikNCm1vZGVsXzFfZml0JFZhcmlhYmxlIDwtIGMoIlIyIiwgIkkyIiwgIlFFIikNCm1vZGVsXzFfZml0JEVzdGltYXRlIDwtIGMobW9kZWxfc3RlcF8yX2F0dCRSMiwgbW9kZWxfc3RlcF8yX2F0dCRJMiwgbW9kZWxfc3RlcF8yX2F0dCRRRSkNCg0KbW9kZWxfMV9tZWFuX2RmIDwtIHJiaW5kKG1vZGVsXzFfbWVhbl9kZiwgbW9kZWxfMV9maXQpDQoNCg0KIyBJbmRlcGVuZGVudCB2YXJpYWJsZSBtb2RlbCANCm1vZGVsXzJfbWVhbl9kZiA8LSBkYXRhLmZyYW1lKG1hdHJpeChuY29sID0gNSwgbnJvdyA9IDcpKQ0KY29sbmFtZXMobW9kZWxfMl9tZWFuX2RmKSA8LSBjKCJNdS9TaWdtYSIsICJWYXJpYWJsZSIsICJFc3RpbWF0ZSIsICJTRSIsICJwIikNCm1vZGVsXzJfbWVhbl9kZiRWYXJpYWJsZSA8LSBjKCJJbnRlcmNlcHQiLCAiTWVhbiB5ZWFyIiwgIkF0dGl0dWRlIGJlaGF2aW9yYWwgKHJlZiA9IGFmZikiLCAiQXR0aXR1ZGUgY29nbml0aXZlIiwgIkFtYmlnaW91cyAocmVmID0gbm8pIiwgIkZpbmFuY2lhbCBjcmlzaXMiLCAiQ292aWQtMTkiKQ0KbW9kZWxfMl9tZWFuX2RmJGBNdS9TaWdtYWAgPC0gYygiTWVhbiBhdHRpdHVkZXMiLCAiIiwgIiIsICIiLCAiIiwgIiIsICIiKQ0KDQptb2RlbF8yX21lYW5fZGYkRXN0aW1hdGUgPC0gYXMubnVtZXJpYyhtb2RlbF9zdGVwXzNfYXR0JGJldGEpICNlc3RpbWF0ZQ0KbW9kZWxfMl9tZWFuX2RmJFNFIDwtIG1vZGVsX3N0ZXBfM19hdHQkc2UgI3NlIGluZGVlZCBidXQgYXMgYSByb3cNCm1vZGVsXzJfbWVhbl9kZiRwIDwtIG1vZGVsX3N0ZXBfM19hdHQkcHZhbCAjIHNhbWUgYXMgZm9yIFNFDQoNCg0KbW9kZWxfMl9tZWFuX2RmJHBfdGV4dCA8LSBjYXNlX3doZW4oDQptb2RlbF8yX21lYW5fZGYkcCA+PSAwLjA1IH4gIiIsDQptb2RlbF8yX21lYW5fZGYkcCA8IDAuMDAxIH4gIioqKiIsDQptb2RlbF8yX21lYW5fZGYkcCA8IDAuMDEgfiAiKioiLA0KbW9kZWxfMl9tZWFuX2RmJHAgPCAwLjA1IH4gIioiDQopDQoNCiMgSSBhbHNvIHdhbnQgdGhlIFIyLCBJMiBhbmQgUUUgaW4gdGhlIHRhYmxlDQptb2RlbF8yX2ZpdCAgPC0gZGF0YS5mcmFtZShtYXRyaXgobmNvbCA9IDYsIG5yb3cgPSAzKSkNCmNvbG5hbWVzKG1vZGVsXzJfZml0KSA8LSBjKCJNdS9TaWdtYSIsICJWYXJpYWJsZSIsICJFc3RpbWF0ZSIsICJTRSIsICJwIiwgInBfdGV4dCIpDQptb2RlbF8yX2ZpdCRWYXJpYWJsZSA8LSBjKCJSMiIsICJJMiIsICJRRSIpDQptb2RlbF8yX2ZpdCRFc3RpbWF0ZSA8LSBjKG1vZGVsX3N0ZXBfM19hdHQkUjIsIG1vZGVsX3N0ZXBfM19hdHQkSTIsIG1vZGVsX3N0ZXBfM19hdHQkUUUpDQoNCm1vZGVsXzJfbWVhbl9kZiA8LSByYmluZChtb2RlbF8yX21lYW5fZGYsIG1vZGVsXzJfZml0KQ0KDQoNCiNBbmQgdGhlIGludGVyYWN0aW9uIG1vZGVsDQptb2RlbF8zX21lYW5fZGYgPC0gZGF0YS5mcmFtZShtYXRyaXgobmNvbCA9IDUsIG5yb3cgPSA3KSkNCmNvbG5hbWVzKG1vZGVsXzNfbWVhbl9kZikgPC0gYygiTXUvU2lnbWEiLCAiVmFyaWFibGUiLCAiRXN0aW1hdGUiLCAiU0UiLCAicCIpDQptb2RlbF8zX21lYW5fZGYkVmFyaWFibGUgPC0gYygiSW50ZXJjZXB0IiwgIk1lYW4geWVhciIsICJBdHRpdHVkZSBiZWhhdmlvcmFsIChyZWYgPSBhZmYpIiwgIkF0dGl0dWRlIGNvZ25pdGl2ZSIsICJBbWJpZ2lvdXMgKHJlZiA9IG5vKSIsICJGaW5hbmNpYWwgY3Jpc2lzIiwgIkNvdmlkLTE5IikNCm1vZGVsXzNfbWVhbl9kZiRgTXUvU2lnbWFgIDwtIGMoIk1lYW4gYXR0aXR1ZGVzIiwgIiIsICIiLCAiIiwgIiIsICIiLCAiIikNCg0KbW9kZWxfM19tZWFuX2RmJEVzdGltYXRlIDwtIGFzLm51bWVyaWMobW9kZWxfc3RlcF80X2F0dCRiZXRhKSAjZXN0aW1hdGUNCm1vZGVsXzNfbWVhbl9kZiRTRSA8LSBtb2RlbF9zdGVwXzRfYXR0JHNlICNzZSBpbmRlZWQgYnV0IGFzIGEgcm93DQptb2RlbF8zX21lYW5fZGYkcCA8LSBtb2RlbF9zdGVwXzRfYXR0JHB2YWwgIyBzYW1lIGFzIGZvciBTRQ0KDQoNCm1vZGVsXzNfbWVhbl9kZiRwX3RleHQgPC0gY2FzZV93aGVuKA0KbW9kZWxfM19tZWFuX2RmJHAgPj0gMC4wNSB+ICIiLA0KbW9kZWxfM19tZWFuX2RmJHAgPCAwLjAwMSB+ICIqKioiLA0KbW9kZWxfM19tZWFuX2RmJHAgPCAwLjAxIH4gIioqIiwNCm1vZGVsXzNfbWVhbl9kZiRwIDwgMC4wNSB+ICIqIg0KKQ0KDQojIEkgYWxzbyB3YW50IHRoZSBSMiwgSTIgYW5kIFFFIGluIHRoZSB0YWJsZQ0KbW9kZWxfM19maXQgIDwtIGRhdGEuZnJhbWUobWF0cml4KG5jb2wgPSA2LCBucm93ID0gMykpDQpjb2xuYW1lcyhtb2RlbF8zX2ZpdCkgPC0gYygiTXUvU2lnbWEiLCAiVmFyaWFibGUiLCAiRXN0aW1hdGUiLCAiU0UiLCAicCIsICJwX3RleHQiKQ0KbW9kZWxfM19maXQkVmFyaWFibGUgPC0gYygiUjIiLCAiSTIiLCAiUUUiKQ0KbW9kZWxfM19maXQkRXN0aW1hdGUgPC0gYyhtb2RlbF9zdGVwXzRfYXR0JFIyLCBtb2RlbF9zdGVwXzRfYXR0JEkyLCBtb2RlbF9zdGVwXzRfYXR0JFFFKQ0KDQptb2RlbF8zX21lYW5fZGYgPC0gcmJpbmQobW9kZWxfM19tZWFuX2RmLCBtb2RlbF8zX2ZpdCkNCg0KdG90YWxfbWVhbiA8LSBjYmluZChtb2RlbF8xX21lYW5fZGYsIG1vZGVsXzJfbWVhbl9kZiwgbW9kZWxfM19tZWFuX2RmKQ0KDQojIE5vdyBmb3IgdGhlIHNpZ21hDQptb2RlbF8xX3Zhcl9kZiA8LSBkYXRhLmZyYW1lKG1hdHJpeChuY29sID0gNSwgbnJvdyA9IDcpKQ0KY29sbmFtZXMobW9kZWxfMV92YXJfZGYpIDwtIGMoIk11L1NpZ21hIiwgIlZhcmlhYmxlIiwgIkVzdGltYXRlIiwgIlNFIiwgInAiKQ0KbW9kZWxfMV92YXJfZGYkVmFyaWFibGUgPC0gYygiSW50ZXJjZXB0IiwgIk1lYW4geWVhciIsICJBdHRpdHVkZSBiZWhhdmlvcmFsIChyZWYgPSBhZmYpIiwgIkF0dGl0dWRlIGNvZ25pdGl2ZSIsICJBbWJpZ2lvdXMgKHJlZiA9IG5vKSIsICJGaW5hbmNpYWwgY3Jpc2lzIiwgIkNvdmlkLTE5IikNCm1vZGVsXzFfdmFyX2RmJGBNdS9TaWdtYWAgPC0gYygiUG9sYXJpemF0aW9uIGluIGF0dGl0dWRlcyIsICIiLCAiIiwgIiIsICIiLCAiIiwgIiIpDQoNCm1vZGVsXzFfdmFyX2RmJEVzdGltYXRlIDwtIGFzLm51bWVyaWMobW9kZWxfc3RlcF8yX3ZhciRiZXRhKSAjZXN0aW1hdGUNCm1vZGVsXzFfdmFyX2RmJFNFIDwtIG1vZGVsX3N0ZXBfMl92YXIkc2UgI3NlIGluZGVlZCBidXQgYXMgYSByb3cNCm1vZGVsXzFfdmFyX2RmJHAgPC0gbW9kZWxfc3RlcF8yX3ZhciRwdmFsICMgc2FtZSBhcyBmb3IgU0UNCg0KDQptb2RlbF8xX3Zhcl9kZiRwX3RleHQgPC0gY2FzZV93aGVuKA0KbW9kZWxfMV92YXJfZGYkcCA+PSAwLjA1IH4gIiIsDQptb2RlbF8xX3Zhcl9kZiRwIDwgMC4wMDEgfiAiKioqIiwNCm1vZGVsXzFfdmFyX2RmJHAgPCAwLjAxIH4gIioqIiwNCm1vZGVsXzFfdmFyX2RmJHAgPCAwLjA1IH4gIioiDQopDQoNCiMgSSBhbHNvIHdhbnQgdGhlIFIyLCBJMiBhbmQgUUUgaW4gdGhlIHRhYmxlDQptb2RlbF8xX2ZpdCAgPC0gZGF0YS5mcmFtZShtYXRyaXgobmNvbCA9IDYsIG5yb3cgPSAzKSkNCmNvbG5hbWVzKG1vZGVsXzFfZml0KSA8LSBjKCJNdS9TaWdtYSIsICJWYXJpYWJsZSIsICJFc3RpbWF0ZSIsICJTRSIsICJwIiwgInBfdGV4dCIpDQptb2RlbF8xX2ZpdCRWYXJpYWJsZSA8LSBjKCJSMiIsICJJMiIsICJRRSIpDQptb2RlbF8xX2ZpdCRFc3RpbWF0ZSA8LSBjKG1vZGVsX3N0ZXBfMl92YXIkUjIsIG1vZGVsX3N0ZXBfMl92YXIkSTIsIG1vZGVsX3N0ZXBfMl92YXIkUUUpDQoNCm1vZGVsXzFfdmFyX2RmIDwtIHJiaW5kKG1vZGVsXzFfdmFyX2RmLCBtb2RlbF8xX2ZpdCkNCg0KDQojIEluZGVwZW5kZW50IHZhcmlhYmxlIG1vZGVsIA0KbW9kZWxfMl92YXJfZGYgPC0gZGF0YS5mcmFtZShtYXRyaXgobmNvbCA9IDUsIG5yb3cgPSA3KSkNCmNvbG5hbWVzKG1vZGVsXzJfdmFyX2RmKSA8LSBjKCJNdS9TaWdtYSIsICJWYXJpYWJsZSIsICJFc3RpbWF0ZSIsICJTRSIsICJwIikNCm1vZGVsXzJfdmFyX2RmJFZhcmlhYmxlIDwtIGMoIkludGVyY2VwdCIsICJNZWFuIHllYXIiLCAiQXR0aXR1ZGUgYmVoYXZpb3JhbCAocmVmID0gYWZmKSIsICJBdHRpdHVkZSBjb2duaXRpdmUiLCAiQW1iaWdpb3VzIChyZWYgPSBubykiLCAiRmluYW5jaWFsIGNyaXNpcyIsICJDb3ZpZC0xOSIpDQptb2RlbF8yX3Zhcl9kZiRgTXUvU2lnbWFgIDwtIGMoIlBvbGFyaXphdGlvbiBpbiBhdHRpdHVkZXMiLCAiIiwgIiIsICIiLCAiIiwgIiIsICIiKQ0KDQptb2RlbF8yX3Zhcl9kZiRFc3RpbWF0ZSA8LSBhcy5udW1lcmljKG1vZGVsX3N0ZXBfM192YXIkYmV0YSkgI2VzdGltYXRlDQptb2RlbF8yX3Zhcl9kZiRTRSA8LSBtb2RlbF9zdGVwXzNfdmFyJHNlICNzZSBpbmRlZWQgYnV0IGFzIGEgcm93DQptb2RlbF8yX3Zhcl9kZiRwIDwtIG1vZGVsX3N0ZXBfM192YXIkcHZhbCAjIHNhbWUgYXMgZm9yIFNFDQoNCg0KbW9kZWxfMl92YXJfZGYkcF90ZXh0IDwtIGNhc2Vfd2hlbigNCm1vZGVsXzJfdmFyX2RmJHAgPj0gMC4wNSB+ICIiLA0KbW9kZWxfMl92YXJfZGYkcCA8IDAuMDAxIH4gIioqKiIsDQptb2RlbF8yX3Zhcl9kZiRwIDwgMC4wMSB+ICIqKiIsDQptb2RlbF8yX3Zhcl9kZiRwIDwgMC4wNSB+ICIqIg0KKQ0KDQojIEkgYWxzbyB3YW50IHRoZSBSMiwgSTIgYW5kIFFFIGluIHRoZSB0YWJsZQ0KbW9kZWxfMl9maXQgIDwtIGRhdGEuZnJhbWUobWF0cml4KG5jb2wgPSA2LCBucm93ID0gMykpDQpjb2xuYW1lcyhtb2RlbF8yX2ZpdCkgPC0gYygiTXUvU2lnbWEiLCAiVmFyaWFibGUiLCAiRXN0aW1hdGUiLCAiU0UiLCAicCIsICJwX3RleHQiKQ0KbW9kZWxfMl9maXQkVmFyaWFibGUgPC0gYygiUjIiLCAiSTIiLCAiUUUiKQ0KbW9kZWxfMl9maXQkRXN0aW1hdGUgPC0gYyhtb2RlbF9zdGVwXzNfdmFyJFIyLCBtb2RlbF9zdGVwXzNfdmFyJEkyLCBtb2RlbF9zdGVwXzNfdmFyJFFFKQ0KDQptb2RlbF8yX3Zhcl9kZiA8LSByYmluZChtb2RlbF8yX3Zhcl9kZiwgbW9kZWxfMl9maXQpDQoNCg0KI0FuZCB0aGUgaW50ZXJhY3Rpb24gbW9kZWwNCm1vZGVsXzNfdmFyX2RmIDwtIGRhdGEuZnJhbWUobWF0cml4KG5jb2wgPSA1LCBucm93ID0gNykpDQpjb2xuYW1lcyhtb2RlbF8zX3Zhcl9kZikgPC0gYygiTXUvU2lnbWEiLCAiVmFyaWFibGUiLCAiRXN0aW1hdGUiLCAiU0UiLCAicCIpDQptb2RlbF8zX3Zhcl9kZiRWYXJpYWJsZSA8LSBjKCJJbnRlcmNlcHQiLCAiTWVhbiB5ZWFyIiwgIkF0dGl0dWRlIGJlaGF2aW9yYWwgKHJlZiA9IGFmZikiLCAiQXR0aXR1ZGUgY29nbml0aXZlIiwgIkFtYmlnaW91cyAocmVmID0gbm8pIiwgIkZpbmFuY2lhbCBjcmlzaXMiLCAiQ292aWQtMTkiKQ0KbW9kZWxfM192YXJfZGYkYE11L1NpZ21hYCA8LSBjKCJQb2xhcml6YXRpb24gaW4gYXR0aXR1ZGVzIiwgIiIsICIiLCAiIiwgIiIsICIiLCAiIikNCg0KbW9kZWxfM192YXJfZGYkRXN0aW1hdGUgPC0gYXMubnVtZXJpYyhtb2RlbF9zdGVwXzRfdmFyJGJldGEpICNlc3RpbWF0ZQ0KbW9kZWxfM192YXJfZGYkU0UgPC0gbW9kZWxfc3RlcF80X3ZhciRzZSAjc2UgaW5kZWVkIGJ1dCBhcyBhIHJvdw0KbW9kZWxfM192YXJfZGYkcCA8LSBtb2RlbF9zdGVwXzRfdmFyJHB2YWwgIyBzYW1lIGFzIGZvciBTRQ0KDQptb2RlbF8zX3Zhcl9kZiRwX3RleHQgPC0gY2FzZV93aGVuKA0KbW9kZWxfM192YXJfZGYkcCA+PSAwLjA1IH4gIiIsDQptb2RlbF8zX3Zhcl9kZiRwIDwgMC4wMDEgfiAiKioqIiwNCm1vZGVsXzNfdmFyX2RmJHAgPCAwLjAxIH4gIioqIiwNCm1vZGVsXzNfdmFyX2RmJHAgPCAwLjA1IH4gIioiDQopDQoNCiMgSSBhbHNvIHdhbnQgdGhlIFIyLCBJMiBhbmQgUUUgaW4gdGhlIHRhYmxlDQptb2RlbF8zX2ZpdCAgPC0gZGF0YS5mcmFtZShtYXRyaXgobmNvbCA9IDYsIG5yb3cgPSAzKSkNCmNvbG5hbWVzKG1vZGVsXzNfZml0KSA8LSBjKCJNdS9TaWdtYSIsICJWYXJpYWJsZSIsICJFc3RpbWF0ZSIsICJTRSIsICJwIiwgInBfdGV4dCIpDQptb2RlbF8zX2ZpdCRWYXJpYWJsZSA8LSBjKCJSMiIsICJJMiIsICJRRSIpDQptb2RlbF8zX2ZpdCRFc3RpbWF0ZSA8LSBjKG1vZGVsX3N0ZXBfNF92YXIkUjIsIG1vZGVsX3N0ZXBfNF92YXIkSTIsIG1vZGVsX3N0ZXBfNF92YXIkUUUpDQoNCm1vZGVsXzNfdmFyX2RmIDwtIHJiaW5kKG1vZGVsXzNfdmFyX2RmLCBtb2RlbF8zX2ZpdCkNCg0KdG90YWxfdmFyIDwtIGNiaW5kKG1vZGVsXzFfdmFyX2RmLCBtb2RlbF8yX3Zhcl9kZiwgbW9kZWxfM192YXJfZGYpDQoNCiNOb3cgYSB0b3RhbCBkYXRhZnJhbWUgd2l0aCBib3RoIG1vZGVscyB0b2dldGhlciwgYW5kIHRoZW4gbWFrZSBzb21lIGNoYW5nZXMgYmVmb3JlIG1ha2luZyB0aGUgdGFibGUNCnRvdGFsX21ldGEgPC0gcmJpbmQodG90YWxfbWVhbiwgdG90YWxfdmFyKQ0KY29sbmFtZXModG90YWxfbWV0YSkgPC0gYygibXVfc2lnbWEiLCAidmFyaWFibGVfZW1wdHkiLCAiZXN0X2VtcHR5IiwgInNlX2VtcHR5IiwgInBfZW1wdHkiLCAicF90ZXh0X2VtcHR5IiwgIm11X3NpZ21hX2luZGVwIiwgInZhcmlhYmxlX2luZGVwIiwgImVzdF9pbmRlcCIsICJzZV9pbmRlcCIsICJwX2luZGVwIiwgInBfdGV4dF9pbmRlcCIsICJtdV9zaWdtYV9pbnRlciIsICJ2YXJpYWJsZV9pbnRlciIsICJlc3RfaW50ZXIiLCAic2VfaW50ZXIiLCAicF9pbnRlciIsICJwX3RleHRfaW50ZXIiICkNCnJvd25hbWVzKHRvdGFsX21ldGEpIDwtIE5VTEwNCnRvdGFsX21ldGEgPC0gZHBseXI6OnNlbGVjdCh0b3RhbF9tZXRhLCBtdV9zaWdtYSwgdmFyaWFibGVfZW1wdHksIGVzdF9lbXB0eSwgc2VfZW1wdHksIHBfdGV4dF9lbXB0eSwgZXN0X2luZGVwLCBzZV9pbmRlcCwgcF90ZXh0X2luZGVwLCBlc3RfaW50ZXIsIHNlX2ludGVyLCBwX3RleHRfaW50ZXIpDQoNCnRvdGFsX21ldGEgPC0gZHBseXI6Om11dGF0ZSh0b3RhbF9tZXRhLCBhY3Jvc3MoLmNvbHM9Yyhlc3RfZW1wdHksIHNlX2VtcHR5LCBlc3RfaW5kZXAsIHNlX2luZGVwLCBlc3RfaW50ZXIsIHNlX2ludGVyKSwgLmZucz0gYXMubnVtZXJpYykpDQpudW1lcmljX2NvbHMgPC0gc2FwcGx5KHRvdGFsX21ldGEsIGlzLm51bWVyaWMpDQp0b3RhbF9tZXRhWywgbnVtZXJpY19jb2xzXSA8LSByb3VuZCh0b3RhbF9tZXRhWywgbnVtZXJpY19jb2xzXSwgZGlnaXRzID0gMykNCg0Ka2FibGUodG90YWxfbWV0YSwgZGlnaXRzID0gMywgY2FwdGlvbiA9ICJBcHBlbmRpeCBYLiBNZXRhLXJlZ3Jlc3Npb24gb24gY2xpbWF0ZSBjaGFuZ2UgYXR0aXR1ZGVzIGFuZCBwb2xhcml6YXRpb24gcGVyIHdhdmUiLA0KICAgICAgY29sLm5hbWVzID0gYyggIiIsICJWYXJpYWJsZXMiLCAiRXN0aW1hdGUiLCAiU3RkLiBFcnJvciIsICIiLCAiRXN0aW1hdGUiLCAiU3RkLiBFcnJvciIsICIiLCAiRXN0aW1hdGUiLCAiU3RkLiBFcnJvciIsICIiKSkgJT4lDQogIGthYmxlX2NsYXNzaWNfMihodG1sX2ZvbnQgPSAiVGltZXMiLCBmaXhlZF90aGVhZCA9IFQsIGZ1bGxfd2lkdGggPSBGKSAlPiUNCiAgYWRkX2hlYWRlcl9hYm92ZShjKCIgIiA9IDIsICJUaW1lLW9ubHkgbW9kZWwiID0gMywgIkluZGVwZW50IHZhciBtb2RlbCIgPSAzLCAiSW50ZXJhY3Rpb24gbW9kZWwiID0gMykpICU+JQ0KICAgZm9vdG5vdGUoDQogICAgZ2VuZXJhbF90aXRsZSA9ICJOb3RlLiIsDQogICAgZ2VuZXJhbCA9ICIqKiogPSBwIDwgMC4wMDEsICoqID0gcCA8IDAuMDEsICogPSBwIDwgMC4wNSIsDQogICAgdGhyZWVwYXJ0dGFibGUgPSBUUlVFLA0KICAgIGZvb3Rub3RlX2FzX2NodW5rID0gVFJVRQ0KICAgICkNCg0KIyU+JQ0KICMgICBzYXZlX2thYmxlKCIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9vdXRwdXQvYXBwZW5kaXgvbWV0YV9yZWdyZXNzaW9uX3RhYmxlX3Blcl93YXZlLmh0bWwiKQ0KDQpgYGANCg0KDQo=</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("meta_analysis_gw_waves.Rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -4,3 +4,4 @@ descriptives212.Rmd
 .DS_Store
 *.png
 .Rproj.user
+/data/

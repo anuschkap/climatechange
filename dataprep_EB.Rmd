@@ -26,8 +26,8 @@ library(psych)
 
 ```
 
-## Years 
-### 1986 
+## Years {-}
+### 1986 {-}
 
 ```{r}
 # Eurobarometer has the most waves
@@ -110,7 +110,7 @@ eb1986sel <- eb1986sel %>% select(v1, v8, env_ec_stat, env_prsimp, sex, eduyrs_c
 save(eb1986sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb1986sel.Rdata")
 ```
 
-### 1992
+### 1992 {-}
 
 ```{r}
 #Continue with 1992
@@ -189,7 +189,7 @@ eb1992sel <- eb1992sel %>% select(v1, v8, env_ec_stat, env_prsimp, lrplace, eduy
 save(eb1992sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb1992sel.Rdata")
 ```
 
-### 1995
+### 1995 {-}
 
 ```{r}
 #1995
@@ -263,7 +263,7 @@ eb1995sel <- eb1995sel %>% select(v1, v8, env_prsimp, env_ec_stat, lrplace, eduy
 save(eb1995sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb1995sel.Rdata")
 ```
 
-### 2004
+### 2004 {-}
 
 ```{r}
 #2004
@@ -334,7 +334,7 @@ save(eb2004sel, file="/Users/anuschka/Documents/climatechange/climatechange/data
 
 ```
 
-### 2007
+### 2007 {-}
 
 ```{r}
 eb2007 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2007.sav", use.value.labels = T,  to.data.frame = T)
@@ -416,7 +416,7 @@ eb2007sel <- eb2007sel %>% select(v1, v8, env_vs_ec, env_quallife, role_ind, big
 save(eb2007sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2007sel.Rdata")
 ```
 
-### 2008
+### 2008 {-}
 
 ```{r}
 #2008
@@ -493,7 +493,7 @@ eb2008sel <- eb2008sel %>% select(v1, v8, cc_unstop, cc_exag, cc_poseu, cc_prsac
 save(eb2008sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2008sel.Rdata")
 ```
 
-### 2009
+### 2009 {-}
 
 ```{r}
 #2009 (2 datasets)
@@ -672,7 +672,7 @@ eb2009bsel <- eb2009bsel %>% select(v1, v8, ccpercept, cchange, cc_unstop, cc_ex
 save(eb2009bsel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2009bsel.Rdata")
 ```
 
-### 2011
+### 2011 {-}
 
 ```{r}
 #2011 consists of 2 waves as well
@@ -822,7 +822,7 @@ eb2011bsel <- eb2011bsel %>% select(v1, v8, cchange, cchange2, cchangetot, ccper
 save(eb2011bsel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2011bsel.Rdata")
 ```
 
-### 2013
+### 2013 {-}
 
 ```{r}
 #2013 
@@ -897,7 +897,7 @@ eb2013sel <- eb2013sel %>% select(studyno1, w1, cchange, cchange2, cchangetot, c
 save(eb2013sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2013sel.Rdata")
 ```
 
-### 2014
+### 2014 {-}
 
 ```{r}
 eb2014 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/eurobarometer/eb2014.sav", use.value.labels = T,  to.data.frame = T)
@@ -964,7 +964,7 @@ eb2014sel <-  eb2014sel %>% select(studyno1, w1, envp_eg, effr_eg, role_ind, big
 save(eb2014sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2014sel.Rdata")
 ```
 
-### 2015
+### 2015 {-}
 
 ```{r}
 #2015
@@ -1043,7 +1043,7 @@ eb2015sel <- eb2015sel %>% select(studyno1, w1, cchange, cchange2, cchangetot, p
 save(eb2015sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2015sel.Rdata")
 ```
 
-### 2017
+### 2017 {-}
 
 ```{r}
 #2017 consists of 2 waves
@@ -1201,7 +1201,7 @@ eb2017bsel <- eb2017bsel %>% select(studyno1, w1, doprot_comp:doprot_eu, role_in
 save(eb2017bsel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2017bsel.Rdata")
 ```
 
-### 2021
+### 2021 {-}
 
 ```{r}
 #Lastly, 2021
@@ -1279,7 +1279,7 @@ eb2021sel <- eb2021sel %>% select(studyno1, w1, cchange, cchange2, cchangetot, c
 save(eb2021sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2021sel.Rdata")
 ```
 
-## Merge all the data into one dataset
+## Merge all the data into one dataset {-}
 
 ```{r}
 #Create one large dataset in smaller steps. 

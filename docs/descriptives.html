@@ -1,0 +1,2784 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Anuschka Peelen" />
+
+<meta name="date" content="2023-09-05" />
+
+<title>Descriptive statistics</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="tweaks.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="blog.html">Blog</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Scripts datapreparation
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="dataprep_EB.html">Data preparation Eurobarometer</a>
+    </li>
+    <li>
+      <a href="dataprep_EVS_ESS_ISSP.html">Data preparation EVS, ESS, ISSP</a>
+    </li>
+    <li>
+      <a href="dataprep_I-O.html">Data preparation I&amp;O Research</a>
+    </li>
+    <li>
+      <a href="weights.html">Weighing data</a>
+    </li>
+    <li>
+      <a href="dataprep_polcat.html">Left right placement</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Scripts descriptives and analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="descriptives.html">Descriptives</a>
+    </li>
+    <li>
+      <a href="single_regression_gamlss_weigh_new.html">Gamlss regressions weighted</a>
+    </li>
+    <li>
+      <a href="single_regression_gw_py_new.html">Gamlss regression shorter time spans</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_weight_gamlss_new.html">Extract coefficients gamlss regressions</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_wg_waves_new.html">Extract coefficients shorter time spans</a>
+    </li>
+    <li>
+      <a href="regression_to_indep_var_analysis_weight_gamlss_new.html">Extract coefficients independent var model</a>
+    </li>
+    <li>
+      <a href="regression_to_interact_analysis_weight_gamlss_new.html">Extract coefficients interaction model</a>
+    </li>
+    <li>
+      <a href="meta_analysis_gamlss_weigh.html">Meta-analysis weighted gamlss</a>
+    </li>
+    <li>
+      <a href="meta_analysis_indep_var.html">Meta-analysis independent variables</a>
+    </li>
+    <li>
+      <a href="meta_analysis_gw_waves.html">Meta-analysis shorter time spans</a>
+    </li>
+    <li>
+      <a></a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/apeelen/climatechange">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Descriptive statistics</h1>
+<h4 class="author">Anuschka Peelen</h4>
+<h4 class="date">2023-09-05</h4>
+
+</div>
+
+
+<p>In this script, I write the code to make some plots and tables that I
+use to in the data and analysis section. You will find the code for the
+plot with datasets per year, the Table with individual regression
+analysis for one variable of ISSP and the Table with all the pooled
+effects.</p>
+<pre class="r"><code>library(dplyr)
+library(here)
+library(ggplot2)
+library(kableExtra)
+library(tidyverse)
+library(writexl)
+library(readxl)
+library(gamlss)
+library(metafor)
+library(meta)</code></pre>
+<div id="ggplot-that-shows-the-years-that-each-dataset-covers"
+class="section level2 unnumbered">
+<h2 class="unnumbered">Ggplot that shows the years that each dataset
+covers</h2>
+<pre class="r"><code>datayear &lt;- read_excel(&quot;C:/Github/climatechange/data/descriptives/dataset_year.xlsx&quot;)</code></pre>
+<pre class="r"><code>color_scale &lt;- c (&quot;#1ABC9C&quot;, &quot;#85C1E9&quot; , &quot;#EB984E&quot;, &quot;#AF7AC5&quot; , &quot;#F1C40F&quot;)
+datayear$dataset &lt;- factor(datayear$dataset, levels = c(&quot;I&amp;O&quot;, &quot;ESS&quot;, &quot;ISSP&quot;, &quot;EVS&quot;, &quot;EB&quot;))
+datayear$color[datayear$dataset == &quot;I&amp;O&quot;] &lt;- &quot;#1ABC9C&quot;
+datayear$color[datayear$dataset == &quot;ESS&quot;] &lt;- &quot;#85C1E9&quot;
+datayear$color[datayear$dataset == &quot;ISSP&quot;] &lt;- &quot;#EB984E&quot;
+datayear$color[datayear$dataset == &quot;EVS&quot;] &lt;- &quot;#AF7AC5&quot;
+datayear$color[datayear$dataset == &quot;EB&quot;] &lt;- &quot;#F1C40F&quot;
+
+first_last_year &lt;- datayear %&gt;%
+  group_by(dataset) %&gt;%
+  summarize(first_year = min(year),
+            last_year = max(year))
+
+yearplot &lt;- ggplot(data = datayear, aes(x = year, y = dataset, color = dataset)) +
+  geom_line(size = 1) +
+  scale_color_manual(values = color_scale) +
+  labs(x = &quot;Year&quot;,
+       y = &quot;Dataset&quot;) +
+  geom_point(data = datayear, aes(x = year), color = datayear$color, size = 2) +
+  geom_point(data = first_last_year, x = first_last_year$first_year) + 
+  geom_point(data = first_last_year, x = first_last_year$last_year) + 
+  geom_text(data = first_last_year, x = first_last_year$first_year, label = first_last_year$first_year, vjust = -1) +
+  geom_text(data = first_last_year, x = first_last_year$last_year, label = first_last_year$last_year, vjust = -1) + 
+  theme_classic() +
+  guides(color = FALSE)
+
+yearplot </code></pre>
+<p><img src="descriptives_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>#ggsave(&quot;yearplot.png&quot;, width = 7, height = 5, path = &quot;/Users/anuschka/Documents/climatechange/climatechange/output/yearplot.png&quot;)</code></pre>
+</div>
+<div id="table-of-the-gamlss-regression-output"
+class="section level2 unnumbered">
+<h2 class="unnumbered">Table of the GAMLSS regression output</h2>
+<pre class="r"><code># Run this piece of code so that in the Table beneath it will not show NAs
+options(knitr.kable.NA = &#39;&#39;)</code></pre>
+<pre class="r"><code># Illustrate the gamlss regressions by showing one from ISSP with kable extra
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;issp_list_empty_w.Rdata&quot;))
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;issp_list_preds_w_new.Rdata&quot;))
+load(here(&quot;./data/final_data/regression_outputs&quot;, &quot;issp_list_interactions_w_new.Rdata&quot;))
+
+# Use first variable, which is &quot;worry&quot;
+model_time_only &lt;- summary(issp_list_empty[[1]])
+model_time_only_df &lt;- as.data.frame(model_time_only)
+model_time_only_df$mu_sigma &lt;- c(&quot;Mu&quot;, &quot;&quot;, &quot;Sigma&quot;, &quot;&quot;)
+model_time_only_df$variables &lt;- c(&quot;Intercept&quot;, &quot;Time&quot;, &quot;Intercept&quot;, &quot;Time&quot;)
+model_time_only_df &lt;- model_time_only_df %&gt;% dplyr:: select(mu_sigma, variables, everything())
+rownames(model_time_only_df) &lt;- NULL
+
+model_indep_df &lt;- as.data.frame(summary(issp_list_preds[[1]]))
+model_indep_df$mu_sigma &lt;- c(&quot;Mu&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,&quot;Sigma&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+model_indep_df$variables &lt;- c(&quot;Intercept&quot;, &quot;Time&quot;, &quot;Gender&quot;,  &quot;Isced intermediate (ref=basic)&quot;, &quot;Isced advanced (ref=basic)&quot;, &quot;Age&quot;, &quot;Intercept&quot;, &quot;Time&quot;, &quot;Gender&quot;,  &quot;Isced intermediate (ref=basic)&quot;, &quot;Isced advanced (ref=basic)&quot;, &quot;Age&quot;)
+model_indep_df &lt;- model_indep_df %&gt;% dplyr::select(mu_sigma, variables, everything())
+rownames(model_indep_df) &lt;- NULL
+
+model_interact_df &lt;- as.data.frame(summary(issp_list_interactions[[1]]))
+model_interact_df$mu_sigma &lt;- c(&quot;Mu&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;Sigma&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+model_interact_df$variables &lt;- c(&quot;Intercept&quot;, &quot;Time&quot;, &quot;Gender&quot;,  &quot;Isced intermediate (ref=basic)&quot;, &quot;Isced advanced (ref=basic)&quot;, &quot;Age&quot;, &quot;Age x time&quot;, &quot;Gender x time&quot;, &quot;Isced intermediate x time&quot;, &quot;Isced advanced x time&quot;, &quot;Intercept&quot;, &quot;Time&quot;, &quot;Gender&quot;,  &quot;Isced intermediate (ref=basic)&quot;, &quot;Isced advanced (ref=basic)&quot;, &quot;Age&quot;, &quot;Age x time&quot;, &quot;Gender x time&quot;, &quot;Isced intermediate x time&quot;, &quot;Isced advanced x time&quot;)
+model_interact_df &lt;- model_interact_df %&gt;% dplyr::select(mu_sigma, variables, everything())
+rownames(model_interact_df) &lt;- NULL
+
+# Difficult to columnbind them, because they&#39;re of different lengths (logically), so use a function
+df_list &lt;- list(model_time_only_df, model_indep_df, model_interact_df)
+
+bind_cols_fill &lt;- function(df_list) {
+
+  max_rows &lt;- map_int(df_list, nrow) %&gt;% max()
+  
+  map(df_list, function(df) {
+    if(nrow(df) == max_rows) return(df)
+    first &lt;- names(df)[1] %&gt;% sym()
+    df %&gt;% add_row(!!first := rep(NA, max_rows - nrow(df)))
+  }) %&gt;% bind_cols()
+}
+
+model_total &lt;- bind_cols_fill(df_list)
+
+model_total[is.na(model_total)] &lt;- &quot;&quot;
+
+# The dataframe is binded, the order is not totally how i want it. The data are now all centered at the top, but for the 
+# previous models, I need the data to be centered around the mu/intercept and sigma/intercept (with a lot of blank spaces). # Furthermore, some variables have a name that have special signs in them, which causes R not to recognize them. To make it #easy, I quickly fix these things in Excel. I don&#39;t make any changes to the data
+write_xlsx(model_total, here(&quot;./data/descriptives/&quot;, &quot;kable_model_total_gamlss.xlsx&quot; ))</code></pre>
+<pre class="r"><code>model_new &lt;- read_excel(here(&quot;./data/descriptives/&quot;, &quot;kable_model_total_gamlss.xlsx&quot; ))
+
+# I Want to round the numeric variables to 3 decimals
+model_new &lt;- dplyr::mutate(model_new, across(.cols = c(-mu_sigma, -variables), .fns= as.numeric))
+numeric_cols &lt;- sapply(model_new, is.numeric)
+model_new[, numeric_cols] &lt;- round(model_new[, numeric_cols], digits = 3)
+
+# There are some annoying variable names that R can&#39;t recognize because it has spacing, so rename the columns
+colnames(model_new) &lt;- (c(&quot;mu_sigma&quot;, &quot;Variables&quot;, &quot;est_time&quot;, &quot;std_err_time&quot;, &quot;p_time&quot;, &quot;est_indep&quot;, &quot;std_err_indep&quot;, &quot;p_indep&quot;, &quot;est_inter&quot;, &quot;std_error_inter&quot;, &quot;p_inter&quot;, &quot;p_text_time_only&quot;, &quot;p_text_indep&quot;, &quot;p_text_inter&quot;))
+
+# Create a new variable to use stars instead of the full p-values in the table
+model_new$p_text_time_only &lt;- case_when(
+  model_new$p_time &gt;= 0.05 ~ &quot;&quot;,
+model_new$p_time &lt; 0.001 ~ &quot;***&quot;,
+model_new$p_time &lt; 0.01 ~ &quot;**&quot;,
+model_new$p_time &lt; 0.05 ~ &quot;*&quot;
+)
+
+model_new$p_text_indep &lt;- case_when(
+  model_new$p_indep &gt;= 0.05 ~ &quot;&quot;,
+model_new$p_indep &lt; 0.001 ~ &quot;***&quot;,
+model_new$p_indep &lt; 0.01 ~ &quot;**&quot;,
+model_new$p_indep &lt; 0.05 ~ &quot;*&quot;
+)
+
+model_new$p_text_inter &lt;- case_when(
+  model_new$p_inter &gt;= 0.05 ~ &quot;&quot;,
+model_new$p_inter &lt; 0.001 ~ &quot;***&quot;,
+model_new$p_inter &lt; 0.01 ~ &quot;**&quot;,
+model_new$p_inter &lt; 0.05 ~ &quot;*&quot;
+)
+
+# Now only select the variables that I want to show in the table
+model_new &lt;- dplyr::select(model_new, mu_sigma, Variables, est_time, std_err_time, p_text_time_only, est_indep, std_err_indep, p_text_indep, est_inter, std_error_inter, p_text_inter)
+
+# Make and save the table 
+kable(model_new, digits = 3, caption = &quot;Table 2. GAMLSS model on worry ISSP (1993 - 2010)&quot;, 
+      col.names = c( &quot;&quot;, &quot;Variables&quot;, &quot;Estimate&quot;, &quot;Std. Error&quot;, &quot;&quot;, &quot;Estimate&quot;, &quot;Std. Error&quot;, &quot;&quot;, &quot;Estimate&quot;, &quot;Std. Error&quot;, &quot;&quot;), align = &quot;l&quot;) %&gt;%
+  kable_classic_2(html_font = &quot;Times&quot;, fixed_thead = T, full_width = F) %&gt;%
+  add_header_above(c(&quot; &quot; = 2, &quot;Time-only model&quot; = 3, &quot;Indepent var model&quot; = 3, &quot;Interaction model&quot; = 3), align = &quot;l&quot;) %&gt;%
+   footnote(
+    general_title = &quot;Note.&quot;,
+    general = &quot;*** = p &lt; 0.001, ** = p &lt; 0.01, * = p &lt; 0.05&quot;,
+    threeparttable = TRUE,
+    footnote_as_chunk = TRUE
+    ) </code></pre>
+<table class=" lightable-classic-2" style="font-family: Times; width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;">
+<caption>
+Table 2. GAMLSS model on worry ISSP (1993 - 2010)
+</caption>
+<thead>
+<tr>
+<th style="empty-cells: hide;" colspan="2">
+</th>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: left; " colspan="3">
+<div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">
+Time-only model
+</div>
+</th>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: left; " colspan="3">
+<div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">
+Indepent var model
+</div>
+</th>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: left; " colspan="3">
+<div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">
+Interaction model
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Variables
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Estimate
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Std. Error
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Estimate
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Std. Error
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Estimate
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Std. Error
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Mu
+</td>
+<td style="text-align:left;">
+Intercept
+</td>
+<td style="text-align:left;">
+3.358
+</td>
+<td style="text-align:left;">
+0.029
+</td>
+<td style="text-align:left;">
+***
+</td>
+<td style="text-align:left;">
+3.453
+</td>
+<td style="text-align:left;">
+0.086
+</td>
+<td style="text-align:left;">
+***
+</td>
+<td style="text-align:left;">
+3.602
+</td>
+<td style="text-align:left;">
+0.120
+</td>
+<td style="text-align:left;">
+***
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Time
+</td>
+<td style="text-align:left;">
+-0.005
+</td>
+<td style="text-align:left;">
+0.003
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+-0.011
+</td>
+<td style="text-align:left;">
+0.003
+</td>
+<td style="text-align:left;">
+***
+</td>
+<td style="text-align:left;">
+-0.045
+</td>
+<td style="text-align:left;">
+0.015
+</td>
+<td style="text-align:left;">
+**
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Gender
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+0.183
+</td>
+<td style="text-align:left;">
+0.038
+</td>
+<td style="text-align:left;">
+***
+</td>
+<td style="text-align:left;">
+0.173
+</td>
+<td style="text-align:left;">
+0.055
+</td>
+<td style="text-align:left;">
+**
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced intermediate (ref=basic)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+0.468
+</td>
+<td style="text-align:left;">
+0.040
+</td>
+<td style="text-align:left;">
+***
+</td>
+<td style="text-align:left;">
+0.397
+</td>
+<td style="text-align:left;">
+0.055
+</td>
+<td style="text-align:left;">
+***
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced advanced (ref=basic)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+0.002
+</td>
+<td style="text-align:left;">
+0.031
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+0.004
+</td>
+<td style="text-align:left;">
+0.045
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+-0.008
+</td>
+<td style="text-align:left;">
+0.001
+</td>
+<td style="text-align:left;">
+***
+</td>
+<td style="text-align:left;">
+-0.011
+</td>
+<td style="text-align:left;">
+0.002
+</td>
+<td style="text-align:left;">
+***
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Age x time
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+0.000
+</td>
+<td style="text-align:left;">
+0.000
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Gender x time
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+0.002
+</td>
+<td style="text-align:left;">
+0.005
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced intermediate x time
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+0.009
+</td>
+<td style="text-align:left;">
+0.008
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced advanced x time
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+0.016
+</td>
+<td style="text-align:left;">
+0.008
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sigma
+</td>
+<td style="text-align:left;">
+Intercept
+</td>
+<td style="text-align:left;">
+1.065
+</td>
+<td style="text-align:left;">
+0.020
+</td>
+<td style="text-align:left;">
+***
+</td>
+<td style="text-align:left;">
+1.109
+</td>
+<td style="text-align:left;">
+0.061
+</td>
+<td style="text-align:left;">
+***
+</td>
+<td style="text-align:left;">
+1.038
+</td>
+<td style="text-align:left;">
+0.085
+</td>
+<td style="text-align:left;">
+***
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Time
+</td>
+<td style="text-align:left;">
+0.001
+</td>
+<td style="text-align:left;">
+0.002
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+0.003
+</td>
+<td style="text-align:left;">
+0.002
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+0.008
+</td>
+<td style="text-align:left;">
+0.011
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Gender
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+-0.087
+</td>
+<td style="text-align:left;">
+0.027
+</td>
+<td style="text-align:left;">
+**
+</td>
+<td style="text-align:left;">
+-0.070
+</td>
+<td style="text-align:left;">
+0.039
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced intermediate (ref=basic)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+-0.093
+</td>
+<td style="text-align:left;">
+0.028
+</td>
+<td style="text-align:left;">
+**
+</td>
+<td style="text-align:left;">
+-0.122
+</td>
+<td style="text-align:left;">
+0.039
+</td>
+<td style="text-align:left;">
+**
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced advanced (ref=basic)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+-0.028
+</td>
+<td style="text-align:left;">
+0.022
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+-0.023
+</td>
+<td style="text-align:left;">
+0.032
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+0.000
+</td>
+<td style="text-align:left;">
+0.001
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+0.002
+</td>
+<td style="text-align:left;">
+0.001
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Age x time
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+0.000
+</td>
+<td style="text-align:left;">
+0.000
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Gender x time
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+-0.002
+</td>
+<td style="text-align:left;">
+0.004
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced intermediate x time
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+0.006
+</td>
+<td style="text-align:left;">
+0.006
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced advanced x time
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+0.006
+</td>
+<td style="text-align:left;">
+0.006
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="padding: 0; " colspan="100%">
+<span style="font-style: italic;">Note.</span> <sup></sup> *** = p &lt;
+0.001, ** = p &lt; 0.01, * = p &lt; 0.05
+</td>
+</tr>
+</tfoot>
+</table></li>
+</ul>
+<pre class="r"><code>#%&gt;%
+    #save_kable(&quot;/Users/anuschka/Documents/climatechange/climatechange/output/gamlss_table.pdf&quot;)</code></pre>
+</div>
+<div id="table-all-pooled-effects" class="section level2 unnumbered">
+<h2 class="unnumbered">Table all pooled effects</h2>
+<pre class="r"><code>rm(list=ls())
+# I want to repeat the above Table, but instead of regressions I now want to put all the pooled effects in there
+# Starting with the time only model
+# You may notice that I use the rma function and metagen. The estimate TE.random of metagen (pooled effect) is the same as the beta in the rma model
+set.seed(1) #(as I am performing analyses with a random aspect)
+
+load(here(&quot;./data/meta_analysis&quot;, &quot;total_reg_results_gam_w_new.RData&quot;))
+
+# Extract the pooled effects, first mean attitudes
+model_step_1_att &lt;- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_reg_results,
+              method = &quot;REML&quot;,
+              test = &quot;knha&quot;)
+
+one &lt;- summary(model_step_1_att)
+one_df &lt;- data.frame(matrix(ncol = 5, nrow = 1))
+colnames(one_df) &lt;- c(&quot;mu_sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;)
+
+one_df$mu_sigma &lt;- c(&quot;Mean attitudes&quot;)
+one_df$Variable &lt;- &quot;Time&quot;
+one_df$Estimate &lt;- as.numeric(one$b)
+one_df$SE &lt;- one$se
+one_df$p &lt;- one$pval
+
+# And now variance
+model_step_1_var &lt;- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_reg_results,
+              method = &quot;REML&quot;,
+              test = &quot;knha&quot;)
+
+two &lt;- summary(model_step_1_var)
+two_df &lt;- data.frame(matrix(ncol = 5, nrow = 1))
+colnames(two_df) &lt;- c(&quot;mu_sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;)
+
+two_df$mu_sigma &lt;- c(&quot;Polarization attitudes&quot;)
+two_df$Variable &lt;- &quot;Time&quot;
+two_df$Estimate &lt;- as.numeric(two$b)
+two_df$SE &lt;- two$se
+two_df$p &lt;- two$pval
+
+# Rowbind them, these are all the pooled effects of the time-only model
+empty_df &lt;- rbind(one_df, two_df)
+
+# Now continue with the independent variable model, first the mean attitudes 
+load(here(&quot;./data/meta_analysis&quot;, &quot;total_indep_var_results_new.RData&quot;))
+
+m2_att &lt;- rma(yi = mu_time_pred,
+              sei = mu_time_sd_pred,
+              data = total_reg_results,
+              method = &quot;REML&quot;,
+              test = &quot;knha&quot;)
+
+# Gender 
+gender_gen &lt;- metagen(TE = mu_sex_est,
+                 seTE = mu_sex_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Age 
+age_gen &lt;- metagen(TE = mu_age_est,
+                 seTE = mu_age_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Educational level. This is now a dummy
+edu_med_gen &lt;- metagen(TE = mu_isced_med_est,
+                 seTE = mu_isced_med_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+edu_high_gen &lt;- metagen(TE = mu_isced_high_est,
+                 seTE = mu_isced_high_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Extract all the data from the models and put them in a dataframe that will later be the input of the kable table
+three_df &lt;- data.frame(matrix(ncol = 5, nrow = 5))
+colnames(three_df) &lt;- c(&quot;mu_sigma_1&quot;, &quot;Variable_1&quot;, &quot;Estimate_1&quot;, &quot;SE_1&quot;, &quot;p_1&quot;)
+three_df$mu_sigma_1 &lt;- c(&quot;Mean attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+three_df$Variable_1 &lt;- c(&quot;Time&quot;, &quot;Gender&quot;, &quot;Age&quot;, &quot;Isced intermediate (ref=basic)&quot;, &quot;Isced advanced (ref=basic)&quot;)
+three_df$Estimate_1 &lt;- c(as.numeric(m2_att$b), gender_gen$TE.random, age_gen$TE.random, edu_med_gen$TE.random, edu_high_gen$TE.random)
+three_df$SE_1 &lt;- c(m2_att$se, gender_gen$seTE.random, age_gen$seTE.random, edu_med_gen$seTE.random, edu_high_gen$seTE.random)
+three_df$p_1 &lt;- c(m2_att$pval, gender_gen$pval.random, age_gen$pval.random, edu_med_gen$pval.random, edu_high_gen$pval.random)                       
+                       
+# The same for variance
+m2_var &lt;- rma(yi = sig_time_pred,
+              sei = sig_time_sd_pred,
+              data = total_reg_results,
+              method = &quot;REML&quot;,
+              test = &quot;knha&quot;)
+
+# Gender
+gender_var_gen &lt;- metagen(TE = sig_sex_est,
+                 seTE = sig_sex_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Age
+age_var_gen &lt;- metagen(TE = sig_age_est,
+                 seTE = sig_age_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Education
+edu_var_med_gen &lt;- metagen(TE = sig_isced_med_est,
+                 seTE = sig_isced_med_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+edu_var_high_gen &lt;- metagen(TE = sig_isced_high_est,
+                 seTE = sig_isced_high_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+four_df &lt;- data.frame(matrix(ncol = 5, nrow = 5))
+colnames(four_df) &lt;- c(&quot;mu_sigma_1&quot;, &quot;Variable_1&quot;, &quot;Estimate_1&quot;, &quot;SE_1&quot;, &quot;p_1&quot;)
+four_df$mu_sigma_1 &lt;- c(&quot;Polarization attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+four_df$Variable_1 &lt;- c(&quot;Time&quot;, &quot;Gender&quot;, &quot;Age&quot;, &quot;Isced intermediate (ref=basic)&quot;, &quot;Isced advanced (ref=basic)&quot;)
+four_df$Estimate_1 &lt;- c(as.numeric(m2_var$b), gender_var_gen$TE.random, age_var_gen$TE.random, edu_var_med_gen$TE.random, edu_var_high_gen$TE.random)
+four_df$SE_1 &lt;- c(m2_att$se, gender_var_gen$seTE.random, age_var_gen$seTE.random, edu_var_med_gen$seTE.random, edu_var_high_gen$seTE.random)
+four_df$p_1 &lt;- c(m2_att$pval, gender_var_gen$pval.random, age_var_gen$pval.random, edu_var_med_gen$pval.random, edu_var_high_gen$pval.random)
+
+
+# Bind rows of these two, these are all the pooled effects of the independent variables model
+indep_df &lt;- rbind(three_df, four_df)
+
+#Now i want the interaction model as well
+load(&quot;C:/Github/climatechange/data/meta_analysis/total_inter_results_new.RData&quot;)
+
+# First mean attitudes
+m3_att &lt;- rma(yi = mu_time_int,
+              sei = mu_time_sd_int,
+              data = total_reg_results,
+              method = &quot;REML&quot;,
+              test = &quot;knha&quot;)
+
+# Gender 
+gender_gen_int &lt;- metagen(TE = mu_sex_est,
+                 seTE = mu_sex_sd,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Age 
+age_gen_int &lt;- metagen(TE = mu_age_est,
+                 seTE = mu_age_sd,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Educational level
+edu_med_gen_int &lt;- metagen(TE = mu_isced_med_est,
+                 seTE = mu_isced_med_sd,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+edu_high_gen_int &lt;- metagen(TE = mu_isced_high_est,
+                 seTE = mu_isced_high_sd,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# And the interaction effects 
+# Gender 
+gender_int_eff &lt;- metagen(TE = mu_sex_est_inter,
+                 seTE = mu_sex_sd_inter,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Age 
+age_int_eff &lt;- metagen(TE = mu_age_est_inter,
+                 seTE = mu_age_sd_inter,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Educational level
+edu_med_int_eff &lt;- metagen(TE = mu_isced_med_est_inter,
+                 seTE = mu_isced_med_sd_inter,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+edu_high_int_eff &lt;- metagen(TE = mu_isced_high_est_inter,
+                 seTE = mu_isced_high_sd_inter,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Now extract the data for a table
+five_df &lt;- data.frame(matrix(ncol = 5, nrow = 9))
+colnames(five_df) &lt;- c(&quot;mu_sigma_2&quot;, &quot;Variable_2&quot;, &quot;Estimate_2&quot;, &quot;SE_2&quot;, &quot;p_2&quot;)
+five_df$mu_sigma_2 &lt;- c(&quot;Mean attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+five_df$Variable_2 &lt;- c(&quot;Time&quot;, &quot;Gender&quot;, &quot;Age&quot;, &quot;Isced intermediate (ref=basic)&quot;, &quot;Isced advanced (ref=basic)&quot;, &quot;Gender x time&quot;, &quot;Age x time&quot;, &quot;Isced intermediate x time&quot;, &quot;Isced advanced x time&quot;)
+five_df$Estimate_2 &lt;- c(as.numeric(m3_att$b), gender_gen_int$TE.random, age_gen_int$TE.random, edu_med_gen_int$TE.random, edu_high_gen_int$TE.random, gender_int_eff$TE.random, age_int_eff$TE.random, edu_med_int_eff$TE.random, edu_high_int_eff$TE.random)
+five_df$SE_2 &lt;- c(m3_att$se, gender_gen_int$seTE.random, age_gen_int$seTE.random, edu_med_gen_int$seTE.random, edu_high_gen_int$seTE.random, gender_int_eff$seTE.random, age_int_eff$seTE.random, edu_med_int_eff$seTE.random, edu_high_int_eff$seTE.random)
+five_df$p_2 &lt;- c(m3_att$pval, gender_gen_int$pval.random, age_gen_int$pval.random, edu_med_gen_int$pval.random, edu_high_gen_int$pval.random, gender_int_eff$pval.random, age_int_eff$pval.random, edu_med_int_eff$pval.random, edu_high_int_eff$pval.random)
+
+# Now the same procedure for the variance
+m3_var &lt;- rma(yi = sig_time_int,
+              sei = sig_time_sd_int,
+              data = total_reg_results,
+              method = &quot;REML&quot;,
+              test = &quot;knha&quot;)
+
+# Gender 
+gender_gen_int_var &lt;- metagen(TE = sig_sex_est,
+                 seTE = sig_sex_sd,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Age 
+age_gen_int_var &lt;- metagen(TE = sig_age_est,
+                 seTE = sig_age_sd,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Educational level
+edu_med_gen_int_var &lt;- metagen(TE = sig_isced_med_est,
+                 seTE = sig_isced_med_sd,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+edu_high_gen_int_var &lt;- metagen(TE = sig_isced_high_est,
+                 seTE = sig_isced_high_sd,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# And the interaction effects 
+# Gender 
+gender_int_eff_var &lt;- metagen(TE = sig_sex_est_inter,
+                 seTE = sig_sex_sd_inter,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Age 
+age_int_eff_var &lt;- metagen(TE = sig_age_est_inter,
+                 seTE = sig_age_sd_inter,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Educational level
+edu_med_int_eff_var &lt;- metagen(TE = sig_isced_med_est_inter,
+                 seTE = sig_isced_med_sd_inter,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+edu_high_int_eff_var &lt;- metagen(TE = sig_isced_high_est_inter,
+                 seTE = sig_isced_high_sd_inter,
+                 data = total_inter_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+six_df &lt;- data.frame(matrix(ncol = 5, nrow = 9))
+colnames(six_df) &lt;- c(&quot;mu_sigma_2&quot;, &quot;Variable_2&quot;, &quot;Estimate_2&quot;, &quot;SE_2&quot;, &quot;p_2&quot;)
+six_df$mu_sigma_2 &lt;- c(&quot;Polarization attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+six_df$Variable_2 &lt;- c(&quot;Time&quot;, &quot;Gender&quot;, &quot;Age&quot;, &quot;Isced intermediate (ref=basic)&quot;, &quot;Isced advanced (ref=basic)&quot;, &quot;Gender x time&quot;, &quot;Age x time&quot;, &quot;Isced intermediate x time&quot;, &quot;Isced advanced x time&quot;)
+six_df$Estimate_2 &lt;- c(as.numeric(m3_var$b), gender_gen_int_var$TE.random, age_gen_int_var$TE.random, edu_med_gen_int_var$TE.random, edu_high_gen_int_var$TE.random, gender_int_eff_var$TE.random, age_int_eff_var$TE.random, edu_med_int_eff_var$TE.random, edu_high_int_eff_var$TE.random)
+six_df$SE_2 &lt;- c(m3_var$se, gender_gen_int_var$seTE.random, age_gen_int_var$seTE.random, edu_med_gen_int_var$seTE.random, edu_high_gen_int_var$seTE.random, gender_int_eff_var$seTE.random, age_int_eff_var$seTE.random, edu_med_int_eff_var$seTE.random, edu_high_int_eff_var$seTE.random)
+six_df$p_2 &lt;- c(m3_att$pval, gender_gen_int_var$pval.random, age_gen_int_var$pval.random, edu_med_gen_int_var$pval.random, edu_high_gen_int_var$pval.random, gender_int_eff_var$pval.random, age_int_eff_var$pval.random, edu_med_int_eff_var$pval.random, edu_high_int_eff_var$pval.random)
+
+#Bind these two, this now has all the pooled effects of the interaction effects
+inter_df &lt;- rbind(five_df, six_df)</code></pre>
+<pre class="r"><code>#Columnbind the three datasets
+# Difficult to columnbind them, because they&#39;re of different lengths (logically)
+df_list &lt;- list(empty_df, indep_df, inter_df)
+
+bind_cols_fill &lt;- function(df_list) {
+
+  max_rows &lt;- map_int(df_list, nrow) %&gt;% max()
+  
+  map(df_list, function(df) {
+    if(nrow(df) == max_rows) return(df)
+    first &lt;- names(df)[1] %&gt;% sym()
+    df %&gt;% add_row(!!first := rep(NA, max_rows - nrow(df)))
+  }) %&gt;% bind_cols()
+}
+
+total_df &lt;- bind_cols_fill(df_list)
+
+#Change the order a bit, just like in the previous table 
+write_xlsx(total_df, here(&quot;./data/descriptives/&quot;, &quot;kable_model_all_pooled_effects.xlsx&quot; ))</code></pre>
+<pre class="r"><code>model_new &lt;- read_excel(here(&quot;./data/descriptives/&quot;, &quot;kable_model_all_pooled_effects.xlsx&quot; ))
+
+# I Want to round the numeric variables to 3 decimals
+model_new &lt;- dplyr::mutate(model_new, across(.cols = c(-mu_sigma_2, -Variable_2), .fns = as.numeric))
+numeric_cols &lt;- sapply(model_new, is.numeric)
+model_new[, numeric_cols] &lt;- round(model_new[, numeric_cols], digits = 3)
+
+# Create a new variable to use stars instead of the full p-values in the table
+model_new$p_text &lt;- case_when(
+  model_new$p &gt;= 0.05 ~ &quot;&quot;,
+model_new$p &lt; 0.001 ~ &quot;***&quot;,
+model_new$p &lt; 0.01 ~ &quot;**&quot;,
+model_new$p &lt; 0.05 ~ &quot;*&quot;
+)
+
+model_new$p_text_1 &lt;- case_when(
+  model_new$p_1 &gt;= 0.05 ~ &quot;&quot;,
+model_new$p_1 &lt; 0.001 ~ &quot;***&quot;,
+model_new$p_1 &lt; 0.01 ~ &quot;**&quot;,
+model_new$p_1 &lt; 0.05 ~ &quot;*&quot;
+)
+
+model_new$p_text_2 &lt;- case_when(
+  model_new$p_2 &gt;= 0.05 ~ &quot;&quot;,
+model_new$p_2 &lt; 0.001 ~ &quot;***&quot;,
+model_new$p_2 &lt; 0.01 ~ &quot;**&quot;,
+model_new$p_2 &lt; 0.05 ~ &quot;*&quot;
+)
+
+# Now only select the variables that I want to show in the table
+model_new &lt;- dplyr::select(model_new, mu_sigma_2, Variable_2, Estimate, SE, p_text, Estimate_1, SE_1, p_text_1, Estimate_2, SE_2, p_text_2)
+
+# Make and save the table as html file
+kable(model_new, digits = 3, caption = &quot;Table 3. All pooled effects mean attitudes and polarization&quot;, 
+      col.names = c( &quot;&quot;, &quot;Variables&quot;, &quot;Estimate&quot;, &quot;Std. Error&quot;, &quot;&quot;, &quot;Estimate&quot;, &quot;Std. Error&quot;, &quot;&quot;, &quot;Estimate&quot;, &quot;Std. Error&quot;, &quot;&quot;)) %&gt;%
+  kable_classic_2(html_font = &quot;Times&quot;, fixed_thead = T, full_width = F) %&gt;%
+  add_header_above(c(&quot; &quot; = 2, &quot;Time-only model&quot; = 3, &quot;Indepent var model&quot; = 3, &quot;Interaction model&quot; = 3)) %&gt;%
+   footnote(
+    general_title = &quot;Note.&quot;,
+    general = &quot;*** = p &lt; 0.001, ** = p &lt; 0.01, * = p &lt; 0.05&quot;,
+    threeparttable = TRUE,
+    footnote_as_chunk = TRUE
+    ) </code></pre>
+<table class=" lightable-classic-2" style="font-family: Times; width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;">
+<caption>
+Table 3. All pooled effects mean attitudes and polarization
+</caption>
+<thead>
+<tr>
+<th style="empty-cells: hide;" colspan="2">
+</th>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">
+Time-only model
+</div>
+</th>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">
+Indepent var model
+</div>
+</th>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">
+Interaction model
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Variables
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Estimate
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Std. Error
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Estimate
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Std. Error
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Estimate
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Std. Error
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Mean attitudes
+</td>
+<td style="text-align:left;">
+Time
+</td>
+<td style="text-align:right;">
+0.013
+</td>
+<td style="text-align:right;">
+0.014
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.009
+</td>
+<td style="text-align:right;">
+0.023
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.030
+</td>
+<td style="text-align:right;">
+0.023
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Gender
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.101
+</td>
+<td style="text-align:right;">
+0.019
+</td>
+<td style="text-align:left;">
+***
+</td>
+<td style="text-align:right;">
+0.104
+</td>
+<td style="text-align:right;">
+0.025
+</td>
+<td style="text-align:left;">
+***
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.002
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced intermediate (ref=basic)
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.165
+</td>
+<td style="text-align:right;">
+0.031
+</td>
+<td style="text-align:left;">
+***
+</td>
+<td style="text-align:right;">
+0.117
+</td>
+<td style="text-align:right;">
+0.033
+</td>
+<td style="text-align:left;">
+**
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced advanced (ref=basic)
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.030
+</td>
+<td style="text-align:right;">
+0.011
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+<td style="text-align:right;">
+0.029
+</td>
+<td style="text-align:right;">
+0.013
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Gender x time
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:right;">
+0.004
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Age x time
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced intermediate x time
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.008
+</td>
+<td style="text-align:right;">
+0.003
+</td>
+<td style="text-align:left;">
+**
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced advanced x time
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.018
+</td>
+<td style="text-align:right;">
+0.009
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Polarization attitudes
+</td>
+<td style="text-align:left;">
+Time
+</td>
+<td style="text-align:right;">
+-0.013
+</td>
+<td style="text-align:right;">
+0.006
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+<td style="text-align:right;">
+-0.011
+</td>
+<td style="text-align:right;">
+0.023
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:right;">
+0.005
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Gender
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.071
+</td>
+<td style="text-align:right;">
+0.009
+</td>
+<td style="text-align:left;">
+***
+</td>
+<td style="text-align:right;">
+0.008
+</td>
+<td style="text-align:right;">
+0.003
+</td>
+<td style="text-align:left;">
+**
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.005
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced intermediate (ref=basic)
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.044
+</td>
+<td style="text-align:right;">
+0.009
+</td>
+<td style="text-align:left;">
+***
+</td>
+<td style="text-align:right;">
+0.018
+</td>
+<td style="text-align:right;">
+0.009
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced advanced (ref=basic)
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.006
+</td>
+<td style="text-align:right;">
+0.004
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+1.183
+</td>
+<td style="text-align:right;">
+0.043
+</td>
+<td style="text-align:left;">
+***
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Gender x time
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.001
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Age x time
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced intermediate x time
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:right;">
+0.002
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced advanced x time
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+-0.001
+</td>
+<td style="text-align:right;">
+0.003
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="padding: 0; " colspan="100%">
+<span style="font-style: italic;">Note.</span> <sup></sup> *** = p &lt;
+0.001, ** = p &lt; 0.01, * = p &lt; 0.05
+</td>
+</tr>
+</tfoot>
+</table></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+<pre class="r"><code>#%&gt;%
+    #save_kable(&quot;/Users/anuschka/Documents/climatechange/climatechange/output/pooled_effects_table.html&quot;)</code></pre>
+</div>
+<div
+id="appendix-d.-pooled-effects-age-only-vs-gender-and-education-only-model"
+class="section level2 unnumbered">
+<h2 class="unnumbered">Appendix D. Pooled effects age-only vs gender and
+education-only model</h2>
+<pre class="r"><code>rm(list=ls())
+set.seed(1) #(as I am performing analyses with a random aspect)
+load(here(&quot;./data/meta_analysis&quot;, &quot;total_indep_var_results_new_edugen.RData&quot;))
+
+# The models in which I only included education and gender 
+m2_att &lt;- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_indep_var_results,
+              method = &quot;REML&quot;,
+              test = &quot;knha&quot;)
+
+# Gender 
+gender_gen &lt;- metagen(TE = mu_sex_est,
+                 seTE = mu_sex_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Educational level. This is now a dummy
+edu_med_gen &lt;- metagen(TE = mu_isced_med_est,
+                 seTE = mu_isced_med_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+edu_high_gen &lt;- metagen(TE = mu_isced_high_est,
+                 seTE = mu_isced_high_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Extract all the data from the models and put them in a dataframe that will later be the input of the kable table
+three_df &lt;- data.frame(matrix(ncol = 6, nrow = 4))
+colnames(three_df) &lt;- c(&quot;mu_sigma_1&quot;, &quot;age_educ_1&quot;, &quot;Variable_1&quot;, &quot;Estimate_1&quot;, &quot;SE_1&quot;, &quot;p_1&quot;)
+three_df$mu_sigma_1 &lt;- c(&quot;Mean attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+three_df$age_educ_1 &lt;- c(&quot;Gender and education&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+three_df$Variable_1 &lt;- c(&quot;Time&quot;, &quot;Gender&quot;, &quot;Isced intermediate (ref=basic)&quot;, &quot;Isced advanced (ref=basic)&quot;)
+three_df$Estimate_1 &lt;- c(as.numeric(m2_att$b), gender_gen$TE.random,edu_med_gen$TE.random, edu_high_gen$TE.random)
+three_df$SE_1 &lt;- c(m2_att$se, gender_gen$seTE.random, edu_med_gen$seTE.random, edu_high_gen$seTE.random)
+three_df$p_1 &lt;- c(m2_att$pval, gender_gen$pval.random, edu_med_gen$pval.random, edu_high_gen$pval.random)                       
+                       
+# The same for variance
+m2_var &lt;- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_indep_var_results,
+              method = &quot;REML&quot;,
+              test = &quot;knha&quot;)
+
+# Gender
+gender_var_gen &lt;- metagen(TE = sig_sex_est,
+                 seTE = sig_sex_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Education
+edu_var_med_gen &lt;- metagen(TE = sig_isced_med_est,
+                 seTE = sig_isced_med_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+edu_var_high_gen &lt;- metagen(TE = sig_isced_high_est,
+                 seTE = sig_isced_high_sd,
+                 data = total_indep_var_results,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+four_df &lt;- data.frame(matrix(ncol = 6, nrow = 4))
+colnames(four_df) &lt;- c(&quot;mu_sigma_1&quot;, &quot;age_educ_1&quot;, &quot;Variable_1&quot;, &quot;Estimate_1&quot;, &quot;SE_1&quot;, &quot;p_1&quot;)
+four_df$mu_sigma_1 &lt;- c(&quot;Polarization attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+four_df$age_educ_1 &lt;- c(&quot;Gender and education&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
+four_df$Variable_1 &lt;- c(&quot;Time&quot;, &quot;Gender&quot;, &quot;Isced intermediate (ref=basic)&quot;, &quot;Isced advanced (ref=basic)&quot;)
+four_df$Estimate_1 &lt;- c(as.numeric(m2_var$b), gender_var_gen$TE.random, edu_var_med_gen$TE.random, edu_var_high_gen$TE.random)
+four_df$SE_1 &lt;- c(m2_att$se, gender_var_gen$seTE.random, edu_var_med_gen$seTE.random, edu_var_high_gen$seTE.random)
+four_df$p_1 &lt;- c(m2_att$pval, gender_var_gen$pval.random, edu_var_med_gen$pval.random, edu_var_high_gen$pval.random)</code></pre>
+<pre class="r"><code>rm(total_indep_var_results)
+# Do the same, but then for the models with only age included
+load(here(&quot;./data/meta_analysis&quot;, &quot;total_indep_var_results_new_age.RData&quot;))
+total_indep_var_results_age &lt;- as.data.frame(total_indep_var_results)
+
+# The models in which I only included education and gender 
+m2_att_age &lt;- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_indep_var_results_age,
+              method = &quot;REML&quot;,
+              test = &quot;knha&quot;)
+
+# Age
+age_gen &lt;- metagen(TE = mu_age_est,
+                 seTE = mu_age_sd,
+                 data = total_indep_var_results_age,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+# Extract all the data from the models and put them in a dataframe that will later be the input of the kable table
+five_df &lt;- data.frame(matrix(ncol = 6, nrow = 2))
+colnames(five_df) &lt;- c(&quot;mu_sigma_1&quot;, &quot;age_educ_1&quot;, &quot;Variable_1&quot;, &quot;Estimate_1&quot;, &quot;SE_1&quot;, &quot;p_1&quot;)
+five_df$mu_sigma_1 &lt;- c(&quot;&quot;, &quot;&quot;)
+five_df$age_educ_1 &lt;- c(&quot;Age&quot;, &quot;&quot;)
+five_df$Variable_1 &lt;- c(&quot;Time&quot;, &quot;Age&quot;)
+five_df$Estimate_1 &lt;- c(as.numeric(m2_att_age$b), age_gen$TE.random)
+five_df$SE_1 &lt;- c(m2_att_age$se, age_gen$seTE.random)
+five_df$p_1 &lt;- c(m2_att_age$pval, age_gen$pval.random)                       
+                       
+# The same for variance
+m2_var_age &lt;- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_indep_var_results_age,
+              method = &quot;REML&quot;,
+              test = &quot;knha&quot;)
+
+# Gender
+age_var_gen &lt;- metagen(TE = sig_age_est,
+                 seTE = sig_age_sd,
+                 data = total_indep_var_results_age,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 hakn = TRUE)
+
+six_df &lt;- data.frame(matrix(ncol = 6, nrow = 2))
+colnames(six_df) &lt;- c(&quot;mu_sigma_1&quot;, &quot;age_educ_1&quot;, &quot;Variable_1&quot;, &quot;Estimate_1&quot;, &quot;SE_1&quot;, &quot;p_1&quot;)
+six_df$mu_sigma_1 &lt;- c(&quot;&quot;, &quot;&quot;)
+six_df$age_educ_1 &lt;- c(&quot;Age&quot;, &quot;&quot;)
+six_df$Variable_1 &lt;- c(&quot;Time&quot;, &quot;Age&quot;)
+six_df$Estimate_1 &lt;- c(as.numeric(m2_var_age$b), age_var_gen$TE.random)
+six_df$SE_1 &lt;- c(m2_var_age$se, age_var_gen$seTE.random)
+six_df$p_1 &lt;- c(m2_var_age$pval, age_var_gen$pval.random)
+
+# The order I want in the tables is three -&gt; five -&gt; four -&gt; six
+total_df &lt;- rbind(three_df, five_df, four_df, six_df)
+
+# I Want to round the numeric variables to 3 decimals
+total_df &lt;- dplyr::mutate(total_df, across(.cols = c(-mu_sigma_1, -Variable_1, -age_educ_1), .fns = as.numeric))
+numeric_cols &lt;- sapply(total_df, is.numeric)
+total_df[, numeric_cols] &lt;- round(total_df[, numeric_cols], digits = 3)
+
+# Create a new variable to use stars instead of the full p-values in the table
+total_df$p_text_1 &lt;- case_when(
+  total_df$p_1 &gt;= 0.05 ~ &quot;&quot;,
+total_df$p_1 &lt; 0.001 ~ &quot;***&quot;,
+total_df$p_1 &lt; 0.01 ~ &quot;**&quot;,
+total_df$p_1 &lt; 0.05 ~ &quot;*&quot;
+)
+
+# Now only select the variables that I want to show in the table
+total_df &lt;- dplyr::select(total_df, mu_sigma_1, age_educ_1, Variable_1, Estimate_1, SE_1, p_text_1)
+
+# Make and save the table as html file
+kable(total_df, digits = 3, caption = &quot;Appendix D. Pooled effects mean attitudes and polarization age, education and gender.&quot;, 
+      col.names = c( &quot;&quot;, &quot;&quot;, &quot;Variables&quot;, &quot;Estimate&quot;, &quot;Std. Error&quot;, &quot;&quot;)) %&gt;%
+  kable_classic_2(html_font = &quot;Times&quot;, fixed_thead = T, full_width = F) %&gt;%
+  add_header_above(c(&quot; &quot; = 3, &quot;Indepent var model&quot; = 3)) %&gt;%
+   footnote(
+    general_title = &quot;Note.&quot;,
+    general = &quot;*** = p &lt; 0.001, ** = p &lt; 0.01, * = p &lt; 0.05&quot;,
+    threeparttable = TRUE,
+    footnote_as_chunk = TRUE
+    )</code></pre>
+<table class=" lightable-classic-2" style="font-family: Times; width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;">
+<caption>
+Appendix D. Pooled effects mean attitudes and polarization age,
+education and gender.
+</caption>
+<thead>
+<tr>
+<th style="empty-cells: hide;" colspan="3">
+</th>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">
+Indepent var model
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Variables
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Estimate
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Std. Error
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Mean attitudes
+</td>
+<td style="text-align:left;">
+Gender and education
+</td>
+<td style="text-align:left;">
+Time
+</td>
+<td style="text-align:right;">
+0.010
+</td>
+<td style="text-align:right;">
+0.023
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Gender
+</td>
+<td style="text-align:right;">
+0.103
+</td>
+<td style="text-align:right;">
+0.020
+</td>
+<td style="text-align:left;">
+***
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced intermediate (ref=basic)
+</td>
+<td style="text-align:right;">
+0.145
+</td>
+<td style="text-align:right;">
+0.034
+</td>
+<td style="text-align:left;">
+***
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced advanced (ref=basic)
+</td>
+<td style="text-align:right;">
+0.042
+</td>
+<td style="text-align:right;">
+0.011
+</td>
+<td style="text-align:left;">
+***
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:left;">
+Time
+</td>
+<td style="text-align:right;">
+0.010
+</td>
+<td style="text-align:right;">
+0.022
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Polarization attitudes
+</td>
+<td style="text-align:left;">
+Gender and education
+</td>
+<td style="text-align:left;">
+Time
+</td>
+<td style="text-align:right;">
+-0.009
+</td>
+<td style="text-align:right;">
+0.023
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Gender
+</td>
+<td style="text-align:right;">
+-0.069
+</td>
+<td style="text-align:right;">
+0.009
+</td>
+<td style="text-align:left;">
+***
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced intermediate (ref=basic)
+</td>
+<td style="text-align:right;">
+-0.046
+</td>
+<td style="text-align:right;">
+0.009
+</td>
+<td style="text-align:left;">
+***
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Isced advanced (ref=basic)
+</td>
+<td style="text-align:right;">
+-0.003
+</td>
+<td style="text-align:right;">
+0.004
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:left;">
+Time
+</td>
+<td style="text-align:right;">
+-0.009
+</td>
+<td style="text-align:right;">
+0.005
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:left;">
+**
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="padding: 0; " colspan="100%">
+<span style="font-style: italic;">Note.</span> <sup></sup> *** = p &lt;
+0.001, ** = p &lt; 0.01, * = p &lt; 0.05
+</td>
+</tr>
+</tfoot>
+</table>
+<pre class="r"><code>#%&gt;%
+ #   save_kable(&quot;/Users/anuschka/Documents/climatechange/climatechange/output/appendix/pooled_effects_edugenage.html&quot;)</code></pre>
+</div>
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRlc2NyaXB0aXZlIHN0YXRpc3RpY3MiDQphdXRob3I6ICJBbnVzY2hrYSBQZWVsZW4iDQpkYXRlOiAiYHIgU3lzLkRhdGUoKWAiDQpvdXRwdXQ6IGh0bWxfZG9jdW1lbnQNCi0tLQ0KDQpgYGB7ciwgZWNobz1GQUxTRX0NCiNrbml0cjo6b3B0c19jaHVuayRzZXQoZXZhbCA9IEZBTFNFKQ0Ka25pdHI6Om9wdHNfY2h1bmskc2V0KG51bWJlcl9zZWN0aW9ucyA9IEZBTFNFKQ0Kb3B0aW9ucyh3aWR0aCA9IDEwMCkNCmNvbG9yaXplIDwtIGZ1bmN0aW9uKHgsIGNvbG9yKSB7c3ByaW50ZigiPHNwYW4gc3R5bGU9J2NvbG9yOiAlczsnPiVzPC9zcGFuPiIsIGNvbG9yLCB4KSB9DQpgYGANCg0KSW4gdGhpcyBzY3JpcHQsIEkgd3JpdGUgdGhlIGNvZGUgdG8gbWFrZSBzb21lIHBsb3RzIGFuZCB0YWJsZXMgdGhhdCBJIHVzZSB0byBpbiB0aGUgZGF0YSBhbmQgYW5hbHlzaXMgc2VjdGlvbi4gWW91IHdpbGwgZmluZCB0aGUgY29kZSBmb3IgdGhlIHBsb3Qgd2l0aCBkYXRhc2V0cyBwZXIgeWVhciwgdGhlIFRhYmxlIHdpdGggaW5kaXZpZHVhbCByZWdyZXNzaW9uIGFuYWx5c2lzIGZvciBvbmUgdmFyaWFibGUgb2YgSVNTUCBhbmQgdGhlIFRhYmxlIHdpdGggYWxsIHRoZSBwb29sZWQgZWZmZWN0cy4gDQoNCmBgYHtyLHJlc3VsdHM9J2hpZGUnLCB3YXJuaW5nPUZBTFNFLCBtZXNzYWdlPUZBTFNFfQ0KbGlicmFyeShkcGx5cikNCmxpYnJhcnkoaGVyZSkNCmxpYnJhcnkoZ2dwbG90MikNCmxpYnJhcnkoa2FibGVFeHRyYSkNCmxpYnJhcnkodGlkeXZlcnNlKQ0KbGlicmFyeSh3cml0ZXhsKQ0KbGlicmFyeShyZWFkeGwpDQpsaWJyYXJ5KGdhbWxzcykNCmxpYnJhcnkobWV0YWZvcikNCmxpYnJhcnkobWV0YSkNCg0KYGBgDQoNCiMjIEdncGxvdCB0aGF0IHNob3dzIHRoZSB5ZWFycyB0aGF0IGVhY2ggZGF0YXNldCBjb3ZlcnMgey19DQoNCmBgYHtyfQ0KZGF0YXllYXIgPC0gcmVhZF9leGNlbCgiQzovR2l0aHViL2NsaW1hdGVjaGFuZ2UvZGF0YS9kZXNjcmlwdGl2ZXMvZGF0YXNldF95ZWFyLnhsc3giKQ0KYGBgDQoNCmBgYHtyLCB3YXJuaW5nPUZBTFNFLCBmaWcuc2hvdz0nYXNpcyd9DQpjb2xvcl9zY2FsZSA8LSBjICgiIzFBQkM5QyIsICIjODVDMUU5IiAsICIjRUI5ODRFIiwgIiNBRjdBQzUiICwgIiNGMUM0MEYiKQ0KZGF0YXllYXIkZGF0YXNldCA8LSBmYWN0b3IoZGF0YXllYXIkZGF0YXNldCwgbGV2ZWxzID0gYygiSSZPIiwgIkVTUyIsICJJU1NQIiwgIkVWUyIsICJFQiIpKQ0KZGF0YXllYXIkY29sb3JbZGF0YXllYXIkZGF0YXNldCA9PSAiSSZPIl0gPC0gIiMxQUJDOUMiDQpkYXRheWVhciRjb2xvcltkYXRheWVhciRkYXRhc2V0ID09ICJFU1MiXSA8LSAiIzg1QzFFOSINCmRhdGF5ZWFyJGNvbG9yW2RhdGF5ZWFyJGRhdGFzZXQgPT0gIklTU1AiXSA8LSAiI0VCOTg0RSINCmRhdGF5ZWFyJGNvbG9yW2RhdGF5ZWFyJGRhdGFzZXQgPT0gIkVWUyJdIDwtICIjQUY3QUM1Ig0KZGF0YXllYXIkY29sb3JbZGF0YXllYXIkZGF0YXNldCA9PSAiRUIiXSA8LSAiI0YxQzQwRiINCg0KZmlyc3RfbGFzdF95ZWFyIDwtIGRhdGF5ZWFyICU+JQ0KICBncm91cF9ieShkYXRhc2V0KSAlPiUNCiAgc3VtbWFyaXplKGZpcnN0X3llYXIgPSBtaW4oeWVhciksDQogICAgICAgICAgICBsYXN0X3llYXIgPSBtYXgoeWVhcikpDQoNCnllYXJwbG90IDwtIGdncGxvdChkYXRhID0gZGF0YXllYXIsIGFlcyh4ID0geWVhciwgeSA9IGRhdGFzZXQsIGNvbG9yID0gZGF0YXNldCkpICsNCiAgZ2VvbV9saW5lKHNpemUgPSAxKSArDQogIHNjYWxlX2NvbG9yX21hbnVhbCh2YWx1ZXMgPSBjb2xvcl9zY2FsZSkgKw0KICBsYWJzKHggPSAiWWVhciIsDQogICAgICAgeSA9ICJEYXRhc2V0IikgKw0KICBnZW9tX3BvaW50KGRhdGEgPSBkYXRheWVhciwgYWVzKHggPSB5ZWFyKSwgY29sb3IgPSBkYXRheWVhciRjb2xvciwgc2l6ZSA9IDIpICsNCiAgZ2VvbV9wb2ludChkYXRhID0gZmlyc3RfbGFzdF95ZWFyLCB4ID0gZmlyc3RfbGFzdF95ZWFyJGZpcnN0X3llYXIpICsgDQogIGdlb21fcG9pbnQoZGF0YSA9IGZpcnN0X2xhc3RfeWVhciwgeCA9IGZpcnN0X2xhc3RfeWVhciRsYXN0X3llYXIpICsgDQogIGdlb21fdGV4dChkYXRhID0gZmlyc3RfbGFzdF95ZWFyLCB4ID0gZmlyc3RfbGFzdF95ZWFyJGZpcnN0X3llYXIsIGxhYmVsID0gZmlyc3RfbGFzdF95ZWFyJGZpcnN0X3llYXIsIHZqdXN0ID0gLTEpICsNCiAgZ2VvbV90ZXh0KGRhdGEgPSBmaXJzdF9sYXN0X3llYXIsIHggPSBmaXJzdF9sYXN0X3llYXIkbGFzdF95ZWFyLCBsYWJlbCA9IGZpcnN0X2xhc3RfeWVhciRsYXN0X3llYXIsIHZqdXN0ID0gLTEpICsgDQogIHRoZW1lX2NsYXNzaWMoKSArDQogIGd1aWRlcyhjb2xvciA9IEZBTFNFKQ0KDQp5ZWFycGxvdCANCg0KI2dnc2F2ZSgieWVhcnBsb3QucG5nIiwgd2lkdGggPSA3LCBoZWlnaHQgPSA1LCBwYXRoID0gIi9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL291dHB1dC95ZWFycGxvdC5wbmciKQ0KYGBgDQoNCiMjIFRhYmxlIG9mIHRoZSBHQU1MU1MgcmVncmVzc2lvbiBvdXRwdXQgey19DQoNCmBgYHtyfQ0KIyBSdW4gdGhpcyBwaWVjZSBvZiBjb2RlIHNvIHRoYXQgaW4gdGhlIFRhYmxlIGJlbmVhdGggaXQgd2lsbCBub3Qgc2hvdyBOQXMNCm9wdGlvbnMoa25pdHIua2FibGUuTkEgPSAnJykNCmBgYA0KDQpgYGB7ciwgZXZhbD1GQUxTRX0NCiMgSWxsdXN0cmF0ZSB0aGUgZ2FtbHNzIHJlZ3Jlc3Npb25zIGJ5IHNob3dpbmcgb25lIGZyb20gSVNTUCB3aXRoIGthYmxlIGV4dHJhDQpsb2FkKGhlcmUoIi4vZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cyIsICJpc3NwX2xpc3RfZW1wdHlfdy5SZGF0YSIpKQ0KbG9hZChoZXJlKCIuL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMiLCAiaXNzcF9saXN0X3ByZWRzX3dfbmV3LlJkYXRhIikpDQpsb2FkKGhlcmUoIi4vZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cyIsICJpc3NwX2xpc3RfaW50ZXJhY3Rpb25zX3dfbmV3LlJkYXRhIikpDQoNCiMgVXNlIGZpcnN0IHZhcmlhYmxlLCB3aGljaCBpcyAid29ycnkiDQptb2RlbF90aW1lX29ubHkgPC0gc3VtbWFyeShpc3NwX2xpc3RfZW1wdHlbWzFdXSkNCm1vZGVsX3RpbWVfb25seV9kZiA8LSBhcy5kYXRhLmZyYW1lKG1vZGVsX3RpbWVfb25seSkNCm1vZGVsX3RpbWVfb25seV9kZiRtdV9zaWdtYSA8LSBjKCJNdSIsICIiLCAiU2lnbWEiLCAiIikNCm1vZGVsX3RpbWVfb25seV9kZiR2YXJpYWJsZXMgPC0gYygiSW50ZXJjZXB0IiwgIlRpbWUiLCAiSW50ZXJjZXB0IiwgIlRpbWUiKQ0KbW9kZWxfdGltZV9vbmx5X2RmIDwtIG1vZGVsX3RpbWVfb25seV9kZiAlPiUgZHBseXI6OiBzZWxlY3QobXVfc2lnbWEsIHZhcmlhYmxlcywgZXZlcnl0aGluZygpKQ0Kcm93bmFtZXMobW9kZWxfdGltZV9vbmx5X2RmKSA8LSBOVUxMDQoNCm1vZGVsX2luZGVwX2RmIDwtIGFzLmRhdGEuZnJhbWUoc3VtbWFyeShpc3NwX2xpc3RfcHJlZHNbWzFdXSkpDQptb2RlbF9pbmRlcF9kZiRtdV9zaWdtYSA8LSBjKCJNdSIsICIiLCAiIiwgIiIsICIiLCAiIiwiU2lnbWEiLCAiIiwgIiIsICIiLCAiIiwgIiIpDQptb2RlbF9pbmRlcF9kZiR2YXJpYWJsZXMgPC0gYygiSW50ZXJjZXB0IiwgIlRpbWUiLCAiR2VuZGVyIiwgICJJc2NlZCBpbnRlcm1lZGlhdGUgKHJlZj1iYXNpYykiLCAiSXNjZWQgYWR2YW5jZWQgKHJlZj1iYXNpYykiLCAiQWdlIiwgIkludGVyY2VwdCIsICJUaW1lIiwgIkdlbmRlciIsICAiSXNjZWQgaW50ZXJtZWRpYXRlIChyZWY9YmFzaWMpIiwgIklzY2VkIGFkdmFuY2VkIChyZWY9YmFzaWMpIiwgIkFnZSIpDQptb2RlbF9pbmRlcF9kZiA8LSBtb2RlbF9pbmRlcF9kZiAlPiUgZHBseXI6OnNlbGVjdChtdV9zaWdtYSwgdmFyaWFibGVzLCBldmVyeXRoaW5nKCkpDQpyb3duYW1lcyhtb2RlbF9pbmRlcF9kZikgPC0gTlVMTA0KDQptb2RlbF9pbnRlcmFjdF9kZiA8LSBhcy5kYXRhLmZyYW1lKHN1bW1hcnkoaXNzcF9saXN0X2ludGVyYWN0aW9uc1tbMV1dKSkNCm1vZGVsX2ludGVyYWN0X2RmJG11X3NpZ21hIDwtIGMoIk11IiwgIiIsICIiLCAiIiwgIiIsICIiLCAiIiwgIiIsICIiLCAiIiwgIlNpZ21hIiwgIiIsICIiLCAiIiwgIiIsICIiLCAiIiwgIiIsICIiLCAiIikNCm1vZGVsX2ludGVyYWN0X2RmJHZhcmlhYmxlcyA8LSBjKCJJbnRlcmNlcHQiLCAiVGltZSIsICJHZW5kZXIiLCAgIklzY2VkIGludGVybWVkaWF0ZSAocmVmPWJhc2ljKSIsICJJc2NlZCBhZHZhbmNlZCAocmVmPWJhc2ljKSIsICJBZ2UiLCAiQWdlIHggdGltZSIsICJHZW5kZXIgeCB0aW1lIiwgIklzY2VkIGludGVybWVkaWF0ZSB4IHRpbWUiLCAiSXNjZWQgYWR2YW5jZWQgeCB0aW1lIiwgIkludGVyY2VwdCIsICJUaW1lIiwgIkdlbmRlciIsICAiSXNjZWQgaW50ZXJtZWRpYXRlIChyZWY9YmFzaWMpIiwgIklzY2VkIGFkdmFuY2VkIChyZWY9YmFzaWMpIiwgIkFnZSIsICJBZ2UgeCB0aW1lIiwgIkdlbmRlciB4IHRpbWUiLCAiSXNjZWQgaW50ZXJtZWRpYXRlIHggdGltZSIsICJJc2NlZCBhZHZhbmNlZCB4IHRpbWUiKQ0KbW9kZWxfaW50ZXJhY3RfZGYgPC0gbW9kZWxfaW50ZXJhY3RfZGYgJT4lIGRwbHlyOjpzZWxlY3QobXVfc2lnbWEsIHZhcmlhYmxlcywgZXZlcnl0aGluZygpKQ0Kcm93bmFtZXMobW9kZWxfaW50ZXJhY3RfZGYpIDwtIE5VTEwNCg0KIyBEaWZmaWN1bHQgdG8gY29sdW1uYmluZCB0aGVtLCBiZWNhdXNlIHRoZXkncmUgb2YgZGlmZmVyZW50IGxlbmd0aHMgKGxvZ2ljYWxseSksIHNvIHVzZSBhIGZ1bmN0aW9uDQpkZl9saXN0IDwtIGxpc3QobW9kZWxfdGltZV9vbmx5X2RmLCBtb2RlbF9pbmRlcF9kZiwgbW9kZWxfaW50ZXJhY3RfZGYpDQoNCmJpbmRfY29sc19maWxsIDwtIGZ1bmN0aW9uKGRmX2xpc3QpIHsNCg0KICBtYXhfcm93cyA8LSBtYXBfaW50KGRmX2xpc3QsIG5yb3cpICU+JSBtYXgoKQ0KICANCiAgbWFwKGRmX2xpc3QsIGZ1bmN0aW9uKGRmKSB7DQogICAgaWYobnJvdyhkZikgPT0gbWF4X3Jvd3MpIHJldHVybihkZikNCiAgICBmaXJzdCA8LSBuYW1lcyhkZilbMV0gJT4lIHN5bSgpDQogICAgZGYgJT4lIGFkZF9yb3coISFmaXJzdCA6PSByZXAoTkEsIG1heF9yb3dzIC0gbnJvdyhkZikpKQ0KICB9KSAlPiUgYmluZF9jb2xzKCkNCn0NCg0KbW9kZWxfdG90YWwgPC0gYmluZF9jb2xzX2ZpbGwoZGZfbGlzdCkNCg0KbW9kZWxfdG90YWxbaXMubmEobW9kZWxfdG90YWwpXSA8LSAiIg0KDQojIFRoZSBkYXRhZnJhbWUgaXMgYmluZGVkLCB0aGUgb3JkZXIgaXMgbm90IHRvdGFsbHkgaG93IGkgd2FudCBpdC4gVGhlIGRhdGEgYXJlIG5vdyBhbGwgY2VudGVyZWQgYXQgdGhlIHRvcCwgYnV0IGZvciB0aGUgDQojIHByZXZpb3VzIG1vZGVscywgSSBuZWVkIHRoZSBkYXRhIHRvIGJlIGNlbnRlcmVkIGFyb3VuZCB0aGUgbXUvaW50ZXJjZXB0IGFuZCBzaWdtYS9pbnRlcmNlcHQgKHdpdGggYSBsb3Qgb2YgYmxhbmsgc3BhY2VzKS4gIyBGdXJ0aGVybW9yZSwgc29tZSB2YXJpYWJsZXMgaGF2ZSBhIG5hbWUgdGhhdCBoYXZlIHNwZWNpYWwgc2lnbnMgaW4gdGhlbSwgd2hpY2ggY2F1c2VzIFIgbm90IHRvIHJlY29nbml6ZSB0aGVtLiBUbyBtYWtlIGl0ICNlYXN5LCBJIHF1aWNrbHkgZml4IHRoZXNlIHRoaW5ncyBpbiBFeGNlbC4gSSBkb24ndCBtYWtlIGFueSBjaGFuZ2VzIHRvIHRoZSBkYXRhDQp3cml0ZV94bHN4KG1vZGVsX3RvdGFsLCBoZXJlKCIuL2RhdGEvZGVzY3JpcHRpdmVzLyIsICJrYWJsZV9tb2RlbF90b3RhbF9nYW1sc3MueGxzeCIgKSkNCmBgYA0KDQoNCmBgYHtyfQ0KbW9kZWxfbmV3IDwtIHJlYWRfZXhjZWwoaGVyZSgiLi9kYXRhL2Rlc2NyaXB0aXZlcy8iLCAia2FibGVfbW9kZWxfdG90YWxfZ2FtbHNzLnhsc3giICkpDQoNCiMgSSBXYW50IHRvIHJvdW5kIHRoZSBudW1lcmljIHZhcmlhYmxlcyB0byAzIGRlY2ltYWxzDQptb2RlbF9uZXcgPC0gZHBseXI6Om11dGF0ZShtb2RlbF9uZXcsIGFjcm9zcyguY29scyA9IGMoLW11X3NpZ21hLCAtdmFyaWFibGVzKSwgLmZucz0gYXMubnVtZXJpYykpDQpudW1lcmljX2NvbHMgPC0gc2FwcGx5KG1vZGVsX25ldywgaXMubnVtZXJpYykNCm1vZGVsX25ld1ssIG51bWVyaWNfY29sc10gPC0gcm91bmQobW9kZWxfbmV3WywgbnVtZXJpY19jb2xzXSwgZGlnaXRzID0gMykNCg0KIyBUaGVyZSBhcmUgc29tZSBhbm5veWluZyB2YXJpYWJsZSBuYW1lcyB0aGF0IFIgY2FuJ3QgcmVjb2duaXplIGJlY2F1c2UgaXQgaGFzIHNwYWNpbmcsIHNvIHJlbmFtZSB0aGUgY29sdW1ucw0KY29sbmFtZXMobW9kZWxfbmV3KSA8LSAoYygibXVfc2lnbWEiLCAiVmFyaWFibGVzIiwgImVzdF90aW1lIiwgInN0ZF9lcnJfdGltZSIsICJwX3RpbWUiLCAiZXN0X2luZGVwIiwgInN0ZF9lcnJfaW5kZXAiLCAicF9pbmRlcCIsICJlc3RfaW50ZXIiLCAic3RkX2Vycm9yX2ludGVyIiwgInBfaW50ZXIiLCAicF90ZXh0X3RpbWVfb25seSIsICJwX3RleHRfaW5kZXAiLCAicF90ZXh0X2ludGVyIikpDQoNCiMgQ3JlYXRlIGEgbmV3IHZhcmlhYmxlIHRvIHVzZSBzdGFycyBpbnN0ZWFkIG9mIHRoZSBmdWxsIHAtdmFsdWVzIGluIHRoZSB0YWJsZQ0KbW9kZWxfbmV3JHBfdGV4dF90aW1lX29ubHkgPC0gY2FzZV93aGVuKA0KICBtb2RlbF9uZXckcF90aW1lID49IDAuMDUgfiAiIiwNCm1vZGVsX25ldyRwX3RpbWUgPCAwLjAwMSB+ICIqKioiLA0KbW9kZWxfbmV3JHBfdGltZSA8IDAuMDEgfiAiKioiLA0KbW9kZWxfbmV3JHBfdGltZSA8IDAuMDUgfiAiKiINCikNCg0KbW9kZWxfbmV3JHBfdGV4dF9pbmRlcCA8LSBjYXNlX3doZW4oDQogIG1vZGVsX25ldyRwX2luZGVwID49IDAuMDUgfiAiIiwNCm1vZGVsX25ldyRwX2luZGVwIDwgMC4wMDEgfiAiKioqIiwNCm1vZGVsX25ldyRwX2luZGVwIDwgMC4wMSB+ICIqKiIsDQptb2RlbF9uZXckcF9pbmRlcCA8IDAuMDUgfiAiKiINCikNCg0KbW9kZWxfbmV3JHBfdGV4dF9pbnRlciA8LSBjYXNlX3doZW4oDQogIG1vZGVsX25ldyRwX2ludGVyID49IDAuMDUgfiAiIiwNCm1vZGVsX25ldyRwX2ludGVyIDwgMC4wMDEgfiAiKioqIiwNCm1vZGVsX25ldyRwX2ludGVyIDwgMC4wMSB+ICIqKiIsDQptb2RlbF9uZXckcF9pbnRlciA8IDAuMDUgfiAiKiINCikNCg0KIyBOb3cgb25seSBzZWxlY3QgdGhlIHZhcmlhYmxlcyB0aGF0IEkgd2FudCB0byBzaG93IGluIHRoZSB0YWJsZQ0KbW9kZWxfbmV3IDwtIGRwbHlyOjpzZWxlY3QobW9kZWxfbmV3LCBtdV9zaWdtYSwgVmFyaWFibGVzLCBlc3RfdGltZSwgc3RkX2Vycl90aW1lLCBwX3RleHRfdGltZV9vbmx5LCBlc3RfaW5kZXAsIHN0ZF9lcnJfaW5kZXAsIHBfdGV4dF9pbmRlcCwgZXN0X2ludGVyLCBzdGRfZXJyb3JfaW50ZXIsIHBfdGV4dF9pbnRlcikNCg0KIyBNYWtlIGFuZCBzYXZlIHRoZSB0YWJsZSANCmthYmxlKG1vZGVsX25ldywgZGlnaXRzID0gMywgY2FwdGlvbiA9ICJUYWJsZSAyLiBHQU1MU1MgbW9kZWwgb24gd29ycnkgSVNTUCAoMTk5MyAtIDIwMTApIiwgDQogICAgICBjb2wubmFtZXMgPSBjKCAiIiwgIlZhcmlhYmxlcyIsICJFc3RpbWF0ZSIsICJTdGQuIEVycm9yIiwgIiIsICJFc3RpbWF0ZSIsICJTdGQuIEVycm9yIiwgIiIsICJFc3RpbWF0ZSIsICJTdGQuIEVycm9yIiwgIiIpLCBhbGlnbiA9ICJsIikgJT4lDQogIGthYmxlX2NsYXNzaWNfMihodG1sX2ZvbnQgPSAiVGltZXMiLCBmaXhlZF90aGVhZCA9IFQsIGZ1bGxfd2lkdGggPSBGKSAlPiUNCiAgYWRkX2hlYWRlcl9hYm92ZShjKCIgIiA9IDIsICJUaW1lLW9ubHkgbW9kZWwiID0gMywgIkluZGVwZW50IHZhciBtb2RlbCIgPSAzLCAiSW50ZXJhY3Rpb24gbW9kZWwiID0gMyksIGFsaWduID0gImwiKSAlPiUNCiAgIGZvb3Rub3RlKA0KICAgIGdlbmVyYWxfdGl0bGUgPSAiTm90ZS4iLA0KICAgIGdlbmVyYWwgPSAiKioqID0gcCA8IDAuMDAxLCAqKiA9IHAgPCAwLjAxLCAqID0gcCA8IDAuMDUiLA0KICAgIHRocmVlcGFydHRhYmxlID0gVFJVRSwNCiAgICBmb290bm90ZV9hc19jaHVuayA9IFRSVUUNCiAgICApIA0KIyU+JQ0KICAgICNzYXZlX2thYmxlKCIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9vdXRwdXQvZ2FtbHNzX3RhYmxlLnBkZiIpDQogIA0KYGBgDQoNCiMjIFRhYmxlIGFsbCBwb29sZWQgZWZmZWN0cyB7LX0NCg0KYGBge3IsIGV2YWw9RkFMU0V9DQpybShsaXN0PWxzKCkpDQojIEkgd2FudCB0byByZXBlYXQgdGhlIGFib3ZlIFRhYmxlLCBidXQgaW5zdGVhZCBvZiByZWdyZXNzaW9ucyBJIG5vdyB3YW50IHRvIHB1dCBhbGwgdGhlIHBvb2xlZCBlZmZlY3RzIGluIHRoZXJlDQojIFN0YXJ0aW5nIHdpdGggdGhlIHRpbWUgb25seSBtb2RlbA0KIyBZb3UgbWF5IG5vdGljZSB0aGF0IEkgdXNlIHRoZSBybWEgZnVuY3Rpb24gYW5kIG1ldGFnZW4uIFRoZSBlc3RpbWF0ZSBURS5yYW5kb20gb2YgbWV0YWdlbiAocG9vbGVkIGVmZmVjdCkgaXMgdGhlIHNhbWUgYXMgdGhlIGJldGEgaW4gdGhlIHJtYSBtb2RlbA0Kc2V0LnNlZWQoMSkgIyhhcyBJIGFtIHBlcmZvcm1pbmcgYW5hbHlzZXMgd2l0aCBhIHJhbmRvbSBhc3BlY3QpDQoNCmxvYWQoaGVyZSgiLi9kYXRhL21ldGFfYW5hbHlzaXMiLCAidG90YWxfcmVnX3Jlc3VsdHNfZ2FtX3dfbmV3LlJEYXRhIikpDQoNCiMgRXh0cmFjdCB0aGUgcG9vbGVkIGVmZmVjdHMsIGZpcnN0IG1lYW4gYXR0aXR1ZGVzDQptb2RlbF9zdGVwXzFfYXR0IDwtIHJtYSh5aSA9IG11X3RpbWUsDQogICAgICAgICAgICAgIHNlaSA9IG11X3RpbWVfc2QsDQogICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9yZWdfcmVzdWx0cywNCiAgICAgICAgICAgICAgbWV0aG9kID0gIlJFTUwiLA0KICAgICAgICAgICAgICB0ZXN0ID0gImtuaGEiKQ0KDQpvbmUgPC0gc3VtbWFyeShtb2RlbF9zdGVwXzFfYXR0KQ0Kb25lX2RmIDwtIGRhdGEuZnJhbWUobWF0cml4KG5jb2wgPSA1LCBucm93ID0gMSkpDQpjb2xuYW1lcyhvbmVfZGYpIDwtIGMoIm11X3NpZ21hIiwgIlZhcmlhYmxlIiwgIkVzdGltYXRlIiwgIlNFIiwgInAiKQ0KDQpvbmVfZGYkbXVfc2lnbWEgPC0gYygiTWVhbiBhdHRpdHVkZXMiKQ0Kb25lX2RmJFZhcmlhYmxlIDwtICJUaW1lIg0Kb25lX2RmJEVzdGltYXRlIDwtIGFzLm51bWVyaWMob25lJGIpDQpvbmVfZGYkU0UgPC0gb25lJHNlDQpvbmVfZGYkcCA8LSBvbmUkcHZhbA0KDQojIEFuZCBub3cgdmFyaWFuY2UNCm1vZGVsX3N0ZXBfMV92YXIgPC0gcm1hKHlpID0gc2lnX3RpbWUsDQogICAgICAgICAgICAgIHNlaSA9IHNpZ190aW1lX3NkLA0KICAgICAgICAgICAgICBkYXRhID0gdG90YWxfcmVnX3Jlc3VsdHMsDQogICAgICAgICAgICAgIG1ldGhvZCA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgdGVzdCA9ICJrbmhhIikNCg0KdHdvIDwtIHN1bW1hcnkobW9kZWxfc3RlcF8xX3ZhcikNCnR3b19kZiA8LSBkYXRhLmZyYW1lKG1hdHJpeChuY29sID0gNSwgbnJvdyA9IDEpKQ0KY29sbmFtZXModHdvX2RmKSA8LSBjKCJtdV9zaWdtYSIsICJWYXJpYWJsZSIsICJFc3RpbWF0ZSIsICJTRSIsICJwIikNCg0KdHdvX2RmJG11X3NpZ21hIDwtIGMoIlBvbGFyaXphdGlvbiBhdHRpdHVkZXMiKQ0KdHdvX2RmJFZhcmlhYmxlIDwtICJUaW1lIg0KdHdvX2RmJEVzdGltYXRlIDwtIGFzLm51bWVyaWModHdvJGIpDQp0d29fZGYkU0UgPC0gdHdvJHNlDQp0d29fZGYkcCA8LSB0d28kcHZhbA0KDQojIFJvd2JpbmQgdGhlbSwgdGhlc2UgYXJlIGFsbCB0aGUgcG9vbGVkIGVmZmVjdHMgb2YgdGhlIHRpbWUtb25seSBtb2RlbA0KZW1wdHlfZGYgPC0gcmJpbmQob25lX2RmLCB0d29fZGYpDQoNCiMgTm93IGNvbnRpbnVlIHdpdGggdGhlIGluZGVwZW5kZW50IHZhcmlhYmxlIG1vZGVsLCBmaXJzdCB0aGUgbWVhbiBhdHRpdHVkZXMgDQpsb2FkKGhlcmUoIi4vZGF0YS9tZXRhX2FuYWx5c2lzIiwgInRvdGFsX2luZGVwX3Zhcl9yZXN1bHRzX25ldy5SRGF0YSIpKQ0KDQptMl9hdHQgPC0gcm1hKHlpID0gbXVfdGltZV9wcmVkLA0KICAgICAgICAgICAgICBzZWkgPSBtdV90aW1lX3NkX3ByZWQsDQogICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9yZWdfcmVzdWx0cywNCiAgICAgICAgICAgICAgbWV0aG9kID0gIlJFTUwiLA0KICAgICAgICAgICAgICB0ZXN0ID0gImtuaGEiKQ0KDQojIEdlbmRlciANCmdlbmRlcl9nZW4gPC0gbWV0YWdlbihURSA9IG11X3NleF9lc3QsDQogICAgICAgICAgICAgICAgIHNlVEUgPSBtdV9zZXhfc2QsDQogICAgICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9pbmRlcF92YXJfcmVzdWx0cywNCiAgICAgICAgICAgICAgICAgZml4ZWQgPSBGQUxTRSwNCiAgICAgICAgICAgICAgICAgcmFuZG9tID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgbWV0aG9kLnRhdSA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgICAgaGFrbiA9IFRSVUUpDQoNCiMgQWdlIA0KYWdlX2dlbiA8LSBtZXRhZ2VuKFRFID0gbXVfYWdlX2VzdCwNCiAgICAgICAgICAgICAgICAgc2VURSA9IG11X2FnZV9zZCwNCiAgICAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX2luZGVwX3Zhcl9yZXN1bHRzLA0KICAgICAgICAgICAgICAgICBmaXhlZCA9IEZBTFNFLA0KICAgICAgICAgICAgICAgICByYW5kb20gPSBUUlVFLA0KICAgICAgICAgICAgICAgICBtZXRob2QudGF1ID0gIlJFTUwiLA0KICAgICAgICAgICAgICAgICBoYWtuID0gVFJVRSkNCg0KIyBFZHVjYXRpb25hbCBsZXZlbC4gVGhpcyBpcyBub3cgYSBkdW1teQ0KZWR1X21lZF9nZW4gPC0gbWV0YWdlbihURSA9IG11X2lzY2VkX21lZF9lc3QsDQogICAgICAgICAgICAgICAgIHNlVEUgPSBtdV9pc2NlZF9tZWRfc2QsDQogICAgICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9pbmRlcF92YXJfcmVzdWx0cywNCiAgICAgICAgICAgICAgICAgZml4ZWQgPSBGQUxTRSwNCiAgICAgICAgICAgICAgICAgcmFuZG9tID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgbWV0aG9kLnRhdSA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgICAgaGFrbiA9IFRSVUUpDQoNCmVkdV9oaWdoX2dlbiA8LSBtZXRhZ2VuKFRFID0gbXVfaXNjZWRfaGlnaF9lc3QsDQogICAgICAgICAgICAgICAgIHNlVEUgPSBtdV9pc2NlZF9oaWdoX3NkLA0KICAgICAgICAgICAgICAgICBkYXRhID0gdG90YWxfaW5kZXBfdmFyX3Jlc3VsdHMsDQogICAgICAgICAgICAgICAgIGZpeGVkID0gRkFMU0UsDQogICAgICAgICAgICAgICAgIHJhbmRvbSA9IFRSVUUsDQogICAgICAgICAgICAgICAgIG1ldGhvZC50YXUgPSAiUkVNTCIsDQogICAgICAgICAgICAgICAgIGhha24gPSBUUlVFKQ0KDQojIEV4dHJhY3QgYWxsIHRoZSBkYXRhIGZyb20gdGhlIG1vZGVscyBhbmQgcHV0IHRoZW0gaW4gYSBkYXRhZnJhbWUgdGhhdCB3aWxsIGxhdGVyIGJlIHRoZSBpbnB1dCBvZiB0aGUga2FibGUgdGFibGUNCnRocmVlX2RmIDwtIGRhdGEuZnJhbWUobWF0cml4KG5jb2wgPSA1LCBucm93ID0gNSkpDQpjb2xuYW1lcyh0aHJlZV9kZikgPC0gYygibXVfc2lnbWFfMSIsICJWYXJpYWJsZV8xIiwgIkVzdGltYXRlXzEiLCAiU0VfMSIsICJwXzEiKQ0KdGhyZWVfZGYkbXVfc2lnbWFfMSA8LSBjKCJNZWFuIGF0dGl0dWRlcyIsICIiLCAiIiwgIiIsICIiKQ0KdGhyZWVfZGYkVmFyaWFibGVfMSA8LSBjKCJUaW1lIiwgIkdlbmRlciIsICJBZ2UiLCAiSXNjZWQgaW50ZXJtZWRpYXRlIChyZWY9YmFzaWMpIiwgIklzY2VkIGFkdmFuY2VkIChyZWY9YmFzaWMpIikNCnRocmVlX2RmJEVzdGltYXRlXzEgPC0gYyhhcy5udW1lcmljKG0yX2F0dCRiKSwgZ2VuZGVyX2dlbiRURS5yYW5kb20sIGFnZV9nZW4kVEUucmFuZG9tLCBlZHVfbWVkX2dlbiRURS5yYW5kb20sIGVkdV9oaWdoX2dlbiRURS5yYW5kb20pDQp0aHJlZV9kZiRTRV8xIDwtIGMobTJfYXR0JHNlLCBnZW5kZXJfZ2VuJHNlVEUucmFuZG9tLCBhZ2VfZ2VuJHNlVEUucmFuZG9tLCBlZHVfbWVkX2dlbiRzZVRFLnJhbmRvbSwgZWR1X2hpZ2hfZ2VuJHNlVEUucmFuZG9tKQ0KdGhyZWVfZGYkcF8xIDwtIGMobTJfYXR0JHB2YWwsIGdlbmRlcl9nZW4kcHZhbC5yYW5kb20sIGFnZV9nZW4kcHZhbC5yYW5kb20sIGVkdV9tZWRfZ2VuJHB2YWwucmFuZG9tLCBlZHVfaGlnaF9nZW4kcHZhbC5yYW5kb20pICAgICAgICAgICAgICAgICAgICAgICANCiAgICAgICAgICAgICAgICAgICAgICAgDQojIFRoZSBzYW1lIGZvciB2YXJpYW5jZQ0KbTJfdmFyIDwtIHJtYSh5aSA9IHNpZ190aW1lX3ByZWQsDQogICAgICAgICAgICAgIHNlaSA9IHNpZ190aW1lX3NkX3ByZWQsDQogICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9yZWdfcmVzdWx0cywNCiAgICAgICAgICAgICAgbWV0aG9kID0gIlJFTUwiLA0KICAgICAgICAgICAgICB0ZXN0ID0gImtuaGEiKQ0KDQojIEdlbmRlcg0KZ2VuZGVyX3Zhcl9nZW4gPC0gbWV0YWdlbihURSA9IHNpZ19zZXhfZXN0LA0KICAgICAgICAgICAgICAgICBzZVRFID0gc2lnX3NleF9zZCwNCiAgICAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX2luZGVwX3Zhcl9yZXN1bHRzLA0KICAgICAgICAgICAgICAgICBmaXhlZCA9IEZBTFNFLA0KICAgICAgICAgICAgICAgICByYW5kb20gPSBUUlVFLA0KICAgICAgICAgICAgICAgICBtZXRob2QudGF1ID0gIlJFTUwiLA0KICAgICAgICAgICAgICAgICBoYWtuID0gVFJVRSkNCg0KIyBBZ2UNCmFnZV92YXJfZ2VuIDwtIG1ldGFnZW4oVEUgPSBzaWdfYWdlX2VzdCwNCiAgICAgICAgICAgICAgICAgc2VURSA9IHNpZ19hZ2Vfc2QsDQogICAgICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9pbmRlcF92YXJfcmVzdWx0cywNCiAgICAgICAgICAgICAgICAgZml4ZWQgPSBGQUxTRSwNCiAgICAgICAgICAgICAgICAgcmFuZG9tID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgbWV0aG9kLnRhdSA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgICAgaGFrbiA9IFRSVUUpDQoNCiMgRWR1Y2F0aW9uDQplZHVfdmFyX21lZF9nZW4gPC0gbWV0YWdlbihURSA9IHNpZ19pc2NlZF9tZWRfZXN0LA0KICAgICAgICAgICAgICAgICBzZVRFID0gc2lnX2lzY2VkX21lZF9zZCwNCiAgICAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX2luZGVwX3Zhcl9yZXN1bHRzLA0KICAgICAgICAgICAgICAgICBmaXhlZCA9IEZBTFNFLA0KICAgICAgICAgICAgICAgICByYW5kb20gPSBUUlVFLA0KICAgICAgICAgICAgICAgICBtZXRob2QudGF1ID0gIlJFTUwiLA0KICAgICAgICAgICAgICAgICBoYWtuID0gVFJVRSkNCg0KZWR1X3Zhcl9oaWdoX2dlbiA8LSBtZXRhZ2VuKFRFID0gc2lnX2lzY2VkX2hpZ2hfZXN0LA0KICAgICAgICAgICAgICAgICBzZVRFID0gc2lnX2lzY2VkX2hpZ2hfc2QsDQogICAgICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9pbmRlcF92YXJfcmVzdWx0cywNCiAgICAgICAgICAgICAgICAgZml4ZWQgPSBGQUxTRSwNCiAgICAgICAgICAgICAgICAgcmFuZG9tID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgbWV0aG9kLnRhdSA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgICAgaGFrbiA9IFRSVUUpDQoNCmZvdXJfZGYgPC0gZGF0YS5mcmFtZShtYXRyaXgobmNvbCA9IDUsIG5yb3cgPSA1KSkNCmNvbG5hbWVzKGZvdXJfZGYpIDwtIGMoIm11X3NpZ21hXzEiLCAiVmFyaWFibGVfMSIsICJFc3RpbWF0ZV8xIiwgIlNFXzEiLCAicF8xIikNCmZvdXJfZGYkbXVfc2lnbWFfMSA8LSBjKCJQb2xhcml6YXRpb24gYXR0aXR1ZGVzIiwgIiIsICIiLCAiIiwgIiIpDQpmb3VyX2RmJFZhcmlhYmxlXzEgPC0gYygiVGltZSIsICJHZW5kZXIiLCAiQWdlIiwgIklzY2VkIGludGVybWVkaWF0ZSAocmVmPWJhc2ljKSIsICJJc2NlZCBhZHZhbmNlZCAocmVmPWJhc2ljKSIpDQpmb3VyX2RmJEVzdGltYXRlXzEgPC0gYyhhcy5udW1lcmljKG0yX3ZhciRiKSwgZ2VuZGVyX3Zhcl9nZW4kVEUucmFuZG9tLCBhZ2VfdmFyX2dlbiRURS5yYW5kb20sIGVkdV92YXJfbWVkX2dlbiRURS5yYW5kb20sIGVkdV92YXJfaGlnaF9nZW4kVEUucmFuZG9tKQ0KZm91cl9kZiRTRV8xIDwtIGMobTJfYXR0JHNlLCBnZW5kZXJfdmFyX2dlbiRzZVRFLnJhbmRvbSwgYWdlX3Zhcl9nZW4kc2VURS5yYW5kb20sIGVkdV92YXJfbWVkX2dlbiRzZVRFLnJhbmRvbSwgZWR1X3Zhcl9oaWdoX2dlbiRzZVRFLnJhbmRvbSkNCmZvdXJfZGYkcF8xIDwtIGMobTJfYXR0JHB2YWwsIGdlbmRlcl92YXJfZ2VuJHB2YWwucmFuZG9tLCBhZ2VfdmFyX2dlbiRwdmFsLnJhbmRvbSwgZWR1X3Zhcl9tZWRfZ2VuJHB2YWwucmFuZG9tLCBlZHVfdmFyX2hpZ2hfZ2VuJHB2YWwucmFuZG9tKQ0KDQoNCiMgQmluZCByb3dzIG9mIHRoZXNlIHR3bywgdGhlc2UgYXJlIGFsbCB0aGUgcG9vbGVkIGVmZmVjdHMgb2YgdGhlIGluZGVwZW5kZW50IHZhcmlhYmxlcyBtb2RlbA0KaW5kZXBfZGYgPC0gcmJpbmQodGhyZWVfZGYsIGZvdXJfZGYpDQoNCiNOb3cgaSB3YW50IHRoZSBpbnRlcmFjdGlvbiBtb2RlbCBhcyB3ZWxsDQpsb2FkKCJDOi9HaXRodWIvY2xpbWF0ZWNoYW5nZS9kYXRhL21ldGFfYW5hbHlzaXMvdG90YWxfaW50ZXJfcmVzdWx0c19uZXcuUkRhdGEiKQ0KDQojIEZpcnN0IG1lYW4gYXR0aXR1ZGVzDQptM19hdHQgPC0gcm1hKHlpID0gbXVfdGltZV9pbnQsDQogICAgICAgICAgICAgIHNlaSA9IG11X3RpbWVfc2RfaW50LA0KICAgICAgICAgICAgICBkYXRhID0gdG90YWxfcmVnX3Jlc3VsdHMsDQogICAgICAgICAgICAgIG1ldGhvZCA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgdGVzdCA9ICJrbmhhIikNCg0KIyBHZW5kZXIgDQpnZW5kZXJfZ2VuX2ludCA8LSBtZXRhZ2VuKFRFID0gbXVfc2V4X2VzdCwNCiAgICAgICAgICAgICAgICAgc2VURSA9IG11X3NleF9zZCwNCiAgICAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX2ludGVyX3Jlc3VsdHMsDQogICAgICAgICAgICAgICAgIGZpeGVkID0gRkFMU0UsDQogICAgICAgICAgICAgICAgIHJhbmRvbSA9IFRSVUUsDQogICAgICAgICAgICAgICAgIG1ldGhvZC50YXUgPSAiUkVNTCIsDQogICAgICAgICAgICAgICAgIGhha24gPSBUUlVFKQ0KDQojIEFnZSANCmFnZV9nZW5faW50IDwtIG1ldGFnZW4oVEUgPSBtdV9hZ2VfZXN0LA0KICAgICAgICAgICAgICAgICBzZVRFID0gbXVfYWdlX3NkLA0KICAgICAgICAgICAgICAgICBkYXRhID0gdG90YWxfaW50ZXJfcmVzdWx0cywNCiAgICAgICAgICAgICAgICAgZml4ZWQgPSBGQUxTRSwNCiAgICAgICAgICAgICAgICAgcmFuZG9tID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgbWV0aG9kLnRhdSA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgICAgaGFrbiA9IFRSVUUpDQoNCiMgRWR1Y2F0aW9uYWwgbGV2ZWwNCmVkdV9tZWRfZ2VuX2ludCA8LSBtZXRhZ2VuKFRFID0gbXVfaXNjZWRfbWVkX2VzdCwNCiAgICAgICAgICAgICAgICAgc2VURSA9IG11X2lzY2VkX21lZF9zZCwNCiAgICAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX2ludGVyX3Jlc3VsdHMsDQogICAgICAgICAgICAgICAgIGZpeGVkID0gRkFMU0UsDQogICAgICAgICAgICAgICAgIHJhbmRvbSA9IFRSVUUsDQogICAgICAgICAgICAgICAgIG1ldGhvZC50YXUgPSAiUkVNTCIsDQogICAgICAgICAgICAgICAgIGhha24gPSBUUlVFKQ0KDQplZHVfaGlnaF9nZW5faW50IDwtIG1ldGFnZW4oVEUgPSBtdV9pc2NlZF9oaWdoX2VzdCwNCiAgICAgICAgICAgICAgICAgc2VURSA9IG11X2lzY2VkX2hpZ2hfc2QsDQogICAgICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9pbnRlcl9yZXN1bHRzLA0KICAgICAgICAgICAgICAgICBmaXhlZCA9IEZBTFNFLA0KICAgICAgICAgICAgICAgICByYW5kb20gPSBUUlVFLA0KICAgICAgICAgICAgICAgICBtZXRob2QudGF1ID0gIlJFTUwiLA0KICAgICAgICAgICAgICAgICBoYWtuID0gVFJVRSkNCg0KIyBBbmQgdGhlIGludGVyYWN0aW9uIGVmZmVjdHMgDQojIEdlbmRlciANCmdlbmRlcl9pbnRfZWZmIDwtIG1ldGFnZW4oVEUgPSBtdV9zZXhfZXN0X2ludGVyLA0KICAgICAgICAgICAgICAgICBzZVRFID0gbXVfc2V4X3NkX2ludGVyLA0KICAgICAgICAgICAgICAgICBkYXRhID0gdG90YWxfaW50ZXJfcmVzdWx0cywNCiAgICAgICAgICAgICAgICAgZml4ZWQgPSBGQUxTRSwNCiAgICAgICAgICAgICAgICAgcmFuZG9tID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgbWV0aG9kLnRhdSA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgICAgaGFrbiA9IFRSVUUpDQoNCiMgQWdlIA0KYWdlX2ludF9lZmYgPC0gbWV0YWdlbihURSA9IG11X2FnZV9lc3RfaW50ZXIsDQogICAgICAgICAgICAgICAgIHNlVEUgPSBtdV9hZ2Vfc2RfaW50ZXIsDQogICAgICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9pbnRlcl9yZXN1bHRzLA0KICAgICAgICAgICAgICAgICBmaXhlZCA9IEZBTFNFLA0KICAgICAgICAgICAgICAgICByYW5kb20gPSBUUlVFLA0KICAgICAgICAgICAgICAgICBtZXRob2QudGF1ID0gIlJFTUwiLA0KICAgICAgICAgICAgICAgICBoYWtuID0gVFJVRSkNCg0KIyBFZHVjYXRpb25hbCBsZXZlbA0KZWR1X21lZF9pbnRfZWZmIDwtIG1ldGFnZW4oVEUgPSBtdV9pc2NlZF9tZWRfZXN0X2ludGVyLA0KICAgICAgICAgICAgICAgICBzZVRFID0gbXVfaXNjZWRfbWVkX3NkX2ludGVyLA0KICAgICAgICAgICAgICAgICBkYXRhID0gdG90YWxfaW50ZXJfcmVzdWx0cywNCiAgICAgICAgICAgICAgICAgZml4ZWQgPSBGQUxTRSwNCiAgICAgICAgICAgICAgICAgcmFuZG9tID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgbWV0aG9kLnRhdSA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgICAgaGFrbiA9IFRSVUUpDQoNCmVkdV9oaWdoX2ludF9lZmYgPC0gbWV0YWdlbihURSA9IG11X2lzY2VkX2hpZ2hfZXN0X2ludGVyLA0KICAgICAgICAgICAgICAgICBzZVRFID0gbXVfaXNjZWRfaGlnaF9zZF9pbnRlciwNCiAgICAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX2ludGVyX3Jlc3VsdHMsDQogICAgICAgICAgICAgICAgIGZpeGVkID0gRkFMU0UsDQogICAgICAgICAgICAgICAgIHJhbmRvbSA9IFRSVUUsDQogICAgICAgICAgICAgICAgIG1ldGhvZC50YXUgPSAiUkVNTCIsDQogICAgICAgICAgICAgICAgIGhha24gPSBUUlVFKQ0KDQojIE5vdyBleHRyYWN0IHRoZSBkYXRhIGZvciBhIHRhYmxlDQpmaXZlX2RmIDwtIGRhdGEuZnJhbWUobWF0cml4KG5jb2wgPSA1LCBucm93ID0gOSkpDQpjb2xuYW1lcyhmaXZlX2RmKSA8LSBjKCJtdV9zaWdtYV8yIiwgIlZhcmlhYmxlXzIiLCAiRXN0aW1hdGVfMiIsICJTRV8yIiwgInBfMiIpDQpmaXZlX2RmJG11X3NpZ21hXzIgPC0gYygiTWVhbiBhdHRpdHVkZXMiLCAiIiwgIiIsICIiLCAiIiwgIiIsICIiLCAiIiwgIiIpDQpmaXZlX2RmJFZhcmlhYmxlXzIgPC0gYygiVGltZSIsICJHZW5kZXIiLCAiQWdlIiwgIklzY2VkIGludGVybWVkaWF0ZSAocmVmPWJhc2ljKSIsICJJc2NlZCBhZHZhbmNlZCAocmVmPWJhc2ljKSIsICJHZW5kZXIgeCB0aW1lIiwgIkFnZSB4IHRpbWUiLCAiSXNjZWQgaW50ZXJtZWRpYXRlIHggdGltZSIsICJJc2NlZCBhZHZhbmNlZCB4IHRpbWUiKQ0KZml2ZV9kZiRFc3RpbWF0ZV8yIDwtIGMoYXMubnVtZXJpYyhtM19hdHQkYiksIGdlbmRlcl9nZW5faW50JFRFLnJhbmRvbSwgYWdlX2dlbl9pbnQkVEUucmFuZG9tLCBlZHVfbWVkX2dlbl9pbnQkVEUucmFuZG9tLCBlZHVfaGlnaF9nZW5faW50JFRFLnJhbmRvbSwgZ2VuZGVyX2ludF9lZmYkVEUucmFuZG9tLCBhZ2VfaW50X2VmZiRURS5yYW5kb20sIGVkdV9tZWRfaW50X2VmZiRURS5yYW5kb20sIGVkdV9oaWdoX2ludF9lZmYkVEUucmFuZG9tKQ0KZml2ZV9kZiRTRV8yIDwtIGMobTNfYXR0JHNlLCBnZW5kZXJfZ2VuX2ludCRzZVRFLnJhbmRvbSwgYWdlX2dlbl9pbnQkc2VURS5yYW5kb20sIGVkdV9tZWRfZ2VuX2ludCRzZVRFLnJhbmRvbSwgZWR1X2hpZ2hfZ2VuX2ludCRzZVRFLnJhbmRvbSwgZ2VuZGVyX2ludF9lZmYkc2VURS5yYW5kb20sIGFnZV9pbnRfZWZmJHNlVEUucmFuZG9tLCBlZHVfbWVkX2ludF9lZmYkc2VURS5yYW5kb20sIGVkdV9oaWdoX2ludF9lZmYkc2VURS5yYW5kb20pDQpmaXZlX2RmJHBfMiA8LSBjKG0zX2F0dCRwdmFsLCBnZW5kZXJfZ2VuX2ludCRwdmFsLnJhbmRvbSwgYWdlX2dlbl9pbnQkcHZhbC5yYW5kb20sIGVkdV9tZWRfZ2VuX2ludCRwdmFsLnJhbmRvbSwgZWR1X2hpZ2hfZ2VuX2ludCRwdmFsLnJhbmRvbSwgZ2VuZGVyX2ludF9lZmYkcHZhbC5yYW5kb20sIGFnZV9pbnRfZWZmJHB2YWwucmFuZG9tLCBlZHVfbWVkX2ludF9lZmYkcHZhbC5yYW5kb20sIGVkdV9oaWdoX2ludF9lZmYkcHZhbC5yYW5kb20pDQoNCiMgTm93IHRoZSBzYW1lIHByb2NlZHVyZSBmb3IgdGhlIHZhcmlhbmNlDQptM192YXIgPC0gcm1hKHlpID0gc2lnX3RpbWVfaW50LA0KICAgICAgICAgICAgICBzZWkgPSBzaWdfdGltZV9zZF9pbnQsDQogICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9yZWdfcmVzdWx0cywNCiAgICAgICAgICAgICAgbWV0aG9kID0gIlJFTUwiLA0KICAgICAgICAgICAgICB0ZXN0ID0gImtuaGEiKQ0KDQojIEdlbmRlciANCmdlbmRlcl9nZW5faW50X3ZhciA8LSBtZXRhZ2VuKFRFID0gc2lnX3NleF9lc3QsDQogICAgICAgICAgICAgICAgIHNlVEUgPSBzaWdfc2V4X3NkLA0KICAgICAgICAgICAgICAgICBkYXRhID0gdG90YWxfaW50ZXJfcmVzdWx0cywNCiAgICAgICAgICAgICAgICAgZml4ZWQgPSBGQUxTRSwNCiAgICAgICAgICAgICAgICAgcmFuZG9tID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgbWV0aG9kLnRhdSA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgICAgaGFrbiA9IFRSVUUpDQoNCiMgQWdlIA0KYWdlX2dlbl9pbnRfdmFyIDwtIG1ldGFnZW4oVEUgPSBzaWdfYWdlX2VzdCwNCiAgICAgICAgICAgICAgICAgc2VURSA9IHNpZ19hZ2Vfc2QsDQogICAgICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9pbnRlcl9yZXN1bHRzLA0KICAgICAgICAgICAgICAgICBmaXhlZCA9IEZBTFNFLA0KICAgICAgICAgICAgICAgICByYW5kb20gPSBUUlVFLA0KICAgICAgICAgICAgICAgICBtZXRob2QudGF1ID0gIlJFTUwiLA0KICAgICAgICAgICAgICAgICBoYWtuID0gVFJVRSkNCg0KIyBFZHVjYXRpb25hbCBsZXZlbA0KZWR1X21lZF9nZW5faW50X3ZhciA8LSBtZXRhZ2VuKFRFID0gc2lnX2lzY2VkX21lZF9lc3QsDQogICAgICAgICAgICAgICAgIHNlVEUgPSBzaWdfaXNjZWRfbWVkX3NkLA0KICAgICAgICAgICAgICAgICBkYXRhID0gdG90YWxfaW50ZXJfcmVzdWx0cywNCiAgICAgICAgICAgICAgICAgZml4ZWQgPSBGQUxTRSwNCiAgICAgICAgICAgICAgICAgcmFuZG9tID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgbWV0aG9kLnRhdSA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgICAgaGFrbiA9IFRSVUUpDQoNCmVkdV9oaWdoX2dlbl9pbnRfdmFyIDwtIG1ldGFnZW4oVEUgPSBzaWdfaXNjZWRfaGlnaF9lc3QsDQogICAgICAgICAgICAgICAgIHNlVEUgPSBzaWdfaXNjZWRfaGlnaF9zZCwNCiAgICAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX2ludGVyX3Jlc3VsdHMsDQogICAgICAgICAgICAgICAgIGZpeGVkID0gRkFMU0UsDQogICAgICAgICAgICAgICAgIHJhbmRvbSA9IFRSVUUsDQogICAgICAgICAgICAgICAgIG1ldGhvZC50YXUgPSAiUkVNTCIsDQogICAgICAgICAgICAgICAgIGhha24gPSBUUlVFKQ0KDQojIEFuZCB0aGUgaW50ZXJhY3Rpb24gZWZmZWN0cyANCiMgR2VuZGVyIA0KZ2VuZGVyX2ludF9lZmZfdmFyIDwtIG1ldGFnZW4oVEUgPSBzaWdfc2V4X2VzdF9pbnRlciwNCiAgICAgICAgICAgICAgICAgc2VURSA9IHNpZ19zZXhfc2RfaW50ZXIsDQogICAgICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9pbnRlcl9yZXN1bHRzLA0KICAgICAgICAgICAgICAgICBmaXhlZCA9IEZBTFNFLA0KICAgICAgICAgICAgICAgICByYW5kb20gPSBUUlVFLA0KICAgICAgICAgICAgICAgICBtZXRob2QudGF1ID0gIlJFTUwiLA0KICAgICAgICAgICAgICAgICBoYWtuID0gVFJVRSkNCg0KIyBBZ2UgDQphZ2VfaW50X2VmZl92YXIgPC0gbWV0YWdlbihURSA9IHNpZ19hZ2VfZXN0X2ludGVyLA0KICAgICAgICAgICAgICAgICBzZVRFID0gc2lnX2FnZV9zZF9pbnRlciwNCiAgICAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX2ludGVyX3Jlc3VsdHMsDQogICAgICAgICAgICAgICAgIGZpeGVkID0gRkFMU0UsDQogICAgICAgICAgICAgICAgIHJhbmRvbSA9IFRSVUUsDQogICAgICAgICAgICAgICAgIG1ldGhvZC50YXUgPSAiUkVNTCIsDQogICAgICAgICAgICAgICAgIGhha24gPSBUUlVFKQ0KDQojIEVkdWNhdGlvbmFsIGxldmVsDQplZHVfbWVkX2ludF9lZmZfdmFyIDwtIG1ldGFnZW4oVEUgPSBzaWdfaXNjZWRfbWVkX2VzdF9pbnRlciwNCiAgICAgICAgICAgICAgICAgc2VURSA9IHNpZ19pc2NlZF9tZWRfc2RfaW50ZXIsDQogICAgICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9pbnRlcl9yZXN1bHRzLA0KICAgICAgICAgICAgICAgICBmaXhlZCA9IEZBTFNFLA0KICAgICAgICAgICAgICAgICByYW5kb20gPSBUUlVFLA0KICAgICAgICAgICAgICAgICBtZXRob2QudGF1ID0gIlJFTUwiLA0KICAgICAgICAgICAgICAgICBoYWtuID0gVFJVRSkNCg0KZWR1X2hpZ2hfaW50X2VmZl92YXIgPC0gbWV0YWdlbihURSA9IHNpZ19pc2NlZF9oaWdoX2VzdF9pbnRlciwNCiAgICAgICAgICAgICAgICAgc2VURSA9IHNpZ19pc2NlZF9oaWdoX3NkX2ludGVyLA0KICAgICAgICAgICAgICAgICBkYXRhID0gdG90YWxfaW50ZXJfcmVzdWx0cywNCiAgICAgICAgICAgICAgICAgZml4ZWQgPSBGQUxTRSwNCiAgICAgICAgICAgICAgICAgcmFuZG9tID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgbWV0aG9kLnRhdSA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgICAgaGFrbiA9IFRSVUUpDQoNCnNpeF9kZiA8LSBkYXRhLmZyYW1lKG1hdHJpeChuY29sID0gNSwgbnJvdyA9IDkpKQ0KY29sbmFtZXMoc2l4X2RmKSA8LSBjKCJtdV9zaWdtYV8yIiwgIlZhcmlhYmxlXzIiLCAiRXN0aW1hdGVfMiIsICJTRV8yIiwgInBfMiIpDQpzaXhfZGYkbXVfc2lnbWFfMiA8LSBjKCJQb2xhcml6YXRpb24gYXR0aXR1ZGVzIiwgIiIsICIiLCAiIiwgIiIsICIiLCAiIiwgIiIsICIiKQ0Kc2l4X2RmJFZhcmlhYmxlXzIgPC0gYygiVGltZSIsICJHZW5kZXIiLCAiQWdlIiwgIklzY2VkIGludGVybWVkaWF0ZSAocmVmPWJhc2ljKSIsICJJc2NlZCBhZHZhbmNlZCAocmVmPWJhc2ljKSIsICJHZW5kZXIgeCB0aW1lIiwgIkFnZSB4IHRpbWUiLCAiSXNjZWQgaW50ZXJtZWRpYXRlIHggdGltZSIsICJJc2NlZCBhZHZhbmNlZCB4IHRpbWUiKQ0Kc2l4X2RmJEVzdGltYXRlXzIgPC0gYyhhcy5udW1lcmljKG0zX3ZhciRiKSwgZ2VuZGVyX2dlbl9pbnRfdmFyJFRFLnJhbmRvbSwgYWdlX2dlbl9pbnRfdmFyJFRFLnJhbmRvbSwgZWR1X21lZF9nZW5faW50X3ZhciRURS5yYW5kb20sIGVkdV9oaWdoX2dlbl9pbnRfdmFyJFRFLnJhbmRvbSwgZ2VuZGVyX2ludF9lZmZfdmFyJFRFLnJhbmRvbSwgYWdlX2ludF9lZmZfdmFyJFRFLnJhbmRvbSwgZWR1X21lZF9pbnRfZWZmX3ZhciRURS5yYW5kb20sIGVkdV9oaWdoX2ludF9lZmZfdmFyJFRFLnJhbmRvbSkNCnNpeF9kZiRTRV8yIDwtIGMobTNfdmFyJHNlLCBnZW5kZXJfZ2VuX2ludF92YXIkc2VURS5yYW5kb20sIGFnZV9nZW5faW50X3ZhciRzZVRFLnJhbmRvbSwgZWR1X21lZF9nZW5faW50X3ZhciRzZVRFLnJhbmRvbSwgZWR1X2hpZ2hfZ2VuX2ludF92YXIkc2VURS5yYW5kb20sIGdlbmRlcl9pbnRfZWZmX3ZhciRzZVRFLnJhbmRvbSwgYWdlX2ludF9lZmZfdmFyJHNlVEUucmFuZG9tLCBlZHVfbWVkX2ludF9lZmZfdmFyJHNlVEUucmFuZG9tLCBlZHVfaGlnaF9pbnRfZWZmX3ZhciRzZVRFLnJhbmRvbSkNCnNpeF9kZiRwXzIgPC0gYyhtM19hdHQkcHZhbCwgZ2VuZGVyX2dlbl9pbnRfdmFyJHB2YWwucmFuZG9tLCBhZ2VfZ2VuX2ludF92YXIkcHZhbC5yYW5kb20sIGVkdV9tZWRfZ2VuX2ludF92YXIkcHZhbC5yYW5kb20sIGVkdV9oaWdoX2dlbl9pbnRfdmFyJHB2YWwucmFuZG9tLCBnZW5kZXJfaW50X2VmZl92YXIkcHZhbC5yYW5kb20sIGFnZV9pbnRfZWZmX3ZhciRwdmFsLnJhbmRvbSwgZWR1X21lZF9pbnRfZWZmX3ZhciRwdmFsLnJhbmRvbSwgZWR1X2hpZ2hfaW50X2VmZl92YXIkcHZhbC5yYW5kb20pDQoNCiNCaW5kIHRoZXNlIHR3bywgdGhpcyBub3cgaGFzIGFsbCB0aGUgcG9vbGVkIGVmZmVjdHMgb2YgdGhlIGludGVyYWN0aW9uIGVmZmVjdHMNCmludGVyX2RmIDwtIHJiaW5kKGZpdmVfZGYsIHNpeF9kZikNCmBgYA0KDQpgYGB7ciwgZXZhbD1GQUxTRX0NCiNDb2x1bW5iaW5kIHRoZSB0aHJlZSBkYXRhc2V0cw0KIyBEaWZmaWN1bHQgdG8gY29sdW1uYmluZCB0aGVtLCBiZWNhdXNlIHRoZXkncmUgb2YgZGlmZmVyZW50IGxlbmd0aHMgKGxvZ2ljYWxseSkNCmRmX2xpc3QgPC0gbGlzdChlbXB0eV9kZiwgaW5kZXBfZGYsIGludGVyX2RmKQ0KDQpiaW5kX2NvbHNfZmlsbCA8LSBmdW5jdGlvbihkZl9saXN0KSB7DQoNCiAgbWF4X3Jvd3MgPC0gbWFwX2ludChkZl9saXN0LCBucm93KSAlPiUgbWF4KCkNCiAgDQogIG1hcChkZl9saXN0LCBmdW5jdGlvbihkZikgew0KICAgIGlmKG5yb3coZGYpID09IG1heF9yb3dzKSByZXR1cm4oZGYpDQogICAgZmlyc3QgPC0gbmFtZXMoZGYpWzFdICU+JSBzeW0oKQ0KICAgIGRmICU+JSBhZGRfcm93KCEhZmlyc3QgOj0gcmVwKE5BLCBtYXhfcm93cyAtIG5yb3coZGYpKSkNCiAgfSkgJT4lIGJpbmRfY29scygpDQp9DQoNCnRvdGFsX2RmIDwtIGJpbmRfY29sc19maWxsKGRmX2xpc3QpDQoNCiNDaGFuZ2UgdGhlIG9yZGVyIGEgYml0LCBqdXN0IGxpa2UgaW4gdGhlIHByZXZpb3VzIHRhYmxlIA0Kd3JpdGVfeGxzeCh0b3RhbF9kZiwgaGVyZSgiLi9kYXRhL2Rlc2NyaXB0aXZlcy8iLCAia2FibGVfbW9kZWxfYWxsX3Bvb2xlZF9lZmZlY3RzLnhsc3giICkpDQpgYGANCg0KDQpgYGB7ciwgd2FybmluZz1GQUxTRX0NCm1vZGVsX25ldyA8LSByZWFkX2V4Y2VsKGhlcmUoIi4vZGF0YS9kZXNjcmlwdGl2ZXMvIiwgImthYmxlX21vZGVsX2FsbF9wb29sZWRfZWZmZWN0cy54bHN4IiApKQ0KDQojIEkgV2FudCB0byByb3VuZCB0aGUgbnVtZXJpYyB2YXJpYWJsZXMgdG8gMyBkZWNpbWFscw0KbW9kZWxfbmV3IDwtIGRwbHlyOjptdXRhdGUobW9kZWxfbmV3LCBhY3Jvc3MoLmNvbHMgPSBjKC1tdV9zaWdtYV8yLCAtVmFyaWFibGVfMiksIC5mbnMgPSBhcy5udW1lcmljKSkNCm51bWVyaWNfY29scyA8LSBzYXBwbHkobW9kZWxfbmV3LCBpcy5udW1lcmljKQ0KbW9kZWxfbmV3WywgbnVtZXJpY19jb2xzXSA8LSByb3VuZChtb2RlbF9uZXdbLCBudW1lcmljX2NvbHNdLCBkaWdpdHMgPSAzKQ0KDQojIENyZWF0ZSBhIG5ldyB2YXJpYWJsZSB0byB1c2Ugc3RhcnMgaW5zdGVhZCBvZiB0aGUgZnVsbCBwLXZhbHVlcyBpbiB0aGUgdGFibGUNCm1vZGVsX25ldyRwX3RleHQgPC0gY2FzZV93aGVuKA0KICBtb2RlbF9uZXckcCA+PSAwLjA1IH4gIiIsDQptb2RlbF9uZXckcCA8IDAuMDAxIH4gIioqKiIsDQptb2RlbF9uZXckcCA8IDAuMDEgfiAiKioiLA0KbW9kZWxfbmV3JHAgPCAwLjA1IH4gIioiDQopDQoNCm1vZGVsX25ldyRwX3RleHRfMSA8LSBjYXNlX3doZW4oDQogIG1vZGVsX25ldyRwXzEgPj0gMC4wNSB+ICIiLA0KbW9kZWxfbmV3JHBfMSA8IDAuMDAxIH4gIioqKiIsDQptb2RlbF9uZXckcF8xIDwgMC4wMSB+ICIqKiIsDQptb2RlbF9uZXckcF8xIDwgMC4wNSB+ICIqIg0KKQ0KDQptb2RlbF9uZXckcF90ZXh0XzIgPC0gY2FzZV93aGVuKA0KICBtb2RlbF9uZXckcF8yID49IDAuMDUgfiAiIiwNCm1vZGVsX25ldyRwXzIgPCAwLjAwMSB+ICIqKioiLA0KbW9kZWxfbmV3JHBfMiA8IDAuMDEgfiAiKioiLA0KbW9kZWxfbmV3JHBfMiA8IDAuMDUgfiAiKiINCikNCg0KIyBOb3cgb25seSBzZWxlY3QgdGhlIHZhcmlhYmxlcyB0aGF0IEkgd2FudCB0byBzaG93IGluIHRoZSB0YWJsZQ0KbW9kZWxfbmV3IDwtIGRwbHlyOjpzZWxlY3QobW9kZWxfbmV3LCBtdV9zaWdtYV8yLCBWYXJpYWJsZV8yLCBFc3RpbWF0ZSwgU0UsIHBfdGV4dCwgRXN0aW1hdGVfMSwgU0VfMSwgcF90ZXh0XzEsIEVzdGltYXRlXzIsIFNFXzIsIHBfdGV4dF8yKQ0KDQojIE1ha2UgYW5kIHNhdmUgdGhlIHRhYmxlIGFzIGh0bWwgZmlsZQ0Ka2FibGUobW9kZWxfbmV3LCBkaWdpdHMgPSAzLCBjYXB0aW9uID0gIlRhYmxlIDMuIEFsbCBwb29sZWQgZWZmZWN0cyBtZWFuIGF0dGl0dWRlcyBhbmQgcG9sYXJpemF0aW9uIiwgDQogICAgICBjb2wubmFtZXMgPSBjKCAiIiwgIlZhcmlhYmxlcyIsICJFc3RpbWF0ZSIsICJTdGQuIEVycm9yIiwgIiIsICJFc3RpbWF0ZSIsICJTdGQuIEVycm9yIiwgIiIsICJFc3RpbWF0ZSIsICJTdGQuIEVycm9yIiwgIiIpKSAlPiUNCiAga2FibGVfY2xhc3NpY18yKGh0bWxfZm9udCA9ICJUaW1lcyIsIGZpeGVkX3RoZWFkID0gVCwgZnVsbF93aWR0aCA9IEYpICU+JQ0KICBhZGRfaGVhZGVyX2Fib3ZlKGMoIiAiID0gMiwgIlRpbWUtb25seSBtb2RlbCIgPSAzLCAiSW5kZXBlbnQgdmFyIG1vZGVsIiA9IDMsICJJbnRlcmFjdGlvbiBtb2RlbCIgPSAzKSkgJT4lDQogICBmb290bm90ZSgNCiAgICBnZW5lcmFsX3RpdGxlID0gIk5vdGUuIiwNCiAgICBnZW5lcmFsID0gIioqKiA9IHAgPCAwLjAwMSwgKiogPSBwIDwgMC4wMSwgKiA9IHAgPCAwLjA1IiwNCiAgICB0aHJlZXBhcnR0YWJsZSA9IFRSVUUsDQogICAgZm9vdG5vdGVfYXNfY2h1bmsgPSBUUlVFDQogICAgKSANCiMlPiUNCiAgICAjc2F2ZV9rYWJsZSgiL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2Uvb3V0cHV0L3Bvb2xlZF9lZmZlY3RzX3RhYmxlLmh0bWwiKQ0KYGBgDQoNCiMjIEFwcGVuZGl4IEQuIFBvb2xlZCBlZmZlY3RzIGFnZS1vbmx5IHZzIGdlbmRlciBhbmQgZWR1Y2F0aW9uLW9ubHkgbW9kZWwgey19DQoNCmBgYHtyLCB3YXJuaW5nPUZBTFNFfQ0Kcm0obGlzdD1scygpKQ0Kc2V0LnNlZWQoMSkgIyhhcyBJIGFtIHBlcmZvcm1pbmcgYW5hbHlzZXMgd2l0aCBhIHJhbmRvbSBhc3BlY3QpDQpsb2FkKGhlcmUoIi4vZGF0YS9tZXRhX2FuYWx5c2lzIiwgInRvdGFsX2luZGVwX3Zhcl9yZXN1bHRzX25ld19lZHVnZW4uUkRhdGEiKSkNCg0KIyBUaGUgbW9kZWxzIGluIHdoaWNoIEkgb25seSBpbmNsdWRlZCBlZHVjYXRpb24gYW5kIGdlbmRlciANCm0yX2F0dCA8LSBybWEoeWkgPSBtdV90aW1lLA0KICAgICAgICAgICAgICBzZWkgPSBtdV90aW1lX3NkLA0KICAgICAgICAgICAgICBkYXRhID0gdG90YWxfaW5kZXBfdmFyX3Jlc3VsdHMsDQogICAgICAgICAgICAgIG1ldGhvZCA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgdGVzdCA9ICJrbmhhIikNCg0KIyBHZW5kZXIgDQpnZW5kZXJfZ2VuIDwtIG1ldGFnZW4oVEUgPSBtdV9zZXhfZXN0LA0KICAgICAgICAgICAgICAgICBzZVRFID0gbXVfc2V4X3NkLA0KICAgICAgICAgICAgICAgICBkYXRhID0gdG90YWxfaW5kZXBfdmFyX3Jlc3VsdHMsDQogICAgICAgICAgICAgICAgIGZpeGVkID0gRkFMU0UsDQogICAgICAgICAgICAgICAgIHJhbmRvbSA9IFRSVUUsDQogICAgICAgICAgICAgICAgIG1ldGhvZC50YXUgPSAiUkVNTCIsDQogICAgICAgICAgICAgICAgIGhha24gPSBUUlVFKQ0KDQojIEVkdWNhdGlvbmFsIGxldmVsLiBUaGlzIGlzIG5vdyBhIGR1bW15DQplZHVfbWVkX2dlbiA8LSBtZXRhZ2VuKFRFID0gbXVfaXNjZWRfbWVkX2VzdCwNCiAgICAgICAgICAgICAgICAgc2VURSA9IG11X2lzY2VkX21lZF9zZCwNCiAgICAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX2luZGVwX3Zhcl9yZXN1bHRzLA0KICAgICAgICAgICAgICAgICBmaXhlZCA9IEZBTFNFLA0KICAgICAgICAgICAgICAgICByYW5kb20gPSBUUlVFLA0KICAgICAgICAgICAgICAgICBtZXRob2QudGF1ID0gIlJFTUwiLA0KICAgICAgICAgICAgICAgICBoYWtuID0gVFJVRSkNCg0KZWR1X2hpZ2hfZ2VuIDwtIG1ldGFnZW4oVEUgPSBtdV9pc2NlZF9oaWdoX2VzdCwNCiAgICAgICAgICAgICAgICAgc2VURSA9IG11X2lzY2VkX2hpZ2hfc2QsDQogICAgICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9pbmRlcF92YXJfcmVzdWx0cywNCiAgICAgICAgICAgICAgICAgZml4ZWQgPSBGQUxTRSwNCiAgICAgICAgICAgICAgICAgcmFuZG9tID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgbWV0aG9kLnRhdSA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgICAgaGFrbiA9IFRSVUUpDQoNCiMgRXh0cmFjdCBhbGwgdGhlIGRhdGEgZnJvbSB0aGUgbW9kZWxzIGFuZCBwdXQgdGhlbSBpbiBhIGRhdGFmcmFtZSB0aGF0IHdpbGwgbGF0ZXIgYmUgdGhlIGlucHV0IG9mIHRoZSBrYWJsZSB0YWJsZQ0KdGhyZWVfZGYgPC0gZGF0YS5mcmFtZShtYXRyaXgobmNvbCA9IDYsIG5yb3cgPSA0KSkNCmNvbG5hbWVzKHRocmVlX2RmKSA8LSBjKCJtdV9zaWdtYV8xIiwgImFnZV9lZHVjXzEiLCAiVmFyaWFibGVfMSIsICJFc3RpbWF0ZV8xIiwgIlNFXzEiLCAicF8xIikNCnRocmVlX2RmJG11X3NpZ21hXzEgPC0gYygiTWVhbiBhdHRpdHVkZXMiLCAiIiwgIiIsICIiKQ0KdGhyZWVfZGYkYWdlX2VkdWNfMSA8LSBjKCJHZW5kZXIgYW5kIGVkdWNhdGlvbiIsICIiLCAiIiwgIiIpDQp0aHJlZV9kZiRWYXJpYWJsZV8xIDwtIGMoIlRpbWUiLCAiR2VuZGVyIiwgIklzY2VkIGludGVybWVkaWF0ZSAocmVmPWJhc2ljKSIsICJJc2NlZCBhZHZhbmNlZCAocmVmPWJhc2ljKSIpDQp0aHJlZV9kZiRFc3RpbWF0ZV8xIDwtIGMoYXMubnVtZXJpYyhtMl9hdHQkYiksIGdlbmRlcl9nZW4kVEUucmFuZG9tLGVkdV9tZWRfZ2VuJFRFLnJhbmRvbSwgZWR1X2hpZ2hfZ2VuJFRFLnJhbmRvbSkNCnRocmVlX2RmJFNFXzEgPC0gYyhtMl9hdHQkc2UsIGdlbmRlcl9nZW4kc2VURS5yYW5kb20sIGVkdV9tZWRfZ2VuJHNlVEUucmFuZG9tLCBlZHVfaGlnaF9nZW4kc2VURS5yYW5kb20pDQp0aHJlZV9kZiRwXzEgPC0gYyhtMl9hdHQkcHZhbCwgZ2VuZGVyX2dlbiRwdmFsLnJhbmRvbSwgZWR1X21lZF9nZW4kcHZhbC5yYW5kb20sIGVkdV9oaWdoX2dlbiRwdmFsLnJhbmRvbSkgICAgICAgICAgICAgICAgICAgICAgIA0KICAgICAgICAgICAgICAgICAgICAgICANCiMgVGhlIHNhbWUgZm9yIHZhcmlhbmNlDQptMl92YXIgPC0gcm1hKHlpID0gc2lnX3RpbWUsDQogICAgICAgICAgICAgIHNlaSA9IHNpZ190aW1lX3NkLA0KICAgICAgICAgICAgICBkYXRhID0gdG90YWxfaW5kZXBfdmFyX3Jlc3VsdHMsDQogICAgICAgICAgICAgIG1ldGhvZCA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgdGVzdCA9ICJrbmhhIikNCg0KIyBHZW5kZXINCmdlbmRlcl92YXJfZ2VuIDwtIG1ldGFnZW4oVEUgPSBzaWdfc2V4X2VzdCwNCiAgICAgICAgICAgICAgICAgc2VURSA9IHNpZ19zZXhfc2QsDQogICAgICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9pbmRlcF92YXJfcmVzdWx0cywNCiAgICAgICAgICAgICAgICAgZml4ZWQgPSBGQUxTRSwNCiAgICAgICAgICAgICAgICAgcmFuZG9tID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgbWV0aG9kLnRhdSA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgICAgaGFrbiA9IFRSVUUpDQoNCiMgRWR1Y2F0aW9uDQplZHVfdmFyX21lZF9nZW4gPC0gbWV0YWdlbihURSA9IHNpZ19pc2NlZF9tZWRfZXN0LA0KICAgICAgICAgICAgICAgICBzZVRFID0gc2lnX2lzY2VkX21lZF9zZCwNCiAgICAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX2luZGVwX3Zhcl9yZXN1bHRzLA0KICAgICAgICAgICAgICAgICBmaXhlZCA9IEZBTFNFLA0KICAgICAgICAgICAgICAgICByYW5kb20gPSBUUlVFLA0KICAgICAgICAgICAgICAgICBtZXRob2QudGF1ID0gIlJFTUwiLA0KICAgICAgICAgICAgICAgICBoYWtuID0gVFJVRSkNCg0KZWR1X3Zhcl9oaWdoX2dlbiA8LSBtZXRhZ2VuKFRFID0gc2lnX2lzY2VkX2hpZ2hfZXN0LA0KICAgICAgICAgICAgICAgICBzZVRFID0gc2lnX2lzY2VkX2hpZ2hfc2QsDQogICAgICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9pbmRlcF92YXJfcmVzdWx0cywNCiAgICAgICAgICAgICAgICAgZml4ZWQgPSBGQUxTRSwNCiAgICAgICAgICAgICAgICAgcmFuZG9tID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgbWV0aG9kLnRhdSA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgICAgaGFrbiA9IFRSVUUpDQoNCmZvdXJfZGYgPC0gZGF0YS5mcmFtZShtYXRyaXgobmNvbCA9IDYsIG5yb3cgPSA0KSkNCmNvbG5hbWVzKGZvdXJfZGYpIDwtIGMoIm11X3NpZ21hXzEiLCAiYWdlX2VkdWNfMSIsICJWYXJpYWJsZV8xIiwgIkVzdGltYXRlXzEiLCAiU0VfMSIsICJwXzEiKQ0KZm91cl9kZiRtdV9zaWdtYV8xIDwtIGMoIlBvbGFyaXphdGlvbiBhdHRpdHVkZXMiLCAiIiwgIiIsICIiKQ0KZm91cl9kZiRhZ2VfZWR1Y18xIDwtIGMoIkdlbmRlciBhbmQgZWR1Y2F0aW9uIiwgIiIsICIiLCAiIikNCmZvdXJfZGYkVmFyaWFibGVfMSA8LSBjKCJUaW1lIiwgIkdlbmRlciIsICJJc2NlZCBpbnRlcm1lZGlhdGUgKHJlZj1iYXNpYykiLCAiSXNjZWQgYWR2YW5jZWQgKHJlZj1iYXNpYykiKQ0KZm91cl9kZiRFc3RpbWF0ZV8xIDwtIGMoYXMubnVtZXJpYyhtMl92YXIkYiksIGdlbmRlcl92YXJfZ2VuJFRFLnJhbmRvbSwgZWR1X3Zhcl9tZWRfZ2VuJFRFLnJhbmRvbSwgZWR1X3Zhcl9oaWdoX2dlbiRURS5yYW5kb20pDQpmb3VyX2RmJFNFXzEgPC0gYyhtMl9hdHQkc2UsIGdlbmRlcl92YXJfZ2VuJHNlVEUucmFuZG9tLCBlZHVfdmFyX21lZF9nZW4kc2VURS5yYW5kb20sIGVkdV92YXJfaGlnaF9nZW4kc2VURS5yYW5kb20pDQpmb3VyX2RmJHBfMSA8LSBjKG0yX2F0dCRwdmFsLCBnZW5kZXJfdmFyX2dlbiRwdmFsLnJhbmRvbSwgZWR1X3Zhcl9tZWRfZ2VuJHB2YWwucmFuZG9tLCBlZHVfdmFyX2hpZ2hfZ2VuJHB2YWwucmFuZG9tKQ0KDQpgYGANCg0KDQpgYGB7ciwgd2FybmluZz1GQUxTRX0NCnJtKHRvdGFsX2luZGVwX3Zhcl9yZXN1bHRzKQ0KIyBEbyB0aGUgc2FtZSwgYnV0IHRoZW4gZm9yIHRoZSBtb2RlbHMgd2l0aCBvbmx5IGFnZSBpbmNsdWRlZA0KbG9hZChoZXJlKCIuL2RhdGEvbWV0YV9hbmFseXNpcyIsICJ0b3RhbF9pbmRlcF92YXJfcmVzdWx0c19uZXdfYWdlLlJEYXRhIikpDQp0b3RhbF9pbmRlcF92YXJfcmVzdWx0c19hZ2UgPC0gYXMuZGF0YS5mcmFtZSh0b3RhbF9pbmRlcF92YXJfcmVzdWx0cykNCg0KIyBUaGUgbW9kZWxzIGluIHdoaWNoIEkgb25seSBpbmNsdWRlZCBlZHVjYXRpb24gYW5kIGdlbmRlciANCm0yX2F0dF9hZ2UgPC0gcm1hKHlpID0gbXVfdGltZSwNCiAgICAgICAgICAgICAgc2VpID0gbXVfdGltZV9zZCwNCiAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX2luZGVwX3Zhcl9yZXN1bHRzX2FnZSwNCiAgICAgICAgICAgICAgbWV0aG9kID0gIlJFTUwiLA0KICAgICAgICAgICAgICB0ZXN0ID0gImtuaGEiKQ0KDQojIEFnZQ0KYWdlX2dlbiA8LSBtZXRhZ2VuKFRFID0gbXVfYWdlX2VzdCwNCiAgICAgICAgICAgICAgICAgc2VURSA9IG11X2FnZV9zZCwNCiAgICAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX2luZGVwX3Zhcl9yZXN1bHRzX2FnZSwNCiAgICAgICAgICAgICAgICAgZml4ZWQgPSBGQUxTRSwNCiAgICAgICAgICAgICAgICAgcmFuZG9tID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgbWV0aG9kLnRhdSA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgICAgaGFrbiA9IFRSVUUpDQoNCiMgRXh0cmFjdCBhbGwgdGhlIGRhdGEgZnJvbSB0aGUgbW9kZWxzIGFuZCBwdXQgdGhlbSBpbiBhIGRhdGFmcmFtZSB0aGF0IHdpbGwgbGF0ZXIgYmUgdGhlIGlucHV0IG9mIHRoZSBrYWJsZSB0YWJsZQ0KZml2ZV9kZiA8LSBkYXRhLmZyYW1lKG1hdHJpeChuY29sID0gNiwgbnJvdyA9IDIpKQ0KY29sbmFtZXMoZml2ZV9kZikgPC0gYygibXVfc2lnbWFfMSIsICJhZ2VfZWR1Y18xIiwgIlZhcmlhYmxlXzEiLCAiRXN0aW1hdGVfMSIsICJTRV8xIiwgInBfMSIpDQpmaXZlX2RmJG11X3NpZ21hXzEgPC0gYygiIiwgIiIpDQpmaXZlX2RmJGFnZV9lZHVjXzEgPC0gYygiQWdlIiwgIiIpDQpmaXZlX2RmJFZhcmlhYmxlXzEgPC0gYygiVGltZSIsICJBZ2UiKQ0KZml2ZV9kZiRFc3RpbWF0ZV8xIDwtIGMoYXMubnVtZXJpYyhtMl9hdHRfYWdlJGIpLCBhZ2VfZ2VuJFRFLnJhbmRvbSkNCmZpdmVfZGYkU0VfMSA8LSBjKG0yX2F0dF9hZ2Ukc2UsIGFnZV9nZW4kc2VURS5yYW5kb20pDQpmaXZlX2RmJHBfMSA8LSBjKG0yX2F0dF9hZ2UkcHZhbCwgYWdlX2dlbiRwdmFsLnJhbmRvbSkgICAgICAgICAgICAgICAgICAgICAgIA0KICAgICAgICAgICAgICAgICAgICAgICANCiMgVGhlIHNhbWUgZm9yIHZhcmlhbmNlDQptMl92YXJfYWdlIDwtIHJtYSh5aSA9IHNpZ190aW1lLA0KICAgICAgICAgICAgICBzZWkgPSBzaWdfdGltZV9zZCwNCiAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX2luZGVwX3Zhcl9yZXN1bHRzX2FnZSwNCiAgICAgICAgICAgICAgbWV0aG9kID0gIlJFTUwiLA0KICAgICAgICAgICAgICB0ZXN0ID0gImtuaGEiKQ0KDQojIEdlbmRlcg0KYWdlX3Zhcl9nZW4gPC0gbWV0YWdlbihURSA9IHNpZ19hZ2VfZXN0LA0KICAgICAgICAgICAgICAgICBzZVRFID0gc2lnX2FnZV9zZCwNCiAgICAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX2luZGVwX3Zhcl9yZXN1bHRzX2FnZSwNCiAgICAgICAgICAgICAgICAgZml4ZWQgPSBGQUxTRSwNCiAgICAgICAgICAgICAgICAgcmFuZG9tID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgbWV0aG9kLnRhdSA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgICAgaGFrbiA9IFRSVUUpDQoNCnNpeF9kZiA8LSBkYXRhLmZyYW1lKG1hdHJpeChuY29sID0gNiwgbnJvdyA9IDIpKQ0KY29sbmFtZXMoc2l4X2RmKSA8LSBjKCJtdV9zaWdtYV8xIiwgImFnZV9lZHVjXzEiLCAiVmFyaWFibGVfMSIsICJFc3RpbWF0ZV8xIiwgIlNFXzEiLCAicF8xIikNCnNpeF9kZiRtdV9zaWdtYV8xIDwtIGMoIiIsICIiKQ0Kc2l4X2RmJGFnZV9lZHVjXzEgPC0gYygiQWdlIiwgIiIpDQpzaXhfZGYkVmFyaWFibGVfMSA8LSBjKCJUaW1lIiwgIkFnZSIpDQpzaXhfZGYkRXN0aW1hdGVfMSA8LSBjKGFzLm51bWVyaWMobTJfdmFyX2FnZSRiKSwgYWdlX3Zhcl9nZW4kVEUucmFuZG9tKQ0Kc2l4X2RmJFNFXzEgPC0gYyhtMl92YXJfYWdlJHNlLCBhZ2VfdmFyX2dlbiRzZVRFLnJhbmRvbSkNCnNpeF9kZiRwXzEgPC0gYyhtMl92YXJfYWdlJHB2YWwsIGFnZV92YXJfZ2VuJHB2YWwucmFuZG9tKQ0KDQojIFRoZSBvcmRlciBJIHdhbnQgaW4gdGhlIHRhYmxlcyBpcyB0aHJlZSAtPiBmaXZlIC0+IGZvdXIgLT4gc2l4DQp0b3RhbF9kZiA8LSByYmluZCh0aHJlZV9kZiwgZml2ZV9kZiwgZm91cl9kZiwgc2l4X2RmKQ0KDQojIEkgV2FudCB0byByb3VuZCB0aGUgbnVtZXJpYyB2YXJpYWJsZXMgdG8gMyBkZWNpbWFscw0KdG90YWxfZGYgPC0gZHBseXI6Om11dGF0ZSh0b3RhbF9kZiwgYWNyb3NzKC5jb2xzID0gYygtbXVfc2lnbWFfMSwgLVZhcmlhYmxlXzEsIC1hZ2VfZWR1Y18xKSwgLmZucyA9IGFzLm51bWVyaWMpKQ0KbnVtZXJpY19jb2xzIDwtIHNhcHBseSh0b3RhbF9kZiwgaXMubnVtZXJpYykNCnRvdGFsX2RmWywgbnVtZXJpY19jb2xzXSA8LSByb3VuZCh0b3RhbF9kZlssIG51bWVyaWNfY29sc10sIGRpZ2l0cyA9IDMpDQoNCiMgQ3JlYXRlIGEgbmV3IHZhcmlhYmxlIHRvIHVzZSBzdGFycyBpbnN0ZWFkIG9mIHRoZSBmdWxsIHAtdmFsdWVzIGluIHRoZSB0YWJsZQ0KdG90YWxfZGYkcF90ZXh0XzEgPC0gY2FzZV93aGVuKA0KICB0b3RhbF9kZiRwXzEgPj0gMC4wNSB+ICIiLA0KdG90YWxfZGYkcF8xIDwgMC4wMDEgfiAiKioqIiwNCnRvdGFsX2RmJHBfMSA8IDAuMDEgfiAiKioiLA0KdG90YWxfZGYkcF8xIDwgMC4wNSB+ICIqIg0KKQ0KDQojIE5vdyBvbmx5IHNlbGVjdCB0aGUgdmFyaWFibGVzIHRoYXQgSSB3YW50IHRvIHNob3cgaW4gdGhlIHRhYmxlDQp0b3RhbF9kZiA8LSBkcGx5cjo6c2VsZWN0KHRvdGFsX2RmLCBtdV9zaWdtYV8xLCBhZ2VfZWR1Y18xLCBWYXJpYWJsZV8xLCBFc3RpbWF0ZV8xLCBTRV8xLCBwX3RleHRfMSkNCg0KIyBNYWtlIGFuZCBzYXZlIHRoZSB0YWJsZSBhcyBodG1sIGZpbGUNCmthYmxlKHRvdGFsX2RmLCBkaWdpdHMgPSAzLCBjYXB0aW9uID0gIkFwcGVuZGl4IEQuIFBvb2xlZCBlZmZlY3RzIG1lYW4gYXR0aXR1ZGVzIGFuZCBwb2xhcml6YXRpb24gYWdlLCBlZHVjYXRpb24gYW5kIGdlbmRlci4iLCANCiAgICAgIGNvbC5uYW1lcyA9IGMoICIiLCAiIiwgIlZhcmlhYmxlcyIsICJFc3RpbWF0ZSIsICJTdGQuIEVycm9yIiwgIiIpKSAlPiUNCiAga2FibGVfY2xhc3NpY18yKGh0bWxfZm9udCA9ICJUaW1lcyIsIGZpeGVkX3RoZWFkID0gVCwgZnVsbF93aWR0aCA9IEYpICU+JQ0KICBhZGRfaGVhZGVyX2Fib3ZlKGMoIiAiID0gMywgIkluZGVwZW50IHZhciBtb2RlbCIgPSAzKSkgJT4lDQogICBmb290bm90ZSgNCiAgICBnZW5lcmFsX3RpdGxlID0gIk5vdGUuIiwNCiAgICBnZW5lcmFsID0gIioqKiA9IHAgPCAwLjAwMSwgKiogPSBwIDwgMC4wMSwgKiA9IHAgPCAwLjA1IiwNCiAgICB0aHJlZXBhcnR0YWJsZSA9IFRSVUUsDQogICAgZm9vdG5vdGVfYXNfY2h1bmsgPSBUUlVFDQogICAgKQ0KIyU+JQ0KICMgICBzYXZlX2thYmxlKCIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9vdXRwdXQvYXBwZW5kaXgvcG9vbGVkX2VmZmVjdHNfZWR1Z2VuYWdlLmh0bWwiKQ0KDQoNCmBgYA0KDQo=</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("descriptives.Rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -7,6 +7,7 @@ output: html_document
 
 ```{r, echo=FALSE}
 #knitr::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(number_sections = FALSE)
 options(width = 100)
 colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
 ```
@@ -24,14 +25,13 @@ library(readxl)
 library(gamlss)
 library(metafor)
 library(meta)
-here()
-here::i_am("scripts/descriptive_stats/descriptives.Rmd")
+
 ```
 
-## Ggplot that shows the years that each dataset covers
+## Ggplot that shows the years that each dataset covers {-}
 
 ```{r}
-datayear <- read_excel("/Users/anuschka/Documents/climatechange/climatechange/data/descriptives/dataset_year.xlsx")
+datayear <- read_excel("C:/Github/climatechange/data/descriptives/dataset_year.xlsx")
 ```
 
 ```{r, warning=FALSE, fig.show='asis'}
@@ -66,7 +66,7 @@ yearplot
 #ggsave("yearplot.png", width = 7, height = 5, path = "/Users/anuschka/Documents/climatechange/climatechange/output/yearplot.png")
 ```
 
-## Table of the GAMLSS regression output
+## Table of the GAMLSS regression output {-}
 
 ```{r}
 # Run this piece of code so that in the Table beneath it will not show NAs
@@ -127,7 +127,7 @@ write_xlsx(model_total, here("./data/descriptives/", "kable_model_total_gamlss.x
 model_new <- read_excel(here("./data/descriptives/", "kable_model_total_gamlss.xlsx" ))
 
 # I Want to round the numeric variables to 3 decimals
-model_new <- mutate_at(model_new, vars(-mu_sigma, -variables), as.numeric)
+model_new <- dplyr::mutate(model_new, across(.cols = c(-mu_sigma, -variables), .fns= as.numeric))
 numeric_cols <- sapply(model_new, is.numeric)
 model_new[, numeric_cols] <- round(model_new[, numeric_cols], digits = 3)
 
@@ -175,7 +175,7 @@ kable(model_new, digits = 3, caption = "Table 2. GAMLSS model on worry ISSP (199
   
 ```
 
-## Table all pooled effects
+## Table all pooled effects {-}
 
 ```{r, eval=FALSE}
 rm(list=ls())
@@ -331,7 +331,7 @@ four_df$p_1 <- c(m2_att$pval, gender_var_gen$pval.random, age_var_gen$pval.rando
 indep_df <- rbind(three_df, four_df)
 
 #Now i want the interaction model as well
-load("/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_inter_results_new.RData")
+load("C:/Github/climatechange/data/meta_analysis/total_inter_results_new.RData")
 
 # First mean attitudes
 m3_att <- rma(yi = mu_time_int,
@@ -537,7 +537,7 @@ write_xlsx(total_df, here("./data/descriptives/", "kable_model_all_pooled_effect
 model_new <- read_excel(here("./data/descriptives/", "kable_model_all_pooled_effects.xlsx" ))
 
 # I Want to round the numeric variables to 3 decimals
-model_new <- mutate_at(model_new, vars(-mu_sigma_2, -Variable_2), as.numeric)
+model_new <- dplyr::mutate(model_new, across(.cols = c(-mu_sigma_2, -Variable_2), .fns = as.numeric))
 numeric_cols <- sapply(model_new, is.numeric)
 model_new[, numeric_cols] <- round(model_new[, numeric_cols], digits = 3)
 
@@ -581,7 +581,7 @@ kable(model_new, digits = 3, caption = "Table 3. All pooled effects mean attitud
     #save_kable("/Users/anuschka/Documents/climatechange/climatechange/output/pooled_effects_table.html")
 ```
 
-## Appendix D. Pooled effects age-only vs gender and education-only model
+## Appendix D. Pooled effects age-only vs gender and education-only model {-}
 
 ```{r, warning=FALSE}
 rm(list=ls())
@@ -737,7 +737,7 @@ six_df$p_1 <- c(m2_var_age$pval, age_var_gen$pval.random)
 total_df <- rbind(three_df, five_df, four_df, six_df)
 
 # I Want to round the numeric variables to 3 decimals
-total_df <- mutate_at(total_df, vars(-mu_sigma_1, -Variable_1, -age_educ_1), as.numeric)
+total_df <- dplyr::mutate(total_df, across(.cols = c(-mu_sigma_1, -Variable_1, -age_educ_1), .fns = as.numeric))
 numeric_cols <- sapply(total_df, is.numeric)
 total_df[, numeric_cols] <- round(total_df[, numeric_cols], digits = 3)
 

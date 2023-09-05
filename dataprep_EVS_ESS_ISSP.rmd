@@ -24,7 +24,7 @@ library(questionr)
 library(psych)
 ```
 
-# European Values Survey
+# European Values Survey {-}
 ```{r}
 #Load in EVS trend file
 evs <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/evs/ZA7503_v2-0-0.sav", use.value.labels = T,  to.data.frame = T)
@@ -145,7 +145,7 @@ evssel <- evssel %>% select(stdyno_w, S001, S002EVS, S006, S017, S018, S020, cli
 save(evssel, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/evssel.Rdata")
 ```
 
-## European Social Survey
+## European Social Survey {-}
 ```{r}
 # Let's do the same with the ESS, for which I will use the 2016 and 2020 wave. 
 ess2016 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/ess/ESS8e02_2.sav", use.value.labels = T,  to.data.frame = T)
@@ -339,7 +339,7 @@ save(esstotal, file="/Users/anuschka/Documents/climatechange/climatechange/data/
 
 ```
 
-## International Social Survey Program
+## International Social Survey Program {-}
 ```{r}
 issp1993 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/issp/ISSP1993.sav", use.value.labels = T,  to.data.frame = T)
 
@@ -660,7 +660,7 @@ issptotal$urban <- factor(issptotal$urban, levels=c("Low urbanity", "Medium urba
 save(issptotal, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/issptotal.Rdata")
 ```
 
-## Merging all the data into large datasets
+## Merging all the data into large datasets {-}
 ```{r}
 # For the three datasets, change the isced into isced cat
 load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/evssel.Rdata")

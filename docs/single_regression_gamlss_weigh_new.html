@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Anuschka Peelen" />
+
+<meta name="date" content="2023-09-05" />
+
+<title>Gamlss regressions all datasets</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="tweaks.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="blog.html">Blog</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Scripts datapreparation
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="dataprep_EB.html">Data preparation Eurobarometer</a>
+    </li>
+    <li>
+      <a href="dataprep_EVS_ESS_ISSP.html">Data preparation EVS, ESS, ISSP</a>
+    </li>
+    <li>
+      <a href="dataprep_I-O.html">Data preparation I&amp;O Research</a>
+    </li>
+    <li>
+      <a href="weights.html">Weighing data</a>
+    </li>
+    <li>
+      <a href="dataprep_polcat.html">Left right placement</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Scripts descriptives and analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="descriptives.html">Descriptives</a>
+    </li>
+    <li>
+      <a href="single_regression_gamlss_weigh_new.html">Gamlss regressions weighted</a>
+    </li>
+    <li>
+      <a href="single_regression_gw_py_new.html">Gamlss regression shorter time spans</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_weight_gamlss_new.html">Extract coefficients gamlss regressions</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_wg_waves_new.html">Extract coefficients shorter time spans</a>
+    </li>
+    <li>
+      <a href="regression_to_indep_var_analysis_weight_gamlss_new.html">Extract coefficients independent var model</a>
+    </li>
+    <li>
+      <a href="regression_to_interact_analysis_weight_gamlss_new.html">Extract coefficients interaction model</a>
+    </li>
+    <li>
+      <a href="meta_analysis_gamlss_weigh.html">Meta-analysis weighted gamlss</a>
+    </li>
+    <li>
+      <a href="meta_analysis_indep_var.html">Meta-analysis independent variables</a>
+    </li>
+    <li>
+      <a href="meta_analysis_gw_waves.html">Meta-analysis shorter time spans</a>
+    </li>
+    <li>
+      <a></a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/apeelen/climatechange">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Gamlss regressions all datasets</h1>
+<h4 class="author">Anuschka Peelen</h4>
+<h4 class="date">2023-09-05</h4>
+
+</div>
+
+
+<p>In this script I use loops to perform gamlss regressions for all 52
+attitudes. The lists that I will get as output are saved with all the
+information, after which - in another script - i will extract the raw
+effects sizes used as input for the meta-regressions. In this specific
+script, I will only include the effects of education and gender to test
+the idea of opposing effects of gender + education versus age.</p>
+<pre class="r"><code>rm(list = ls())
+#install.packages(&quot;gamlss&quot;)
+library(gamlss)
+library(tidyverse)
+library(dplyr)
+library(here)
+library(fastDummies)
+library(here)
+here()
+here::i_am(&quot;scripts/analysis/single_regression.Rmd&quot;)</code></pre>
+<div id="ess" class="section level2 unnumbered">
+<h2 class="unnumbered">ESS</h2>
+<pre class="r"><code>load(here(&quot;./data/final_data&quot;, &quot;esstotal.RData&quot;))
+
+# Gamlss cannot handle NAs, so I have to listwise delete all of them
+ess_complete &lt;- esstotal %&gt;% drop_na()
+ess_complete$time &lt;- ess_complete$surveyyear - min(ess_complete$surveyyear)
+
+# I want to build models. In the empty model, I only want to include time. 
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;worry&quot;, &quot;cause&quot;, &quot;pers_resp&quot;)
+
+ess_list_empty &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression. The sigma formula pastes every variable one by one and calculates variance, the other formula shows the mean attitudes effects
+  ess_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = ess_complete, weights = weightvec)
+  
+  ess_list_empty[[i]] &lt;- ess_fit
+} 
+
+summary(ess_list_empty[[1]]) #Sig pos effect of surveyyear on both intercept and variance (worry)
+summary(ess_list_empty[[2]]) # Sig neg effect on intercept, sig pos effect on variance (cause)
+summary(ess_list_empty[[3]]) # Sig pos effect on intercept, sig neg effect on variance (pers_resp)
+ 
+save(ess_list_empty, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_empty_w.RData&quot;)
+
+#Estimate a second model with the indicators + time
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;worry&quot;, &quot;cause&quot;, &quot;pers_resp&quot;)
+
+ess_list_preds &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  ess_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = ess_complete, weights = weightvec)
+  
+  ess_list_preds[[i]] &lt;- ess_fit
+} 
+
+summary(ess_list_preds[[1]]) 
+
+save(ess_list_preds, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_preds_w_new.RData&quot;)
+
+#Now the last model with interaction of time on predictor variables
+ess_complete$age_time &lt;- ess_complete$age * ess_complete$time
+ess_complete$sex_time &lt;- as.numeric(ess_complete$sex) * ess_complete$time
+ess_complete &lt;- fastDummies::dummy_cols(ess_complete, select_columns = &quot;isced_cat&quot;)
+ess_complete$isced_basic_time &lt;- ess_complete$isced_cat_Basic * ess_complete$time
+ess_complete$isced_intermediate_time &lt;- ess_complete$isced_cat_Intermediate * ess_complete$time
+ess_complete$isced_advanced_time &lt;- ess_complete$isced_cat_Advanced * ess_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+ess_list_interactions &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  ess_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = ess_complete, weights = weightvec)
+  
+  ess_list_interactions[[i]] &lt;- ess_fit
+} 
+
+
+summary(ess_list_interactions[[1]]) 
+summary(ess_list_interactions[[2]]) 
+summary(ess_list_interactions[[3]])
+
+save(ess_list_interactions, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_interactions_w_new.RData&quot;)</code></pre>
+</div>
+<div id="evs" class="section level2 unnumbered">
+<h2 class="unnumbered">EVS</h2>
+<pre class="r"><code># Perform the same procedure for the EVS
+load(here(&quot;./data/final_data&quot;, &quot;evssel.RData&quot;))
+
+evs_complete &lt;- evssel %&gt;% dplyr::select(surveyyear:marstat, weightvec, isced_cat)
+evs_complete &lt;- evs_complete %&gt;% drop_na()
+evs_complete$time &lt;- evs_complete$surveyyear - min(evs_complete$surveyyear)
+
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;climate5&quot;)
+
+evs_list_empty &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regrevsion
+  evs_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = evs_complete, weights = weightvec)
+  
+  evs_list_empty[[i]] &lt;- evs_fit
+} 
+
+summary(evs_list_empty[[1]]) #Sig pos effect of time on intercept
+
+model1 &lt;- evs_list_empty[[1]]
+plot(model1, ts = &quot;true&quot;)
+
+save(evs_list_empty, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/evs_list_empty_w.RData&quot;)
+
+# Predictor model
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;climate5&quot;)
+
+evs_list_preds &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regrevsion
+  evs_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = evs_complete, weights = weightvec)
+  
+  evs_list_preds[[i]] &lt;- evs_fit
+} 
+
+summary(evs_list_preds[[1]]) 
+
+save(evs_list_preds, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/evs_list_preds_w_new.RData&quot;)
+
+#Now the last model with interaction of time on predictor variables
+evs_complete$age_time &lt;- evs_complete$age * evs_complete$time
+evs_complete$sex_time &lt;- as.numeric(evs_complete$sex) * evs_complete$time
+evs_complete &lt;- fastDummies::dummy_cols(evs_complete, select_columns = &quot;isced_cat&quot;)
+evs_complete$isced_basic_time &lt;- evs_complete$isced_cat_Basic * evs_complete$time
+evs_complete$isced_intermediate_time &lt;- evs_complete$isced_cat_Intermediate * evs_complete$time
+evs_complete$isced_advanced_time &lt;- evs_complete$isced_cat_Advanced * evs_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+evs_list_interactions &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regrevsion
+  evs_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = evs_complete, weights = weightvec)
+  
+  evs_list_interactions[[i]] &lt;- evs_fit
+} 
+
+summary(evs_list_interactions[[1]]) 
+
+save(evs_list_interactions, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/evs_list_interactions_w_new.RData&quot;)</code></pre>
+</div>
+<div id="io" class="section level2 unnumbered">
+<h2 class="unnumbered">I&amp;O</h2>
+<pre class="r"><code>load(here(&quot;./data/final_data&quot;, &quot;io_total.RData&quot;))
+io_complete &lt;- io_total %&gt;% dplyr::select(worried:surveyyear, weightvec, isced_cat)
+#Urban, IOINKOMEN, IOPOL has to go away
+io_complete = subset(io_complete, select = -c(urban,IOINKOMEN, IOPOL2017) )
+io_complete &lt;- io_complete %&gt;% drop_na()
+
+io_complete$time &lt;- io_complete$surveyyear - min(io_complete$surveyyear)
+
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;worried&quot;, &quot;frontrunner&quot;, &quot;worry_future&quot;, &quot;resp_citiz&quot;, &quot;dk_start&quot;, &quot;do_gov&quot;, &quot;buss_help&quot;, &quot;min_contr&quot;, &quot;human_resp&quot;)
+
+io_list_empty &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  io_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = io_complete, weights = weightvec)
+  
+  io_list_empty[[i]] &lt;- io_fit
+} 
+
+summary(io_list_empty[[1]]) #Sig pos effect of time on intercept, not on variance
+summary(io_list_empty[[2]])
+
+model1 &lt;- io_list_empty[[1]]
+plot(model1, ts = &quot;true&quot;)
+
+save(io_list_empty, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/io_list_empty_w.RData&quot;)
+
+# Predictor model
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;worried&quot;, &quot;frontrunner&quot;, &quot;worry_future&quot;, &quot;resp_citiz&quot;, &quot;dk_start&quot;, &quot;do_gov&quot;, &quot;buss_help&quot;, &quot;min_contr&quot;, &quot;human_resp&quot;)
+
+io_list_preds &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  io_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = io_complete, weights = weightvec)
+  
+  io_list_preds[[i]] &lt;- io_fit
+} 
+
+summary(io_list_preds[[1]]) 
+
+save(io_list_preds, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/io_list_preds_w_new.RData&quot;)
+
+#Now the last model with interaction of time on predictor variables
+io_complete$age_time &lt;- io_complete$age * io_complete$time
+io_complete$sex_time &lt;- as.numeric(io_complete$sex) * io_complete$time
+io_complete &lt;- fastDummies::dummy_cols(io_complete, select_columns = &quot;isced_cat&quot;)
+io_complete$isced_basic_time &lt;- io_complete$isced_cat_Basic * io_complete$time
+io_complete$isced_intermediate_time &lt;- io_complete$isced_cat_Intermediate * io_complete$time
+io_complete$isced_advanced_time &lt;- io_complete$isced_cat_Advanced * io_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+io_list_interactions &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  io_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = io_complete, weights = weightvec)
+  
+  io_list_interactions[[i]] &lt;- io_fit
+} 
+
+
+summary(io_list_interactions[[1]]) 
+
+save(io_list_interactions, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/io_list_interactions_w_new.RData&quot;)</code></pre>
+</div>
+<div id="issp" class="section level2 unnumbered">
+<h2 class="unnumbered">ISSP</h2>
+<pre class="r"><code>load(here(&quot;./data/final_data&quot;, &quot;issptotal.Rdata&quot;))
+issptotal$surveyyear[is.na(issptotal$surveyyear)] &lt;- &quot;2010&quot;
+issptotal$surveyyear &lt;- as.numeric(issptotal$surveyyear)
+
+# The issp has variables that are asked in all three waves, and variables that are asked only in 2 waves. So I have to run the code on subsets of the data. First I estimate the models for the statements that are asked throughout the three waves
+issp_complete &lt;- issptotal %&gt;% dplyr::select(surveyyear:marstat, weightvec, isced_cat)
+issp_complete &lt;- issp_complete %&gt;% drop_na()
+issp_complete$time &lt;- issp_complete$surveyyear - min(issp_complete$surveyyear)
+
+# Time-only
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;worry&quot;, &quot;lifeharm&quot;, &quot;willing_price&quot;, &quot;willing_tax&quot;, &quot;willing_living&quot;, &quot;do_right&quot;, &quot;progharm&quot;, &quot;econprotect&quot;, &quot;people_decide&quot;)
+
+issp_list_empty &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  issp_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula,
+                     family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = issp_complete, weights = weightvec)
+  
+  issp_list_empty[[i]] &lt;- issp_fit
+} 
+
+summary(issp_list_empty[[1]]) 
+summary(issp_list_empty[[2]]) 
+summary(issp_list_empty[[3]]) 
+ 
+save(issp_list_empty, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_empty_w.RData&quot;)
+
+# Now with predictors
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;worry&quot;, &quot;lifeharm&quot;, &quot;willing_price&quot;, &quot;willing_tax&quot;, &quot;willing_living&quot;, &quot;do_right&quot;, &quot;progharm&quot;, &quot;econprotect&quot;, &quot;people_decide&quot; )
+
+issp_list_preds &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  issp_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula,
+                      family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = issp_complete, weights = weightvec)
+  
+  issp_list_preds[[i]] &lt;- issp_fit
+} 
+
+summary(issp_list_preds[[9]]) 
+
+save(issp_list_preds, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_preds_w_new.RData&quot;)
+
+# And now interactions
+issp_complete$age_time &lt;- issp_complete$age * issp_complete$time
+issp_complete$sex_time &lt;- as.numeric(issp_complete$sex) * issp_complete$time
+issp_complete &lt;- fastDummies::dummy_cols(issp_complete, select_columns = &quot;isced_cat&quot;)
+issp_complete$isced_basic_time &lt;- issp_complete$isced_cat_Basic * issp_complete$time
+issp_complete$isced_intermediate_time &lt;- issp_complete$isced_cat_Intermediate * issp_complete$time
+issp_complete$isced_advanced_time &lt;- issp_complete$isced_cat_Advanced * issp_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+issp_list_interactions &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regressisspn
+  issp_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = issp_complete, weights = weightvec)
+  
+  issp_list_interactions[[i]] &lt;- issp_fit
+} 
+
+summary(issp_list_interactions[[1]]) 
+
+save(issp_list_interactions, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_interactions_w_new.RData&quot;)
+
+# Now the variables that are only asked twice
+issp_complete &lt;- issptotal %&gt;% dplyr::select(surveyyear, isced:growharm, weightvec, isced_cat)
+issp_complete &lt;- issp_complete %&gt;% drop_na()
+issp_complete$time &lt;- issp_complete$surveyyear - min(issp_complete$surveyyear)
+
+# Time-only model
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;exag&quot;, &quot;moreimp&quot;, &quot;othersame&quot;, &quot;country_effort&quot;, &quot;growharm&quot;)
+
+issp_list_empty_2_waves &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  issp_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = issp_complete, weights = weightvec)
+  
+  issp_list_empty_2_waves[[i]] &lt;- issp_fit
+  } 
+
+summary(issp_list_empty_2_waves[[1]]) 
+summary(issp_list_empty_2_waves[[2]])
+summary(issp_list_empty_2_waves[[3]]) 
+
+save(issp_list_empty_2_waves, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_empty_2_waves_w.RData&quot;)
+
+# And the model with the predictors
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;exag&quot;, &quot;moreimp&quot;, &quot;othersame&quot;, &quot;country_effort&quot;, &quot;growharm&quot;)
+
+issp_list_preds_2_waves &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  issp_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = issp_complete, weights = weightvec)
+  
+  issp_list_preds_2_waves[[i]] &lt;- issp_fit
+} 
+
+summary(issp_list_preds_2_waves[[1]]) 
+
+save(issp_list_preds_2_waves, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_preds_2_waves_w_new.RData&quot;)
+
+# And lastly, again the interactions
+issp_complete$age_time &lt;- issp_complete$age * issp_complete$time
+issp_complete$sex_time &lt;- as.numeric(issp_complete$sex) * issp_complete$time
+issp_complete &lt;- fastDummies::dummy_cols(issp_complete, select_columns = &quot;isced_cat&quot;)
+issp_complete$isced_basic_time &lt;- issp_complete$isced_cat_Basic * issp_complete$time
+issp_complete$isced_intermediate_time &lt;- issp_complete$isced_cat_Intermediate * issp_complete$time
+issp_complete$isced_advanced_time &lt;- issp_complete$isced_cat_Advanced * issp_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+issp_list_interactions_2_waves &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regressisspn
+  issp_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = issp_complete, weights = weightvec)
+  
+  issp_list_interactions_2_waves[[i]] &lt;- issp_fit
+} 
+
+summary(issp_list_interactions_2_waves[[1]]) 
+
+save(issp_list_interactions_2_waves, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_interactions_2_waves_w_new.RData&quot;)</code></pre>
+</div>
+<div id="eb" class="section level2 unnumbered">
+<h2 class="unnumbered">EB</h2>
+<pre class="r"><code># Now the most difficult one: Eurobarometer. No items are asked steadily throughout time, so have to work with a lot of subsets. 
+load(here(&quot;./data/final_data&quot;, &quot;eb_tot.Rdata&quot;))
+
+# first 1986 - 1995
+eb_complete &lt;- eb_tot %&gt;% dplyr::select(surveyyear, env_ec_stat, env_prsimp, sex, isced: urban, weightvec, isced_cat)
+# Religion is only asked in one wave
+eb_complete &lt;- eb_complete %&gt;% drop_na()
+eb_complete$time &lt;- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+# First empty model 
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;env_ec_stat&quot;, &quot;env_prsimp&quot;)
+
+eb_list_empty_1986 &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_empty_1986[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_empty_1986[[1]]) 
+summary(eb_list_empty_1986[[2]])
+
+save(eb_list_empty_1986, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_1986_w.RData&quot;)
+
+# Model with predictors
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;env_ec_stat&quot;, &quot;env_prsimp&quot;)
+
+eb_list_preds_1986 &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_preds_1986[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_preds_1986[[1]]) 
+summary(eb_list_preds_1986[[2]])
+
+save(eb_list_preds_1986, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_1986_w_new.RData&quot;)
+
+# And the model with interactions
+eb_complete$age_time &lt;- eb_complete$age * eb_complete$time
+eb_complete$sex_time &lt;- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete &lt;- fastDummies::dummy_cols(eb_complete, select_columns = &quot;isced_cat&quot;)
+eb_complete$isced_basic_time &lt;- eb_complete$isced_cat_Basic * eb_complete$time
+eb_complete$isced_intermediate_time &lt;- eb_complete$isced_cat_Intermediate * eb_complete$time
+eb_complete$isced_advanced_time &lt;- eb_complete$isced_cat_Advanced * eb_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+eb_list_interactions_1986 &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_interactions_1986[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_interactions_1986[[1]]) 
+summary(eb_list_interactions_1986[[2]])
+
+save(eb_list_interactions_1986, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_1986_w_new.RData&quot;)</code></pre>
+<pre class="r"><code># Now with the influence of environment on quality of life
+eb_complete &lt;- eb_tot %&gt;% dplyr::select(surveyyear, env_quallife, sex, isced, urban, age, weightvec, isced_cat)
+# Lrplace and income are not asked in all waves
+eb_complete &lt;- eb_complete %&gt;% drop_na()
+eb_complete$time &lt;- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+# First empty model 
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;env_quallife&quot;)
+
+eb_list_empty_quallife &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_empty_quallife[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_empty_quallife[[1]]) 
+
+save(eb_list_empty_quallife, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_quallife_w.RData&quot;)
+
+# Model with predictors
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;env_quallife&quot;)
+
+eb_list_preds_quallife &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_preds_quallife[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_preds_quallife[[1]]) 
+
+save(eb_list_preds_quallife, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_quallife_w_new.RData&quot;)
+
+# And the model with interactions
+eb_complete$age_time &lt;- eb_complete$age * eb_complete$time
+eb_complete$sex_time &lt;- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete &lt;- fastDummies::dummy_cols(eb_complete, select_columns = &quot;isced_cat&quot;)
+eb_complete$isced_basic_time &lt;- eb_complete$isced_cat_Basic * eb_complete$time
+eb_complete$isced_intermediate_time &lt;- eb_complete$isced_cat_Intermediate * eb_complete$time
+eb_complete$isced_advanced_time &lt;- eb_complete$isced_cat_Advanced * eb_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+eb_list_interactions_quallife &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regressebn
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_interactions_quallife[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_interactions_quallife[[1]]) 
+
+save(eb_list_interactions_quallife, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_quallife_w_new.RData&quot;)</code></pre>
+<pre class="r"><code># Now 2 statements that are asked 4 times
+eb_complete &lt;- eb_tot %&gt;% dplyr::select(surveyyear, role_ind, big_pol, sex, isced, urban, age, weightvec, isced_cat)
+# Lrplace and income are not asked in all waves
+eb_complete &lt;- eb_complete %&gt;% drop_na()
+eb_complete$time &lt;- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+# First empty model 
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;role_ind&quot;, &quot;big_pol&quot;)
+
+eb_list_empty_2007 &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_empty_2007[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_empty_2007[[2]]) 
+
+save(eb_list_empty_2007, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2007_w.RData&quot;)
+
+# Model with predictors
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;role_ind&quot;, &quot;big_pol&quot;)
+
+eb_list_preds_2007 &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_preds_2007[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_preds_2007[[1]]) 
+
+save(eb_list_preds_2007, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2007_w_new.RData&quot;)
+
+# And the model with interactions
+eb_complete$age_time &lt;- eb_complete$age * eb_complete$time
+eb_complete$sex_time &lt;- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete &lt;- fastDummies::dummy_cols(eb_complete, select_columns = &quot;isced_cat&quot;)
+eb_complete$isced_basic_time &lt;- eb_complete$isced_cat_Basic * eb_complete$time
+eb_complete$isced_intermediate_time &lt;- eb_complete$isced_cat_Intermediate * eb_complete$time
+eb_complete$isced_advanced_time &lt;- eb_complete$isced_cat_Advanced * eb_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+eb_list_interactions_2007 &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regressebn
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_interactions_2007[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_interactions_2007[[1]]) 
+
+save(eb_list_interactions_2007, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2007_w_new.RData&quot;)</code></pre>
+<pre class="r"><code># Now 2 statements that are asked 4 times
+eb_complete &lt;- eb_tot %&gt;% dplyr::select(surveyyear, buyprod, sex, isced, urban, age, weightvec, isced_cat)
+eb_complete &lt;- eb_complete %&gt;% drop_na()
+eb_complete$time &lt;- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+# First empty model 
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;buyprod&quot;)
+
+eb_list_empty_buyprod &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_empty_buyprod[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_empty_buyprod[[1]]) 
+
+save(eb_list_empty_buyprod, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_buyprod_w.RData&quot;)
+
+# Model with predictors
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;buyprod&quot;)
+
+eb_list_preds_buyprod &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_preds_buyprod[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_preds_buyprod[[1]]) 
+
+save(eb_list_preds_buyprod, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_buyprod_w_new.RData&quot;)
+
+# And the model with interactions
+eb_complete$age_time &lt;- eb_complete$age * eb_complete$time
+eb_complete$sex_time &lt;- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete &lt;- fastDummies::dummy_cols(eb_complete, select_columns = &quot;isced_cat&quot;)
+eb_complete$isced_basic_time &lt;- eb_complete$isced_cat_Basic * eb_complete$time
+eb_complete$isced_intermediate_time &lt;- eb_complete$isced_cat_Intermediate * eb_complete$time
+eb_complete$isced_advanced_time &lt;- eb_complete$isced_cat_Advanced * eb_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+eb_list_interactions_buyprod &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_interactions_buyprod[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_interactions_buyprod[[1]]) 
+
+save(eb_list_interactions_buyprod, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_buyprod_w_new.RData&quot;)</code></pre>
+<pre class="r"><code># Now 2 statements that are asked 4 times
+eb_complete &lt;- eb_tot %&gt;% dplyr::select(surveyyear, eff_daily, sex, isced, urban, age, weightvec, isced_cat)
+eb_complete &lt;- eb_complete %&gt;% drop_na()
+eb_complete$time &lt;- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+# First empty model 
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;eff_daily&quot;)
+
+eb_list_empty_eff_daily &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_empty_eff_daily[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_empty_eff_daily[[1]]) 
+
+save(eb_list_empty_eff_daily, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_eff_daily_w.RData&quot;)
+
+# Model with predictors
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;eff_daily&quot;)
+
+eb_list_preds_eff_daily &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_preds_eff_daily[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_preds_eff_daily[[1]]) 
+
+save(eb_list_preds_eff_daily, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_eff_daily_w_new.RData&quot;)
+
+# And the model with interactions
+eb_complete$age_time &lt;- eb_complete$age * eb_complete$time
+eb_complete$sex_time &lt;- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete &lt;- fastDummies::dummy_cols(eb_complete, select_columns = &quot;isced_cat&quot;)
+eb_complete$isced_basic_time &lt;- eb_complete$isced_cat_Basic * eb_complete$time
+eb_complete$isced_intermediate_time &lt;- eb_complete$isced_cat_Intermediate * eb_complete$time
+eb_complete$isced_advanced_time &lt;- eb_complete$isced_cat_Advanced * eb_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+eb_list_interactions_eff_daily &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_interactions_eff_daily[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_interactions_eff_daily[[1]]) 
+
+save(eb_list_interactions_eff_daily, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_eff_daily_w_new.RData&quot;)</code></pre>
+<pre class="r"><code># Now 4 vars that are asked 2 waves
+eb_complete &lt;- eb_tot %&gt;% dplyr::select(surveyyear, cc_unstop:cc_prsact, sex, isced, urban, age, weightvec, isced_cat)
+eb_complete &lt;- eb_complete %&gt;% drop_na()
+eb_complete$time &lt;- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+# First empty model 
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;cc_unstop&quot;, &quot;cc_exag&quot;, &quot;cc_poseu&quot;, &quot;cc_prsact&quot;)
+
+eb_list_empty_2008 &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_empty_2008[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_empty_2008[[1]]) 
+
+save(eb_list_empty_2008, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2008_w.RData&quot;)
+
+# Model with predictors
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;cc_unstop&quot;, &quot;cc_exag&quot;, &quot;cc_poseu&quot;, &quot;cc_prsact&quot;)
+
+eb_list_preds_2008 &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_preds_2008[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_preds_2008[[1]]) 
+
+save(eb_list_preds_2008, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2008_w_new.RData&quot;)
+
+# And the model with interactions
+eb_complete$age_time &lt;- eb_complete$age * eb_complete$time
+eb_complete$sex_time &lt;- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete &lt;- fastDummies::dummy_cols(eb_complete, select_columns = &quot;isced_cat&quot;)
+eb_complete$isced_basic_time &lt;- eb_complete$isced_cat_Basic * eb_complete$time
+eb_complete$isced_intermediate_time &lt;- eb_complete$isced_cat_Intermediate * eb_complete$time
+eb_complete$isced_advanced_time &lt;- eb_complete$isced_cat_Advanced * eb_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+eb_list_interactions_2008 &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_interactions_2008[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_interactions_2008[[1]]) 
+
+save(eb_list_interactions_2008, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2008_w_new.RData&quot;)</code></pre>
+<pre class="r"><code># Climate change perception asked in six waves
+eb_complete &lt;- eb_tot %&gt;% dplyr::select(surveyyear, ccpercept, cchange, sex, isced, urban, age, weightvec, isced_cat)
+eb_complete &lt;- eb_complete %&gt;% drop_na()
+eb_complete$time &lt;- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+# First empty model 
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;ccpercept&quot;, &quot;cchange&quot;)
+
+eb_list_empty_2009 &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_empty_2009[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_empty_2009[[1]]) 
+
+save(eb_list_empty_2009, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2009_w.RData&quot;)
+
+# Model with predictors
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;ccpercept&quot;, &quot;cchange&quot;)
+
+eb_list_preds_2009 &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_preds_2009[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_preds_2009[[1]]) 
+
+save(eb_list_preds_2009, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2009_w_new.RData&quot;)
+
+# And the model with interactions
+eb_complete$age_time &lt;- eb_complete$age * eb_complete$time
+eb_complete$sex_time &lt;- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete &lt;- fastDummies::dummy_cols(eb_complete, select_columns = &quot;isced_cat&quot;)
+eb_complete$isced_basic_time &lt;- eb_complete$isced_cat_Basic * eb_complete$time
+eb_complete$isced_intermediate_time &lt;- eb_complete$isced_cat_Intermediate * eb_complete$time
+eb_complete$isced_advanced_time &lt;- eb_complete$isced_cat_Advanced * eb_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+eb_list_interactions_2009 &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_interactions_2009[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_interactions_2009[[1]]) 
+
+save(eb_list_interactions_2009, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2009_w_new.RData&quot;)</code></pre>
+<pre class="r"><code># Personal importance asked in 3 waves
+eb_complete &lt;- eb_tot %&gt;% dplyr::select(surveyyear, pers_imp, sex, isced, urban, age, weightvec, isced_cat)
+eb_complete &lt;- eb_complete %&gt;% drop_na()
+eb_complete$time &lt;- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+# First empty model 
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;pers_imp&quot;)
+
+eb_list_empty_pers_imp &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula,family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_empty_pers_imp[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_empty_pers_imp[[1]]) 
+
+save(eb_list_empty_pers_imp, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_pers_imp_w.RData&quot;)
+
+# Model with predictors
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;pers_imp&quot;)
+
+eb_list_preds_pers_imp &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_preds_pers_imp[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_preds_pers_imp[[1]]) 
+
+save(eb_list_preds_pers_imp, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_pers_imp_w_new.RData&quot;)
+
+# And the model with interactions
+eb_complete$age_time &lt;- eb_complete$age * eb_complete$time
+eb_complete$sex_time &lt;- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete &lt;- fastDummies::dummy_cols(eb_complete, select_columns = &quot;isced_cat&quot;)
+eb_complete$isced_basic_time &lt;- eb_complete$isced_cat_Basic * eb_complete$time
+eb_complete$isced_intermediate_time &lt;- eb_complete$isced_cat_Intermediate * eb_complete$time
+eb_complete$isced_advanced_time &lt;- eb_complete$isced_cat_Advanced * eb_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+eb_list_interactions_pers_imp &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_interactions_pers_imp[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_interactions_pers_imp[[1]]) 
+
+save(eb_list_interactions_pers_imp, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_pers_imp_w_new.RData&quot;)</code></pre>
+<pre class="r"><code># Questions about who does enough asked in 3 waves
+eb_complete &lt;- eb_tot %&gt;% dplyr::select(surveyyear, doprot_natgov:doprot_citiz, sex, isced, urban, age, weightvec, isced_cat)
+eb_complete &lt;- eb_complete %&gt;% drop_na()
+eb_complete$time &lt;- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+# First empty model 
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;doprot_natgov&quot;, &quot;doprot_eu&quot;, &quot;doprot_region&quot;, &quot;doprot_comp&quot;, &quot;doprot_citiz&quot;)
+
+eb_list_empty_doprot &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_empty_doprot[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_empty_doprot[[1]]) 
+
+save(eb_list_empty_doprot, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_doprot_w.RData&quot;)
+
+# Model with predictors
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;doprot_natgov&quot;, &quot;doprot_eu&quot;, &quot;doprot_region&quot;, &quot;doprot_comp&quot;, &quot;doprot_citiz&quot;)
+
+eb_list_preds_doprot &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_preds_doprot[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_preds_doprot[[1]]) 
+
+save(eb_list_preds_doprot, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_doprot_w_new.RData&quot;)
+
+# And the model with interactions
+eb_complete$age_time &lt;- eb_complete$age * eb_complete$time
+eb_complete$sex_time &lt;- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete &lt;- fastDummies::dummy_cols(eb_complete, select_columns = &quot;isced_cat&quot;)
+eb_complete$isced_basic_time &lt;- eb_complete$isced_cat_Basic * eb_complete$time
+eb_complete$isced_intermediate_time &lt;- eb_complete$isced_cat_Intermediate * eb_complete$time
+eb_complete$isced_advanced_time &lt;- eb_complete$isced_cat_Advanced * eb_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+eb_list_interactions_doprot &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_interactions_doprot[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_interactions_doprot[[1]]) 
+
+save(eb_list_interactions_doprot, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_doprot_w_new.RData&quot;)</code></pre>
+<pre class="r"><code># Questions about environment asked in 2 waves
+eb_complete &lt;- eb_tot %&gt;% dplyr::select(surveyyear, envp_eg, effr_eg, sex, isced, urban, age, weightvec, isced_cat)
+eb_complete &lt;- eb_complete %&gt;% drop_na()
+eb_complete$time &lt;- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+# First empty model 
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;envp_eg&quot;, &quot;effr_eg&quot;)
+
+eb_list_empty_2011 &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_empty_2011[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_empty_2011[[1]]) 
+
+save(eb_list_empty_2011, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2011_w.RData&quot;)
+
+# Model with predictors
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;envp_eg&quot;, &quot;effr_eg&quot;)
+
+eb_list_preds_2011 &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_preds_2011[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_preds_2011[[1]]) 
+
+save(eb_list_preds_2011, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2011_w_new.RData&quot;)
+
+# And the model with interactions
+eb_complete$age_time &lt;- eb_complete$age * eb_complete$time
+eb_complete$sex_time &lt;- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete &lt;- fastDummies::dummy_cols(eb_complete, select_columns = &quot;isced_cat&quot;)
+eb_complete$isced_basic_time &lt;- eb_complete$isced_cat_Basic * eb_complete$time
+eb_complete$isced_intermediate_time &lt;- eb_complete$isced_cat_Intermediate * eb_complete$time
+eb_complete$isced_advanced_time &lt;- eb_complete$isced_cat_Advanced * eb_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+eb_list_interactions_2011 &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_interactions_2011[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_interactions_2011[[1]]) 
+
+save(eb_list_interactions_2011, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2011_w_new.RData&quot;)</code></pre>
+<pre class="r"><code># Questions about naming climate change a problem
+eb_complete &lt;- eb_tot %&gt;% dplyr::select(surveyyear, cchange2, cchangetot, sex, isced, urban, age, weightvec, isced_cat)
+eb_complete &lt;- eb_complete %&gt;% drop_na()
+eb_complete$time &lt;- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+# First empty model 
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;cchange2&quot;, &quot;cchangetot&quot;)
+
+eb_list_empty_cchange2 &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_empty_cchange2[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_empty_cchange2[[1]]) 
+
+save(eb_list_empty_cchange2, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_cchange2_w.RData&quot;)
+
+# Model with predictors
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;cchange2&quot;, &quot;cchangetot&quot;)
+
+eb_list_preds_cchange2 &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_preds_cchange2[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_preds_cchange2[[1]]) 
+
+save(eb_list_preds_cchange2, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_cchange2_w_new.RData&quot;)
+
+# And the model with interactions
+eb_complete$age_time &lt;- eb_complete$age * eb_complete$time
+eb_complete$sex_time &lt;- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete &lt;- fastDummies::dummy_cols(eb_complete, select_columns = &quot;isced_cat&quot;)
+eb_complete$isced_basic_time &lt;- eb_complete$isced_cat_Basic * eb_complete$time
+eb_complete$isced_intermediate_time &lt;- eb_complete$isced_cat_Intermediate * eb_complete$time
+eb_complete$isced_advanced_time &lt;- eb_complete$isced_cat_Advanced * eb_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+eb_list_interactions_cchange2 &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_interactions_cchange2[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_interactions_cchange2[[1]]) 
+
+save(eb_list_interactions_cchange2, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_cchange2_w_new.RData&quot;)</code></pre>
+<pre class="r"><code># Question about personal action taken
+eb_complete &lt;- eb_tot %&gt;% dplyr::select(surveyyear, prsaction, sex, isced, urban, age, weightvec, isced_cat)
+eb_complete &lt;- eb_complete %&gt;% drop_na()
+eb_complete$time &lt;- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+# First empty model 
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;prsaction&quot;)
+
+eb_list_empty_prsaction &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_empty_prsaction[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_empty_prsaction[[1]]) 
+
+save(eb_list_empty_prsaction, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_prsaction_w.RData&quot;)
+
+# Model with predictors
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;prsaction&quot;)
+
+eb_list_preds_prsaction &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_preds_prsaction[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_preds_prsaction[[1]]) 
+
+save(eb_list_preds_prsaction, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_prsaction_w_new.RData&quot;)
+
+# And the model with interactions
+eb_complete$age_time &lt;- eb_complete$age * eb_complete$time
+eb_complete$sex_time &lt;- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete &lt;- fastDummies::dummy_cols(eb_complete, select_columns = &quot;isced_cat&quot;)
+eb_complete$isced_basic_time &lt;- eb_complete$isced_cat_Basic * eb_complete$time
+eb_complete$isced_intermediate_time &lt;- eb_complete$isced_cat_Intermediate * eb_complete$time
+eb_complete$isced_advanced_time &lt;- eb_complete$isced_cat_Advanced * eb_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+eb_list_interactions_prsaction &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_interactions_prsaction[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_interactions_prsaction[[1]]) 
+
+save(eb_list_interactions_prsaction, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_prsaction_w_new.RData&quot;)</code></pre>
+<pre class="r"><code># Last item, whether the city undertakes enough action
+eb_complete &lt;- eb_tot %&gt;% dplyr::select(surveyyear, doprot_city, sex, isced, urban, age, weightvec, isced_cat)
+eb_complete &lt;- eb_complete %&gt;% drop_na()
+eb_complete$time &lt;- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
+# First empty model 
+predictors &lt;- c(&quot;time&quot;)
+deps &lt;- c(&quot;doprot_city&quot;)
+
+eb_list_empty_doprot_city &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_empty_doprot_city[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_empty_doprot_city[[1]]) 
+
+save(eb_list_empty_doprot_city, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_doprot_city_w.RData&quot;)
+
+# Model with predictors
+predictors &lt;- c(&quot;time&quot;, &quot;sex&quot;, &quot;isced_cat&quot;, &quot;age&quot;)
+deps &lt;- c(&quot;doprot_city&quot;)
+
+eb_list_preds_doprot_city &lt;- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;))), sigma.formula = sigma.formula, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_preds_doprot_city[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_preds_doprot_city[[1]]) 
+
+save(eb_list_preds_doprot_city, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_doprot_city_w_new.RData&quot;)
+
+# And the model with interactions
+eb_complete$age_time &lt;- eb_complete$age * eb_complete$time
+eb_complete$sex_time &lt;- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete &lt;- fastDummies::dummy_cols(eb_complete, select_columns = &quot;isced_cat&quot;)
+eb_complete$isced_basic_time &lt;- eb_complete$isced_cat_Basic * eb_complete$time
+eb_complete$isced_intermediate_time &lt;- eb_complete$isced_cat_Intermediate * eb_complete$time
+eb_complete$isced_advanced_time &lt;- eb_complete$isced_cat_Advanced * eb_complete$time
+
+interactions &lt;- c(&quot;age_time&quot;, &quot;sex_time&quot;, &quot;isced_intermediate_time&quot;, &quot;isced_advanced_time&quot;)
+
+eb_list_interactions_doprot_city &lt;- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula &lt;- as.formula(paste(&quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot; + &quot;)))
+  # Perform the linear regression
+  eb_fit &lt;- gamlss(as.formula(paste(deps[i], &quot;~&quot;, paste(predictors, collapse = &quot; + &quot;), &quot; + &quot;, paste(interactions, collapse = &quot;+ &quot;))), sigma.formula = sigma.formula,&quot; + &quot;, family=NO(mu.link = &quot;identity&quot;, sigma.link = &quot;identity&quot;), data = eb_complete, weights = weightvec)
+  
+  eb_list_interactions_doprot_city[[i]] &lt;- eb_fit
+} 
+
+summary(eb_list_interactions_doprot_city[[1]]) 
+
+save(eb_list_interactions_doprot_city, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_doprot_city_w_new.RData&quot;)</code></pre>
+</div>
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkdhbWxzcyByZWdyZXNzaW9ucyBhbGwgZGF0YXNldHMiDQphdXRob3I6ICJBbnVzY2hrYSBQZWVsZW4iDQpkYXRlOiAiYHIgU3lzLkRhdGUoKWAiDQpvdXRwdXQ6IGh0bWxfZG9jdW1lbnQNCi0tLQ0KDQpgYGB7ciwgZWNobz1GQUxTRX0NCmtuaXRyOjpvcHRzX2NodW5rJHNldChldmFsID0gRkFMU0UpDQprbml0cjo6b3B0c19jaHVuayRzZXQobnVtYmVyX3NlY3Rpb25zID0gRkFMU0UpDQpvcHRpb25zKHdpZHRoID0gMTAwKQ0KY29sb3JpemUgPC0gZnVuY3Rpb24oeCwgY29sb3IpIHtzcHJpbnRmKCI8c3BhbiBzdHlsZT0nY29sb3I6ICVzOyc+JXM8L3NwYW4+IiwgY29sb3IsIHgpIH0NCmBgYA0KDQpJbiB0aGlzIHNjcmlwdCBJIHVzZSBsb29wcyB0byBwZXJmb3JtIGdhbWxzcyByZWdyZXNzaW9ucyBmb3IgYWxsIDUyIGF0dGl0dWRlcy4gVGhlIGxpc3RzIHRoYXQgSSB3aWxsIGdldCBhcyBvdXRwdXQgYXJlIHNhdmVkIHdpdGggYWxsIHRoZSBpbmZvcm1hdGlvbiwgYWZ0ZXIgd2hpY2ggLSBpbiBhbm90aGVyIHNjcmlwdCAtIGkgd2lsbCBleHRyYWN0IHRoZSByYXcgZWZmZWN0cyBzaXplcyB1c2VkIGFzIGlucHV0IGZvciB0aGUgbWV0YS1yZWdyZXNzaW9ucy4gSW4gdGhpcyBzcGVjaWZpYyBzY3JpcHQsIEkgd2lsbCBvbmx5IGluY2x1ZGUgdGhlIGVmZmVjdHMgb2YgZWR1Y2F0aW9uIGFuZCBnZW5kZXIgdG8gdGVzdCB0aGUgaWRlYSBvZiBvcHBvc2luZyBlZmZlY3RzIG9mIGdlbmRlciArIGVkdWNhdGlvbiB2ZXJzdXMgYWdlLiANCg0KYGBge3J9DQpybShsaXN0ID0gbHMoKSkNCiNpbnN0YWxsLnBhY2thZ2VzKCJnYW1sc3MiKQ0KbGlicmFyeShnYW1sc3MpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KGhlcmUpDQpsaWJyYXJ5KGZhc3REdW1taWVzKQ0KbGlicmFyeShoZXJlKQ0KaGVyZSgpDQpoZXJlOjppX2FtKCJzY3JpcHRzL2FuYWx5c2lzL3NpbmdsZV9yZWdyZXNzaW9uLlJtZCIpDQpgYGANCg0KIyMgRVNTIHstfQ0KDQpgYGB7cn0NCmxvYWQoaGVyZSgiLi9kYXRhL2ZpbmFsX2RhdGEiLCAiZXNzdG90YWwuUkRhdGEiKSkNCg0KIyBHYW1sc3MgY2Fubm90IGhhbmRsZSBOQXMsIHNvIEkgaGF2ZSB0byBsaXN0d2lzZSBkZWxldGUgYWxsIG9mIHRoZW0NCmVzc19jb21wbGV0ZSA8LSBlc3N0b3RhbCAlPiUgZHJvcF9uYSgpDQplc3NfY29tcGxldGUkdGltZSA8LSBlc3NfY29tcGxldGUkc3VydmV5eWVhciAtIG1pbihlc3NfY29tcGxldGUkc3VydmV5eWVhcikNCg0KIyBJIHdhbnQgdG8gYnVpbGQgbW9kZWxzLiBJbiB0aGUgZW1wdHkgbW9kZWwsIEkgb25seSB3YW50IHRvIGluY2x1ZGUgdGltZS4gDQpwcmVkaWN0b3JzIDwtIGMoInRpbWUiKQ0KZGVwcyA8LSBjKCJ3b3JyeSIsICJjYXVzZSIsICJwZXJzX3Jlc3AiKQ0KDQplc3NfbGlzdF9lbXB0eSA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24uIFRoZSBzaWdtYSBmb3JtdWxhIHBhc3RlcyBldmVyeSB2YXJpYWJsZSBvbmUgYnkgb25lIGFuZCBjYWxjdWxhdGVzIHZhcmlhbmNlLCB0aGUgb3RoZXIgZm9ybXVsYSBzaG93cyB0aGUgbWVhbiBhdHRpdHVkZXMgZWZmZWN0cw0KICBlc3NfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsIGZhbWlseT1OTyhtdS5saW5rID0gImlkZW50aXR5Iiwgc2lnbWEubGluayA9ICJpZGVudGl0eSIpLCBkYXRhID0gZXNzX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZXNzX2xpc3RfZW1wdHlbW2ldXSA8LSBlc3NfZml0DQp9IA0KDQpzdW1tYXJ5KGVzc19saXN0X2VtcHR5W1sxXV0pICNTaWcgcG9zIGVmZmVjdCBvZiBzdXJ2ZXl5ZWFyIG9uIGJvdGggaW50ZXJjZXB0IGFuZCB2YXJpYW5jZSAod29ycnkpDQpzdW1tYXJ5KGVzc19saXN0X2VtcHR5W1syXV0pICMgU2lnIG5lZyBlZmZlY3Qgb24gaW50ZXJjZXB0LCBzaWcgcG9zIGVmZmVjdCBvbiB2YXJpYW5jZSAoY2F1c2UpDQpzdW1tYXJ5KGVzc19saXN0X2VtcHR5W1szXV0pICMgU2lnIHBvcyBlZmZlY3Qgb24gaW50ZXJjZXB0LCBzaWcgbmVnIGVmZmVjdCBvbiB2YXJpYW5jZSAocGVyc19yZXNwKQ0KIA0Kc2F2ZShlc3NfbGlzdF9lbXB0eSwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9lc3NfbGlzdF9lbXB0eV93LlJEYXRhIikNCg0KI0VzdGltYXRlIGEgc2Vjb25kIG1vZGVsIHdpdGggdGhlIGluZGljYXRvcnMgKyB0aW1lDQpwcmVkaWN0b3JzIDwtIGMoInRpbWUiLCAic2V4IiwgImlzY2VkX2NhdCIsICJhZ2UiKQ0KZGVwcyA8LSBjKCJ3b3JyeSIsICJjYXVzZSIsICJwZXJzX3Jlc3AiKQ0KDQplc3NfbGlzdF9wcmVkcyA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgZXNzX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGVzc19jb21wbGV0ZSwgd2VpZ2h0cyA9IHdlaWdodHZlYykNCiAgDQogIGVzc19saXN0X3ByZWRzW1tpXV0gPC0gZXNzX2ZpdA0KfSANCg0Kc3VtbWFyeShlc3NfbGlzdF9wcmVkc1tbMV1dKSANCg0Kc2F2ZShlc3NfbGlzdF9wcmVkcywgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9lc3NfbGlzdF9wcmVkc193X25ldy5SRGF0YSIpDQoNCiNOb3cgdGhlIGxhc3QgbW9kZWwgd2l0aCBpbnRlcmFjdGlvbiBvZiB0aW1lIG9uIHByZWRpY3RvciB2YXJpYWJsZXMNCmVzc19jb21wbGV0ZSRhZ2VfdGltZSA8LSBlc3NfY29tcGxldGUkYWdlICogZXNzX2NvbXBsZXRlJHRpbWUNCmVzc19jb21wbGV0ZSRzZXhfdGltZSA8LSBhcy5udW1lcmljKGVzc19jb21wbGV0ZSRzZXgpICogZXNzX2NvbXBsZXRlJHRpbWUNCmVzc19jb21wbGV0ZSA8LSBmYXN0RHVtbWllczo6ZHVtbXlfY29scyhlc3NfY29tcGxldGUsIHNlbGVjdF9jb2x1bW5zID0gImlzY2VkX2NhdCIpDQplc3NfY29tcGxldGUkaXNjZWRfYmFzaWNfdGltZSA8LSBlc3NfY29tcGxldGUkaXNjZWRfY2F0X0Jhc2ljICogZXNzX2NvbXBsZXRlJHRpbWUNCmVzc19jb21wbGV0ZSRpc2NlZF9pbnRlcm1lZGlhdGVfdGltZSA8LSBlc3NfY29tcGxldGUkaXNjZWRfY2F0X0ludGVybWVkaWF0ZSAqIGVzc19jb21wbGV0ZSR0aW1lDQplc3NfY29tcGxldGUkaXNjZWRfYWR2YW5jZWRfdGltZSA8LSBlc3NfY29tcGxldGUkaXNjZWRfY2F0X0FkdmFuY2VkICogZXNzX2NvbXBsZXRlJHRpbWUNCg0KaW50ZXJhY3Rpb25zIDwtIGMoImFnZV90aW1lIiwgInNleF90aW1lIiwgImlzY2VkX2ludGVybWVkaWF0ZV90aW1lIiwgImlzY2VkX2FkdmFuY2VkX3RpbWUiKQ0KDQplc3NfbGlzdF9pbnRlcmFjdGlvbnMgPC0gbGlzdCgpDQoNCiBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpLCAiICsgIiwgcGFzdGUoaW50ZXJhY3Rpb25zLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgZXNzX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpLCAiICsgIiwgcGFzdGUoaW50ZXJhY3Rpb25zLCBjb2xsYXBzZSA9ICIrICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCIgKyAiLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGVzc19jb21wbGV0ZSwgd2VpZ2h0cyA9IHdlaWdodHZlYykNCiAgDQogIGVzc19saXN0X2ludGVyYWN0aW9uc1tbaV1dIDwtIGVzc19maXQNCn0gDQoNCg0Kc3VtbWFyeShlc3NfbGlzdF9pbnRlcmFjdGlvbnNbWzFdXSkgDQpzdW1tYXJ5KGVzc19saXN0X2ludGVyYWN0aW9uc1tbMl1dKSANCnN1bW1hcnkoZXNzX2xpc3RfaW50ZXJhY3Rpb25zW1szXV0pDQoNCnNhdmUoZXNzX2xpc3RfaW50ZXJhY3Rpb25zLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2Vzc19saXN0X2ludGVyYWN0aW9uc193X25ldy5SRGF0YSIpDQpgYGANCg0KIyMgRVZTIHstfQ0KDQpgYGB7cn0NCiMgUGVyZm9ybSB0aGUgc2FtZSBwcm9jZWR1cmUgZm9yIHRoZSBFVlMNCmxvYWQoaGVyZSgiLi9kYXRhL2ZpbmFsX2RhdGEiLCAiZXZzc2VsLlJEYXRhIikpDQoNCmV2c19jb21wbGV0ZSA8LSBldnNzZWwgJT4lIGRwbHlyOjpzZWxlY3Qoc3VydmV5eWVhcjptYXJzdGF0LCB3ZWlnaHR2ZWMsIGlzY2VkX2NhdCkNCmV2c19jb21wbGV0ZSA8LSBldnNfY29tcGxldGUgJT4lIGRyb3BfbmEoKQ0KZXZzX2NvbXBsZXRlJHRpbWUgPC0gZXZzX2NvbXBsZXRlJHN1cnZleXllYXIgLSBtaW4oZXZzX2NvbXBsZXRlJHN1cnZleXllYXIpDQoNCnByZWRpY3RvcnMgPC0gYygidGltZSIpDQpkZXBzIDwtIGMoImNsaW1hdGU1IikNCg0KZXZzX2xpc3RfZW1wdHkgPC0gbGlzdCgpDQoNCiMgTG9vcCB0aHJvdWdoIGVhY2ggZGVwZW5kZW50IHZhcmlhYmxlDQogIGZvciAoaSBpbiAxOmxlbmd0aChkZXBzKSkgew0KICAjIFNwZWNpZnkgdGhlIHNpZ21hIGZvcm11bGENCiAgc2lnbWEuZm9ybXVsYSA8LSBhcy5mb3JtdWxhKHBhc3RlKCJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKQ0KICAjIFBlcmZvcm0gdGhlIGxpbmVhciByZWdyZXZzaW9uDQogIGV2c19maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBldnNfY29tcGxldGUsIHdlaWdodHMgPSB3ZWlnaHR2ZWMpDQogIA0KICBldnNfbGlzdF9lbXB0eVtbaV1dIDwtIGV2c19maXQNCn0gDQoNCnN1bW1hcnkoZXZzX2xpc3RfZW1wdHlbWzFdXSkgI1NpZyBwb3MgZWZmZWN0IG9mIHRpbWUgb24gaW50ZXJjZXB0DQoNCm1vZGVsMSA8LSBldnNfbGlzdF9lbXB0eVtbMV1dDQpwbG90KG1vZGVsMSwgdHMgPSAidHJ1ZSIpDQoNCnNhdmUoZXZzX2xpc3RfZW1wdHksIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMvZXZzX2xpc3RfZW1wdHlfdy5SRGF0YSIpDQoNCiMgUHJlZGljdG9yIG1vZGVsDQpwcmVkaWN0b3JzIDwtIGMoInRpbWUiLCAic2V4IiwgImlzY2VkX2NhdCIsICJhZ2UiKQ0KZGVwcyA8LSBjKCJjbGltYXRlNSIpDQoNCmV2c19saXN0X3ByZWRzIDwtIGxpc3QoKQ0KDQojIExvb3AgdGhyb3VnaCBlYWNoIGRlcGVuZGVudCB2YXJpYWJsZQ0KICBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSkNCiAgIyBQZXJmb3JtIHRoZSBsaW5lYXIgcmVncmV2c2lvbg0KICBldnNfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsIGZhbWlseT1OTyhtdS5saW5rID0gImlkZW50aXR5Iiwgc2lnbWEubGluayA9ICJpZGVudGl0eSIpLCBkYXRhID0gZXZzX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZXZzX2xpc3RfcHJlZHNbW2ldXSA8LSBldnNfZml0DQp9IA0KDQpzdW1tYXJ5KGV2c19saXN0X3ByZWRzW1sxXV0pIA0KDQpzYXZlKGV2c19saXN0X3ByZWRzLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2V2c19saXN0X3ByZWRzX3dfbmV3LlJEYXRhIikNCg0KI05vdyB0aGUgbGFzdCBtb2RlbCB3aXRoIGludGVyYWN0aW9uIG9mIHRpbWUgb24gcHJlZGljdG9yIHZhcmlhYmxlcw0KZXZzX2NvbXBsZXRlJGFnZV90aW1lIDwtIGV2c19jb21wbGV0ZSRhZ2UgKiBldnNfY29tcGxldGUkdGltZQ0KZXZzX2NvbXBsZXRlJHNleF90aW1lIDwtIGFzLm51bWVyaWMoZXZzX2NvbXBsZXRlJHNleCkgKiBldnNfY29tcGxldGUkdGltZQ0KZXZzX2NvbXBsZXRlIDwtIGZhc3REdW1taWVzOjpkdW1teV9jb2xzKGV2c19jb21wbGV0ZSwgc2VsZWN0X2NvbHVtbnMgPSAiaXNjZWRfY2F0IikNCmV2c19jb21wbGV0ZSRpc2NlZF9iYXNpY190aW1lIDwtIGV2c19jb21wbGV0ZSRpc2NlZF9jYXRfQmFzaWMgKiBldnNfY29tcGxldGUkdGltZQ0KZXZzX2NvbXBsZXRlJGlzY2VkX2ludGVybWVkaWF0ZV90aW1lIDwtIGV2c19jb21wbGV0ZSRpc2NlZF9jYXRfSW50ZXJtZWRpYXRlICogZXZzX2NvbXBsZXRlJHRpbWUNCmV2c19jb21wbGV0ZSRpc2NlZF9hZHZhbmNlZF90aW1lIDwtIGV2c19jb21wbGV0ZSRpc2NlZF9jYXRfQWR2YW5jZWQgKiBldnNfY29tcGxldGUkdGltZQ0KDQppbnRlcmFjdGlvbnMgPC0gYygiYWdlX3RpbWUiLCAic2V4X3RpbWUiLCAiaXNjZWRfaW50ZXJtZWRpYXRlX3RpbWUiLCAiaXNjZWRfYWR2YW5jZWRfdGltZSIpDQoNCmV2c19saXN0X2ludGVyYWN0aW9ucyA8LSBsaXN0KCkNCg0KIGZvciAoaSBpbiAxOmxlbmd0aChkZXBzKSkgew0KICAjIFNwZWNpZnkgdGhlIHNpZ21hIGZvcm11bGENCiAgc2lnbWEuZm9ybXVsYSA8LSBhcy5mb3JtdWxhKHBhc3RlKCJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIiksICIgKyAiLCBwYXN0ZShpbnRlcmFjdGlvbnMsIGNvbGxhcHNlID0gIiArICIpKSkNCiAgIyBQZXJmb3JtIHRoZSBsaW5lYXIgcmVncmV2c2lvbg0KICBldnNfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIiksICIgKyAiLCBwYXN0ZShpbnRlcmFjdGlvbnMsIGNvbGxhcHNlID0gIisgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsIiArICIsIGZhbWlseT1OTyhtdS5saW5rID0gImlkZW50aXR5Iiwgc2lnbWEubGluayA9ICJpZGVudGl0eSIpLCBkYXRhID0gZXZzX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZXZzX2xpc3RfaW50ZXJhY3Rpb25zW1tpXV0gPC0gZXZzX2ZpdA0KfSANCg0Kc3VtbWFyeShldnNfbGlzdF9pbnRlcmFjdGlvbnNbWzFdXSkgDQoNCnNhdmUoZXZzX2xpc3RfaW50ZXJhY3Rpb25zLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2V2c19saXN0X2ludGVyYWN0aW9uc193X25ldy5SRGF0YSIpDQoNCmBgYA0KDQojIyBJJk8gey19DQoNCmBgYHtyfQ0KbG9hZChoZXJlKCIuL2RhdGEvZmluYWxfZGF0YSIsICJpb190b3RhbC5SRGF0YSIpKQ0KaW9fY29tcGxldGUgPC0gaW9fdG90YWwgJT4lIGRwbHlyOjpzZWxlY3Qod29ycmllZDpzdXJ2ZXl5ZWFyLCB3ZWlnaHR2ZWMsIGlzY2VkX2NhdCkNCiNVcmJhbiwgSU9JTktPTUVOLCBJT1BPTCBoYXMgdG8gZ28gYXdheQ0KaW9fY29tcGxldGUgPSBzdWJzZXQoaW9fY29tcGxldGUsIHNlbGVjdCA9IC1jKHVyYmFuLElPSU5LT01FTiwgSU9QT0wyMDE3KSApDQppb19jb21wbGV0ZSA8LSBpb19jb21wbGV0ZSAlPiUgZHJvcF9uYSgpDQoNCmlvX2NvbXBsZXRlJHRpbWUgPC0gaW9fY29tcGxldGUkc3VydmV5eWVhciAtIG1pbihpb19jb21wbGV0ZSRzdXJ2ZXl5ZWFyKQ0KDQpwcmVkaWN0b3JzIDwtIGMoInRpbWUiKQ0KZGVwcyA8LSBjKCJ3b3JyaWVkIiwgImZyb250cnVubmVyIiwgIndvcnJ5X2Z1dHVyZSIsICJyZXNwX2NpdGl6IiwgImRrX3N0YXJ0IiwgImRvX2dvdiIsICJidXNzX2hlbHAiLCAibWluX2NvbnRyIiwgImh1bWFuX3Jlc3AiKQ0KDQppb19saXN0X2VtcHR5IDwtIGxpc3QoKQ0KDQojIExvb3AgdGhyb3VnaCBlYWNoIGRlcGVuZGVudCB2YXJpYWJsZQ0KICBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSkNCiAgIyBQZXJmb3JtIHRoZSBsaW5lYXIgcmVncmVzc2lvbg0KICBpb19maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBpb19jb21wbGV0ZSwgd2VpZ2h0cyA9IHdlaWdodHZlYykNCiAgDQogIGlvX2xpc3RfZW1wdHlbW2ldXSA8LSBpb19maXQNCn0gDQoNCnN1bW1hcnkoaW9fbGlzdF9lbXB0eVtbMV1dKSAjU2lnIHBvcyBlZmZlY3Qgb2YgdGltZSBvbiBpbnRlcmNlcHQsIG5vdCBvbiB2YXJpYW5jZQ0Kc3VtbWFyeShpb19saXN0X2VtcHR5W1syXV0pDQoNCm1vZGVsMSA8LSBpb19saXN0X2VtcHR5W1sxXV0NCnBsb3QobW9kZWwxLCB0cyA9ICJ0cnVlIikNCg0Kc2F2ZShpb19saXN0X2VtcHR5LCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2lvX2xpc3RfZW1wdHlfdy5SRGF0YSIpDQoNCiMgUHJlZGljdG9yIG1vZGVsDQpwcmVkaWN0b3JzIDwtIGMoInRpbWUiLCAic2V4IiwgImlzY2VkX2NhdCIsICJhZ2UiKQ0KZGVwcyA8LSBjKCJ3b3JyaWVkIiwgImZyb250cnVubmVyIiwgIndvcnJ5X2Z1dHVyZSIsICJyZXNwX2NpdGl6IiwgImRrX3N0YXJ0IiwgImRvX2dvdiIsICJidXNzX2hlbHAiLCAibWluX2NvbnRyIiwgImh1bWFuX3Jlc3AiKQ0KDQppb19saXN0X3ByZWRzIDwtIGxpc3QoKQ0KDQojIExvb3AgdGhyb3VnaCBlYWNoIGRlcGVuZGVudCB2YXJpYWJsZQ0KICBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSkNCiAgIyBQZXJmb3JtIHRoZSBsaW5lYXIgcmVncmVzc2lvbg0KICBpb19maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBpb19jb21wbGV0ZSwgd2VpZ2h0cyA9IHdlaWdodHZlYykNCiAgDQogIGlvX2xpc3RfcHJlZHNbW2ldXSA8LSBpb19maXQNCn0gDQoNCnN1bW1hcnkoaW9fbGlzdF9wcmVkc1tbMV1dKSANCg0Kc2F2ZShpb19saXN0X3ByZWRzLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2lvX2xpc3RfcHJlZHNfd19uZXcuUkRhdGEiKQ0KDQojTm93IHRoZSBsYXN0IG1vZGVsIHdpdGggaW50ZXJhY3Rpb24gb2YgdGltZSBvbiBwcmVkaWN0b3IgdmFyaWFibGVzDQppb19jb21wbGV0ZSRhZ2VfdGltZSA8LSBpb19jb21wbGV0ZSRhZ2UgKiBpb19jb21wbGV0ZSR0aW1lDQppb19jb21wbGV0ZSRzZXhfdGltZSA8LSBhcy5udW1lcmljKGlvX2NvbXBsZXRlJHNleCkgKiBpb19jb21wbGV0ZSR0aW1lDQppb19jb21wbGV0ZSA8LSBmYXN0RHVtbWllczo6ZHVtbXlfY29scyhpb19jb21wbGV0ZSwgc2VsZWN0X2NvbHVtbnMgPSAiaXNjZWRfY2F0IikNCmlvX2NvbXBsZXRlJGlzY2VkX2Jhc2ljX3RpbWUgPC0gaW9fY29tcGxldGUkaXNjZWRfY2F0X0Jhc2ljICogaW9fY29tcGxldGUkdGltZQ0KaW9fY29tcGxldGUkaXNjZWRfaW50ZXJtZWRpYXRlX3RpbWUgPC0gaW9fY29tcGxldGUkaXNjZWRfY2F0X0ludGVybWVkaWF0ZSAqIGlvX2NvbXBsZXRlJHRpbWUNCmlvX2NvbXBsZXRlJGlzY2VkX2FkdmFuY2VkX3RpbWUgPC0gaW9fY29tcGxldGUkaXNjZWRfY2F0X0FkdmFuY2VkICogaW9fY29tcGxldGUkdGltZQ0KDQppbnRlcmFjdGlvbnMgPC0gYygiYWdlX3RpbWUiLCAic2V4X3RpbWUiLCAiaXNjZWRfaW50ZXJtZWRpYXRlX3RpbWUiLCAiaXNjZWRfYWR2YW5jZWRfdGltZSIpDQoNCmlvX2xpc3RfaW50ZXJhY3Rpb25zIDwtIGxpc3QoKQ0KDQogZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSwgIiArICIsIHBhc3RlKGludGVyYWN0aW9ucywgY29sbGFwc2UgPSAiICsgIikpKQ0KICAjIFBlcmZvcm0gdGhlIGxpbmVhciByZWdyZXNzaW9uDQogIGlvX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpLCAiICsgIiwgcGFzdGUoaW50ZXJhY3Rpb25zLCBjb2xsYXBzZSA9ICIrICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCIgKyAiLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGlvX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgaW9fbGlzdF9pbnRlcmFjdGlvbnNbW2ldXSA8LSBpb19maXQNCn0gDQoNCg0Kc3VtbWFyeShpb19saXN0X2ludGVyYWN0aW9uc1tbMV1dKSANCg0Kc2F2ZShpb19saXN0X2ludGVyYWN0aW9ucywgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9pb19saXN0X2ludGVyYWN0aW9uc193X25ldy5SRGF0YSIpDQoNCmBgYA0KDQojIyBJU1NQIHstfQ0KDQpgYGB7cn0NCmxvYWQoaGVyZSgiLi9kYXRhL2ZpbmFsX2RhdGEiLCAiaXNzcHRvdGFsLlJkYXRhIikpDQppc3NwdG90YWwkc3VydmV5eWVhcltpcy5uYShpc3NwdG90YWwkc3VydmV5eWVhcildIDwtICIyMDEwIg0KaXNzcHRvdGFsJHN1cnZleXllYXIgPC0gYXMubnVtZXJpYyhpc3NwdG90YWwkc3VydmV5eWVhcikNCg0KIyBUaGUgaXNzcCBoYXMgdmFyaWFibGVzIHRoYXQgYXJlIGFza2VkIGluIGFsbCB0aHJlZSB3YXZlcywgYW5kIHZhcmlhYmxlcyB0aGF0IGFyZSBhc2tlZCBvbmx5IGluIDIgd2F2ZXMuIFNvIEkgaGF2ZSB0byBydW4gdGhlIGNvZGUgb24gc3Vic2V0cyBvZiB0aGUgZGF0YS4gRmlyc3QgSSBlc3RpbWF0ZSB0aGUgbW9kZWxzIGZvciB0aGUgc3RhdGVtZW50cyB0aGF0IGFyZSBhc2tlZCB0aHJvdWdob3V0IHRoZSB0aHJlZSB3YXZlcw0KaXNzcF9jb21wbGV0ZSA8LSBpc3NwdG90YWwgJT4lIGRwbHlyOjpzZWxlY3Qoc3VydmV5eWVhcjptYXJzdGF0LCB3ZWlnaHR2ZWMsIGlzY2VkX2NhdCkNCmlzc3BfY29tcGxldGUgPC0gaXNzcF9jb21wbGV0ZSAlPiUgZHJvcF9uYSgpDQppc3NwX2NvbXBsZXRlJHRpbWUgPC0gaXNzcF9jb21wbGV0ZSRzdXJ2ZXl5ZWFyIC0gbWluKGlzc3BfY29tcGxldGUkc3VydmV5eWVhcikNCg0KIyBUaW1lLW9ubHkNCnByZWRpY3RvcnMgPC0gYygidGltZSIpDQpkZXBzIDwtIGMoIndvcnJ5IiwgImxpZmVoYXJtIiwgIndpbGxpbmdfcHJpY2UiLCAid2lsbGluZ190YXgiLCAid2lsbGluZ19saXZpbmciLCAiZG9fcmlnaHQiLCAicHJvZ2hhcm0iLCAiZWNvbnByb3RlY3QiLCAicGVvcGxlX2RlY2lkZSIpDQoNCmlzc3BfbGlzdF9lbXB0eSA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgaXNzcF9maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwNCiAgICAgICAgICAgICAgICAgICAgIGZhbWlseT1OTyhtdS5saW5rID0gImlkZW50aXR5Iiwgc2lnbWEubGluayA9ICJpZGVudGl0eSIpLCBkYXRhID0gaXNzcF9jb21wbGV0ZSwgd2VpZ2h0cyA9IHdlaWdodHZlYykNCiAgDQogIGlzc3BfbGlzdF9lbXB0eVtbaV1dIDwtIGlzc3BfZml0DQp9IA0KDQpzdW1tYXJ5KGlzc3BfbGlzdF9lbXB0eVtbMV1dKSANCnN1bW1hcnkoaXNzcF9saXN0X2VtcHR5W1syXV0pIA0Kc3VtbWFyeShpc3NwX2xpc3RfZW1wdHlbWzNdXSkgDQogDQpzYXZlKGlzc3BfbGlzdF9lbXB0eSwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9pc3NwX2xpc3RfZW1wdHlfdy5SRGF0YSIpDQoNCiMgTm93IHdpdGggcHJlZGljdG9ycw0KcHJlZGljdG9ycyA8LSBjKCJ0aW1lIiwgInNleCIsICJpc2NlZF9jYXQiLCAiYWdlIikNCmRlcHMgPC0gYygid29ycnkiLCAibGlmZWhhcm0iLCAid2lsbGluZ19wcmljZSIsICJ3aWxsaW5nX3RheCIsICJ3aWxsaW5nX2xpdmluZyIsICJkb19yaWdodCIsICJwcm9naGFybSIsICJlY29ucHJvdGVjdCIsICJwZW9wbGVfZGVjaWRlIiApDQoNCmlzc3BfbGlzdF9wcmVkcyA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgaXNzcF9maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwNCiAgICAgICAgICAgICAgICAgICAgICBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGlzc3BfY29tcGxldGUsIHdlaWdodHMgPSB3ZWlnaHR2ZWMpDQogIA0KICBpc3NwX2xpc3RfcHJlZHNbW2ldXSA8LSBpc3NwX2ZpdA0KfSANCg0Kc3VtbWFyeShpc3NwX2xpc3RfcHJlZHNbWzldXSkgDQoNCnNhdmUoaXNzcF9saXN0X3ByZWRzLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2lzc3BfbGlzdF9wcmVkc193X25ldy5SRGF0YSIpDQoNCiMgQW5kIG5vdyBpbnRlcmFjdGlvbnMNCmlzc3BfY29tcGxldGUkYWdlX3RpbWUgPC0gaXNzcF9jb21wbGV0ZSRhZ2UgKiBpc3NwX2NvbXBsZXRlJHRpbWUNCmlzc3BfY29tcGxldGUkc2V4X3RpbWUgPC0gYXMubnVtZXJpYyhpc3NwX2NvbXBsZXRlJHNleCkgKiBpc3NwX2NvbXBsZXRlJHRpbWUNCmlzc3BfY29tcGxldGUgPC0gZmFzdER1bW1pZXM6OmR1bW15X2NvbHMoaXNzcF9jb21wbGV0ZSwgc2VsZWN0X2NvbHVtbnMgPSAiaXNjZWRfY2F0IikNCmlzc3BfY29tcGxldGUkaXNjZWRfYmFzaWNfdGltZSA8LSBpc3NwX2NvbXBsZXRlJGlzY2VkX2NhdF9CYXNpYyAqIGlzc3BfY29tcGxldGUkdGltZQ0KaXNzcF9jb21wbGV0ZSRpc2NlZF9pbnRlcm1lZGlhdGVfdGltZSA8LSBpc3NwX2NvbXBsZXRlJGlzY2VkX2NhdF9JbnRlcm1lZGlhdGUgKiBpc3NwX2NvbXBsZXRlJHRpbWUNCmlzc3BfY29tcGxldGUkaXNjZWRfYWR2YW5jZWRfdGltZSA8LSBpc3NwX2NvbXBsZXRlJGlzY2VkX2NhdF9BZHZhbmNlZCAqIGlzc3BfY29tcGxldGUkdGltZQ0KDQppbnRlcmFjdGlvbnMgPC0gYygiYWdlX3RpbWUiLCAic2V4X3RpbWUiLCAiaXNjZWRfaW50ZXJtZWRpYXRlX3RpbWUiLCAiaXNjZWRfYWR2YW5jZWRfdGltZSIpDQoNCmlzc3BfbGlzdF9pbnRlcmFjdGlvbnMgPC0gbGlzdCgpDQoNCiBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpLCAiICsgIiwgcGFzdGUoaW50ZXJhY3Rpb25zLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npc3Nwbg0KICBpc3NwX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpLCAiICsgIiwgcGFzdGUoaW50ZXJhY3Rpb25zLCBjb2xsYXBzZSA9ICIrICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCIgKyAiLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGlzc3BfY29tcGxldGUsIHdlaWdodHMgPSB3ZWlnaHR2ZWMpDQogIA0KICBpc3NwX2xpc3RfaW50ZXJhY3Rpb25zW1tpXV0gPC0gaXNzcF9maXQNCn0gDQoNCnN1bW1hcnkoaXNzcF9saXN0X2ludGVyYWN0aW9uc1tbMV1dKSANCg0Kc2F2ZShpc3NwX2xpc3RfaW50ZXJhY3Rpb25zLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2lzc3BfbGlzdF9pbnRlcmFjdGlvbnNfd19uZXcuUkRhdGEiKQ0KDQojIE5vdyB0aGUgdmFyaWFibGVzIHRoYXQgYXJlIG9ubHkgYXNrZWQgdHdpY2UNCmlzc3BfY29tcGxldGUgPC0gaXNzcHRvdGFsICU+JSBkcGx5cjo6c2VsZWN0KHN1cnZleXllYXIsIGlzY2VkOmdyb3doYXJtLCB3ZWlnaHR2ZWMsIGlzY2VkX2NhdCkNCmlzc3BfY29tcGxldGUgPC0gaXNzcF9jb21wbGV0ZSAlPiUgZHJvcF9uYSgpDQppc3NwX2NvbXBsZXRlJHRpbWUgPC0gaXNzcF9jb21wbGV0ZSRzdXJ2ZXl5ZWFyIC0gbWluKGlzc3BfY29tcGxldGUkc3VydmV5eWVhcikNCg0KIyBUaW1lLW9ubHkgbW9kZWwNCnByZWRpY3RvcnMgPC0gYygidGltZSIpDQpkZXBzIDwtIGMoImV4YWciLCAibW9yZWltcCIsICJvdGhlcnNhbWUiLCAiY291bnRyeV9lZmZvcnQiLCAiZ3Jvd2hhcm0iKQ0KDQppc3NwX2xpc3RfZW1wdHlfMl93YXZlcyA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgaXNzcF9maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBpc3NwX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgaXNzcF9saXN0X2VtcHR5XzJfd2F2ZXNbW2ldXSA8LSBpc3NwX2ZpdA0KICB9IA0KDQpzdW1tYXJ5KGlzc3BfbGlzdF9lbXB0eV8yX3dhdmVzW1sxXV0pIA0Kc3VtbWFyeShpc3NwX2xpc3RfZW1wdHlfMl93YXZlc1tbMl1dKQ0Kc3VtbWFyeShpc3NwX2xpc3RfZW1wdHlfMl93YXZlc1tbM11dKSANCg0Kc2F2ZShpc3NwX2xpc3RfZW1wdHlfMl93YXZlcywgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9pc3NwX2xpc3RfZW1wdHlfMl93YXZlc193LlJEYXRhIikNCg0KIyBBbmQgdGhlIG1vZGVsIHdpdGggdGhlIHByZWRpY3RvcnMNCnByZWRpY3RvcnMgPC0gYygidGltZSIsICJzZXgiLCAiaXNjZWRfY2F0IiwgImFnZSIpDQpkZXBzIDwtIGMoImV4YWciLCAibW9yZWltcCIsICJvdGhlcnNhbWUiLCAiY291bnRyeV9lZmZvcnQiLCAiZ3Jvd2hhcm0iKQ0KDQppc3NwX2xpc3RfcHJlZHNfMl93YXZlcyA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgaXNzcF9maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBpc3NwX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgaXNzcF9saXN0X3ByZWRzXzJfd2F2ZXNbW2ldXSA8LSBpc3NwX2ZpdA0KfSANCg0Kc3VtbWFyeShpc3NwX2xpc3RfcHJlZHNfMl93YXZlc1tbMV1dKSANCg0Kc2F2ZShpc3NwX2xpc3RfcHJlZHNfMl93YXZlcywgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9pc3NwX2xpc3RfcHJlZHNfMl93YXZlc193X25ldy5SRGF0YSIpDQoNCiMgQW5kIGxhc3RseSwgYWdhaW4gdGhlIGludGVyYWN0aW9ucw0KaXNzcF9jb21wbGV0ZSRhZ2VfdGltZSA8LSBpc3NwX2NvbXBsZXRlJGFnZSAqIGlzc3BfY29tcGxldGUkdGltZQ0KaXNzcF9jb21wbGV0ZSRzZXhfdGltZSA8LSBhcy5udW1lcmljKGlzc3BfY29tcGxldGUkc2V4KSAqIGlzc3BfY29tcGxldGUkdGltZQ0KaXNzcF9jb21wbGV0ZSA8LSBmYXN0RHVtbWllczo6ZHVtbXlfY29scyhpc3NwX2NvbXBsZXRlLCBzZWxlY3RfY29sdW1ucyA9ICJpc2NlZF9jYXQiKQ0KaXNzcF9jb21wbGV0ZSRpc2NlZF9iYXNpY190aW1lIDwtIGlzc3BfY29tcGxldGUkaXNjZWRfY2F0X0Jhc2ljICogaXNzcF9jb21wbGV0ZSR0aW1lDQppc3NwX2NvbXBsZXRlJGlzY2VkX2ludGVybWVkaWF0ZV90aW1lIDwtIGlzc3BfY29tcGxldGUkaXNjZWRfY2F0X0ludGVybWVkaWF0ZSAqIGlzc3BfY29tcGxldGUkdGltZQ0KaXNzcF9jb21wbGV0ZSRpc2NlZF9hZHZhbmNlZF90aW1lIDwtIGlzc3BfY29tcGxldGUkaXNjZWRfY2F0X0FkdmFuY2VkICogaXNzcF9jb21wbGV0ZSR0aW1lDQoNCmludGVyYWN0aW9ucyA8LSBjKCJhZ2VfdGltZSIsICJzZXhfdGltZSIsICJpc2NlZF9pbnRlcm1lZGlhdGVfdGltZSIsICJpc2NlZF9hZHZhbmNlZF90aW1lIikNCg0KaXNzcF9saXN0X2ludGVyYWN0aW9uc18yX3dhdmVzIDwtIGxpc3QoKQ0KDQogZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSwgIiArICIsIHBhc3RlKGludGVyYWN0aW9ucywgY29sbGFwc2UgPSAiICsgIikpKQ0KICAjIFBlcmZvcm0gdGhlIGxpbmVhciByZWdyZXNzaXNzcG4NCiAgaXNzcF9maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSwgIiArICIsIHBhc3RlKGludGVyYWN0aW9ucywgY29sbGFwc2UgPSAiKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwiICsgIiwgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBpc3NwX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgaXNzcF9saXN0X2ludGVyYWN0aW9uc18yX3dhdmVzW1tpXV0gPC0gaXNzcF9maXQNCn0gDQoNCnN1bW1hcnkoaXNzcF9saXN0X2ludGVyYWN0aW9uc18yX3dhdmVzW1sxXV0pIA0KDQpzYXZlKGlzc3BfbGlzdF9pbnRlcmFjdGlvbnNfMl93YXZlcywgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9pc3NwX2xpc3RfaW50ZXJhY3Rpb25zXzJfd2F2ZXNfd19uZXcuUkRhdGEiKQ0KYGBgDQoNCiMjIEVCIHstfQ0KDQpgYGB7cn0NCiMgTm93IHRoZSBtb3N0IGRpZmZpY3VsdCBvbmU6IEV1cm9iYXJvbWV0ZXIuIE5vIGl0ZW1zIGFyZSBhc2tlZCBzdGVhZGlseSB0aHJvdWdob3V0IHRpbWUsIHNvIGhhdmUgdG8gd29yayB3aXRoIGEgbG90IG9mIHN1YnNldHMuIA0KbG9hZChoZXJlKCIuL2RhdGEvZmluYWxfZGF0YSIsICJlYl90b3QuUmRhdGEiKSkNCg0KIyBmaXJzdCAxOTg2IC0gMTk5NQ0KZWJfY29tcGxldGUgPC0gZWJfdG90ICU+JSBkcGx5cjo6c2VsZWN0KHN1cnZleXllYXIsIGVudl9lY19zdGF0LCBlbnZfcHJzaW1wLCBzZXgsIGlzY2VkOiB1cmJhbiwgd2VpZ2h0dmVjLCBpc2NlZF9jYXQpDQojIFJlbGlnaW9uIGlzIG9ubHkgYXNrZWQgaW4gb25lIHdhdmUNCmViX2NvbXBsZXRlIDwtIGViX2NvbXBsZXRlICU+JSBkcm9wX25hKCkNCmViX2NvbXBsZXRlJHRpbWUgPC0gZWJfY29tcGxldGUkc3VydmV5eWVhciAtIG1pbihlYl9jb21wbGV0ZSRzdXJ2ZXl5ZWFyKQ0KDQojIEZpcnN0IGVtcHR5IG1vZGVsIA0KcHJlZGljdG9ycyA8LSBjKCJ0aW1lIikNCmRlcHMgPC0gYygiZW52X2VjX3N0YXQiLCAiZW52X3Byc2ltcCIpDQoNCmViX2xpc3RfZW1wdHlfMTk4NiA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgZWJfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsDQogICAgICAgICAgICAgICAgICAgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBlYl9jb21wbGV0ZSwgd2VpZ2h0cyA9IHdlaWdodHZlYykNCiAgDQogIGViX2xpc3RfZW1wdHlfMTk4NltbaV1dIDwtIGViX2ZpdA0KfSANCg0Kc3VtbWFyeShlYl9saXN0X2VtcHR5XzE5ODZbWzFdXSkgDQpzdW1tYXJ5KGViX2xpc3RfZW1wdHlfMTk4NltbMl1dKQ0KDQpzYXZlKGViX2xpc3RfZW1wdHlfMTk4NiwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9lYl9saXN0X2VtcHR5XzE5ODZfdy5SRGF0YSIpDQoNCiMgTW9kZWwgd2l0aCBwcmVkaWN0b3JzDQpwcmVkaWN0b3JzIDwtIGMoInRpbWUiLCAic2V4IiwgImlzY2VkX2NhdCIsICJhZ2UiKQ0KZGVwcyA8LSBjKCJlbnZfZWNfc3RhdCIsICJlbnZfcHJzaW1wIikNCg0KZWJfbGlzdF9wcmVkc18xOTg2IDwtIGxpc3QoKQ0KDQojIExvb3AgdGhyb3VnaCBlYWNoIGRlcGVuZGVudCB2YXJpYWJsZQ0KICBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSkNCiAgIyBQZXJmb3JtIHRoZSBsaW5lYXIgcmVncmVzc2lvbg0KICBlYl9maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwNCiAgICAgICAgICAgICAgICAgICBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGViX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZWJfbGlzdF9wcmVkc18xOTg2W1tpXV0gPC0gZWJfZml0DQp9IA0KDQpzdW1tYXJ5KGViX2xpc3RfcHJlZHNfMTk4NltbMV1dKSANCnN1bW1hcnkoZWJfbGlzdF9wcmVkc18xOTg2W1syXV0pDQoNCnNhdmUoZWJfbGlzdF9wcmVkc18xOTg2LCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2ViX2xpc3RfcHJlZHNfMTk4Nl93X25ldy5SRGF0YSIpDQoNCiMgQW5kIHRoZSBtb2RlbCB3aXRoIGludGVyYWN0aW9ucw0KZWJfY29tcGxldGUkYWdlX3RpbWUgPC0gZWJfY29tcGxldGUkYWdlICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUkc2V4X3RpbWUgPC0gYXMubnVtZXJpYyhlYl9jb21wbGV0ZSRzZXgpICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUgPC0gZmFzdER1bW1pZXM6OmR1bW15X2NvbHMoZWJfY29tcGxldGUsIHNlbGVjdF9jb2x1bW5zID0gImlzY2VkX2NhdCIpDQplYl9jb21wbGV0ZSRpc2NlZF9iYXNpY190aW1lIDwtIGViX2NvbXBsZXRlJGlzY2VkX2NhdF9CYXNpYyAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlJGlzY2VkX2ludGVybWVkaWF0ZV90aW1lIDwtIGViX2NvbXBsZXRlJGlzY2VkX2NhdF9JbnRlcm1lZGlhdGUgKiBlYl9jb21wbGV0ZSR0aW1lDQplYl9jb21wbGV0ZSRpc2NlZF9hZHZhbmNlZF90aW1lIDwtIGViX2NvbXBsZXRlJGlzY2VkX2NhdF9BZHZhbmNlZCAqIGViX2NvbXBsZXRlJHRpbWUNCg0KaW50ZXJhY3Rpb25zIDwtIGMoImFnZV90aW1lIiwgInNleF90aW1lIiwgImlzY2VkX2ludGVybWVkaWF0ZV90aW1lIiwgImlzY2VkX2FkdmFuY2VkX3RpbWUiKQ0KDQplYl9saXN0X2ludGVyYWN0aW9uc18xOTg2IDwtIGxpc3QoKQ0KDQogZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSwgIiArICIsIHBhc3RlKGludGVyYWN0aW9ucywgY29sbGFwc2UgPSAiICsgIikpKQ0KICAjIFBlcmZvcm0gdGhlIGxpbmVhciByZWdyZXNzaW9uDQogIGViX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpLCAiICsgIiwgcGFzdGUoaW50ZXJhY3Rpb25zLCBjb2xsYXBzZSA9ICIrICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCIgKyAiLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGViX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZWJfbGlzdF9pbnRlcmFjdGlvbnNfMTk4NltbaV1dIDwtIGViX2ZpdA0KfSANCg0Kc3VtbWFyeShlYl9saXN0X2ludGVyYWN0aW9uc18xOTg2W1sxXV0pIA0Kc3VtbWFyeShlYl9saXN0X2ludGVyYWN0aW9uc18xOTg2W1syXV0pDQoNCnNhdmUoZWJfbGlzdF9pbnRlcmFjdGlvbnNfMTk4NiwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9lYl9saXN0X2ludGVyYWN0aW9uc18xOTg2X3dfbmV3LlJEYXRhIikNCmBgYA0KDQpgYGB7cn0NCiMgTm93IHdpdGggdGhlIGluZmx1ZW5jZSBvZiBlbnZpcm9ubWVudCBvbiBxdWFsaXR5IG9mIGxpZmUNCmViX2NvbXBsZXRlIDwtIGViX3RvdCAlPiUgZHBseXI6OnNlbGVjdChzdXJ2ZXl5ZWFyLCBlbnZfcXVhbGxpZmUsIHNleCwgaXNjZWQsIHVyYmFuLCBhZ2UsIHdlaWdodHZlYywgaXNjZWRfY2F0KQ0KIyBMcnBsYWNlIGFuZCBpbmNvbWUgYXJlIG5vdCBhc2tlZCBpbiBhbGwgd2F2ZXMNCmViX2NvbXBsZXRlIDwtIGViX2NvbXBsZXRlICU+JSBkcm9wX25hKCkNCmViX2NvbXBsZXRlJHRpbWUgPC0gZWJfY29tcGxldGUkc3VydmV5eWVhciAtIG1pbihlYl9jb21wbGV0ZSRzdXJ2ZXl5ZWFyKQ0KDQojIEZpcnN0IGVtcHR5IG1vZGVsIA0KcHJlZGljdG9ycyA8LSBjKCJ0aW1lIikNCmRlcHMgPC0gYygiZW52X3F1YWxsaWZlIikNCg0KZWJfbGlzdF9lbXB0eV9xdWFsbGlmZSA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgZWJfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsIGZhbWlseT1OTyhtdS5saW5rID0gImlkZW50aXR5Iiwgc2lnbWEubGluayA9ICJpZGVudGl0eSIpLCBkYXRhID0gZWJfY29tcGxldGUsIHdlaWdodHMgPSB3ZWlnaHR2ZWMpDQogIA0KICBlYl9saXN0X2VtcHR5X3F1YWxsaWZlW1tpXV0gPC0gZWJfZml0DQp9IA0KDQpzdW1tYXJ5KGViX2xpc3RfZW1wdHlfcXVhbGxpZmVbWzFdXSkgDQoNCnNhdmUoZWJfbGlzdF9lbXB0eV9xdWFsbGlmZSwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9lYl9saXN0X2VtcHR5X3F1YWxsaWZlX3cuUkRhdGEiKQ0KDQojIE1vZGVsIHdpdGggcHJlZGljdG9ycw0KcHJlZGljdG9ycyA8LSBjKCJ0aW1lIiwgInNleCIsICJpc2NlZF9jYXQiLCAiYWdlIikNCmRlcHMgPC0gYygiZW52X3F1YWxsaWZlIikNCg0KZWJfbGlzdF9wcmVkc19xdWFsbGlmZSA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgZWJfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsDQogICAgICAgICAgICAgICAgICAgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBlYl9jb21wbGV0ZSwgd2VpZ2h0cyA9IHdlaWdodHZlYykNCiAgDQogIGViX2xpc3RfcHJlZHNfcXVhbGxpZmVbW2ldXSA8LSBlYl9maXQNCn0gDQoNCnN1bW1hcnkoZWJfbGlzdF9wcmVkc19xdWFsbGlmZVtbMV1dKSANCg0Kc2F2ZShlYl9saXN0X3ByZWRzX3F1YWxsaWZlLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2ViX2xpc3RfcHJlZHNfcXVhbGxpZmVfd19uZXcuUkRhdGEiKQ0KDQojIEFuZCB0aGUgbW9kZWwgd2l0aCBpbnRlcmFjdGlvbnMNCmViX2NvbXBsZXRlJGFnZV90aW1lIDwtIGViX2NvbXBsZXRlJGFnZSAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlJHNleF90aW1lIDwtIGFzLm51bWVyaWMoZWJfY29tcGxldGUkc2V4KSAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlIDwtIGZhc3REdW1taWVzOjpkdW1teV9jb2xzKGViX2NvbXBsZXRlLCBzZWxlY3RfY29sdW1ucyA9ICJpc2NlZF9jYXQiKQ0KZWJfY29tcGxldGUkaXNjZWRfYmFzaWNfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfQmFzaWMgKiBlYl9jb21wbGV0ZSR0aW1lDQplYl9jb21wbGV0ZSRpc2NlZF9pbnRlcm1lZGlhdGVfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfSW50ZXJtZWRpYXRlICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUkaXNjZWRfYWR2YW5jZWRfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfQWR2YW5jZWQgKiBlYl9jb21wbGV0ZSR0aW1lDQoNCmludGVyYWN0aW9ucyA8LSBjKCJhZ2VfdGltZSIsICJzZXhfdGltZSIsICJpc2NlZF9pbnRlcm1lZGlhdGVfdGltZSIsICJpc2NlZF9hZHZhbmNlZF90aW1lIikNCg0KZWJfbGlzdF9pbnRlcmFjdGlvbnNfcXVhbGxpZmUgPC0gbGlzdCgpDQoNCiBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpLCAiICsgIiwgcGFzdGUoaW50ZXJhY3Rpb25zLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3NlYm4NCiAgZWJfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIiksICIgKyAiLCBwYXN0ZShpbnRlcmFjdGlvbnMsIGNvbGxhcHNlID0gIisgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsIiArICIsIGZhbWlseT1OTyhtdS5saW5rID0gImlkZW50aXR5Iiwgc2lnbWEubGluayA9ICJpZGVudGl0eSIpLCBkYXRhID0gZWJfY29tcGxldGUsIHdlaWdodHMgPSB3ZWlnaHR2ZWMpDQogIA0KICBlYl9saXN0X2ludGVyYWN0aW9uc19xdWFsbGlmZVtbaV1dIDwtIGViX2ZpdA0KfSANCg0Kc3VtbWFyeShlYl9saXN0X2ludGVyYWN0aW9uc19xdWFsbGlmZVtbMV1dKSANCg0Kc2F2ZShlYl9saXN0X2ludGVyYWN0aW9uc19xdWFsbGlmZSwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9lYl9saXN0X2ludGVyYWN0aW9uc19xdWFsbGlmZV93X25ldy5SRGF0YSIpDQpgYGANCg0KYGBge3J9DQojIE5vdyAyIHN0YXRlbWVudHMgdGhhdCBhcmUgYXNrZWQgNCB0aW1lcw0KZWJfY29tcGxldGUgPC0gZWJfdG90ICU+JSBkcGx5cjo6c2VsZWN0KHN1cnZleXllYXIsIHJvbGVfaW5kLCBiaWdfcG9sLCBzZXgsIGlzY2VkLCB1cmJhbiwgYWdlLCB3ZWlnaHR2ZWMsIGlzY2VkX2NhdCkNCiMgTHJwbGFjZSBhbmQgaW5jb21lIGFyZSBub3QgYXNrZWQgaW4gYWxsIHdhdmVzDQplYl9jb21wbGV0ZSA8LSBlYl9jb21wbGV0ZSAlPiUgZHJvcF9uYSgpDQplYl9jb21wbGV0ZSR0aW1lIDwtIGViX2NvbXBsZXRlJHN1cnZleXllYXIgLSBtaW4oZWJfY29tcGxldGUkc3VydmV5eWVhcikNCg0KIyBGaXJzdCBlbXB0eSBtb2RlbCANCnByZWRpY3RvcnMgPC0gYygidGltZSIpDQpkZXBzIDwtIGMoInJvbGVfaW5kIiwgImJpZ19wb2wiKQ0KDQplYl9saXN0X2VtcHR5XzIwMDcgPC0gbGlzdCgpDQoNCiMgTG9vcCB0aHJvdWdoIGVhY2ggZGVwZW5kZW50IHZhcmlhYmxlDQogIGZvciAoaSBpbiAxOmxlbmd0aChkZXBzKSkgew0KICAjIFNwZWNpZnkgdGhlIHNpZ21hIGZvcm11bGENCiAgc2lnbWEuZm9ybXVsYSA8LSBhcy5mb3JtdWxhKHBhc3RlKCJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKQ0KICAjIFBlcmZvcm0gdGhlIGxpbmVhciByZWdyZXNzaW9uDQogIGViX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGViX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZWJfbGlzdF9lbXB0eV8yMDA3W1tpXV0gPC0gZWJfZml0DQp9IA0KDQpzdW1tYXJ5KGViX2xpc3RfZW1wdHlfMjAwN1tbMl1dKSANCg0Kc2F2ZShlYl9saXN0X2VtcHR5XzIwMDcsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMvZWJfbGlzdF9lbXB0eV8yMDA3X3cuUkRhdGEiKQ0KDQojIE1vZGVsIHdpdGggcHJlZGljdG9ycw0KcHJlZGljdG9ycyA8LSBjKCJ0aW1lIiwgInNleCIsICJpc2NlZF9jYXQiLCAiYWdlIikNCmRlcHMgPC0gYygicm9sZV9pbmQiLCAiYmlnX3BvbCIpDQoNCmViX2xpc3RfcHJlZHNfMjAwNyA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgZWJfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsIGZhbWlseT1OTyhtdS5saW5rID0gImlkZW50aXR5Iiwgc2lnbWEubGluayA9ICJpZGVudGl0eSIpLCBkYXRhID0gZWJfY29tcGxldGUsIHdlaWdodHMgPSB3ZWlnaHR2ZWMpDQogIA0KICBlYl9saXN0X3ByZWRzXzIwMDdbW2ldXSA8LSBlYl9maXQNCn0gDQoNCnN1bW1hcnkoZWJfbGlzdF9wcmVkc18yMDA3W1sxXV0pIA0KDQpzYXZlKGViX2xpc3RfcHJlZHNfMjAwNywgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9lYl9saXN0X3ByZWRzXzIwMDdfd19uZXcuUkRhdGEiKQ0KDQojIEFuZCB0aGUgbW9kZWwgd2l0aCBpbnRlcmFjdGlvbnMNCmViX2NvbXBsZXRlJGFnZV90aW1lIDwtIGViX2NvbXBsZXRlJGFnZSAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlJHNleF90aW1lIDwtIGFzLm51bWVyaWMoZWJfY29tcGxldGUkc2V4KSAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlIDwtIGZhc3REdW1taWVzOjpkdW1teV9jb2xzKGViX2NvbXBsZXRlLCBzZWxlY3RfY29sdW1ucyA9ICJpc2NlZF9jYXQiKQ0KZWJfY29tcGxldGUkaXNjZWRfYmFzaWNfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfQmFzaWMgKiBlYl9jb21wbGV0ZSR0aW1lDQplYl9jb21wbGV0ZSRpc2NlZF9pbnRlcm1lZGlhdGVfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfSW50ZXJtZWRpYXRlICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUkaXNjZWRfYWR2YW5jZWRfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfQWR2YW5jZWQgKiBlYl9jb21wbGV0ZSR0aW1lDQoNCmludGVyYWN0aW9ucyA8LSBjKCJhZ2VfdGltZSIsICJzZXhfdGltZSIsICJpc2NlZF9pbnRlcm1lZGlhdGVfdGltZSIsICJpc2NlZF9hZHZhbmNlZF90aW1lIikNCg0KZWJfbGlzdF9pbnRlcmFjdGlvbnNfMjAwNyA8LSBsaXN0KCkNCg0KIGZvciAoaSBpbiAxOmxlbmd0aChkZXBzKSkgew0KICAjIFNwZWNpZnkgdGhlIHNpZ21hIGZvcm11bGENCiAgc2lnbWEuZm9ybXVsYSA8LSBhcy5mb3JtdWxhKHBhc3RlKCJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIiksICIgKyAiLCBwYXN0ZShpbnRlcmFjdGlvbnMsIGNvbGxhcHNlID0gIiArICIpKSkNCiAgIyBQZXJmb3JtIHRoZSBsaW5lYXIgcmVncmVzc2Vibg0KICBlYl9maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSwgIiArICIsIHBhc3RlKGludGVyYWN0aW9ucywgY29sbGFwc2UgPSAiKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwiICsgIiwgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBlYl9jb21wbGV0ZSwgd2VpZ2h0cyA9IHdlaWdodHZlYykNCiAgDQogIGViX2xpc3RfaW50ZXJhY3Rpb25zXzIwMDdbW2ldXSA8LSBlYl9maXQNCn0gDQoNCnN1bW1hcnkoZWJfbGlzdF9pbnRlcmFjdGlvbnNfMjAwN1tbMV1dKSANCg0Kc2F2ZShlYl9saXN0X2ludGVyYWN0aW9uc18yMDA3LCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2ViX2xpc3RfaW50ZXJhY3Rpb25zXzIwMDdfd19uZXcuUkRhdGEiKQ0KYGBgDQoNCmBgYHtyfQ0KIyBOb3cgMiBzdGF0ZW1lbnRzIHRoYXQgYXJlIGFza2VkIDQgdGltZXMNCmViX2NvbXBsZXRlIDwtIGViX3RvdCAlPiUgZHBseXI6OnNlbGVjdChzdXJ2ZXl5ZWFyLCBidXlwcm9kLCBzZXgsIGlzY2VkLCB1cmJhbiwgYWdlLCB3ZWlnaHR2ZWMsIGlzY2VkX2NhdCkNCmViX2NvbXBsZXRlIDwtIGViX2NvbXBsZXRlICU+JSBkcm9wX25hKCkNCmViX2NvbXBsZXRlJHRpbWUgPC0gZWJfY29tcGxldGUkc3VydmV5eWVhciAtIG1pbihlYl9jb21wbGV0ZSRzdXJ2ZXl5ZWFyKQ0KDQojIEZpcnN0IGVtcHR5IG1vZGVsIA0KcHJlZGljdG9ycyA8LSBjKCJ0aW1lIikNCmRlcHMgPC0gYygiYnV5cHJvZCIpDQoNCmViX2xpc3RfZW1wdHlfYnV5cHJvZCA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgZWJfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsIGZhbWlseT1OTyhtdS5saW5rID0gImlkZW50aXR5Iiwgc2lnbWEubGluayA9ICJpZGVudGl0eSIpLCBkYXRhID0gZWJfY29tcGxldGUsIHdlaWdodHMgPSB3ZWlnaHR2ZWMpDQogIA0KICBlYl9saXN0X2VtcHR5X2J1eXByb2RbW2ldXSA8LSBlYl9maXQNCn0gDQoNCnN1bW1hcnkoZWJfbGlzdF9lbXB0eV9idXlwcm9kW1sxXV0pIA0KDQpzYXZlKGViX2xpc3RfZW1wdHlfYnV5cHJvZCwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9lYl9saXN0X2VtcHR5X2J1eXByb2Rfdy5SRGF0YSIpDQoNCiMgTW9kZWwgd2l0aCBwcmVkaWN0b3JzDQpwcmVkaWN0b3JzIDwtIGMoInRpbWUiLCAic2V4IiwgImlzY2VkX2NhdCIsICJhZ2UiKQ0KZGVwcyA8LSBjKCJidXlwcm9kIikNCg0KZWJfbGlzdF9wcmVkc19idXlwcm9kIDwtIGxpc3QoKQ0KDQojIExvb3AgdGhyb3VnaCBlYWNoIGRlcGVuZGVudCB2YXJpYWJsZQ0KICBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSkNCiAgIyBQZXJmb3JtIHRoZSBsaW5lYXIgcmVncmVzc2lvbg0KICBlYl9maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBlYl9jb21wbGV0ZSwgd2VpZ2h0cyA9IHdlaWdodHZlYykNCiAgDQogIGViX2xpc3RfcHJlZHNfYnV5cHJvZFtbaV1dIDwtIGViX2ZpdA0KfSANCg0Kc3VtbWFyeShlYl9saXN0X3ByZWRzX2J1eXByb2RbWzFdXSkgDQoNCnNhdmUoZWJfbGlzdF9wcmVkc19idXlwcm9kLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2ViX2xpc3RfcHJlZHNfYnV5cHJvZF93X25ldy5SRGF0YSIpDQoNCiMgQW5kIHRoZSBtb2RlbCB3aXRoIGludGVyYWN0aW9ucw0KZWJfY29tcGxldGUkYWdlX3RpbWUgPC0gZWJfY29tcGxldGUkYWdlICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUkc2V4X3RpbWUgPC0gYXMubnVtZXJpYyhlYl9jb21wbGV0ZSRzZXgpICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUgPC0gZmFzdER1bW1pZXM6OmR1bW15X2NvbHMoZWJfY29tcGxldGUsIHNlbGVjdF9jb2x1bW5zID0gImlzY2VkX2NhdCIpDQplYl9jb21wbGV0ZSRpc2NlZF9iYXNpY190aW1lIDwtIGViX2NvbXBsZXRlJGlzY2VkX2NhdF9CYXNpYyAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlJGlzY2VkX2ludGVybWVkaWF0ZV90aW1lIDwtIGViX2NvbXBsZXRlJGlzY2VkX2NhdF9JbnRlcm1lZGlhdGUgKiBlYl9jb21wbGV0ZSR0aW1lDQplYl9jb21wbGV0ZSRpc2NlZF9hZHZhbmNlZF90aW1lIDwtIGViX2NvbXBsZXRlJGlzY2VkX2NhdF9BZHZhbmNlZCAqIGViX2NvbXBsZXRlJHRpbWUNCg0KaW50ZXJhY3Rpb25zIDwtIGMoImFnZV90aW1lIiwgInNleF90aW1lIiwgImlzY2VkX2ludGVybWVkaWF0ZV90aW1lIiwgImlzY2VkX2FkdmFuY2VkX3RpbWUiKQ0KDQplYl9saXN0X2ludGVyYWN0aW9uc19idXlwcm9kIDwtIGxpc3QoKQ0KDQogZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSwgIiArICIsIHBhc3RlKGludGVyYWN0aW9ucywgY29sbGFwc2UgPSAiICsgIikpKQ0KICAjIFBlcmZvcm0gdGhlIGxpbmVhciByZWdyZXNzaW9uDQogIGViX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpLCAiICsgIiwgcGFzdGUoaW50ZXJhY3Rpb25zLCBjb2xsYXBzZSA9ICIrICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCIgKyAiLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGViX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZWJfbGlzdF9pbnRlcmFjdGlvbnNfYnV5cHJvZFtbaV1dIDwtIGViX2ZpdA0KfSANCg0Kc3VtbWFyeShlYl9saXN0X2ludGVyYWN0aW9uc19idXlwcm9kW1sxXV0pIA0KDQpzYXZlKGViX2xpc3RfaW50ZXJhY3Rpb25zX2J1eXByb2QsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMvZWJfbGlzdF9pbnRlcmFjdGlvbnNfYnV5cHJvZF93X25ldy5SRGF0YSIpDQpgYGANCg0KYGBge3J9DQojIE5vdyAyIHN0YXRlbWVudHMgdGhhdCBhcmUgYXNrZWQgNCB0aW1lcw0KZWJfY29tcGxldGUgPC0gZWJfdG90ICU+JSBkcGx5cjo6c2VsZWN0KHN1cnZleXllYXIsIGVmZl9kYWlseSwgc2V4LCBpc2NlZCwgdXJiYW4sIGFnZSwgd2VpZ2h0dmVjLCBpc2NlZF9jYXQpDQplYl9jb21wbGV0ZSA8LSBlYl9jb21wbGV0ZSAlPiUgZHJvcF9uYSgpDQplYl9jb21wbGV0ZSR0aW1lIDwtIGViX2NvbXBsZXRlJHN1cnZleXllYXIgLSBtaW4oZWJfY29tcGxldGUkc3VydmV5eWVhcikNCg0KIyBGaXJzdCBlbXB0eSBtb2RlbCANCnByZWRpY3RvcnMgPC0gYygidGltZSIpDQpkZXBzIDwtIGMoImVmZl9kYWlseSIpDQoNCmViX2xpc3RfZW1wdHlfZWZmX2RhaWx5IDwtIGxpc3QoKQ0KDQojIExvb3AgdGhyb3VnaCBlYWNoIGRlcGVuZGVudCB2YXJpYWJsZQ0KICBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSkNCiAgIyBQZXJmb3JtIHRoZSBsaW5lYXIgcmVncmVzc2lvbg0KICBlYl9maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBlYl9jb21wbGV0ZSwgd2VpZ2h0cyA9IHdlaWdodHZlYykNCiAgDQogIGViX2xpc3RfZW1wdHlfZWZmX2RhaWx5W1tpXV0gPC0gZWJfZml0DQp9IA0KDQpzdW1tYXJ5KGViX2xpc3RfZW1wdHlfZWZmX2RhaWx5W1sxXV0pIA0KDQpzYXZlKGViX2xpc3RfZW1wdHlfZWZmX2RhaWx5LCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2ViX2xpc3RfZW1wdHlfZWZmX2RhaWx5X3cuUkRhdGEiKQ0KDQojIE1vZGVsIHdpdGggcHJlZGljdG9ycw0KcHJlZGljdG9ycyA8LSBjKCJ0aW1lIiwgInNleCIsICJpc2NlZF9jYXQiLCAiYWdlIikNCmRlcHMgPC0gYygiZWZmX2RhaWx5IikNCg0KZWJfbGlzdF9wcmVkc19lZmZfZGFpbHkgPC0gbGlzdCgpDQoNCiMgTG9vcCB0aHJvdWdoIGVhY2ggZGVwZW5kZW50IHZhcmlhYmxlDQogIGZvciAoaSBpbiAxOmxlbmd0aChkZXBzKSkgew0KICAjIFNwZWNpZnkgdGhlIHNpZ21hIGZvcm11bGENCiAgc2lnbWEuZm9ybXVsYSA8LSBhcy5mb3JtdWxhKHBhc3RlKCJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKQ0KICAjIFBlcmZvcm0gdGhlIGxpbmVhciByZWdyZXNzaW9uDQogIGViX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGViX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZWJfbGlzdF9wcmVkc19lZmZfZGFpbHlbW2ldXSA8LSBlYl9maXQNCn0gDQoNCnN1bW1hcnkoZWJfbGlzdF9wcmVkc19lZmZfZGFpbHlbWzFdXSkgDQoNCnNhdmUoZWJfbGlzdF9wcmVkc19lZmZfZGFpbHksIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMvZWJfbGlzdF9wcmVkc19lZmZfZGFpbHlfd19uZXcuUkRhdGEiKQ0KDQojIEFuZCB0aGUgbW9kZWwgd2l0aCBpbnRlcmFjdGlvbnMNCmViX2NvbXBsZXRlJGFnZV90aW1lIDwtIGViX2NvbXBsZXRlJGFnZSAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlJHNleF90aW1lIDwtIGFzLm51bWVyaWMoZWJfY29tcGxldGUkc2V4KSAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlIDwtIGZhc3REdW1taWVzOjpkdW1teV9jb2xzKGViX2NvbXBsZXRlLCBzZWxlY3RfY29sdW1ucyA9ICJpc2NlZF9jYXQiKQ0KZWJfY29tcGxldGUkaXNjZWRfYmFzaWNfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfQmFzaWMgKiBlYl9jb21wbGV0ZSR0aW1lDQplYl9jb21wbGV0ZSRpc2NlZF9pbnRlcm1lZGlhdGVfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfSW50ZXJtZWRpYXRlICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUkaXNjZWRfYWR2YW5jZWRfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfQWR2YW5jZWQgKiBlYl9jb21wbGV0ZSR0aW1lDQoNCmludGVyYWN0aW9ucyA8LSBjKCJhZ2VfdGltZSIsICJzZXhfdGltZSIsICJpc2NlZF9pbnRlcm1lZGlhdGVfdGltZSIsICJpc2NlZF9hZHZhbmNlZF90aW1lIikNCg0KZWJfbGlzdF9pbnRlcmFjdGlvbnNfZWZmX2RhaWx5IDwtIGxpc3QoKQ0KDQogZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSwgIiArICIsIHBhc3RlKGludGVyYWN0aW9ucywgY29sbGFwc2UgPSAiICsgIikpKQ0KICAjIFBlcmZvcm0gdGhlIGxpbmVhciByZWdyZXNzaW9uDQogIGViX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpLCAiICsgIiwgcGFzdGUoaW50ZXJhY3Rpb25zLCBjb2xsYXBzZSA9ICIrICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCIgKyAiLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGViX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZWJfbGlzdF9pbnRlcmFjdGlvbnNfZWZmX2RhaWx5W1tpXV0gPC0gZWJfZml0DQp9IA0KDQpzdW1tYXJ5KGViX2xpc3RfaW50ZXJhY3Rpb25zX2VmZl9kYWlseVtbMV1dKSANCg0Kc2F2ZShlYl9saXN0X2ludGVyYWN0aW9uc19lZmZfZGFpbHksIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMvZWJfbGlzdF9pbnRlcmFjdGlvbnNfZWZmX2RhaWx5X3dfbmV3LlJEYXRhIikNCmBgYA0KDQpgYGB7cn0NCiMgTm93IDQgdmFycyB0aGF0IGFyZSBhc2tlZCAyIHdhdmVzDQplYl9jb21wbGV0ZSA8LSBlYl90b3QgJT4lIGRwbHlyOjpzZWxlY3Qoc3VydmV5eWVhciwgY2NfdW5zdG9wOmNjX3Byc2FjdCwgc2V4LCBpc2NlZCwgdXJiYW4sIGFnZSwgd2VpZ2h0dmVjLCBpc2NlZF9jYXQpDQplYl9jb21wbGV0ZSA8LSBlYl9jb21wbGV0ZSAlPiUgZHJvcF9uYSgpDQplYl9jb21wbGV0ZSR0aW1lIDwtIGViX2NvbXBsZXRlJHN1cnZleXllYXIgLSBtaW4oZWJfY29tcGxldGUkc3VydmV5eWVhcikNCg0KIyBGaXJzdCBlbXB0eSBtb2RlbCANCnByZWRpY3RvcnMgPC0gYygidGltZSIpDQpkZXBzIDwtIGMoImNjX3Vuc3RvcCIsICJjY19leGFnIiwgImNjX3Bvc2V1IiwgImNjX3Byc2FjdCIpDQoNCmViX2xpc3RfZW1wdHlfMjAwOCA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgZWJfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsIGZhbWlseT1OTyhtdS5saW5rID0gImlkZW50aXR5Iiwgc2lnbWEubGluayA9ICJpZGVudGl0eSIpLCBkYXRhID0gZWJfY29tcGxldGUsIHdlaWdodHMgPSB3ZWlnaHR2ZWMpDQogIA0KICBlYl9saXN0X2VtcHR5XzIwMDhbW2ldXSA8LSBlYl9maXQNCn0gDQoNCnN1bW1hcnkoZWJfbGlzdF9lbXB0eV8yMDA4W1sxXV0pIA0KDQpzYXZlKGViX2xpc3RfZW1wdHlfMjAwOCwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9lYl9saXN0X2VtcHR5XzIwMDhfdy5SRGF0YSIpDQoNCiMgTW9kZWwgd2l0aCBwcmVkaWN0b3JzDQpwcmVkaWN0b3JzIDwtIGMoInRpbWUiLCAic2V4IiwgImlzY2VkX2NhdCIsICJhZ2UiKQ0KZGVwcyA8LSBjKCJjY191bnN0b3AiLCAiY2NfZXhhZyIsICJjY19wb3NldSIsICJjY19wcnNhY3QiKQ0KDQplYl9saXN0X3ByZWRzXzIwMDggPC0gbGlzdCgpDQoNCiMgTG9vcCB0aHJvdWdoIGVhY2ggZGVwZW5kZW50IHZhcmlhYmxlDQogIGZvciAoaSBpbiAxOmxlbmd0aChkZXBzKSkgew0KICAjIFNwZWNpZnkgdGhlIHNpZ21hIGZvcm11bGENCiAgc2lnbWEuZm9ybXVsYSA8LSBhcy5mb3JtdWxhKHBhc3RlKCJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKQ0KICAjIFBlcmZvcm0gdGhlIGxpbmVhciByZWdyZXNzaW9uDQogIGViX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGViX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZWJfbGlzdF9wcmVkc18yMDA4W1tpXV0gPC0gZWJfZml0DQp9IA0KDQpzdW1tYXJ5KGViX2xpc3RfcHJlZHNfMjAwOFtbMV1dKSANCg0Kc2F2ZShlYl9saXN0X3ByZWRzXzIwMDgsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMvZWJfbGlzdF9wcmVkc18yMDA4X3dfbmV3LlJEYXRhIikNCg0KIyBBbmQgdGhlIG1vZGVsIHdpdGggaW50ZXJhY3Rpb25zDQplYl9jb21wbGV0ZSRhZ2VfdGltZSA8LSBlYl9jb21wbGV0ZSRhZ2UgKiBlYl9jb21wbGV0ZSR0aW1lDQplYl9jb21wbGV0ZSRzZXhfdGltZSA8LSBhcy5udW1lcmljKGViX2NvbXBsZXRlJHNleCkgKiBlYl9jb21wbGV0ZSR0aW1lDQplYl9jb21wbGV0ZSA8LSBmYXN0RHVtbWllczo6ZHVtbXlfY29scyhlYl9jb21wbGV0ZSwgc2VsZWN0X2NvbHVtbnMgPSAiaXNjZWRfY2F0IikNCmViX2NvbXBsZXRlJGlzY2VkX2Jhc2ljX3RpbWUgPC0gZWJfY29tcGxldGUkaXNjZWRfY2F0X0Jhc2ljICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUkaXNjZWRfaW50ZXJtZWRpYXRlX3RpbWUgPC0gZWJfY29tcGxldGUkaXNjZWRfY2F0X0ludGVybWVkaWF0ZSAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlJGlzY2VkX2FkdmFuY2VkX3RpbWUgPC0gZWJfY29tcGxldGUkaXNjZWRfY2F0X0FkdmFuY2VkICogZWJfY29tcGxldGUkdGltZQ0KDQppbnRlcmFjdGlvbnMgPC0gYygiYWdlX3RpbWUiLCAic2V4X3RpbWUiLCAiaXNjZWRfaW50ZXJtZWRpYXRlX3RpbWUiLCAiaXNjZWRfYWR2YW5jZWRfdGltZSIpDQoNCmViX2xpc3RfaW50ZXJhY3Rpb25zXzIwMDggPC0gbGlzdCgpDQoNCiBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpLCAiICsgIiwgcGFzdGUoaW50ZXJhY3Rpb25zLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgZWJfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIiksICIgKyAiLCBwYXN0ZShpbnRlcmFjdGlvbnMsIGNvbGxhcHNlID0gIisgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsIiArICIsIGZhbWlseT1OTyhtdS5saW5rID0gImlkZW50aXR5Iiwgc2lnbWEubGluayA9ICJpZGVudGl0eSIpLCBkYXRhID0gZWJfY29tcGxldGUsIHdlaWdodHMgPSB3ZWlnaHR2ZWMpDQogIA0KICBlYl9saXN0X2ludGVyYWN0aW9uc18yMDA4W1tpXV0gPC0gZWJfZml0DQp9IA0KDQpzdW1tYXJ5KGViX2xpc3RfaW50ZXJhY3Rpb25zXzIwMDhbWzFdXSkgDQoNCnNhdmUoZWJfbGlzdF9pbnRlcmFjdGlvbnNfMjAwOCwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9lYl9saXN0X2ludGVyYWN0aW9uc18yMDA4X3dfbmV3LlJEYXRhIikNCmBgYA0KDQoNCmBgYHtyfQ0KIyBDbGltYXRlIGNoYW5nZSBwZXJjZXB0aW9uIGFza2VkIGluIHNpeCB3YXZlcw0KZWJfY29tcGxldGUgPC0gZWJfdG90ICU+JSBkcGx5cjo6c2VsZWN0KHN1cnZleXllYXIsIGNjcGVyY2VwdCwgY2NoYW5nZSwgc2V4LCBpc2NlZCwgdXJiYW4sIGFnZSwgd2VpZ2h0dmVjLCBpc2NlZF9jYXQpDQplYl9jb21wbGV0ZSA8LSBlYl9jb21wbGV0ZSAlPiUgZHJvcF9uYSgpDQplYl9jb21wbGV0ZSR0aW1lIDwtIGViX2NvbXBsZXRlJHN1cnZleXllYXIgLSBtaW4oZWJfY29tcGxldGUkc3VydmV5eWVhcikNCg0KIyBGaXJzdCBlbXB0eSBtb2RlbCANCnByZWRpY3RvcnMgPC0gYygidGltZSIpDQpkZXBzIDwtIGMoImNjcGVyY2VwdCIsICJjY2hhbmdlIikNCg0KZWJfbGlzdF9lbXB0eV8yMDA5IDwtIGxpc3QoKQ0KDQojIExvb3AgdGhyb3VnaCBlYWNoIGRlcGVuZGVudCB2YXJpYWJsZQ0KICBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSkNCiAgIyBQZXJmb3JtIHRoZSBsaW5lYXIgcmVncmVzc2lvbg0KICBlYl9maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBlYl9jb21wbGV0ZSwgd2VpZ2h0cyA9IHdlaWdodHZlYykNCiAgDQogIGViX2xpc3RfZW1wdHlfMjAwOVtbaV1dIDwtIGViX2ZpdA0KfSANCg0Kc3VtbWFyeShlYl9saXN0X2VtcHR5XzIwMDlbWzFdXSkgDQoNCnNhdmUoZWJfbGlzdF9lbXB0eV8yMDA5LCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2ViX2xpc3RfZW1wdHlfMjAwOV93LlJEYXRhIikNCg0KIyBNb2RlbCB3aXRoIHByZWRpY3RvcnMNCnByZWRpY3RvcnMgPC0gYygidGltZSIsICJzZXgiLCAiaXNjZWRfY2F0IiwgImFnZSIpDQpkZXBzIDwtIGMoImNjcGVyY2VwdCIsICJjY2hhbmdlIikNCg0KZWJfbGlzdF9wcmVkc18yMDA5IDwtIGxpc3QoKQ0KDQojIExvb3AgdGhyb3VnaCBlYWNoIGRlcGVuZGVudCB2YXJpYWJsZQ0KICBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSkNCiAgIyBQZXJmb3JtIHRoZSBsaW5lYXIgcmVncmVzc2lvbg0KICBlYl9maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBlYl9jb21wbGV0ZSwgd2VpZ2h0cyA9IHdlaWdodHZlYykNCiAgDQogIGViX2xpc3RfcHJlZHNfMjAwOVtbaV1dIDwtIGViX2ZpdA0KfSANCg0Kc3VtbWFyeShlYl9saXN0X3ByZWRzXzIwMDlbWzFdXSkgDQoNCnNhdmUoZWJfbGlzdF9wcmVkc18yMDA5LCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2ViX2xpc3RfcHJlZHNfMjAwOV93X25ldy5SRGF0YSIpDQoNCiMgQW5kIHRoZSBtb2RlbCB3aXRoIGludGVyYWN0aW9ucw0KZWJfY29tcGxldGUkYWdlX3RpbWUgPC0gZWJfY29tcGxldGUkYWdlICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUkc2V4X3RpbWUgPC0gYXMubnVtZXJpYyhlYl9jb21wbGV0ZSRzZXgpICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUgPC0gZmFzdER1bW1pZXM6OmR1bW15X2NvbHMoZWJfY29tcGxldGUsIHNlbGVjdF9jb2x1bW5zID0gImlzY2VkX2NhdCIpDQplYl9jb21wbGV0ZSRpc2NlZF9iYXNpY190aW1lIDwtIGViX2NvbXBsZXRlJGlzY2VkX2NhdF9CYXNpYyAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlJGlzY2VkX2ludGVybWVkaWF0ZV90aW1lIDwtIGViX2NvbXBsZXRlJGlzY2VkX2NhdF9JbnRlcm1lZGlhdGUgKiBlYl9jb21wbGV0ZSR0aW1lDQplYl9jb21wbGV0ZSRpc2NlZF9hZHZhbmNlZF90aW1lIDwtIGViX2NvbXBsZXRlJGlzY2VkX2NhdF9BZHZhbmNlZCAqIGViX2NvbXBsZXRlJHRpbWUNCg0KaW50ZXJhY3Rpb25zIDwtIGMoImFnZV90aW1lIiwgInNleF90aW1lIiwgImlzY2VkX2ludGVybWVkaWF0ZV90aW1lIiwgImlzY2VkX2FkdmFuY2VkX3RpbWUiKQ0KDQplYl9saXN0X2ludGVyYWN0aW9uc18yMDA5IDwtIGxpc3QoKQ0KDQogZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSwgIiArICIsIHBhc3RlKGludGVyYWN0aW9ucywgY29sbGFwc2UgPSAiICsgIikpKQ0KICAjIFBlcmZvcm0gdGhlIGxpbmVhciByZWdyZXNzaW9uDQogIGViX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpLCAiICsgIiwgcGFzdGUoaW50ZXJhY3Rpb25zLCBjb2xsYXBzZSA9ICIrICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCIgKyAiLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGViX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZWJfbGlzdF9pbnRlcmFjdGlvbnNfMjAwOVtbaV1dIDwtIGViX2ZpdA0KfSANCg0Kc3VtbWFyeShlYl9saXN0X2ludGVyYWN0aW9uc18yMDA5W1sxXV0pIA0KDQpzYXZlKGViX2xpc3RfaW50ZXJhY3Rpb25zXzIwMDksIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMvZWJfbGlzdF9pbnRlcmFjdGlvbnNfMjAwOV93X25ldy5SRGF0YSIpDQpgYGANCg0KYGBge3J9DQojIFBlcnNvbmFsIGltcG9ydGFuY2UgYXNrZWQgaW4gMyB3YXZlcw0KZWJfY29tcGxldGUgPC0gZWJfdG90ICU+JSBkcGx5cjo6c2VsZWN0KHN1cnZleXllYXIsIHBlcnNfaW1wLCBzZXgsIGlzY2VkLCB1cmJhbiwgYWdlLCB3ZWlnaHR2ZWMsIGlzY2VkX2NhdCkNCmViX2NvbXBsZXRlIDwtIGViX2NvbXBsZXRlICU+JSBkcm9wX25hKCkNCmViX2NvbXBsZXRlJHRpbWUgPC0gZWJfY29tcGxldGUkc3VydmV5eWVhciAtIG1pbihlYl9jb21wbGV0ZSRzdXJ2ZXl5ZWFyKQ0KDQojIEZpcnN0IGVtcHR5IG1vZGVsIA0KcHJlZGljdG9ycyA8LSBjKCJ0aW1lIikNCmRlcHMgPC0gYygicGVyc19pbXAiKQ0KDQplYl9saXN0X2VtcHR5X3BlcnNfaW1wIDwtIGxpc3QoKQ0KDQojIExvb3AgdGhyb3VnaCBlYWNoIGRlcGVuZGVudCB2YXJpYWJsZQ0KICBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSkNCiAgIyBQZXJmb3JtIHRoZSBsaW5lYXIgcmVncmVzc2lvbg0KICBlYl9maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSxmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGViX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZWJfbGlzdF9lbXB0eV9wZXJzX2ltcFtbaV1dIDwtIGViX2ZpdA0KfSANCg0Kc3VtbWFyeShlYl9saXN0X2VtcHR5X3BlcnNfaW1wW1sxXV0pIA0KDQpzYXZlKGViX2xpc3RfZW1wdHlfcGVyc19pbXAsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMvZWJfbGlzdF9lbXB0eV9wZXJzX2ltcF93LlJEYXRhIikNCg0KIyBNb2RlbCB3aXRoIHByZWRpY3RvcnMNCnByZWRpY3RvcnMgPC0gYygidGltZSIsICJzZXgiLCAiaXNjZWRfY2F0IiwgImFnZSIpDQpkZXBzIDwtIGMoInBlcnNfaW1wIikNCg0KZWJfbGlzdF9wcmVkc19wZXJzX2ltcCA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgZWJfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsDQogICAgICAgICAgICAgICAgICAgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBlYl9jb21wbGV0ZSwgd2VpZ2h0cyA9IHdlaWdodHZlYykNCiAgDQogIGViX2xpc3RfcHJlZHNfcGVyc19pbXBbW2ldXSA8LSBlYl9maXQNCn0gDQoNCnN1bW1hcnkoZWJfbGlzdF9wcmVkc19wZXJzX2ltcFtbMV1dKSANCg0Kc2F2ZShlYl9saXN0X3ByZWRzX3BlcnNfaW1wLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2ViX2xpc3RfcHJlZHNfcGVyc19pbXBfd19uZXcuUkRhdGEiKQ0KDQojIEFuZCB0aGUgbW9kZWwgd2l0aCBpbnRlcmFjdGlvbnMNCmViX2NvbXBsZXRlJGFnZV90aW1lIDwtIGViX2NvbXBsZXRlJGFnZSAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlJHNleF90aW1lIDwtIGFzLm51bWVyaWMoZWJfY29tcGxldGUkc2V4KSAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlIDwtIGZhc3REdW1taWVzOjpkdW1teV9jb2xzKGViX2NvbXBsZXRlLCBzZWxlY3RfY29sdW1ucyA9ICJpc2NlZF9jYXQiKQ0KZWJfY29tcGxldGUkaXNjZWRfYmFzaWNfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfQmFzaWMgKiBlYl9jb21wbGV0ZSR0aW1lDQplYl9jb21wbGV0ZSRpc2NlZF9pbnRlcm1lZGlhdGVfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfSW50ZXJtZWRpYXRlICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUkaXNjZWRfYWR2YW5jZWRfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfQWR2YW5jZWQgKiBlYl9jb21wbGV0ZSR0aW1lDQoNCmludGVyYWN0aW9ucyA8LSBjKCJhZ2VfdGltZSIsICJzZXhfdGltZSIsICJpc2NlZF9pbnRlcm1lZGlhdGVfdGltZSIsICJpc2NlZF9hZHZhbmNlZF90aW1lIikNCg0KZWJfbGlzdF9pbnRlcmFjdGlvbnNfcGVyc19pbXAgPC0gbGlzdCgpDQoNCiBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpLCAiICsgIiwgcGFzdGUoaW50ZXJhY3Rpb25zLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgZWJfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIiksICIgKyAiLCBwYXN0ZShpbnRlcmFjdGlvbnMsIGNvbGxhcHNlID0gIisgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsIiArICIsIGZhbWlseT1OTyhtdS5saW5rID0gImlkZW50aXR5Iiwgc2lnbWEubGluayA9ICJpZGVudGl0eSIpLCBkYXRhID0gZWJfY29tcGxldGUsIHdlaWdodHMgPSB3ZWlnaHR2ZWMpDQogIA0KICBlYl9saXN0X2ludGVyYWN0aW9uc19wZXJzX2ltcFtbaV1dIDwtIGViX2ZpdA0KfSANCg0Kc3VtbWFyeShlYl9saXN0X2ludGVyYWN0aW9uc19wZXJzX2ltcFtbMV1dKSANCg0Kc2F2ZShlYl9saXN0X2ludGVyYWN0aW9uc19wZXJzX2ltcCwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9lYl9saXN0X2ludGVyYWN0aW9uc19wZXJzX2ltcF93X25ldy5SRGF0YSIpDQpgYGANCg0KYGBge3J9DQojIFF1ZXN0aW9ucyBhYm91dCB3aG8gZG9lcyBlbm91Z2ggYXNrZWQgaW4gMyB3YXZlcw0KZWJfY29tcGxldGUgPC0gZWJfdG90ICU+JSBkcGx5cjo6c2VsZWN0KHN1cnZleXllYXIsIGRvcHJvdF9uYXRnb3Y6ZG9wcm90X2NpdGl6LCBzZXgsIGlzY2VkLCB1cmJhbiwgYWdlLCB3ZWlnaHR2ZWMsIGlzY2VkX2NhdCkNCmViX2NvbXBsZXRlIDwtIGViX2NvbXBsZXRlICU+JSBkcm9wX25hKCkNCmViX2NvbXBsZXRlJHRpbWUgPC0gZWJfY29tcGxldGUkc3VydmV5eWVhciAtIG1pbihlYl9jb21wbGV0ZSRzdXJ2ZXl5ZWFyKQ0KDQojIEZpcnN0IGVtcHR5IG1vZGVsIA0KcHJlZGljdG9ycyA8LSBjKCJ0aW1lIikNCmRlcHMgPC0gYygiZG9wcm90X25hdGdvdiIsICJkb3Byb3RfZXUiLCAiZG9wcm90X3JlZ2lvbiIsICJkb3Byb3RfY29tcCIsICJkb3Byb3RfY2l0aXoiKQ0KDQplYl9saXN0X2VtcHR5X2RvcHJvdCA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgZWJfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsIGZhbWlseT1OTyhtdS5saW5rID0gImlkZW50aXR5Iiwgc2lnbWEubGluayA9ICJpZGVudGl0eSIpLCBkYXRhID0gZWJfY29tcGxldGUsIHdlaWdodHMgPSB3ZWlnaHR2ZWMpDQogIA0KICBlYl9saXN0X2VtcHR5X2RvcHJvdFtbaV1dIDwtIGViX2ZpdA0KfSANCg0Kc3VtbWFyeShlYl9saXN0X2VtcHR5X2RvcHJvdFtbMV1dKSANCg0Kc2F2ZShlYl9saXN0X2VtcHR5X2RvcHJvdCwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9lYl9saXN0X2VtcHR5X2RvcHJvdF93LlJEYXRhIikNCg0KIyBNb2RlbCB3aXRoIHByZWRpY3RvcnMNCnByZWRpY3RvcnMgPC0gYygidGltZSIsICJzZXgiLCAiaXNjZWRfY2F0IiwgImFnZSIpDQpkZXBzIDwtIGMoImRvcHJvdF9uYXRnb3YiLCAiZG9wcm90X2V1IiwgImRvcHJvdF9yZWdpb24iLCAiZG9wcm90X2NvbXAiLCAiZG9wcm90X2NpdGl6IikNCg0KZWJfbGlzdF9wcmVkc19kb3Byb3QgPC0gbGlzdCgpDQoNCiMgTG9vcCB0aHJvdWdoIGVhY2ggZGVwZW5kZW50IHZhcmlhYmxlDQogIGZvciAoaSBpbiAxOmxlbmd0aChkZXBzKSkgew0KICAjIFNwZWNpZnkgdGhlIHNpZ21hIGZvcm11bGENCiAgc2lnbWEuZm9ybXVsYSA8LSBhcy5mb3JtdWxhKHBhc3RlKCJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKQ0KICAjIFBlcmZvcm0gdGhlIGxpbmVhciByZWdyZXNzaW9uDQogIGViX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGViX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZWJfbGlzdF9wcmVkc19kb3Byb3RbW2ldXSA8LSBlYl9maXQNCn0gDQoNCnN1bW1hcnkoZWJfbGlzdF9wcmVkc19kb3Byb3RbWzFdXSkgDQoNCnNhdmUoZWJfbGlzdF9wcmVkc19kb3Byb3QsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMvZWJfbGlzdF9wcmVkc19kb3Byb3Rfd19uZXcuUkRhdGEiKQ0KDQojIEFuZCB0aGUgbW9kZWwgd2l0aCBpbnRlcmFjdGlvbnMNCmViX2NvbXBsZXRlJGFnZV90aW1lIDwtIGViX2NvbXBsZXRlJGFnZSAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlJHNleF90aW1lIDwtIGFzLm51bWVyaWMoZWJfY29tcGxldGUkc2V4KSAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlIDwtIGZhc3REdW1taWVzOjpkdW1teV9jb2xzKGViX2NvbXBsZXRlLCBzZWxlY3RfY29sdW1ucyA9ICJpc2NlZF9jYXQiKQ0KZWJfY29tcGxldGUkaXNjZWRfYmFzaWNfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfQmFzaWMgKiBlYl9jb21wbGV0ZSR0aW1lDQplYl9jb21wbGV0ZSRpc2NlZF9pbnRlcm1lZGlhdGVfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfSW50ZXJtZWRpYXRlICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUkaXNjZWRfYWR2YW5jZWRfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfQWR2YW5jZWQgKiBlYl9jb21wbGV0ZSR0aW1lDQoNCmludGVyYWN0aW9ucyA8LSBjKCJhZ2VfdGltZSIsICJzZXhfdGltZSIsICJpc2NlZF9pbnRlcm1lZGlhdGVfdGltZSIsICJpc2NlZF9hZHZhbmNlZF90aW1lIikNCg0KZWJfbGlzdF9pbnRlcmFjdGlvbnNfZG9wcm90IDwtIGxpc3QoKQ0KDQogZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSwgIiArICIsIHBhc3RlKGludGVyYWN0aW9ucywgY29sbGFwc2UgPSAiICsgIikpKQ0KICAjIFBlcmZvcm0gdGhlIGxpbmVhciByZWdyZXNzaW9uDQogIGViX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpLCAiICsgIiwgcGFzdGUoaW50ZXJhY3Rpb25zLCBjb2xsYXBzZSA9ICIrICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCIgKyAiLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGViX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZWJfbGlzdF9pbnRlcmFjdGlvbnNfZG9wcm90W1tpXV0gPC0gZWJfZml0DQp9IA0KDQpzdW1tYXJ5KGViX2xpc3RfaW50ZXJhY3Rpb25zX2RvcHJvdFtbMV1dKSANCg0Kc2F2ZShlYl9saXN0X2ludGVyYWN0aW9uc19kb3Byb3QsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMvZWJfbGlzdF9pbnRlcmFjdGlvbnNfZG9wcm90X3dfbmV3LlJEYXRhIikNCmBgYA0KDQpgYGB7cn0NCiMgUXVlc3Rpb25zIGFib3V0IGVudmlyb25tZW50IGFza2VkIGluIDIgd2F2ZXMNCmViX2NvbXBsZXRlIDwtIGViX3RvdCAlPiUgZHBseXI6OnNlbGVjdChzdXJ2ZXl5ZWFyLCBlbnZwX2VnLCBlZmZyX2VnLCBzZXgsIGlzY2VkLCB1cmJhbiwgYWdlLCB3ZWlnaHR2ZWMsIGlzY2VkX2NhdCkNCmViX2NvbXBsZXRlIDwtIGViX2NvbXBsZXRlICU+JSBkcm9wX25hKCkNCmViX2NvbXBsZXRlJHRpbWUgPC0gZWJfY29tcGxldGUkc3VydmV5eWVhciAtIG1pbihlYl9jb21wbGV0ZSRzdXJ2ZXl5ZWFyKQ0KDQojIEZpcnN0IGVtcHR5IG1vZGVsIA0KcHJlZGljdG9ycyA8LSBjKCJ0aW1lIikNCmRlcHMgPC0gYygiZW52cF9lZyIsICJlZmZyX2VnIikNCg0KZWJfbGlzdF9lbXB0eV8yMDExIDwtIGxpc3QoKQ0KDQojIExvb3AgdGhyb3VnaCBlYWNoIGRlcGVuZGVudCB2YXJpYWJsZQ0KICBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSkNCiAgIyBQZXJmb3JtIHRoZSBsaW5lYXIgcmVncmVzc2lvbg0KICBlYl9maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBlYl9jb21wbGV0ZSwgd2VpZ2h0cyA9IHdlaWdodHZlYykNCiAgDQogIGViX2xpc3RfZW1wdHlfMjAxMVtbaV1dIDwtIGViX2ZpdA0KfSANCg0Kc3VtbWFyeShlYl9saXN0X2VtcHR5XzIwMTFbWzFdXSkgDQoNCnNhdmUoZWJfbGlzdF9lbXB0eV8yMDExLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2ViX2xpc3RfZW1wdHlfMjAxMV93LlJEYXRhIikNCg0KIyBNb2RlbCB3aXRoIHByZWRpY3RvcnMNCnByZWRpY3RvcnMgPC0gYygidGltZSIsICJzZXgiLCAiaXNjZWRfY2F0IiwgImFnZSIpDQpkZXBzIDwtIGMoImVudnBfZWciLCAiZWZmcl9lZyIpDQoNCmViX2xpc3RfcHJlZHNfMjAxMSA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgZWJfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsIGZhbWlseT1OTyhtdS5saW5rID0gImlkZW50aXR5Iiwgc2lnbWEubGluayA9ICJpZGVudGl0eSIpLCBkYXRhID0gZWJfY29tcGxldGUsIHdlaWdodHMgPSB3ZWlnaHR2ZWMpDQogIA0KICBlYl9saXN0X3ByZWRzXzIwMTFbW2ldXSA8LSBlYl9maXQNCn0gDQoNCnN1bW1hcnkoZWJfbGlzdF9wcmVkc18yMDExW1sxXV0pIA0KDQpzYXZlKGViX2xpc3RfcHJlZHNfMjAxMSwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9lYl9saXN0X3ByZWRzXzIwMTFfd19uZXcuUkRhdGEiKQ0KDQojIEFuZCB0aGUgbW9kZWwgd2l0aCBpbnRlcmFjdGlvbnMNCmViX2NvbXBsZXRlJGFnZV90aW1lIDwtIGViX2NvbXBsZXRlJGFnZSAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlJHNleF90aW1lIDwtIGFzLm51bWVyaWMoZWJfY29tcGxldGUkc2V4KSAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlIDwtIGZhc3REdW1taWVzOjpkdW1teV9jb2xzKGViX2NvbXBsZXRlLCBzZWxlY3RfY29sdW1ucyA9ICJpc2NlZF9jYXQiKQ0KZWJfY29tcGxldGUkaXNjZWRfYmFzaWNfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfQmFzaWMgKiBlYl9jb21wbGV0ZSR0aW1lDQplYl9jb21wbGV0ZSRpc2NlZF9pbnRlcm1lZGlhdGVfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfSW50ZXJtZWRpYXRlICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUkaXNjZWRfYWR2YW5jZWRfdGltZSA8LSBlYl9jb21wbGV0ZSRpc2NlZF9jYXRfQWR2YW5jZWQgKiBlYl9jb21wbGV0ZSR0aW1lDQoNCmludGVyYWN0aW9ucyA8LSBjKCJhZ2VfdGltZSIsICJzZXhfdGltZSIsICJpc2NlZF9pbnRlcm1lZGlhdGVfdGltZSIsICJpc2NlZF9hZHZhbmNlZF90aW1lIikNCg0KZWJfbGlzdF9pbnRlcmFjdGlvbnNfMjAxMSA8LSBsaXN0KCkNCg0KIGZvciAoaSBpbiAxOmxlbmd0aChkZXBzKSkgew0KICAjIFNwZWNpZnkgdGhlIHNpZ21hIGZvcm11bGENCiAgc2lnbWEuZm9ybXVsYSA8LSBhcy5mb3JtdWxhKHBhc3RlKCJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIiksICIgKyAiLCBwYXN0ZShpbnRlcmFjdGlvbnMsIGNvbGxhcHNlID0gIiArICIpKSkNCiAgIyBQZXJmb3JtIHRoZSBsaW5lYXIgcmVncmVzc2lvbg0KICBlYl9maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSwgIiArICIsIHBhc3RlKGludGVyYWN0aW9ucywgY29sbGFwc2UgPSAiKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwiICsgIiwgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBlYl9jb21wbGV0ZSwgd2VpZ2h0cyA9IHdlaWdodHZlYykNCiAgDQogIGViX2xpc3RfaW50ZXJhY3Rpb25zXzIwMTFbW2ldXSA8LSBlYl9maXQNCn0gDQoNCnN1bW1hcnkoZWJfbGlzdF9pbnRlcmFjdGlvbnNfMjAxMVtbMV1dKSANCg0Kc2F2ZShlYl9saXN0X2ludGVyYWN0aW9uc18yMDExLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2ViX2xpc3RfaW50ZXJhY3Rpb25zXzIwMTFfd19uZXcuUkRhdGEiKQ0KYGBgDQoNCmBgYHtyfQ0KIyBRdWVzdGlvbnMgYWJvdXQgbmFtaW5nIGNsaW1hdGUgY2hhbmdlIGEgcHJvYmxlbQ0KZWJfY29tcGxldGUgPC0gZWJfdG90ICU+JSBkcGx5cjo6c2VsZWN0KHN1cnZleXllYXIsIGNjaGFuZ2UyLCBjY2hhbmdldG90LCBzZXgsIGlzY2VkLCB1cmJhbiwgYWdlLCB3ZWlnaHR2ZWMsIGlzY2VkX2NhdCkNCmViX2NvbXBsZXRlIDwtIGViX2NvbXBsZXRlICU+JSBkcm9wX25hKCkNCmViX2NvbXBsZXRlJHRpbWUgPC0gZWJfY29tcGxldGUkc3VydmV5eWVhciAtIG1pbihlYl9jb21wbGV0ZSRzdXJ2ZXl5ZWFyKQ0KDQojIEZpcnN0IGVtcHR5IG1vZGVsIA0KcHJlZGljdG9ycyA8LSBjKCJ0aW1lIikNCmRlcHMgPC0gYygiY2NoYW5nZTIiLCAiY2NoYW5nZXRvdCIpDQoNCmViX2xpc3RfZW1wdHlfY2NoYW5nZTIgPC0gbGlzdCgpDQoNCiMgTG9vcCB0aHJvdWdoIGVhY2ggZGVwZW5kZW50IHZhcmlhYmxlDQogIGZvciAoaSBpbiAxOmxlbmd0aChkZXBzKSkgew0KICAjIFNwZWNpZnkgdGhlIHNpZ21hIGZvcm11bGENCiAgc2lnbWEuZm9ybXVsYSA8LSBhcy5mb3JtdWxhKHBhc3RlKCJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKQ0KICAjIFBlcmZvcm0gdGhlIGxpbmVhciByZWdyZXNzaW9uDQogIGViX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGViX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZWJfbGlzdF9lbXB0eV9jY2hhbmdlMltbaV1dIDwtIGViX2ZpdA0KfSANCg0Kc3VtbWFyeShlYl9saXN0X2VtcHR5X2NjaGFuZ2UyW1sxXV0pIA0KDQpzYXZlKGViX2xpc3RfZW1wdHlfY2NoYW5nZTIsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMvZWJfbGlzdF9lbXB0eV9jY2hhbmdlMl93LlJEYXRhIikNCg0KIyBNb2RlbCB3aXRoIHByZWRpY3RvcnMNCnByZWRpY3RvcnMgPC0gYygidGltZSIsICJzZXgiLCAiaXNjZWRfY2F0IiwgImFnZSIpDQpkZXBzIDwtIGMoImNjaGFuZ2UyIiwgImNjaGFuZ2V0b3QiKQ0KDQplYl9saXN0X3ByZWRzX2NjaGFuZ2UyIDwtIGxpc3QoKQ0KDQojIExvb3AgdGhyb3VnaCBlYWNoIGRlcGVuZGVudCB2YXJpYWJsZQ0KICBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSkNCiAgIyBQZXJmb3JtIHRoZSBsaW5lYXIgcmVncmVzc2lvbg0KICBlYl9maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwNCiAgICAgICAgICAgICAgICAgICBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGViX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZWJfbGlzdF9wcmVkc19jY2hhbmdlMltbaV1dIDwtIGViX2ZpdA0KfSANCg0Kc3VtbWFyeShlYl9saXN0X3ByZWRzX2NjaGFuZ2UyW1sxXV0pIA0KDQpzYXZlKGViX2xpc3RfcHJlZHNfY2NoYW5nZTIsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMvZWJfbGlzdF9wcmVkc19jY2hhbmdlMl93X25ldy5SRGF0YSIpDQoNCiMgQW5kIHRoZSBtb2RlbCB3aXRoIGludGVyYWN0aW9ucw0KZWJfY29tcGxldGUkYWdlX3RpbWUgPC0gZWJfY29tcGxldGUkYWdlICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUkc2V4X3RpbWUgPC0gYXMubnVtZXJpYyhlYl9jb21wbGV0ZSRzZXgpICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUgPC0gZmFzdER1bW1pZXM6OmR1bW15X2NvbHMoZWJfY29tcGxldGUsIHNlbGVjdF9jb2x1bW5zID0gImlzY2VkX2NhdCIpDQplYl9jb21wbGV0ZSRpc2NlZF9iYXNpY190aW1lIDwtIGViX2NvbXBsZXRlJGlzY2VkX2NhdF9CYXNpYyAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlJGlzY2VkX2ludGVybWVkaWF0ZV90aW1lIDwtIGViX2NvbXBsZXRlJGlzY2VkX2NhdF9JbnRlcm1lZGlhdGUgKiBlYl9jb21wbGV0ZSR0aW1lDQplYl9jb21wbGV0ZSRpc2NlZF9hZHZhbmNlZF90aW1lIDwtIGViX2NvbXBsZXRlJGlzY2VkX2NhdF9BZHZhbmNlZCAqIGViX2NvbXBsZXRlJHRpbWUNCg0KaW50ZXJhY3Rpb25zIDwtIGMoImFnZV90aW1lIiwgInNleF90aW1lIiwgImlzY2VkX2ludGVybWVkaWF0ZV90aW1lIiwgImlzY2VkX2FkdmFuY2VkX3RpbWUiKQ0KDQplYl9saXN0X2ludGVyYWN0aW9uc19jY2hhbmdlMiA8LSBsaXN0KCkNCg0KIGZvciAoaSBpbiAxOmxlbmd0aChkZXBzKSkgew0KICAjIFNwZWNpZnkgdGhlIHNpZ21hIGZvcm11bGENCiAgc2lnbWEuZm9ybXVsYSA8LSBhcy5mb3JtdWxhKHBhc3RlKCJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIiksICIgKyAiLCBwYXN0ZShpbnRlcmFjdGlvbnMsIGNvbGxhcHNlID0gIiArICIpKSkNCiAgIyBQZXJmb3JtIHRoZSBsaW5lYXIgcmVncmVzc2lvbg0KICBlYl9maXQgPC0gZ2FtbHNzKGFzLmZvcm11bGEocGFzdGUoZGVwc1tpXSwgIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSwgIiArICIsIHBhc3RlKGludGVyYWN0aW9ucywgY29sbGFwc2UgPSAiKyAiKSkpLCBzaWdtYS5mb3JtdWxhID0gc2lnbWEuZm9ybXVsYSwiICsgIiwgZmFtaWx5PU5PKG11LmxpbmsgPSAiaWRlbnRpdHkiLCBzaWdtYS5saW5rID0gImlkZW50aXR5IiksIGRhdGEgPSBlYl9jb21wbGV0ZSwgd2VpZ2h0cyA9IHdlaWdodHZlYykNCiAgDQogIGViX2xpc3RfaW50ZXJhY3Rpb25zX2NjaGFuZ2UyW1tpXV0gPC0gZWJfZml0DQp9IA0KDQpzdW1tYXJ5KGViX2xpc3RfaW50ZXJhY3Rpb25zX2NjaGFuZ2UyW1sxXV0pIA0KDQpzYXZlKGViX2xpc3RfaW50ZXJhY3Rpb25zX2NjaGFuZ2UyLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvcmVncmVzc2lvbl9vdXRwdXRzL2ViX2xpc3RfaW50ZXJhY3Rpb25zX2NjaGFuZ2UyX3dfbmV3LlJEYXRhIikNCmBgYA0KDQpgYGB7cn0NCiMgUXVlc3Rpb24gYWJvdXQgcGVyc29uYWwgYWN0aW9uIHRha2VuDQplYl9jb21wbGV0ZSA8LSBlYl90b3QgJT4lIGRwbHlyOjpzZWxlY3Qoc3VydmV5eWVhciwgcHJzYWN0aW9uLCBzZXgsIGlzY2VkLCB1cmJhbiwgYWdlLCB3ZWlnaHR2ZWMsIGlzY2VkX2NhdCkNCmViX2NvbXBsZXRlIDwtIGViX2NvbXBsZXRlICU+JSBkcm9wX25hKCkNCmViX2NvbXBsZXRlJHRpbWUgPC0gZWJfY29tcGxldGUkc3VydmV5eWVhciAtIG1pbihlYl9jb21wbGV0ZSRzdXJ2ZXl5ZWFyKQ0KDQojIEZpcnN0IGVtcHR5IG1vZGVsIA0KcHJlZGljdG9ycyA8LSBjKCJ0aW1lIikNCmRlcHMgPC0gYygicHJzYWN0aW9uIikNCg0KZWJfbGlzdF9lbXB0eV9wcnNhY3Rpb24gPC0gbGlzdCgpDQoNCiMgTG9vcCB0aHJvdWdoIGVhY2ggZGVwZW5kZW50IHZhcmlhYmxlDQogIGZvciAoaSBpbiAxOmxlbmd0aChkZXBzKSkgew0KICAjIFNwZWNpZnkgdGhlIHNpZ21hIGZvcm11bGENCiAgc2lnbWEuZm9ybXVsYSA8LSBhcy5mb3JtdWxhKHBhc3RlKCJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKQ0KICAjIFBlcmZvcm0gdGhlIGxpbmVhciByZWdyZXNzaW9uDQogIGViX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGViX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZWJfbGlzdF9lbXB0eV9wcnNhY3Rpb25bW2ldXSA8LSBlYl9maXQNCn0gDQoNCnN1bW1hcnkoZWJfbGlzdF9lbXB0eV9wcnNhY3Rpb25bWzFdXSkgDQoNCnNhdmUoZWJfbGlzdF9lbXB0eV9wcnNhY3Rpb24sIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMvZWJfbGlzdF9lbXB0eV9wcnNhY3Rpb25fdy5SRGF0YSIpDQoNCiMgTW9kZWwgd2l0aCBwcmVkaWN0b3JzDQpwcmVkaWN0b3JzIDwtIGMoInRpbWUiLCAic2V4IiwgImlzY2VkX2NhdCIsICJhZ2UiKQ0KZGVwcyA8LSBjKCJwcnNhY3Rpb24iKQ0KDQplYl9saXN0X3ByZWRzX3Byc2FjdGlvbiA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgZWJfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsIGZhbWlseT1OTyhtdS5saW5rID0gImlkZW50aXR5Iiwgc2lnbWEubGluayA9ICJpZGVudGl0eSIpLCBkYXRhID0gZWJfY29tcGxldGUsIHdlaWdodHMgPSB3ZWlnaHR2ZWMpDQogIA0KICBlYl9saXN0X3ByZWRzX3Byc2FjdGlvbltbaV1dIDwtIGViX2ZpdA0KfSANCg0Kc3VtbWFyeShlYl9saXN0X3ByZWRzX3Byc2FjdGlvbltbMV1dKSANCg0Kc2F2ZShlYl9saXN0X3ByZWRzX3Byc2FjdGlvbiwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9lYl9saXN0X3ByZWRzX3Byc2FjdGlvbl93X25ldy5SRGF0YSIpDQoNCiMgQW5kIHRoZSBtb2RlbCB3aXRoIGludGVyYWN0aW9ucw0KZWJfY29tcGxldGUkYWdlX3RpbWUgPC0gZWJfY29tcGxldGUkYWdlICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUkc2V4X3RpbWUgPC0gYXMubnVtZXJpYyhlYl9jb21wbGV0ZSRzZXgpICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUgPC0gZmFzdER1bW1pZXM6OmR1bW15X2NvbHMoZWJfY29tcGxldGUsIHNlbGVjdF9jb2x1bW5zID0gImlzY2VkX2NhdCIpDQplYl9jb21wbGV0ZSRpc2NlZF9iYXNpY190aW1lIDwtIGViX2NvbXBsZXRlJGlzY2VkX2NhdF9CYXNpYyAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlJGlzY2VkX2ludGVybWVkaWF0ZV90aW1lIDwtIGViX2NvbXBsZXRlJGlzY2VkX2NhdF9JbnRlcm1lZGlhdGUgKiBlYl9jb21wbGV0ZSR0aW1lDQplYl9jb21wbGV0ZSRpc2NlZF9hZHZhbmNlZF90aW1lIDwtIGViX2NvbXBsZXRlJGlzY2VkX2NhdF9BZHZhbmNlZCAqIGViX2NvbXBsZXRlJHRpbWUNCg0KaW50ZXJhY3Rpb25zIDwtIGMoImFnZV90aW1lIiwgInNleF90aW1lIiwgImlzY2VkX2ludGVybWVkaWF0ZV90aW1lIiwgImlzY2VkX2FkdmFuY2VkX3RpbWUiKQ0KDQplYl9saXN0X2ludGVyYWN0aW9uc19wcnNhY3Rpb24gPC0gbGlzdCgpDQoNCiBmb3IgKGkgaW4gMTpsZW5ndGgoZGVwcykpIHsNCiAgIyBTcGVjaWZ5IHRoZSBzaWdtYSBmb3JtdWxhDQogIHNpZ21hLmZvcm11bGEgPC0gYXMuZm9ybXVsYShwYXN0ZSgifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpLCAiICsgIiwgcGFzdGUoaW50ZXJhY3Rpb25zLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgZWJfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIiksICIgKyAiLCBwYXN0ZShpbnRlcmFjdGlvbnMsIGNvbGxhcHNlID0gIisgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsIiArICIsIGZhbWlseT1OTyhtdS5saW5rID0gImlkZW50aXR5Iiwgc2lnbWEubGluayA9ICJpZGVudGl0eSIpLCBkYXRhID0gZWJfY29tcGxldGUsIHdlaWdodHMgPSB3ZWlnaHR2ZWMpDQogIA0KICBlYl9saXN0X2ludGVyYWN0aW9uc19wcnNhY3Rpb25bW2ldXSA8LSBlYl9maXQNCn0gDQoNCnN1bW1hcnkoZWJfbGlzdF9pbnRlcmFjdGlvbnNfcHJzYWN0aW9uW1sxXV0pIA0KDQpzYXZlKGViX2xpc3RfaW50ZXJhY3Rpb25zX3Byc2FjdGlvbiwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9lYl9saXN0X2ludGVyYWN0aW9uc19wcnNhY3Rpb25fd19uZXcuUkRhdGEiKQ0KYGBgDQoNCmBgYHtyfQ0KIyBMYXN0IGl0ZW0sIHdoZXRoZXIgdGhlIGNpdHkgdW5kZXJ0YWtlcyBlbm91Z2ggYWN0aW9uDQplYl9jb21wbGV0ZSA8LSBlYl90b3QgJT4lIGRwbHlyOjpzZWxlY3Qoc3VydmV5eWVhciwgZG9wcm90X2NpdHksIHNleCwgaXNjZWQsIHVyYmFuLCBhZ2UsIHdlaWdodHZlYywgaXNjZWRfY2F0KQ0KZWJfY29tcGxldGUgPC0gZWJfY29tcGxldGUgJT4lIGRyb3BfbmEoKQ0KZWJfY29tcGxldGUkdGltZSA8LSBlYl9jb21wbGV0ZSRzdXJ2ZXl5ZWFyIC0gbWluKGViX2NvbXBsZXRlJHN1cnZleXllYXIpDQoNCiMgRmlyc3QgZW1wdHkgbW9kZWwgDQpwcmVkaWN0b3JzIDwtIGMoInRpbWUiKQ0KZGVwcyA8LSBjKCJkb3Byb3RfY2l0eSIpDQoNCmViX2xpc3RfZW1wdHlfZG9wcm90X2NpdHkgPC0gbGlzdCgpDQoNCiMgTG9vcCB0aHJvdWdoIGVhY2ggZGVwZW5kZW50IHZhcmlhYmxlDQogIGZvciAoaSBpbiAxOmxlbmd0aChkZXBzKSkgew0KICAjIFNwZWNpZnkgdGhlIHNpZ21hIGZvcm11bGENCiAgc2lnbWEuZm9ybXVsYSA8LSBhcy5mb3JtdWxhKHBhc3RlKCJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKQ0KICAjIFBlcmZvcm0gdGhlIGxpbmVhciByZWdyZXNzaW9uDQogIGViX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGViX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZWJfbGlzdF9lbXB0eV9kb3Byb3RfY2l0eVtbaV1dIDwtIGViX2ZpdA0KfSANCg0Kc3VtbWFyeShlYl9saXN0X2VtcHR5X2RvcHJvdF9jaXR5W1sxXV0pIA0KDQpzYXZlKGViX2xpc3RfZW1wdHlfZG9wcm90X2NpdHksIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMvZWJfbGlzdF9lbXB0eV9kb3Byb3RfY2l0eV93LlJEYXRhIikNCg0KIyBNb2RlbCB3aXRoIHByZWRpY3RvcnMNCnByZWRpY3RvcnMgPC0gYygidGltZSIsICJzZXgiLCAiaXNjZWRfY2F0IiwgImFnZSIpDQpkZXBzIDwtIGMoImRvcHJvdF9jaXR5IikNCg0KZWJfbGlzdF9wcmVkc19kb3Byb3RfY2l0eSA8LSBsaXN0KCkNCg0KIyBMb29wIHRocm91Z2ggZWFjaCBkZXBlbmRlbnQgdmFyaWFibGUNCiAgZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSkpDQogICMgUGVyZm9ybSB0aGUgbGluZWFyIHJlZ3Jlc3Npb24NCiAgZWJfZml0IDwtIGdhbWxzcyhhcy5mb3JtdWxhKHBhc3RlKGRlcHNbaV0sICJ+IiwgcGFzdGUocHJlZGljdG9ycywgY29sbGFwc2UgPSAiICsgIikpKSwgc2lnbWEuZm9ybXVsYSA9IHNpZ21hLmZvcm11bGEsIGZhbWlseT1OTyhtdS5saW5rID0gImlkZW50aXR5Iiwgc2lnbWEubGluayA9ICJpZGVudGl0eSIpLCBkYXRhID0gZWJfY29tcGxldGUsIHdlaWdodHMgPSB3ZWlnaHR2ZWMpDQogIA0KICBlYl9saXN0X3ByZWRzX2RvcHJvdF9jaXR5W1tpXV0gPC0gZWJfZml0DQp9IA0KDQpzdW1tYXJ5KGViX2xpc3RfcHJlZHNfZG9wcm90X2NpdHlbWzFdXSkgDQoNCnNhdmUoZWJfbGlzdF9wcmVkc19kb3Byb3RfY2l0eSwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL3JlZ3Jlc3Npb25fb3V0cHV0cy9lYl9saXN0X3ByZWRzX2RvcHJvdF9jaXR5X3dfbmV3LlJEYXRhIikNCg0KIyBBbmQgdGhlIG1vZGVsIHdpdGggaW50ZXJhY3Rpb25zDQplYl9jb21wbGV0ZSRhZ2VfdGltZSA8LSBlYl9jb21wbGV0ZSRhZ2UgKiBlYl9jb21wbGV0ZSR0aW1lDQplYl9jb21wbGV0ZSRzZXhfdGltZSA8LSBhcy5udW1lcmljKGViX2NvbXBsZXRlJHNleCkgKiBlYl9jb21wbGV0ZSR0aW1lDQplYl9jb21wbGV0ZSA8LSBmYXN0RHVtbWllczo6ZHVtbXlfY29scyhlYl9jb21wbGV0ZSwgc2VsZWN0X2NvbHVtbnMgPSAiaXNjZWRfY2F0IikNCmViX2NvbXBsZXRlJGlzY2VkX2Jhc2ljX3RpbWUgPC0gZWJfY29tcGxldGUkaXNjZWRfY2F0X0Jhc2ljICogZWJfY29tcGxldGUkdGltZQ0KZWJfY29tcGxldGUkaXNjZWRfaW50ZXJtZWRpYXRlX3RpbWUgPC0gZWJfY29tcGxldGUkaXNjZWRfY2F0X0ludGVybWVkaWF0ZSAqIGViX2NvbXBsZXRlJHRpbWUNCmViX2NvbXBsZXRlJGlzY2VkX2FkdmFuY2VkX3RpbWUgPC0gZWJfY29tcGxldGUkaXNjZWRfY2F0X0FkdmFuY2VkICogZWJfY29tcGxldGUkdGltZQ0KDQppbnRlcmFjdGlvbnMgPC0gYygiYWdlX3RpbWUiLCAic2V4X3RpbWUiLCAiaXNjZWRfaW50ZXJtZWRpYXRlX3RpbWUiLCAiaXNjZWRfYWR2YW5jZWRfdGltZSIpDQoNCmViX2xpc3RfaW50ZXJhY3Rpb25zX2RvcHJvdF9jaXR5IDwtIGxpc3QoKQ0KDQogZm9yIChpIGluIDE6bGVuZ3RoKGRlcHMpKSB7DQogICMgU3BlY2lmeSB0aGUgc2lnbWEgZm9ybXVsYQ0KICBzaWdtYS5mb3JtdWxhIDwtIGFzLmZvcm11bGEocGFzdGUoIn4iLCBwYXN0ZShwcmVkaWN0b3JzLCBjb2xsYXBzZSA9ICIgKyAiKSwgIiArICIsIHBhc3RlKGludGVyYWN0aW9ucywgY29sbGFwc2UgPSAiICsgIikpKQ0KICAjIFBlcmZvcm0gdGhlIGxpbmVhciByZWdyZXNzaW9uDQogIGViX2ZpdCA8LSBnYW1sc3MoYXMuZm9ybXVsYShwYXN0ZShkZXBzW2ldLCAifiIsIHBhc3RlKHByZWRpY3RvcnMsIGNvbGxhcHNlID0gIiArICIpLCAiICsgIiwgcGFzdGUoaW50ZXJhY3Rpb25zLCBjb2xsYXBzZSA9ICIrICIpKSksIHNpZ21hLmZvcm11bGEgPSBzaWdtYS5mb3JtdWxhLCIgKyAiLCBmYW1pbHk9Tk8obXUubGluayA9ICJpZGVudGl0eSIsIHNpZ21hLmxpbmsgPSAiaWRlbnRpdHkiKSwgZGF0YSA9IGViX2NvbXBsZXRlLCB3ZWlnaHRzID0gd2VpZ2h0dmVjKQ0KICANCiAgZWJfbGlzdF9pbnRlcmFjdGlvbnNfZG9wcm90X2NpdHlbW2ldXSA8LSBlYl9maXQNCn0gDQoNCnN1bW1hcnkoZWJfbGlzdF9pbnRlcmFjdGlvbnNfZG9wcm90X2NpdHlbWzFdXSkgDQoNCnNhdmUoZWJfbGlzdF9pbnRlcmFjdGlvbnNfZG9wcm90X2NpdHksIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9yZWdyZXNzaW9uX291dHB1dHMvZWJfbGlzdF9pbnRlcmFjdGlvbnNfZG9wcm90X2NpdHlfd19uZXcuUkRhdGEiKQ0KYGBgDQo=</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("single_regression_gamlss_weigh_new.Rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

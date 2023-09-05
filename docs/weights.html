@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Anuschka Peelen" />
+
+<meta name="date" content="2023-09-05" />
+
+<title>Creating weight factors for all datasets per year</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="tweaks.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="blog.html">Blog</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Scripts datapreparation
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="dataprep_EB.html">Data preparation Eurobarometer</a>
+    </li>
+    <li>
+      <a href="dataprep_EVS_ESS_ISSP.html">Data preparation EVS, ESS, ISSP</a>
+    </li>
+    <li>
+      <a href="dataprep_I-O.html">Data preparation I&amp;O Research</a>
+    </li>
+    <li>
+      <a href="weights.html">Weighing data</a>
+    </li>
+    <li>
+      <a href="dataprep_polcat.html">Left right placement</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Scripts descriptives and analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="descriptives.html">Descriptives</a>
+    </li>
+    <li>
+      <a href="single_regression_gamlss_weigh_new.html">Gamlss regressions weighted</a>
+    </li>
+    <li>
+      <a href="single_regression_gw_py_new.html">Gamlss regression shorter time spans</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_weight_gamlss_new.html">Extract coefficients gamlss regressions</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_wg_waves_new.html">Extract coefficients shorter time spans</a>
+    </li>
+    <li>
+      <a href="regression_to_indep_var_analysis_weight_gamlss_new.html">Extract coefficients independent var model</a>
+    </li>
+    <li>
+      <a href="regression_to_interact_analysis_weight_gamlss_new.html">Extract coefficients interaction model</a>
+    </li>
+    <li>
+      <a href="meta_analysis_gamlss_weigh.html">Meta-analysis weighted gamlss</a>
+    </li>
+    <li>
+      <a href="meta_analysis_indep_var.html">Meta-analysis independent variables</a>
+    </li>
+    <li>
+      <a href="meta_analysis_gw_waves.html">Meta-analysis shorter time spans</a>
+    </li>
+    <li>
+      <a></a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/apeelen/climatechange">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Creating weight factors for all datasets
+per year</h1>
+<h4 class="author">Anuschka Peelen</h4>
+<h4 class="date">2023-09-05</h4>
+
+</div>
+
+
+<p>In this script, I calculate weight factors for each dataset and each
+wave. The target values I use as input are derived from Statistics
+Netherlands. The Excel file with these target values can be found in
+this replication package. I will weigh for age, gender, urbanity and
+marital status.</p>
+<pre class="r"><code>rm(list = ls())
+#install.packages(&quot;anesrake&quot;)
+library(anesrake)
+library(tidyverse)
+library(here)
+library(kableExtra) # needed later to make an example table that compares the proportions
+set.seed(1)
+# I use the here package so that I do not have to load files from my personal documents. However, here does not seem to be compatible with the (d)plyr package. That is why in previous scripts you may have seen that I did load from my local device.
+here()
+here::i_am(&quot;scripts/analysis/single_regression.Rmd&quot;)</code></pre>
+<div id="issp" class="section level2 unnumbered">
+<h2 class="unnumbered">ISSP</h2>
+<pre class="r"><code>#Create a weight variable for each dataset, which I can later use in the regression analyses to weigh the data with
+load(here(&quot;./data/all_waves&quot;, &quot;issp93sel.RData&quot;))
+
+#Create variables in the environment with the target values
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.49, 0.51)
+
+attributes(issp93sel$age)
+issp93sel$age_cat[issp93sel$age &gt;=15 &amp; issp93sel$age &lt;= 30] &lt;- 1
+issp93sel$age_cat[issp93sel$age &gt;=31 &amp; issp93sel$age &lt;= 45] &lt;- 2
+issp93sel$age_cat[issp93sel$age &gt;=46 &amp; issp93sel$age &lt;= 60] &lt;- 3
+issp93sel$age_cat[issp93sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.25, 0.24, 0.17, 0.17)
+
+#You notice here that I only weigh for sex and age, because information on urbanity and marital status was not yet available for 1993
+targets &lt;- list(sex, age_cat)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;)
+
+issp93sel$caseid &lt;- 1:length(issp93sel$sex)
+
+#To use anesrakefinder, the variables in the original dataset have to be numeric
+issp93sel$sex &lt;- as.numeric(issp93sel$sex)
+
+#Anesrakefinder weighs the data and provides a summary of this process
+anesrakefinder(targets, issp93sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, issp93sel, caseid = issp93sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+#Assign the weights to each person in the new variable weightvec, which can later be used in the regression analysis
+issp93sel$weightvec  &lt;- unlist(outsave[1])
+
+save(issp93sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp93sel.Rdata&quot;)
+
+#Repeat the same for the wave in 2000
+load(here(&quot;./data/all_waves&quot;, &quot;issp00sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.49, 0.51)
+
+attributes(issp00sel$age)
+issp00sel$age_cat[issp00sel$age &gt;=15 &amp; issp00sel$age &lt;= 30] &lt;- 1
+issp00sel$age_cat[issp00sel$age &gt;=31 &amp; issp00sel$age &lt;= 45] &lt;- 2
+issp00sel$age_cat[issp00sel$age &gt;=46 &amp; issp00sel$age &lt;= 60] &lt;- 3
+issp00sel$age_cat[issp00sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.21, 0.24, 0.19, 0.17)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.42, 0.17, 0.41)
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.59, 0.41)
+
+targets &lt;- list(sex, age_cat, urban, marstat)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;urban&quot;, &quot;marstat&quot;)
+
+issp00sel$caseid &lt;- 1:length(issp00sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+issp00sel$sex &lt;- as.numeric(issp00sel$sex)
+issp00sel$urban &lt;- as.numeric(issp00sel$urban)
+issp00sel$marstat &lt;- as.numeric(issp00sel$marstat)
+
+anesrakefinder(targets, issp00sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, issp00sel, caseid = issp00sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+issp00sel$weightvec  &lt;- unlist(outsave[1])
+
+save(issp00sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp00sel.Rdata&quot;)</code></pre>
+<pre class="r"><code># Create a table that compares the weighted and unweighted proportions and the target values, using the ISSP 2000 as an example. 
+
+# Create variables
+sex_unweight &lt;- wpct(issp00sel$sex)
+sex_weight &lt;- wpct(issp00sel$sex, issp00sel$weightvec)
+
+age_unweight &lt;- wpct(issp00sel$age_cat)
+age_weight &lt;- wpct(issp00sel$age_cat, issp00sel$weightvec)
+
+urban_unweight &lt;- wpct(issp00sel$urban)
+urban_weight &lt;- wpct(issp00sel$urban, issp00sel$weightvec)
+
+marstat_unweight &lt;- wpct(issp00sel$marstat)
+marstat_weight &lt;- wpct(issp00sel$marstat, issp00sel$weightvec)
+
+# Put the information in a df per variable
+table_sex &lt;- data.frame(Variable = c(&quot;Gender&quot;, &quot;&quot;),
+  Category = c(&quot;Male&quot;, &quot;Female&quot;),
+  Unweighted = paste(round(sex_unweight * 100, 1), &quot;%&quot;),
+  Weighted = paste(round(sex_weight * 100, 1), &quot;%&quot;)
+)
+
+table_mar &lt;- data.frame(Variable = c(&quot;Marital Status&quot;, &quot;&quot;),
+  Category = c(&quot;Living together&quot;, &quot;Not living together&quot;),
+  Unweighted = paste(round(marstat_unweight * 100, 1), &quot;%&quot;),
+  Weighted = paste(round(marstat_weight * 100, 1), &quot;%&quot;)
+)
+
+table_urban &lt;- data.frame(Variable = c(&quot;Urbanity&quot;, &quot;&quot;, &quot;&quot;),
+  Category = c(&quot;Low urbanity&quot;, &quot;Medium urbanity&quot;, &quot;High urbanity&quot;),
+  Unweighted = paste(round(urban_unweight * 100, 1), &quot;%&quot;),
+  Weighted = paste(round(urban_weight * 100, 1), &quot;%&quot;)
+)
+
+table_age &lt;- data.frame(Variable = c(&quot;Age category&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;),
+  Category = c(&quot;Under 30&quot;, &quot;31 to 45&quot;, &quot;46 to 61&quot;, &quot;61 and older&quot;),
+  Unweighted = paste(round(age_unweight * 100, 1), &quot;%&quot;),
+  Weighted = paste(round(age_weight * 100, 1), &quot;%&quot;)
+)
+
+# Create a df with all target weights
+targetweights &lt;- data.frame(Variable = c(&quot;Gender&quot;, &quot;&quot;, &quot;Marital Status&quot;, &quot;&quot;, &quot;Urbanity&quot;, &quot;&quot;, &quot;&quot;, &quot;Age category&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;),
+Category = c(&quot;Male&quot;, &quot;Female&quot;, &quot;Living together&quot;, &quot;Not living together&quot;, &quot;Low urbanity&quot;, &quot;Medium urbanity&quot;, &quot;High urbanity&quot;, &quot;Under 30&quot;, &quot;31 to 45&quot;, &quot;46 to 61&quot;, &quot;61 and older&quot;), 
+Target = c(&quot;49.4%&quot;,&quot;50.6%&quot;, &quot;58.8%&quot;, &quot;41.2%&quot;, &quot;41.7%&quot;, &quot;17.5%&quot;, &quot;40.9%&quot;, &quot;20.9%&quot;, &quot;24.0%&quot;, &quot;19.3%&quot;, &quot;17.1%&quot;))
+
+# Bind these tables in 2 steps, as targetweights has a different row number than the other dfs. 
+table_total &lt;- rbind(table_sex, table_mar, table_urban, table_age)
+table_total &lt;- left_join(table_total, targetweights)
+
+# Make and save the table as html
+weight_table &lt;- kable(table_total, format = &quot;html&quot;, align = &quot;l&quot;,
+      caption = &quot;Appendix B. Proportions weighted and unweighted for ISSP 2000&quot;) %&gt;%
+  kable_classic_2(full_width = FALSE) %&gt;%
+  save_kable(&quot;/Users/anuschka/Documents/climatechange/climatechange/output/appendix/weight_table.html&quot;)</code></pre>
+<pre class="r"><code># And lastly for 2010
+load(here(&quot;./data/all_waves&quot;, &quot;issp10sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.49, 0.51)
+
+attributes(issp10sel$age)
+issp10sel$age_cat[issp10sel$age &gt;=15 &amp; issp10sel$age &lt;= 30] &lt;- 1
+issp10sel$age_cat[issp10sel$age &gt;=31 &amp; issp10sel$age &lt;= 45] &lt;- 2
+issp10sel$age_cat[issp10sel$age &gt;=46 &amp; issp10sel$age &lt;= 60] &lt;- 3
+issp10sel$age_cat[issp10sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.19, 0.21, 0.21, 0.20)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.38, 0.18, 0.44)
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.55, 0.45)
+
+targets &lt;- list(sex, age_cat, urban, marstat)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;urban&quot;, &quot;marstat&quot;)
+
+issp10sel$caseid &lt;- 1:length(issp10sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+issp10sel$sex &lt;- as.numeric(issp10sel$sex)
+issp10sel$urban &lt;- as.numeric(issp10sel$urban)
+issp10sel$marstat &lt;- as.numeric(issp10sel$marstat)
+
+anesrakefinder(targets, issp10sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, issp10sel, caseid = issp10sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+issp10sel$weightvec  &lt;- unlist(outsave[1])
+
+save(issp10sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp10sel.Rdata&quot;)</code></pre>
+</div>
+<div id="ess" class="section level2 unnumbered">
+<h2 class="unnumbered">ESS</h2>
+<pre class="r"><code># And now for ESS, repeat the same measure
+load(here(&quot;./data/all_waves&quot;, &quot;ess16sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.50, 0.50)
+
+attributes(ess16sel$age)
+ess16sel$age_cat[ess16sel$age &gt;=15 &amp; ess16sel$age &lt;= 30] &lt;- 1
+ess16sel$age_cat[ess16sel$age &gt;=31 &amp; ess16sel$age &lt;= 45] &lt;- 2
+ess16sel$age_cat[ess16sel$age &gt;=46 &amp; ess16sel$age &lt;= 60] &lt;- 3
+ess16sel$age_cat[ess16sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.20, 0.18, 0.22, 0.23)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.35, 0.17, 0.48)
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.53, 0.47)
+
+targets &lt;- list(sex, age_cat, urban)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;urban&quot;)
+
+ess16sel$caseid &lt;- 1:length(ess16sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+ess16sel$sex &lt;- as.numeric(ess16sel$sex)
+ess16sel$urban &lt;- as.numeric(ess16sel$urban)
+
+anesrakefinder(targets, ess16sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, ess16sel, caseid = ess16sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+ess16sel$weightvec  &lt;- unlist(outsave[1])
+
+save(ess16sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess16sel.Rdata&quot;)</code></pre>
+<pre class="r"><code>#And for ess2020
+load(here(&quot;./data/all_waves&quot;, &quot;ess20sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.50, 0.50)
+
+attributes(ess20sel$age)
+ess20sel$age_cat[ess20sel$age &gt;=15 &amp; ess20sel$age &lt;= 30] &lt;- 1
+ess20sel$age_cat[ess20sel$age &gt;=31 &amp; ess20sel$age &lt;= 45] &lt;- 2
+ess20sel$age_cat[ess20sel$age &gt;=46 &amp; ess20sel$age &lt;= 60] &lt;- 3
+ess20sel$age_cat[ess20sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.20, 0.18, 0.21, 0.25)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.34, 0.17, 0.49)
+
+targets &lt;- list(sex, age_cat, urban)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;urban&quot;)
+
+ess20sel$caseid &lt;- 1:length(ess20sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+ess20sel$sex &lt;- as.numeric(ess20sel$sex)
+ess20sel$urban &lt;- as.numeric(ess20sel$urban)
+
+anesrakefinder(targets, ess20sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, ess20sel, caseid = ess20sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+ess20sel$weightvec  &lt;- unlist(outsave[1])
+
+save(ess20sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess20sel.Rdata&quot;)</code></pre>
+</div>
+<div id="evs" class="section level2 unnumbered">
+<h2 class="unnumbered">EVS</h2>
+<pre class="r"><code># Then the EVS, which I have to split up because I use the compiled dataset
+load(here(&quot;./data/final_data&quot;, &quot;evssel.RData&quot;))
+
+# First select only the observations of 1990
+evs90 &lt;- subset(evssel, surveyyear == 1990)
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.49, 0.51)
+
+attributes(evs90$age)
+evs90$age_cat[evs90$age &gt;=15 &amp; evs90$age &lt;= 30] &lt;- 1
+evs90$age_cat[evs90$age &gt;=31 &amp; evs90$age &lt;= 45] &lt;- 2
+evs90$age_cat[evs90$age &gt;=46 &amp; evs90$age &lt;= 60] &lt;- 3
+evs90$age_cat[evs90$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.25, 0.24, 0.16, 0.16)
+
+targets &lt;- list(sex, age_cat)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;)
+
+evs90$caseid &lt;- 1:length(evs90$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+evs90$sex &lt;- as.numeric(evs90$sex)
+
+anesrakefinder(targets, evs90, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, evs90, caseid = evs90$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+evs90$weightvec  &lt;- unlist(outsave[1])
+
+# Then those of 1999
+evs99 &lt;- subset(evssel, surveyyear == 1999)
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.49, 0.51)
+
+attributes(evs99$age)
+evs99$age_cat[evs99$age &gt;=15 &amp; evs99$age &lt;= 30] &lt;- 1
+evs99$age_cat[evs99$age &gt;=31 &amp; evs99$age &lt;= 45] &lt;- 2
+evs99$age_cat[evs99$age &gt;=46 &amp; evs99$age &lt;= 60] &lt;- 3
+evs99$age_cat[evs99$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.21, 0.24, 0.19, 0.17)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.59, 0.41)
+
+targets &lt;- list(sex, age_cat, marstat)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+evs99$sex &lt;- as.numeric(evs99$sex)
+evs99$marstat &lt;- as.numeric(evs99$marstat)
+
+evs99$caseid &lt;- 1:length(evs99$sex)
+
+anesrakefinder(targets, evs99, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, evs99, caseid = evs99$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+evs99$weightvec  &lt;- unlist(outsave[1])
+
+# And lastly of 2008
+evs2008 &lt;- subset(evssel, surveyyear == 2008)
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.49, 0.51)
+
+attributes(evs2008$age)
+evs2008$age_cat[evs2008$age &gt;=15 &amp; evs2008$age &lt;= 30] &lt;- 1
+evs2008$age_cat[evs2008$age &gt;=31 &amp; evs2008$age &lt;= 45] &lt;- 2
+evs2008$age_cat[evs2008$age &gt;=46 &amp; evs2008$age &lt;= 60] &lt;- 3
+evs2008$age_cat[evs2008$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.19, 0.22, 0.21, 0.19)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.56, 0.44)
+
+targets &lt;- list(sex, age_cat, marstat)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+evs2008$sex &lt;- as.numeric(evs2008$sex)
+evs2008$marstat &lt;- as.numeric(evs2008$marstat)
+
+evs2008$caseid &lt;- 1:length(evs2008$sex)
+
+anesrakefinder(targets, evs2008, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, evs2008, caseid = evs2008$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+evs2008$weightvec  &lt;- unlist(outsave[1])
+
+#Turn marital status back to original because it is not a numeric variable
+evs90$marstat &lt;- as.factor(evs90$marstat)
+evs99$marstat &lt;- as.factor(evs99$marstat)
+evs2008$marstat &lt;- as.factor(evs2008$marstat)
+
+# Bind the three together
+evssel &lt;- dplyr::bind_rows(evs90, evs99, evs2008)
+
+#Save the total to which now the weights are added per year
+save(evssel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange//data/final_data/evssel.Rdata&quot;)</code></pre>
+</div>
+<div id="io-research" class="section level2 unnumbered">
+<h2 class="unnumbered">I&amp;O research</h2>
+<pre class="r"><code># I &amp; O Research
+load(here(&quot;./data/all_waves&quot;, &quot;io2019sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.50, 0.50)
+
+attributes(io2019sel$age)
+io2019sel$age_cat[io2019sel$age &gt;=15 &amp; io2019sel$age &lt;= 30] &lt;- 1
+io2019sel$age_cat[io2019sel$age &gt;=31 &amp; io2019sel$age &lt;= 45] &lt;- 2
+io2019sel$age_cat[io2019sel$age &gt;=46 &amp; io2019sel$age &lt;= 60] &lt;- 3
+io2019sel$age_cat[io2019sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.20, 0.18, 0.22, 0.24)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.34, 0.17, 0.49)
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.52, 0.48)
+
+targets &lt;- list(sex, age_cat, urban, marstat)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;urban&quot;, &quot;marstat&quot;)
+
+io2019sel$caseid &lt;- 1:length(io2019sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+io2019sel$sex &lt;- as.numeric(io2019sel$sex)
+io2019sel$urban &lt;- as.numeric(io2019sel$urban)
+io2019sel$marstat &lt;- as.numeric(io2019sel$marstat)
+
+anesrakefinder(targets, io2019sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, io2019sel, caseid = io2019sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+io2019sel$weightvec  &lt;- unlist(outsave[1])
+
+save(io2019sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2019sel.Rdata&quot;)</code></pre>
+<pre class="r"><code># Io2020
+
+load(here(&quot;./data/all_waves&quot;, &quot;io2020sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.50, 0.50)
+
+attributes(io2020sel$age)
+io2020sel$age_cat[io2020sel$age &gt;=15 &amp; io2020sel$age &lt;= 30] &lt;- 1
+io2020sel$age_cat[io2020sel$age &gt;=31 &amp; io2020sel$age &lt;= 45] &lt;- 2
+io2020sel$age_cat[io2020sel$age &gt;=46 &amp; io2020sel$age &lt;= 60] &lt;- 3
+io2020sel$age_cat[io2020sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.20, 0.18, 0.21, 0.25)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.52, 0.48)
+
+targets &lt;- list(sex, age_cat, marstat)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;)
+
+io2020sel$caseid &lt;- 1:length(io2020sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+io2020sel$sex &lt;- as.numeric(io2020sel$sex)
+io2020sel$marstat &lt;- as.numeric(io2020sel$marstat)
+
+anesrakefinder(targets, io2020sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, io2020sel, caseid = io2020sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+io2020sel$weightvec  &lt;- unlist(outsave[1])
+
+save(io2020sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2020sel.Rdata&quot;)</code></pre>
+<pre class="r"><code>#Io 2022
+load(here(&quot;./data/all_waves&quot;, &quot;io2022sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.50, 0.50)
+
+attributes(io2022sel$age)
+io2022sel$age_cat[io2022sel$age &gt;=15 &amp; io2022sel$age &lt;= 30] &lt;- 1
+io2022sel$age_cat[io2022sel$age &gt;=31 &amp; io2022sel$age &lt;= 45] &lt;- 2
+io2022sel$age_cat[io2022sel$age &gt;=46 &amp; io2022sel$age &lt;= 60] &lt;- 3
+io2022sel$age_cat[io2022sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.20, 0.18, 0.21, 0.25)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.51, 0.49)
+
+targets &lt;- list(sex, age_cat, marstat)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;)
+
+io2022sel$caseid &lt;- 1:length(io2022sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+io2022sel$sex &lt;- as.numeric(io2022sel$sex)
+io2022sel$marstat &lt;- as.numeric(io2022sel$marstat)
+
+anesrakefinder(targets, io2022sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, io2022sel, caseid = io2022sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+io2022sel$weightvec  &lt;- unlist(outsave[1])
+
+save(io2022sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2022sel.Rdata&quot;)</code></pre>
+</div>
+<div id="eb" class="section level2 unnumbered">
+<h2 class="unnumbered">EB</h2>
+<pre class="r"><code>#Lastly Eurobarometer, which has a lot of waves and thus a lot of repetition. Still it is difficult to write a loop, as targetweights differ each year. So Im just repeating the script many times. 
+load(here(&quot;./data/all_waves&quot;, &quot;eb1986sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.49, 0.51)
+
+attributes(eb1986sel$age)
+eb1986sel$age_cat[eb1986sel$age &gt;=15 &amp; eb1986sel$age &lt;= 30] &lt;- 1
+eb1986sel$age_cat[eb1986sel$age &gt;=31 &amp; eb1986sel$age &lt;= 45] &lt;- 2
+eb1986sel$age_cat[eb1986sel$age &gt;=46 &amp; eb1986sel$age &lt;= 60] &lt;- 3
+eb1986sel$age_cat[eb1986sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.25, 0.24, 0.16, 0.16)
+
+targets &lt;- list(sex, age_cat)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;)
+
+eb1986sel$caseid &lt;- 1:length(eb1986sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb1986sel$sex &lt;- as.numeric(eb1986sel$sex)
+
+anesrakefinder(targets, eb1986sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, eb1986sel, caseid = eb1986sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb1986sel$weightvec  &lt;- unlist(outsave[1])
+
+save(eb1986sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb1986sel.Rdata&quot;)</code></pre>
+<pre class="r"><code># Eb 1992
+load(here(&quot;./data/all_waves&quot;, &quot;eb1992sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.49, 0.51)
+
+attributes(eb1992sel$age)
+eb1992sel$age_cat[eb1992sel$age &gt;=15 &amp; eb1992sel$age &lt;= 30] &lt;- 1
+eb1992sel$age_cat[eb1992sel$age &gt;=31 &amp; eb1992sel$age &lt;= 45] &lt;- 2
+eb1992sel$age_cat[eb1992sel$age &gt;=46 &amp; eb1992sel$age &lt;= 60] &lt;- 3
+eb1992sel$age_cat[eb1992sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.25, 0.24, 0.24, 0.16)
+
+targets &lt;- list(sex, age_cat)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;)
+
+eb1992sel$caseid &lt;- 1:length(eb1992sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb1992sel$sex &lt;- as.numeric(eb1992sel$sex)
+
+anesrakefinder(targets, eb1992sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, eb1992sel, caseid = eb1992sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb1992sel$weightvec  &lt;- unlist(outsave[1])
+
+save(eb1992sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb1992sel.Rdata&quot;)</code></pre>
+<pre class="r"><code># Eb 1995
+load(here(&quot;./data/all_waves&quot;, &quot;eb1995sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.49, 0.51)
+
+attributes(eb1995sel$age)
+eb1995sel$age_cat[eb1995sel$age &gt;=15 &amp; eb1995sel$age &lt;= 30] &lt;- 1
+eb1995sel$age_cat[eb1995sel$age &gt;=31 &amp; eb1995sel$age &lt;= 45] &lt;- 2
+eb1995sel$age_cat[eb1995sel$age &gt;=46 &amp; eb1995sel$age &lt;= 60] &lt;- 3
+eb1995sel$age_cat[eb1995sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.24, 0.24, 0.18, 0.17)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.6, 0.4)
+
+targets &lt;- list(sex, age_cat, marstat)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;)
+
+eb1995sel$caseid &lt;- 1:length(eb1995sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb1995sel$sex &lt;- as.numeric(eb1995sel$sex)
+eb1995sel$marstat &lt;- as.numeric(eb1995sel$marstat)
+
+anesrakefinder(targets, eb1995sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, eb1995sel, caseid = eb1995sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb1995sel$weightvec  &lt;- unlist(outsave[1])
+
+save(eb1995sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb1995sel.Rdata&quot;)</code></pre>
+<pre class="r"><code># 2004
+load(here(&quot;./data/all_waves&quot;, &quot;eb2004sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.49, 0.51)
+
+attributes(eb2004sel$age)
+eb2004sel$age_cat[eb2004sel$age &gt;=15 &amp; eb2004sel$age &lt;= 30] &lt;- 1
+eb2004sel$age_cat[eb2004sel$age &gt;=31 &amp; eb2004sel$age &lt;= 45] &lt;- 2
+eb2004sel$age_cat[eb2004sel$age &gt;=46 &amp; eb2004sel$age &lt;= 60] &lt;- 3
+eb2004sel$age_cat[eb2004sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.20, 0.24, 0.20, 0.18)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.58, 0.42)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.41, 0.18, 0.42)
+
+targets &lt;- list(sex, age_cat, marstat, urban)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;, &quot;urban&quot;)
+
+eb2004sel$caseid &lt;- 1:length(eb2004sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2004sel$sex &lt;- as.numeric(eb2004sel$sex)
+eb2004sel$marstat &lt;- as.numeric(eb2004sel$marstat)
+eb2004sel$urban &lt;- as.numeric(eb2004sel$urban)
+
+anesrakefinder(targets, eb2004sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, eb2004sel, caseid = eb2004sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2004sel$weightvec  &lt;- unlist(outsave[1])
+
+save(eb2004sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2004sel.Rdata&quot;)</code></pre>
+<pre class="r"><code># 2007
+load(here(&quot;./data/all_waves&quot;, &quot;eb2007sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.49, 0.51)
+
+attributes(eb2007sel$age)
+eb2007sel$age_cat[eb2007sel$age &gt;=15 &amp; eb2007sel$age &lt;= 30] &lt;- 1
+eb2007sel$age_cat[eb2007sel$age &gt;=31 &amp; eb2007sel$age &lt;= 45] &lt;- 2
+eb2007sel$age_cat[eb2007sel$age &gt;=46 &amp; eb2007sel$age &lt;= 60] &lt;- 3
+eb2007sel$age_cat[eb2007sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.19, 0.23, 0.21, 0.19)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.56, 0.43)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.40, 0.18, 0.42)
+
+targets &lt;- list(sex, age_cat, marstat, urban)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;, &quot;urban&quot;)
+
+eb2007sel$caseid &lt;- 1:length(eb2007sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2007sel$sex &lt;- as.numeric(eb2007sel$sex)
+eb2007sel$marstat &lt;- as.numeric(eb2007sel$marstat)
+eb2007sel$urban &lt;- as.numeric(eb2007sel$urban)
+
+anesrakefinder(targets, eb2007sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, eb2007sel, caseid = eb2007sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2007sel$weightvec  &lt;- unlist(outsave[1])
+
+save(eb2007sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2007sel.Rdata&quot;)</code></pre>
+<pre class="r"><code># 2008
+load(here(&quot;./data/all_waves&quot;, &quot;eb2008sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.49, 0.51)
+
+attributes(eb2008sel$age)
+eb2008sel$age_cat[eb2008sel$age &gt;=15 &amp; eb2008sel$age &lt;= 30] &lt;- 1
+eb2008sel$age_cat[eb2008sel$age &gt;=31 &amp; eb2008sel$age &lt;= 45] &lt;- 2
+eb2008sel$age_cat[eb2008sel$age &gt;=46 &amp; eb2008sel$age &lt;= 60] &lt;- 3
+eb2008sel$age_cat[eb2008sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.19, 0.22, 0.21, 0.19)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.56, 0.44)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.39, 0.18, 0.42)
+
+targets &lt;- list(sex, age_cat, marstat, urban)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;, &quot;urban&quot;)
+
+eb2008sel$caseid &lt;- 1:length(eb2008sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2008sel$sex &lt;- as.numeric(eb2008sel$sex)
+eb2008sel$marstat &lt;- as.numeric(eb2008sel$marstat)
+eb2008sel$urban &lt;- as.numeric(eb2008sel$urban)
+
+anesrakefinder(targets, eb2008sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, eb2008sel, caseid = eb2008sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2008sel$weightvec  &lt;- unlist(outsave[1])
+
+save(eb2008sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2008sel.Rdata&quot;)</code></pre>
+<pre class="r"><code># 2009
+load(here(&quot;./data/all_waves&quot;, &quot;eb2009asel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.49, 0.51)
+
+attributes(eb2009asel$age)
+eb2009asel$age_cat[eb2009asel$age &gt;=15 &amp; eb2009asel$age &lt;= 30] &lt;- 1
+eb2009asel$age_cat[eb2009asel$age &gt;=31 &amp; eb2009asel$age &lt;= 45] &lt;- 2
+eb2009asel$age_cat[eb2009asel$age &gt;=46 &amp; eb2009asel$age &lt;= 60] &lt;- 3
+eb2009asel$age_cat[eb2009asel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.19, 0.22, 0.21, 0.20)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.56, 0.44)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.39, 0.18, 0.43)
+
+targets &lt;- list(sex, age_cat, marstat, urban)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;, &quot;urban&quot;)
+
+eb2009asel$caseid &lt;- 1:length(eb2009asel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2009asel$sex &lt;- as.numeric(eb2009asel$sex)
+eb2009asel$marstat &lt;- as.numeric(eb2009asel$marstat)
+eb2009asel$urban &lt;- as.numeric(eb2009asel$urban)
+
+anesrakefinder(targets, eb2009asel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, eb2009asel, caseid = eb2009asel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2009asel$weightvec  &lt;- unlist(outsave[1])
+
+save(eb2009asel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2009asel.Rdata&quot;)
+
+# 2009b
+load(here(&quot;./data/all_waves&quot;, &quot;eb2009bsel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.49, 0.51)
+
+attributes(eb2009bsel$age)
+eb2009bsel$age_cat[eb2009bsel$age &gt;=15 &amp; eb2009bsel$age &lt;= 30] &lt;- 1
+eb2009bsel$age_cat[eb2009bsel$age &gt;=31 &amp; eb2009bsel$age &lt;= 45] &lt;- 2
+eb2009bsel$age_cat[eb2009bsel$age &gt;=46 &amp; eb2009bsel$age &lt;= 60] &lt;- 3
+eb2009bsel$age_cat[eb2009bsel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.19, 0.22, 0.21, 0.20)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.56, 0.44)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.39, 0.18, 0.43)
+
+targets &lt;- list(sex, age_cat, marstat, urban)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;, &quot;urban&quot;)
+
+eb2009bsel$caseid &lt;- 1:length(eb2009bsel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2009bsel$sex &lt;- as.numeric(eb2009bsel$sex)
+eb2009bsel$marstat &lt;- as.numeric(eb2009bsel$marstat)
+eb2009bsel$urban &lt;- as.numeric(eb2009bsel$urban)
+
+anesrakefinder(targets, eb2009bsel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, eb2009bsel, caseid = eb2009bsel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2009bsel$weightvec  &lt;- unlist(outsave[1])
+
+save(eb2009bsel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2009bsel.Rdata&quot;)</code></pre>
+<pre class="r"><code># 2011
+load(here(&quot;./data/all_waves&quot;, &quot;eb2011asel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.49, 0.51)
+
+attributes(eb2011asel$age)
+eb2011asel$age_cat[eb2011asel$age &gt;=15 &amp; eb2011asel$age &lt;= 30] &lt;- 1
+eb2011asel$age_cat[eb2011asel$age &gt;=31 &amp; eb2011asel$age &lt;= 45] &lt;- 2
+eb2011asel$age_cat[eb2011asel$age &gt;=46 &amp; eb2011asel$age &lt;= 60] &lt;- 3
+eb2011asel$age_cat[eb2011asel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.20, 0.21, 0.21, 0.21)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.55, 0.45)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.38, 0.18, 0.44)
+
+targets &lt;- list(sex, age_cat, marstat, urban)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;, &quot;urban&quot;)
+
+eb2011asel$caseid &lt;- 1:length(eb2011asel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2011asel$sex &lt;- as.numeric(eb2011asel$sex)
+eb2011asel$marstat &lt;- as.numeric(eb2011asel$marstat)
+eb2011asel$urban &lt;- as.numeric(eb2011asel$urban)
+
+anesrakefinder(targets, eb2011asel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, eb2011asel, caseid = eb2011asel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2011asel$weightvec  &lt;- unlist(outsave[1])
+
+save(eb2011asel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2011asel.Rdata&quot;)
+
+#2011b
+load(here(&quot;./data/all_waves&quot;, &quot;eb2011bsel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.49, 0.51)
+
+attributes(eb2011bsel$age)
+eb2011bsel$age_cat[eb2011bsel$age &gt;=15 &amp; eb2011bsel$age &lt;= 30] &lt;- 1
+eb2011bsel$age_cat[eb2011bsel$age &gt;=31 &amp; eb2011bsel$age &lt;= 45] &lt;- 2
+eb2011bsel$age_cat[eb2011bsel$age &gt;=46 &amp; eb2011bsel$age &lt;= 60] &lt;- 3
+eb2011bsel$age_cat[eb2011bsel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.20, 0.21, 0.21, 0.21)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.55, 0.45)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.38, 0.18, 0.44)
+
+targets &lt;- list(sex, age_cat, marstat, urban)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;, &quot;urban&quot;)
+
+eb2011bsel$caseid &lt;- 1:length(eb2011bsel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2011bsel$sex &lt;- as.numeric(eb2011bsel$sex)
+eb2011bsel$marstat &lt;- as.numeric(eb2011bsel$marstat)
+eb2011bsel$urban &lt;- as.numeric(eb2011bsel$urban)
+
+anesrakefinder(targets, eb2011bsel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, eb2011bsel, caseid = eb2011bsel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2011bsel$weightvec  &lt;- unlist(outsave[1])
+
+save(eb2011bsel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2011bsel.Rdata&quot;)</code></pre>
+<pre class="r"><code># 2013
+load(here(&quot;./data/all_waves&quot;, &quot;eb2013sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.50, 0.50)
+
+attributes(eb2013sel$age)
+eb2013sel$age_cat[eb2013sel$age &gt;=15 &amp; eb2013sel$age &lt;= 30] &lt;- 1
+eb2013sel$age_cat[eb2013sel$age &gt;=31 &amp; eb2013sel$age &lt;= 45] &lt;- 2
+eb2013sel$age_cat[eb2013sel$age &gt;=46 &amp; eb2013sel$age &lt;= 60] &lt;- 3
+eb2013sel$age_cat[eb2013sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.20, 0.20, 0.21, 0.22)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.54, 0.46)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.37, 0.18, 0.45)
+
+targets &lt;- list(sex, age_cat, marstat, urban)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;, &quot;urban&quot;)
+
+eb2013sel$caseid &lt;- 1:length(eb2013sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2013sel$sex &lt;- as.numeric(eb2013sel$sex)
+eb2013sel$marstat &lt;- as.numeric(eb2013sel$marstat)
+eb2013sel$urban &lt;- as.numeric(eb2013sel$urban)
+
+anesrakefinder(targets, eb2013sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, eb2013sel, caseid = eb2013sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2013sel$weightvec  &lt;- unlist(outsave[1])
+
+save(eb2013sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2013sel.Rdata&quot;)</code></pre>
+<pre class="r"><code># 2014
+load(here(&quot;./data/all_waves&quot;, &quot;eb2014sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.50, 0.50)
+
+attributes(eb2014sel$age)
+eb2014sel$age_cat[eb2014sel$age &gt;=15 &amp; eb2014sel$age &lt;= 30] &lt;- 1
+eb2014sel$age_cat[eb2014sel$age &gt;=31 &amp; eb2014sel$age &lt;= 45] &lt;- 2
+eb2014sel$age_cat[eb2014sel$age &gt;=46 &amp; eb2014sel$age &lt;= 60] &lt;- 3
+eb2014sel$age_cat[eb2014sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.20, 0.20, 0.22, 0.22)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.54, 0.46)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.37, 0.18, 0.45)
+
+targets &lt;- list(sex, age_cat, marstat, urban)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;, &quot;urban&quot;)
+
+eb2014sel$caseid &lt;- 1:length(eb2014sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2014sel$sex &lt;- as.numeric(eb2014sel$sex)
+eb2014sel$marstat &lt;- as.numeric(eb2014sel$marstat)
+eb2014sel$urban &lt;- as.numeric(eb2014sel$urban)
+
+anesrakefinder(targets, eb2014sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, eb2014sel, caseid = eb2014sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2014sel$weightvec  &lt;- unlist(outsave[1])
+
+save(eb2014sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2014sel.Rdata&quot;)</code></pre>
+<pre class="r"><code># 2015
+load(here(&quot;./data/all_waves&quot;, &quot;eb2015sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.50, 0.50)
+
+attributes(eb2015sel$age)
+eb2015sel$age_cat[eb2015sel$age &gt;=15 &amp; eb2015sel$age &lt;= 30] &lt;- 1
+eb2015sel$age_cat[eb2015sel$age &gt;=31 &amp; eb2015sel$age &lt;= 45] &lt;- 2
+eb2015sel$age_cat[eb2015sel$age &gt;=46 &amp; eb2015sel$age &lt;= 60] &lt;- 3
+eb2015sel$age_cat[eb2015sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.20, 0.20, 0.22, 0.22)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.54, 0.46)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.37, 0.18, 0.45)
+
+targets &lt;- list(sex, age_cat, marstat, urban)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;, &quot;urban&quot;)
+
+eb2015sel$caseid &lt;- 1:length(eb2015sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2015sel$sex &lt;- as.numeric(eb2015sel$sex)
+eb2015sel$marstat &lt;- as.numeric(eb2015sel$marstat)
+eb2015sel$urban &lt;- as.numeric(eb2015sel$urban)
+
+anesrakefinder(targets, eb2015sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, eb2015sel, caseid = eb2015sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2015sel$weightvec  &lt;- unlist(outsave[1])
+
+save(eb2015sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2015sel.Rdata&quot;)</code></pre>
+<pre class="r"><code>#2017a
+load(here(&quot;./data/all_waves&quot;, &quot;eb2017asel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.50, 0.50)
+
+attributes(eb2017asel$age)
+eb2017asel$age_cat[eb2017asel$age &gt;=15 &amp; eb2017asel$age &lt;= 30] &lt;- 1
+eb2017asel$age_cat[eb2017asel$age &gt;=31 &amp; eb2017asel$age &lt;= 45] &lt;- 2
+eb2017asel$age_cat[eb2017asel$age &gt;=46 &amp; eb2017asel$age &lt;= 60] &lt;- 3
+eb2017asel$age_cat[eb2017asel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.20, 0.19, 0.22, 0.23)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.53, 0.47)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.35, 0.17, 0.48)
+
+targets &lt;- list(sex, age_cat, marstat, urban)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;, &quot;urban&quot;)
+
+eb2017asel$caseid &lt;- 1:length(eb2017asel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2017asel$sex &lt;- as.numeric(eb2017asel$sex)
+eb2017asel$marstat &lt;- as.numeric(eb2017asel$marstat)
+eb2017asel$urban &lt;- as.numeric(eb2017asel$urban)
+
+anesrakefinder(targets, eb2017asel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, eb2017asel, caseid = eb2017asel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2017asel$weightvec  &lt;- unlist(outsave[1])
+
+save(eb2017asel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2017asel.Rdata&quot;)
+
+#2017b
+load(here(&quot;./data/all_waves&quot;, &quot;eb2017bsel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.50, 0.50)
+
+attributes(eb2017bsel$age)
+eb2017bsel$age_cat[eb2017bsel$age &gt;=15 &amp; eb2017bsel$age &lt;= 30] &lt;- 1
+eb2017bsel$age_cat[eb2017bsel$age &gt;=31 &amp; eb2017bsel$age &lt;= 45] &lt;- 2
+eb2017bsel$age_cat[eb2017bsel$age &gt;=46 &amp; eb2017bsel$age &lt;= 60] &lt;- 3
+eb2017bsel$age_cat[eb2017bsel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.20, 0.19, 0.22, 0.23)
+
+marstat &lt;- c(&#39;1&#39;, &#39;2&#39;)
+marstat &lt;- c(0.53, 0.47)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.35, 0.17, 0.48)
+
+targets &lt;- list(sex, age_cat, marstat, urban)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;marstat&quot;, &quot;urban&quot;)
+
+eb2017bsel$caseid &lt;- 1:length(eb2017bsel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2017bsel$sex &lt;- as.numeric(eb2017bsel$sex)
+eb2017bsel$marstat &lt;- as.numeric(eb2017bsel$marstat)
+eb2017bsel$urban &lt;- as.numeric(eb2017bsel$urban)
+
+anesrakefinder(targets, eb2017bsel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, eb2017bsel, caseid = eb2017bsel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2017bsel$weightvec  &lt;- unlist(outsave[1])
+
+save(eb2017bsel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2017bsel.Rdata&quot;)</code></pre>
+<pre class="r"><code>#2021
+load(here(&quot;./data/all_waves&quot;, &quot;eb2021sel.RData&quot;))
+
+sex &lt;- c(&#39;Male&#39;, &#39;Female&#39;)
+sex &lt;- c(0.50, 0.50)
+
+attributes(eb2021sel$age)
+eb2021sel$age_cat[eb2021sel$age &gt;=15 &amp; eb2021sel$age &lt;= 30] &lt;- 1
+eb2021sel$age_cat[eb2021sel$age &gt;=31 &amp; eb2021sel$age &lt;= 45] &lt;- 2
+eb2021sel$age_cat[eb2021sel$age &gt;=46 &amp; eb2021sel$age &lt;= 60] &lt;- 3
+eb2021sel$age_cat[eb2021sel$age &gt;=61] &lt;- 4
+
+age_cat &lt;- c(&#39;u30&#39;, &#39;3145&#39;, &#39;4661&#39;, &#39;61o&#39;)
+age_cat &lt;- c(0.20, 0.18, 0.21, 0.25)
+
+urban &lt;- c(&#39;Low urbanity&#39;, &#39;Medium urbanity&#39;, &#39;High urbanity&#39;)
+urban &lt;- c(0.34, 0.17, 0.49)
+
+targets &lt;- list(sex, age_cat, urban)
+names(targets) &lt;- c(&quot;sex&quot;, &quot;age_cat&quot;, &quot;urban&quot;)
+
+eb2021sel$caseid &lt;- 1:length(eb2021sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+eb2021sel$sex &lt;- as.numeric(eb2021sel$sex)
+eb2021sel$urban &lt;- as.numeric(eb2021sel$urban)
+
+anesrakefinder(targets, eb2021sel, choosemethod = &quot;total&quot;)
+
+outsave &lt;- anesrake(targets, eb2021sel, caseid = eb2021sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = &quot;total&quot;,
+  type = &quot;pctlim&quot;, pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+eb2021sel$weightvec  &lt;- unlist(outsave[1])
+
+save(eb2021sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/eb2021sel.Rdata&quot;)</code></pre>
+</div>
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkNyZWF0aW5nIHdlaWdodCBmYWN0b3JzIGZvciBhbGwgZGF0YXNldHMgcGVyIHllYXIiDQphdXRob3I6ICJBbnVzY2hrYSBQZWVsZW4iDQpkYXRlOiAiYHIgU3lzLkRhdGUoKWAiDQpvdXRwdXQ6IGh0bWxfZG9jdW1lbnQNCi0tLQ0KDQpgYGB7ciwgZWNobz1GQUxTRX0NCmtuaXRyOjpvcHRzX2NodW5rJHNldChldmFsID0gRkFMU0UpDQpvcHRpb25zKHdpZHRoID0gMTAwKQ0KY29sb3JpemUgPC0gZnVuY3Rpb24oeCwgY29sb3IpIHtzcHJpbnRmKCI8c3BhbiBzdHlsZT0nY29sb3I6ICVzOyc+JXM8L3NwYW4+IiwgY29sb3IsIHgpIH0NCmBgYA0KDQpJbiB0aGlzIHNjcmlwdCwgSSBjYWxjdWxhdGUgd2VpZ2h0IGZhY3RvcnMgZm9yIGVhY2ggZGF0YXNldCBhbmQgZWFjaCB3YXZlLiBUaGUgdGFyZ2V0IHZhbHVlcyBJIHVzZSBhcyBpbnB1dCBhcmUgZGVyaXZlZCBmcm9tIFN0YXRpc3RpY3MgTmV0aGVybGFuZHMuIFRoZSBFeGNlbCBmaWxlIHdpdGggdGhlc2UgdGFyZ2V0IHZhbHVlcyBjYW4gYmUgZm91bmQgaW4gdGhpcyByZXBsaWNhdGlvbiBwYWNrYWdlLiBJIHdpbGwgd2VpZ2ggZm9yIGFnZSwgZ2VuZGVyLCB1cmJhbml0eSBhbmQgbWFyaXRhbCBzdGF0dXMuIA0KDQpgYGB7cn0NCnJtKGxpc3QgPSBscygpKQ0KI2luc3RhbGwucGFja2FnZXMoImFuZXNyYWtlIikNCmxpYnJhcnkoYW5lc3Jha2UpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoaGVyZSkNCmxpYnJhcnkoa2FibGVFeHRyYSkgIyBuZWVkZWQgbGF0ZXIgdG8gbWFrZSBhbiBleGFtcGxlIHRhYmxlIHRoYXQgY29tcGFyZXMgdGhlIHByb3BvcnRpb25zDQpzZXQuc2VlZCgxKQ0KIyBJIHVzZSB0aGUgaGVyZSBwYWNrYWdlIHNvIHRoYXQgSSBkbyBub3QgaGF2ZSB0byBsb2FkIGZpbGVzIGZyb20gbXkgcGVyc29uYWwgZG9jdW1lbnRzLiBIb3dldmVyLCBoZXJlIGRvZXMgbm90IHNlZW0gdG8gYmUgY29tcGF0aWJsZSB3aXRoIHRoZSAoZClwbHlyIHBhY2thZ2UuIFRoYXQgaXMgd2h5IGluIHByZXZpb3VzIHNjcmlwdHMgeW91IG1heSBoYXZlIHNlZW4gdGhhdCBJIGRpZCBsb2FkIGZyb20gbXkgbG9jYWwgZGV2aWNlLg0KaGVyZSgpDQpoZXJlOjppX2FtKCJzY3JpcHRzL2FuYWx5c2lzL3NpbmdsZV9yZWdyZXNzaW9uLlJtZCIpDQpgYGANCg0KIyMgSVNTUCB7LX0NCg0KYGBge3J9DQojQ3JlYXRlIGEgd2VpZ2h0IHZhcmlhYmxlIGZvciBlYWNoIGRhdGFzZXQsIHdoaWNoIEkgY2FuIGxhdGVyIHVzZSBpbiB0aGUgcmVncmVzc2lvbiBhbmFseXNlcyB0byB3ZWlnaCB0aGUgZGF0YSB3aXRoDQpsb2FkKGhlcmUoIi4vZGF0YS9hbGxfd2F2ZXMiLCAiaXNzcDkzc2VsLlJEYXRhIikpDQoNCiNDcmVhdGUgdmFyaWFibGVzIGluIHRoZSBlbnZpcm9ubWVudCB3aXRoIHRoZSB0YXJnZXQgdmFsdWVzDQpzZXggPC0gYygnTWFsZScsICdGZW1hbGUnKQ0Kc2V4IDwtIGMoMC40OSwgMC41MSkNCg0KYXR0cmlidXRlcyhpc3NwOTNzZWwkYWdlKQ0KaXNzcDkzc2VsJGFnZV9jYXRbaXNzcDkzc2VsJGFnZSA+PTE1ICYgaXNzcDkzc2VsJGFnZSA8PSAzMF0gPC0gMQ0KaXNzcDkzc2VsJGFnZV9jYXRbaXNzcDkzc2VsJGFnZSA+PTMxICYgaXNzcDkzc2VsJGFnZSA8PSA0NV0gPC0gMg0KaXNzcDkzc2VsJGFnZV9jYXRbaXNzcDkzc2VsJGFnZSA+PTQ2ICYgaXNzcDkzc2VsJGFnZSA8PSA2MF0gPC0gMw0KaXNzcDkzc2VsJGFnZV9jYXRbaXNzcDkzc2VsJGFnZSA+PTYxXSA8LSA0DQoNCmFnZV9jYXQgPC0gYygndTMwJywgJzMxNDUnLCAnNDY2MScsICc2MW8nKQ0KYWdlX2NhdCA8LSBjKDAuMjUsIDAuMjQsIDAuMTcsIDAuMTcpDQoNCiNZb3Ugbm90aWNlIGhlcmUgdGhhdCBJIG9ubHkgd2VpZ2ggZm9yIHNleCBhbmQgYWdlLCBiZWNhdXNlIGluZm9ybWF0aW9uIG9uIHVyYmFuaXR5IGFuZCBtYXJpdGFsIHN0YXR1cyB3YXMgbm90IHlldCBhdmFpbGFibGUgZm9yIDE5OTMNCnRhcmdldHMgPC0gbGlzdChzZXgsIGFnZV9jYXQpDQpuYW1lcyh0YXJnZXRzKSA8LSBjKCJzZXgiLCAiYWdlX2NhdCIpDQoNCmlzc3A5M3NlbCRjYXNlaWQgPC0gMTpsZW5ndGgoaXNzcDkzc2VsJHNleCkNCg0KI1RvIHVzZSBhbmVzcmFrZWZpbmRlciwgdGhlIHZhcmlhYmxlcyBpbiB0aGUgb3JpZ2luYWwgZGF0YXNldCBoYXZlIHRvIGJlIG51bWVyaWMNCmlzc3A5M3NlbCRzZXggPC0gYXMubnVtZXJpYyhpc3NwOTNzZWwkc2V4KQ0KDQojQW5lc3Jha2VmaW5kZXIgd2VpZ2hzIHRoZSBkYXRhIGFuZCBwcm92aWRlcyBhIHN1bW1hcnkgb2YgdGhpcyBwcm9jZXNzDQphbmVzcmFrZWZpbmRlcih0YXJnZXRzLCBpc3NwOTNzZWwsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIpDQoNCm91dHNhdmUgPC0gYW5lc3Jha2UodGFyZ2V0cywgaXNzcDkzc2VsLCBjYXNlaWQgPSBpc3NwOTNzZWwkY2FzZWlkLA0KICB2ZXJib3NlPSBGQUxTRSwgY2FwID0gNSwgY2hvb3NlbWV0aG9kID0gInRvdGFsIiwNCiAgdHlwZSA9ICJwY3RsaW0iLCBwY3RsaW0gPSAuMDUgLCBubGltID0gNSwNCiAgaXRlcmF0ZSA9IFRSVUUgLCBmb3JjZTEgPSBUUlVFKQ0Kc3VtbWFyeShvdXRzYXZlKQ0KDQojQXNzaWduIHRoZSB3ZWlnaHRzIHRvIGVhY2ggcGVyc29uIGluIHRoZSBuZXcgdmFyaWFibGUgd2VpZ2h0dmVjLCB3aGljaCBjYW4gbGF0ZXIgYmUgdXNlZCBpbiB0aGUgcmVncmVzc2lvbiBhbmFseXNpcw0KaXNzcDkzc2VsJHdlaWdodHZlYyAgPC0gdW5saXN0KG91dHNhdmVbMV0pDQoNCnNhdmUoaXNzcDkzc2VsLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9pc3NwOTNzZWwuUmRhdGEiKQ0KDQojUmVwZWF0IHRoZSBzYW1lIGZvciB0aGUgd2F2ZSBpbiAyMDAwDQpsb2FkKGhlcmUoIi4vZGF0YS9hbGxfd2F2ZXMiLCAiaXNzcDAwc2VsLlJEYXRhIikpDQoNCnNleCA8LSBjKCdNYWxlJywgJ0ZlbWFsZScpDQpzZXggPC0gYygwLjQ5LCAwLjUxKQ0KDQphdHRyaWJ1dGVzKGlzc3AwMHNlbCRhZ2UpDQppc3NwMDBzZWwkYWdlX2NhdFtpc3NwMDBzZWwkYWdlID49MTUgJiBpc3NwMDBzZWwkYWdlIDw9IDMwXSA8LSAxDQppc3NwMDBzZWwkYWdlX2NhdFtpc3NwMDBzZWwkYWdlID49MzEgJiBpc3NwMDBzZWwkYWdlIDw9IDQ1XSA8LSAyDQppc3NwMDBzZWwkYWdlX2NhdFtpc3NwMDBzZWwkYWdlID49NDYgJiBpc3NwMDBzZWwkYWdlIDw9IDYwXSA8LSAzDQppc3NwMDBzZWwkYWdlX2NhdFtpc3NwMDBzZWwkYWdlID49NjFdIDwtIDQNCg0KYWdlX2NhdCA8LSBjKCd1MzAnLCAnMzE0NScsICc0NjYxJywgJzYxbycpDQphZ2VfY2F0IDwtIGMoMC4yMSwgMC4yNCwgMC4xOSwgMC4xNykNCg0KdXJiYW4gPC0gYygnTG93IHVyYmFuaXR5JywgJ01lZGl1bSB1cmJhbml0eScsICdIaWdoIHVyYmFuaXR5JykNCnVyYmFuIDwtIGMoMC40MiwgMC4xNywgMC40MSkNCm1hcnN0YXQgPC0gYygnMScsICcyJykNCm1hcnN0YXQgPC0gYygwLjU5LCAwLjQxKQ0KDQp0YXJnZXRzIDwtIGxpc3Qoc2V4LCBhZ2VfY2F0LCB1cmJhbiwgbWFyc3RhdCkNCm5hbWVzKHRhcmdldHMpIDwtIGMoInNleCIsICJhZ2VfY2F0IiwgInVyYmFuIiwgIm1hcnN0YXQiKQ0KDQppc3NwMDBzZWwkY2FzZWlkIDwtIDE6bGVuZ3RoKGlzc3AwMHNlbCRzZXgpDQoNCiMgVG8gdXNlIGFuZXNyYWtlZmluZGVyLCB0aGUgdmFyaWFibGVzIGluIHRoZSBvcmlnaW5hbCBkYXRhc2V0IGhhdmUgdG8gYmUgbnVtZXJpYw0KaXNzcDAwc2VsJHNleCA8LSBhcy5udW1lcmljKGlzc3AwMHNlbCRzZXgpDQppc3NwMDBzZWwkdXJiYW4gPC0gYXMubnVtZXJpYyhpc3NwMDBzZWwkdXJiYW4pDQppc3NwMDBzZWwkbWFyc3RhdCA8LSBhcy5udW1lcmljKGlzc3AwMHNlbCRtYXJzdGF0KQ0KDQphbmVzcmFrZWZpbmRlcih0YXJnZXRzLCBpc3NwMDBzZWwsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIpDQoNCm91dHNhdmUgPC0gYW5lc3Jha2UodGFyZ2V0cywgaXNzcDAwc2VsLCBjYXNlaWQgPSBpc3NwMDBzZWwkY2FzZWlkLA0KICB2ZXJib3NlPSBGQUxTRSwgY2FwID0gNSwgY2hvb3NlbWV0aG9kID0gInRvdGFsIiwNCiAgdHlwZSA9ICJwY3RsaW0iLCBwY3RsaW0gPSAuMDUgLCBubGltID0gNSwNCiAgaXRlcmF0ZSA9IFRSVUUgLCBmb3JjZTEgPSBUUlVFKQ0Kc3VtbWFyeShvdXRzYXZlKQ0KDQppc3NwMDBzZWwkd2VpZ2h0dmVjICA8LSB1bmxpc3Qob3V0c2F2ZVsxXSkNCg0Kc2F2ZShpc3NwMDBzZWwsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvYWxsX3dhdmVzL2lzc3AwMHNlbC5SZGF0YSIpDQoNCmBgYA0KDQoNCmBgYHtyfQ0KIyBDcmVhdGUgYSB0YWJsZSB0aGF0IGNvbXBhcmVzIHRoZSB3ZWlnaHRlZCBhbmQgdW53ZWlnaHRlZCBwcm9wb3J0aW9ucyBhbmQgdGhlIHRhcmdldCB2YWx1ZXMsIHVzaW5nIHRoZSBJU1NQIDIwMDAgYXMgYW4gZXhhbXBsZS4gDQoNCiMgQ3JlYXRlIHZhcmlhYmxlcw0Kc2V4X3Vud2VpZ2h0IDwtIHdwY3QoaXNzcDAwc2VsJHNleCkNCnNleF93ZWlnaHQgPC0gd3BjdChpc3NwMDBzZWwkc2V4LCBpc3NwMDBzZWwkd2VpZ2h0dmVjKQ0KDQphZ2VfdW53ZWlnaHQgPC0gd3BjdChpc3NwMDBzZWwkYWdlX2NhdCkNCmFnZV93ZWlnaHQgPC0gd3BjdChpc3NwMDBzZWwkYWdlX2NhdCwgaXNzcDAwc2VsJHdlaWdodHZlYykNCg0KdXJiYW5fdW53ZWlnaHQgPC0gd3BjdChpc3NwMDBzZWwkdXJiYW4pDQp1cmJhbl93ZWlnaHQgPC0gd3BjdChpc3NwMDBzZWwkdXJiYW4sIGlzc3AwMHNlbCR3ZWlnaHR2ZWMpDQoNCm1hcnN0YXRfdW53ZWlnaHQgPC0gd3BjdChpc3NwMDBzZWwkbWFyc3RhdCkNCm1hcnN0YXRfd2VpZ2h0IDwtIHdwY3QoaXNzcDAwc2VsJG1hcnN0YXQsIGlzc3AwMHNlbCR3ZWlnaHR2ZWMpDQoNCiMgUHV0IHRoZSBpbmZvcm1hdGlvbiBpbiBhIGRmIHBlciB2YXJpYWJsZQ0KdGFibGVfc2V4IDwtIGRhdGEuZnJhbWUoVmFyaWFibGUgPSBjKCJHZW5kZXIiLCAiIiksDQogIENhdGVnb3J5ID0gYygiTWFsZSIsICJGZW1hbGUiKSwNCiAgVW53ZWlnaHRlZCA9IHBhc3RlKHJvdW5kKHNleF91bndlaWdodCAqIDEwMCwgMSksICIlIiksDQogIFdlaWdodGVkID0gcGFzdGUocm91bmQoc2V4X3dlaWdodCAqIDEwMCwgMSksICIlIikNCikNCg0KdGFibGVfbWFyIDwtIGRhdGEuZnJhbWUoVmFyaWFibGUgPSBjKCJNYXJpdGFsIFN0YXR1cyIsICIiKSwNCiAgQ2F0ZWdvcnkgPSBjKCJMaXZpbmcgdG9nZXRoZXIiLCAiTm90IGxpdmluZyB0b2dldGhlciIpLA0KICBVbndlaWdodGVkID0gcGFzdGUocm91bmQobWFyc3RhdF91bndlaWdodCAqIDEwMCwgMSksICIlIiksDQogIFdlaWdodGVkID0gcGFzdGUocm91bmQobWFyc3RhdF93ZWlnaHQgKiAxMDAsIDEpLCAiJSIpDQopDQoNCnRhYmxlX3VyYmFuIDwtIGRhdGEuZnJhbWUoVmFyaWFibGUgPSBjKCJVcmJhbml0eSIsICIiLCAiIiksDQogIENhdGVnb3J5ID0gYygiTG93IHVyYmFuaXR5IiwgIk1lZGl1bSB1cmJhbml0eSIsICJIaWdoIHVyYmFuaXR5IiksDQogIFVud2VpZ2h0ZWQgPSBwYXN0ZShyb3VuZCh1cmJhbl91bndlaWdodCAqIDEwMCwgMSksICIlIiksDQogIFdlaWdodGVkID0gcGFzdGUocm91bmQodXJiYW5fd2VpZ2h0ICogMTAwLCAxKSwgIiUiKQ0KKQ0KDQp0YWJsZV9hZ2UgPC0gZGF0YS5mcmFtZShWYXJpYWJsZSA9IGMoIkFnZSBjYXRlZ29yeSIsICIiLCAiIiwgIiIpLA0KICBDYXRlZ29yeSA9IGMoIlVuZGVyIDMwIiwgIjMxIHRvIDQ1IiwgIjQ2IHRvIDYxIiwgIjYxIGFuZCBvbGRlciIpLA0KICBVbndlaWdodGVkID0gcGFzdGUocm91bmQoYWdlX3Vud2VpZ2h0ICogMTAwLCAxKSwgIiUiKSwNCiAgV2VpZ2h0ZWQgPSBwYXN0ZShyb3VuZChhZ2Vfd2VpZ2h0ICogMTAwLCAxKSwgIiUiKQ0KKQ0KDQojIENyZWF0ZSBhIGRmIHdpdGggYWxsIHRhcmdldCB3ZWlnaHRzDQp0YXJnZXR3ZWlnaHRzIDwtIGRhdGEuZnJhbWUoVmFyaWFibGUgPSBjKCJHZW5kZXIiLCAiIiwgIk1hcml0YWwgU3RhdHVzIiwgIiIsICJVcmJhbml0eSIsICIiLCAiIiwgIkFnZSBjYXRlZ29yeSIsICIiLCAiIiwgIiIpLA0KQ2F0ZWdvcnkgPSBjKCJNYWxlIiwgIkZlbWFsZSIsICJMaXZpbmcgdG9nZXRoZXIiLCAiTm90IGxpdmluZyB0b2dldGhlciIsICJMb3cgdXJiYW5pdHkiLCAiTWVkaXVtIHVyYmFuaXR5IiwgIkhpZ2ggdXJiYW5pdHkiLCAiVW5kZXIgMzAiLCAiMzEgdG8gNDUiLCAiNDYgdG8gNjEiLCAiNjEgYW5kIG9sZGVyIiksIA0KVGFyZ2V0ID0gYygiNDkuNCUiLCI1MC42JSIsICI1OC44JSIsICI0MS4yJSIsICI0MS43JSIsICIxNy41JSIsICI0MC45JSIsICIyMC45JSIsICIyNC4wJSIsICIxOS4zJSIsICIxNy4xJSIpKQ0KDQojIEJpbmQgdGhlc2UgdGFibGVzIGluIDIgc3RlcHMsIGFzIHRhcmdldHdlaWdodHMgaGFzIGEgZGlmZmVyZW50IHJvdyBudW1iZXIgdGhhbiB0aGUgb3RoZXIgZGZzLiANCnRhYmxlX3RvdGFsIDwtIHJiaW5kKHRhYmxlX3NleCwgdGFibGVfbWFyLCB0YWJsZV91cmJhbiwgdGFibGVfYWdlKQ0KdGFibGVfdG90YWwgPC0gbGVmdF9qb2luKHRhYmxlX3RvdGFsLCB0YXJnZXR3ZWlnaHRzKQ0KDQojIE1ha2UgYW5kIHNhdmUgdGhlIHRhYmxlIGFzIGh0bWwNCndlaWdodF90YWJsZSA8LSBrYWJsZSh0YWJsZV90b3RhbCwgZm9ybWF0ID0gImh0bWwiLCBhbGlnbiA9ICJsIiwNCiAgICAgIGNhcHRpb24gPSAiQXBwZW5kaXggQi4gUHJvcG9ydGlvbnMgd2VpZ2h0ZWQgYW5kIHVud2VpZ2h0ZWQgZm9yIElTU1AgMjAwMCIpICU+JQ0KICBrYWJsZV9jbGFzc2ljXzIoZnVsbF93aWR0aCA9IEZBTFNFKSAlPiUNCiAgc2F2ZV9rYWJsZSgiL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2Uvb3V0cHV0L2FwcGVuZGl4L3dlaWdodF90YWJsZS5odG1sIikNCg0KYGBgDQoNCg0KYGBge3J9DQojIEFuZCBsYXN0bHkgZm9yIDIwMTANCmxvYWQoaGVyZSgiLi9kYXRhL2FsbF93YXZlcyIsICJpc3NwMTBzZWwuUkRhdGEiKSkNCg0Kc2V4IDwtIGMoJ01hbGUnLCAnRmVtYWxlJykNCnNleCA8LSBjKDAuNDksIDAuNTEpDQoNCmF0dHJpYnV0ZXMoaXNzcDEwc2VsJGFnZSkNCmlzc3AxMHNlbCRhZ2VfY2F0W2lzc3AxMHNlbCRhZ2UgPj0xNSAmIGlzc3AxMHNlbCRhZ2UgPD0gMzBdIDwtIDENCmlzc3AxMHNlbCRhZ2VfY2F0W2lzc3AxMHNlbCRhZ2UgPj0zMSAmIGlzc3AxMHNlbCRhZ2UgPD0gNDVdIDwtIDINCmlzc3AxMHNlbCRhZ2VfY2F0W2lzc3AxMHNlbCRhZ2UgPj00NiAmIGlzc3AxMHNlbCRhZ2UgPD0gNjBdIDwtIDMNCmlzc3AxMHNlbCRhZ2VfY2F0W2lzc3AxMHNlbCRhZ2UgPj02MV0gPC0gNA0KDQphZ2VfY2F0IDwtIGMoJ3UzMCcsICczMTQ1JywgJzQ2NjEnLCAnNjFvJykNCmFnZV9jYXQgPC0gYygwLjE5LCAwLjIxLCAwLjIxLCAwLjIwKQ0KDQp1cmJhbiA8LSBjKCdMb3cgdXJiYW5pdHknLCAnTWVkaXVtIHVyYmFuaXR5JywgJ0hpZ2ggdXJiYW5pdHknKQ0KdXJiYW4gPC0gYygwLjM4LCAwLjE4LCAwLjQ0KQ0KbWFyc3RhdCA8LSBjKCcxJywgJzInKQ0KbWFyc3RhdCA8LSBjKDAuNTUsIDAuNDUpDQoNCnRhcmdldHMgPC0gbGlzdChzZXgsIGFnZV9jYXQsIHVyYmFuLCBtYXJzdGF0KQ0KbmFtZXModGFyZ2V0cykgPC0gYygic2V4IiwgImFnZV9jYXQiLCAidXJiYW4iLCAibWFyc3RhdCIpDQoNCmlzc3AxMHNlbCRjYXNlaWQgPC0gMTpsZW5ndGgoaXNzcDEwc2VsJHNleCkNCg0KIyBUbyB1c2UgYW5lc3Jha2VmaW5kZXIsIHRoZSB2YXJpYWJsZXMgaW4gdGhlIG9yaWdpbmFsIGRhdGFzZXQgaGF2ZSB0byBiZSBudW1lcmljDQppc3NwMTBzZWwkc2V4IDwtIGFzLm51bWVyaWMoaXNzcDEwc2VsJHNleCkNCmlzc3AxMHNlbCR1cmJhbiA8LSBhcy5udW1lcmljKGlzc3AxMHNlbCR1cmJhbikNCmlzc3AxMHNlbCRtYXJzdGF0IDwtIGFzLm51bWVyaWMoaXNzcDEwc2VsJG1hcnN0YXQpDQoNCmFuZXNyYWtlZmluZGVyKHRhcmdldHMsIGlzc3AxMHNlbCwgY2hvb3NlbWV0aG9kID0gInRvdGFsIikNCg0Kb3V0c2F2ZSA8LSBhbmVzcmFrZSh0YXJnZXRzLCBpc3NwMTBzZWwsIGNhc2VpZCA9IGlzc3AxMHNlbCRjYXNlaWQsDQogIHZlcmJvc2U9IEZBTFNFLCBjYXAgPSA1LCBjaG9vc2VtZXRob2QgPSAidG90YWwiLA0KICB0eXBlID0gInBjdGxpbSIsIHBjdGxpbSA9IC4wNSAsIG5saW0gPSA1LA0KICBpdGVyYXRlID0gVFJVRSAsIGZvcmNlMSA9IFRSVUUpDQpzdW1tYXJ5KG91dHNhdmUpDQoNCmlzc3AxMHNlbCR3ZWlnaHR2ZWMgIDwtIHVubGlzdChvdXRzYXZlWzFdKQ0KDQpzYXZlKGlzc3AxMHNlbCwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9hbGxfd2F2ZXMvaXNzcDEwc2VsLlJkYXRhIikNCmBgYA0KDQojIyBFU1Mgey19DQoNCmBgYHtyfQ0KIyBBbmQgbm93IGZvciBFU1MsIHJlcGVhdCB0aGUgc2FtZSBtZWFzdXJlDQpsb2FkKGhlcmUoIi4vZGF0YS9hbGxfd2F2ZXMiLCAiZXNzMTZzZWwuUkRhdGEiKSkNCg0Kc2V4IDwtIGMoJ01hbGUnLCAnRmVtYWxlJykNCnNleCA8LSBjKDAuNTAsIDAuNTApDQoNCmF0dHJpYnV0ZXMoZXNzMTZzZWwkYWdlKQ0KZXNzMTZzZWwkYWdlX2NhdFtlc3MxNnNlbCRhZ2UgPj0xNSAmIGVzczE2c2VsJGFnZSA8PSAzMF0gPC0gMQ0KZXNzMTZzZWwkYWdlX2NhdFtlc3MxNnNlbCRhZ2UgPj0zMSAmIGVzczE2c2VsJGFnZSA8PSA0NV0gPC0gMg0KZXNzMTZzZWwkYWdlX2NhdFtlc3MxNnNlbCRhZ2UgPj00NiAmIGVzczE2c2VsJGFnZSA8PSA2MF0gPC0gMw0KZXNzMTZzZWwkYWdlX2NhdFtlc3MxNnNlbCRhZ2UgPj02MV0gPC0gNA0KDQphZ2VfY2F0IDwtIGMoJ3UzMCcsICczMTQ1JywgJzQ2NjEnLCAnNjFvJykNCmFnZV9jYXQgPC0gYygwLjIwLCAwLjE4LCAwLjIyLCAwLjIzKQ0KDQp1cmJhbiA8LSBjKCdMb3cgdXJiYW5pdHknLCAnTWVkaXVtIHVyYmFuaXR5JywgJ0hpZ2ggdXJiYW5pdHknKQ0KdXJiYW4gPC0gYygwLjM1LCAwLjE3LCAwLjQ4KQ0KbWFyc3RhdCA8LSBjKCcxJywgJzInKQ0KbWFyc3RhdCA8LSBjKDAuNTMsIDAuNDcpDQoNCnRhcmdldHMgPC0gbGlzdChzZXgsIGFnZV9jYXQsIHVyYmFuKQ0KbmFtZXModGFyZ2V0cykgPC0gYygic2V4IiwgImFnZV9jYXQiLCAidXJiYW4iKQ0KDQplc3MxNnNlbCRjYXNlaWQgPC0gMTpsZW5ndGgoZXNzMTZzZWwkc2V4KQ0KDQojIFRvIHVzZSBhbmVzcmFrZWZpbmRlciwgdGhlIHZhcmlhYmxlcyBpbiB0aGUgb3JpZ2luYWwgZGF0YXNldCBoYXZlIHRvIGJlIG51bWVyaWMNCmVzczE2c2VsJHNleCA8LSBhcy5udW1lcmljKGVzczE2c2VsJHNleCkNCmVzczE2c2VsJHVyYmFuIDwtIGFzLm51bWVyaWMoZXNzMTZzZWwkdXJiYW4pDQoNCmFuZXNyYWtlZmluZGVyKHRhcmdldHMsIGVzczE2c2VsLCBjaG9vc2VtZXRob2QgPSAidG90YWwiKQ0KDQpvdXRzYXZlIDwtIGFuZXNyYWtlKHRhcmdldHMsIGVzczE2c2VsLCBjYXNlaWQgPSBlc3MxNnNlbCRjYXNlaWQsDQogIHZlcmJvc2U9IEZBTFNFLCBjYXAgPSA1LCBjaG9vc2VtZXRob2QgPSAidG90YWwiLA0KICB0eXBlID0gInBjdGxpbSIsIHBjdGxpbSA9IC4wNSAsIG5saW0gPSA1LA0KICBpdGVyYXRlID0gVFJVRSAsIGZvcmNlMSA9IFRSVUUpDQpzdW1tYXJ5KG91dHNhdmUpDQoNCmVzczE2c2VsJHdlaWdodHZlYyAgPC0gdW5saXN0KG91dHNhdmVbMV0pDQoNCnNhdmUoZXNzMTZzZWwsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvYWxsX3dhdmVzL2VzczE2c2VsLlJkYXRhIikNCmBgYA0KDQoNCmBgYHtyfQ0KI0FuZCBmb3IgZXNzMjAyMA0KbG9hZChoZXJlKCIuL2RhdGEvYWxsX3dhdmVzIiwgImVzczIwc2VsLlJEYXRhIikpDQoNCnNleCA8LSBjKCdNYWxlJywgJ0ZlbWFsZScpDQpzZXggPC0gYygwLjUwLCAwLjUwKQ0KDQphdHRyaWJ1dGVzKGVzczIwc2VsJGFnZSkNCmVzczIwc2VsJGFnZV9jYXRbZXNzMjBzZWwkYWdlID49MTUgJiBlc3MyMHNlbCRhZ2UgPD0gMzBdIDwtIDENCmVzczIwc2VsJGFnZV9jYXRbZXNzMjBzZWwkYWdlID49MzEgJiBlc3MyMHNlbCRhZ2UgPD0gNDVdIDwtIDINCmVzczIwc2VsJGFnZV9jYXRbZXNzMjBzZWwkYWdlID49NDYgJiBlc3MyMHNlbCRhZ2UgPD0gNjBdIDwtIDMNCmVzczIwc2VsJGFnZV9jYXRbZXNzMjBzZWwkYWdlID49NjFdIDwtIDQNCg0KYWdlX2NhdCA8LSBjKCd1MzAnLCAnMzE0NScsICc0NjYxJywgJzYxbycpDQphZ2VfY2F0IDwtIGMoMC4yMCwgMC4xOCwgMC4yMSwgMC4yNSkNCg0KdXJiYW4gPC0gYygnTG93IHVyYmFuaXR5JywgJ01lZGl1bSB1cmJhbml0eScsICdIaWdoIHVyYmFuaXR5JykNCnVyYmFuIDwtIGMoMC4zNCwgMC4xNywgMC40OSkNCg0KdGFyZ2V0cyA8LSBsaXN0KHNleCwgYWdlX2NhdCwgdXJiYW4pDQpuYW1lcyh0YXJnZXRzKSA8LSBjKCJzZXgiLCAiYWdlX2NhdCIsICJ1cmJhbiIpDQoNCmVzczIwc2VsJGNhc2VpZCA8LSAxOmxlbmd0aChlc3MyMHNlbCRzZXgpDQoNCiMgVG8gdXNlIGFuZXNyYWtlZmluZGVyLCB0aGUgdmFyaWFibGVzIGluIHRoZSBvcmlnaW5hbCBkYXRhc2V0IGhhdmUgdG8gYmUgbnVtZXJpYw0KZXNzMjBzZWwkc2V4IDwtIGFzLm51bWVyaWMoZXNzMjBzZWwkc2V4KQ0KZXNzMjBzZWwkdXJiYW4gPC0gYXMubnVtZXJpYyhlc3MyMHNlbCR1cmJhbikNCg0KYW5lc3Jha2VmaW5kZXIodGFyZ2V0cywgZXNzMjBzZWwsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIpDQoNCm91dHNhdmUgPC0gYW5lc3Jha2UodGFyZ2V0cywgZXNzMjBzZWwsIGNhc2VpZCA9IGVzczIwc2VsJGNhc2VpZCwNCiAgdmVyYm9zZT0gRkFMU0UsIGNhcCA9IDUsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIsDQogIHR5cGUgPSAicGN0bGltIiwgcGN0bGltID0gLjA1ICwgbmxpbSA9IDUsDQogIGl0ZXJhdGUgPSBUUlVFICwgZm9yY2UxID0gVFJVRSkNCnN1bW1hcnkob3V0c2F2ZSkNCg0KZXNzMjBzZWwkd2VpZ2h0dmVjICA8LSB1bmxpc3Qob3V0c2F2ZVsxXSkNCg0Kc2F2ZShlc3MyMHNlbCwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9hbGxfd2F2ZXMvZXNzMjBzZWwuUmRhdGEiKQ0KYGBgDQoNCiMjIEVWUyB7LX0NCg0KYGBge3J9DQojIFRoZW4gdGhlIEVWUywgd2hpY2ggSSBoYXZlIHRvIHNwbGl0IHVwIGJlY2F1c2UgSSB1c2UgdGhlIGNvbXBpbGVkIGRhdGFzZXQNCmxvYWQoaGVyZSgiLi9kYXRhL2ZpbmFsX2RhdGEiLCAiZXZzc2VsLlJEYXRhIikpDQoNCiMgRmlyc3Qgc2VsZWN0IG9ubHkgdGhlIG9ic2VydmF0aW9ucyBvZiAxOTkwDQpldnM5MCA8LSBzdWJzZXQoZXZzc2VsLCBzdXJ2ZXl5ZWFyID09IDE5OTApDQpzZXggPC0gYygnTWFsZScsICdGZW1hbGUnKQ0Kc2V4IDwtIGMoMC40OSwgMC41MSkNCg0KYXR0cmlidXRlcyhldnM5MCRhZ2UpDQpldnM5MCRhZ2VfY2F0W2V2czkwJGFnZSA+PTE1ICYgZXZzOTAkYWdlIDw9IDMwXSA8LSAxDQpldnM5MCRhZ2VfY2F0W2V2czkwJGFnZSA+PTMxICYgZXZzOTAkYWdlIDw9IDQ1XSA8LSAyDQpldnM5MCRhZ2VfY2F0W2V2czkwJGFnZSA+PTQ2ICYgZXZzOTAkYWdlIDw9IDYwXSA8LSAzDQpldnM5MCRhZ2VfY2F0W2V2czkwJGFnZSA+PTYxXSA8LSA0DQoNCmFnZV9jYXQgPC0gYygndTMwJywgJzMxNDUnLCAnNDY2MScsICc2MW8nKQ0KYWdlX2NhdCA8LSBjKDAuMjUsIDAuMjQsIDAuMTYsIDAuMTYpDQoNCnRhcmdldHMgPC0gbGlzdChzZXgsIGFnZV9jYXQpDQpuYW1lcyh0YXJnZXRzKSA8LSBjKCJzZXgiLCAiYWdlX2NhdCIpDQoNCmV2czkwJGNhc2VpZCA8LSAxOmxlbmd0aChldnM5MCRzZXgpDQoNCiMgVG8gdXNlIGFuZXNyYWtlZmluZGVyLCB0aGUgdmFyaWFibGVzIGluIHRoZSBvcmlnaW5hbCBkYXRhc2V0IGhhdmUgdG8gYmUgbnVtZXJpYw0KZXZzOTAkc2V4IDwtIGFzLm51bWVyaWMoZXZzOTAkc2V4KQ0KDQphbmVzcmFrZWZpbmRlcih0YXJnZXRzLCBldnM5MCwgY2hvb3NlbWV0aG9kID0gInRvdGFsIikNCg0Kb3V0c2F2ZSA8LSBhbmVzcmFrZSh0YXJnZXRzLCBldnM5MCwgY2FzZWlkID0gZXZzOTAkY2FzZWlkLA0KICB2ZXJib3NlPSBGQUxTRSwgY2FwID0gNSwgY2hvb3NlbWV0aG9kID0gInRvdGFsIiwNCiAgdHlwZSA9ICJwY3RsaW0iLCBwY3RsaW0gPSAuMDUgLCBubGltID0gNSwNCiAgaXRlcmF0ZSA9IFRSVUUgLCBmb3JjZTEgPSBUUlVFKQ0Kc3VtbWFyeShvdXRzYXZlKQ0KDQpldnM5MCR3ZWlnaHR2ZWMgIDwtIHVubGlzdChvdXRzYXZlWzFdKQ0KDQojIFRoZW4gdGhvc2Ugb2YgMTk5OQ0KZXZzOTkgPC0gc3Vic2V0KGV2c3NlbCwgc3VydmV5eWVhciA9PSAxOTk5KQ0Kc2V4IDwtIGMoJ01hbGUnLCAnRmVtYWxlJykNCnNleCA8LSBjKDAuNDksIDAuNTEpDQoNCmF0dHJpYnV0ZXMoZXZzOTkkYWdlKQ0KZXZzOTkkYWdlX2NhdFtldnM5OSRhZ2UgPj0xNSAmIGV2czk5JGFnZSA8PSAzMF0gPC0gMQ0KZXZzOTkkYWdlX2NhdFtldnM5OSRhZ2UgPj0zMSAmIGV2czk5JGFnZSA8PSA0NV0gPC0gMg0KZXZzOTkkYWdlX2NhdFtldnM5OSRhZ2UgPj00NiAmIGV2czk5JGFnZSA8PSA2MF0gPC0gMw0KZXZzOTkkYWdlX2NhdFtldnM5OSRhZ2UgPj02MV0gPC0gNA0KDQphZ2VfY2F0IDwtIGMoJ3UzMCcsICczMTQ1JywgJzQ2NjEnLCAnNjFvJykNCmFnZV9jYXQgPC0gYygwLjIxLCAwLjI0LCAwLjE5LCAwLjE3KQ0KDQptYXJzdGF0IDwtIGMoJzEnLCAnMicpDQptYXJzdGF0IDwtIGMoMC41OSwgMC40MSkNCg0KdGFyZ2V0cyA8LSBsaXN0KHNleCwgYWdlX2NhdCwgbWFyc3RhdCkNCm5hbWVzKHRhcmdldHMpIDwtIGMoInNleCIsICJhZ2VfY2F0IiwgIm1hcnN0YXQiKQ0KDQojIFRvIHVzZSBhbmVzcmFrZWZpbmRlciwgdGhlIHZhcmlhYmxlcyBpbiB0aGUgb3JpZ2luYWwgZGF0YXNldCBoYXZlIHRvIGJlIG51bWVyaWMNCmV2czk5JHNleCA8LSBhcy5udW1lcmljKGV2czk5JHNleCkNCmV2czk5JG1hcnN0YXQgPC0gYXMubnVtZXJpYyhldnM5OSRtYXJzdGF0KQ0KDQpldnM5OSRjYXNlaWQgPC0gMTpsZW5ndGgoZXZzOTkkc2V4KQ0KDQphbmVzcmFrZWZpbmRlcih0YXJnZXRzLCBldnM5OSwgY2hvb3NlbWV0aG9kID0gInRvdGFsIikNCg0Kb3V0c2F2ZSA8LSBhbmVzcmFrZSh0YXJnZXRzLCBldnM5OSwgY2FzZWlkID0gZXZzOTkkY2FzZWlkLA0KICB2ZXJib3NlPSBGQUxTRSwgY2FwID0gNSwgY2hvb3NlbWV0aG9kID0gInRvdGFsIiwNCiAgdHlwZSA9ICJwY3RsaW0iLCBwY3RsaW0gPSAuMDUgLCBubGltID0gNSwNCiAgaXRlcmF0ZSA9IFRSVUUgLCBmb3JjZTEgPSBUUlVFKQ0Kc3VtbWFyeShvdXRzYXZlKQ0KDQpldnM5OSR3ZWlnaHR2ZWMgIDwtIHVubGlzdChvdXRzYXZlWzFdKQ0KDQojIEFuZCBsYXN0bHkgb2YgMjAwOA0KZXZzMjAwOCA8LSBzdWJzZXQoZXZzc2VsLCBzdXJ2ZXl5ZWFyID09IDIwMDgpDQpzZXggPC0gYygnTWFsZScsICdGZW1hbGUnKQ0Kc2V4IDwtIGMoMC40OSwgMC41MSkNCg0KYXR0cmlidXRlcyhldnMyMDA4JGFnZSkNCmV2czIwMDgkYWdlX2NhdFtldnMyMDA4JGFnZSA+PTE1ICYgZXZzMjAwOCRhZ2UgPD0gMzBdIDwtIDENCmV2czIwMDgkYWdlX2NhdFtldnMyMDA4JGFnZSA+PTMxICYgZXZzMjAwOCRhZ2UgPD0gNDVdIDwtIDINCmV2czIwMDgkYWdlX2NhdFtldnMyMDA4JGFnZSA+PTQ2ICYgZXZzMjAwOCRhZ2UgPD0gNjBdIDwtIDMNCmV2czIwMDgkYWdlX2NhdFtldnMyMDA4JGFnZSA+PTYxXSA8LSA0DQoNCmFnZV9jYXQgPC0gYygndTMwJywgJzMxNDUnLCAnNDY2MScsICc2MW8nKQ0KYWdlX2NhdCA8LSBjKDAuMTksIDAuMjIsIDAuMjEsIDAuMTkpDQoNCm1hcnN0YXQgPC0gYygnMScsICcyJykNCm1hcnN0YXQgPC0gYygwLjU2LCAwLjQ0KQ0KDQp0YXJnZXRzIDwtIGxpc3Qoc2V4LCBhZ2VfY2F0LCBtYXJzdGF0KQ0KbmFtZXModGFyZ2V0cykgPC0gYygic2V4IiwgImFnZV9jYXQiLCAibWFyc3RhdCIpDQoNCiMgVG8gdXNlIGFuZXNyYWtlZmluZGVyLCB0aGUgdmFyaWFibGVzIGluIHRoZSBvcmlnaW5hbCBkYXRhc2V0IGhhdmUgdG8gYmUgbnVtZXJpYw0KZXZzMjAwOCRzZXggPC0gYXMubnVtZXJpYyhldnMyMDA4JHNleCkNCmV2czIwMDgkbWFyc3RhdCA8LSBhcy5udW1lcmljKGV2czIwMDgkbWFyc3RhdCkNCg0KZXZzMjAwOCRjYXNlaWQgPC0gMTpsZW5ndGgoZXZzMjAwOCRzZXgpDQoNCmFuZXNyYWtlZmluZGVyKHRhcmdldHMsIGV2czIwMDgsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIpDQoNCm91dHNhdmUgPC0gYW5lc3Jha2UodGFyZ2V0cywgZXZzMjAwOCwgY2FzZWlkID0gZXZzMjAwOCRjYXNlaWQsDQogIHZlcmJvc2U9IEZBTFNFLCBjYXAgPSA1LCBjaG9vc2VtZXRob2QgPSAidG90YWwiLA0KICB0eXBlID0gInBjdGxpbSIsIHBjdGxpbSA9IC4wNSAsIG5saW0gPSA1LA0KICBpdGVyYXRlID0gVFJVRSAsIGZvcmNlMSA9IFRSVUUpDQpzdW1tYXJ5KG91dHNhdmUpDQoNCmV2czIwMDgkd2VpZ2h0dmVjICA8LSB1bmxpc3Qob3V0c2F2ZVsxXSkNCg0KI1R1cm4gbWFyaXRhbCBzdGF0dXMgYmFjayB0byBvcmlnaW5hbCBiZWNhdXNlIGl0IGlzIG5vdCBhIG51bWVyaWMgdmFyaWFibGUNCmV2czkwJG1hcnN0YXQgPC0gYXMuZmFjdG9yKGV2czkwJG1hcnN0YXQpDQpldnM5OSRtYXJzdGF0IDwtIGFzLmZhY3RvcihldnM5OSRtYXJzdGF0KQ0KZXZzMjAwOCRtYXJzdGF0IDwtIGFzLmZhY3RvcihldnMyMDA4JG1hcnN0YXQpDQoNCiMgQmluZCB0aGUgdGhyZWUgdG9nZXRoZXINCmV2c3NlbCA8LSBkcGx5cjo6YmluZF9yb3dzKGV2czkwLCBldnM5OSwgZXZzMjAwOCkNCg0KI1NhdmUgdGhlIHRvdGFsIHRvIHdoaWNoIG5vdyB0aGUgd2VpZ2h0cyBhcmUgYWRkZWQgcGVyIHllYXINCnNhdmUoZXZzc2VsLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS8vZGF0YS9maW5hbF9kYXRhL2V2c3NlbC5SZGF0YSIpDQpgYGANCg0KIyMgSSZPIHJlc2VhcmNoIHstfQ0KDQpgYGB7cn0NCiMgSSAmIE8gUmVzZWFyY2gNCmxvYWQoaGVyZSgiLi9kYXRhL2FsbF93YXZlcyIsICJpbzIwMTlzZWwuUkRhdGEiKSkNCg0Kc2V4IDwtIGMoJ01hbGUnLCAnRmVtYWxlJykNCnNleCA8LSBjKDAuNTAsIDAuNTApDQoNCmF0dHJpYnV0ZXMoaW8yMDE5c2VsJGFnZSkNCmlvMjAxOXNlbCRhZ2VfY2F0W2lvMjAxOXNlbCRhZ2UgPj0xNSAmIGlvMjAxOXNlbCRhZ2UgPD0gMzBdIDwtIDENCmlvMjAxOXNlbCRhZ2VfY2F0W2lvMjAxOXNlbCRhZ2UgPj0zMSAmIGlvMjAxOXNlbCRhZ2UgPD0gNDVdIDwtIDINCmlvMjAxOXNlbCRhZ2VfY2F0W2lvMjAxOXNlbCRhZ2UgPj00NiAmIGlvMjAxOXNlbCRhZ2UgPD0gNjBdIDwtIDMNCmlvMjAxOXNlbCRhZ2VfY2F0W2lvMjAxOXNlbCRhZ2UgPj02MV0gPC0gNA0KDQphZ2VfY2F0IDwtIGMoJ3UzMCcsICczMTQ1JywgJzQ2NjEnLCAnNjFvJykNCmFnZV9jYXQgPC0gYygwLjIwLCAwLjE4LCAwLjIyLCAwLjI0KQ0KDQp1cmJhbiA8LSBjKCdMb3cgdXJiYW5pdHknLCAnTWVkaXVtIHVyYmFuaXR5JywgJ0hpZ2ggdXJiYW5pdHknKQ0KdXJiYW4gPC0gYygwLjM0LCAwLjE3LCAwLjQ5KQ0KbWFyc3RhdCA8LSBjKCcxJywgJzInKQ0KbWFyc3RhdCA8LSBjKDAuNTIsIDAuNDgpDQoNCnRhcmdldHMgPC0gbGlzdChzZXgsIGFnZV9jYXQsIHVyYmFuLCBtYXJzdGF0KQ0KbmFtZXModGFyZ2V0cykgPC0gYygic2V4IiwgImFnZV9jYXQiLCAidXJiYW4iLCAibWFyc3RhdCIpDQoNCmlvMjAxOXNlbCRjYXNlaWQgPC0gMTpsZW5ndGgoaW8yMDE5c2VsJHNleCkNCg0KIyBUbyB1c2UgYW5lc3Jha2VmaW5kZXIsIHRoZSB2YXJpYWJsZXMgaW4gdGhlIG9yaWdpbmFsIGRhdGFzZXQgaGF2ZSB0byBiZSBudW1lcmljDQppbzIwMTlzZWwkc2V4IDwtIGFzLm51bWVyaWMoaW8yMDE5c2VsJHNleCkNCmlvMjAxOXNlbCR1cmJhbiA8LSBhcy5udW1lcmljKGlvMjAxOXNlbCR1cmJhbikNCmlvMjAxOXNlbCRtYXJzdGF0IDwtIGFzLm51bWVyaWMoaW8yMDE5c2VsJG1hcnN0YXQpDQoNCmFuZXNyYWtlZmluZGVyKHRhcmdldHMsIGlvMjAxOXNlbCwgY2hvb3NlbWV0aG9kID0gInRvdGFsIikNCg0Kb3V0c2F2ZSA8LSBhbmVzcmFrZSh0YXJnZXRzLCBpbzIwMTlzZWwsIGNhc2VpZCA9IGlvMjAxOXNlbCRjYXNlaWQsDQogIHZlcmJvc2U9IEZBTFNFLCBjYXAgPSA1LCBjaG9vc2VtZXRob2QgPSAidG90YWwiLA0KICB0eXBlID0gInBjdGxpbSIsIHBjdGxpbSA9IC4wNSAsIG5saW0gPSA1LA0KICBpdGVyYXRlID0gVFJVRSAsIGZvcmNlMSA9IFRSVUUpDQpzdW1tYXJ5KG91dHNhdmUpDQoNCmlvMjAxOXNlbCR3ZWlnaHR2ZWMgIDwtIHVubGlzdChvdXRzYXZlWzFdKQ0KDQpzYXZlKGlvMjAxOXNlbCwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9hbGxfd2F2ZXMvaW8yMDE5c2VsLlJkYXRhIikNCmBgYA0KDQoNCmBgYHtyfQ0KIyBJbzIwMjANCg0KbG9hZChoZXJlKCIuL2RhdGEvYWxsX3dhdmVzIiwgImlvMjAyMHNlbC5SRGF0YSIpKQ0KDQpzZXggPC0gYygnTWFsZScsICdGZW1hbGUnKQ0Kc2V4IDwtIGMoMC41MCwgMC41MCkNCg0KYXR0cmlidXRlcyhpbzIwMjBzZWwkYWdlKQ0KaW8yMDIwc2VsJGFnZV9jYXRbaW8yMDIwc2VsJGFnZSA+PTE1ICYgaW8yMDIwc2VsJGFnZSA8PSAzMF0gPC0gMQ0KaW8yMDIwc2VsJGFnZV9jYXRbaW8yMDIwc2VsJGFnZSA+PTMxICYgaW8yMDIwc2VsJGFnZSA8PSA0NV0gPC0gMg0KaW8yMDIwc2VsJGFnZV9jYXRbaW8yMDIwc2VsJGFnZSA+PTQ2ICYgaW8yMDIwc2VsJGFnZSA8PSA2MF0gPC0gMw0KaW8yMDIwc2VsJGFnZV9jYXRbaW8yMDIwc2VsJGFnZSA+PTYxXSA8LSA0DQoNCmFnZV9jYXQgPC0gYygndTMwJywgJzMxNDUnLCAnNDY2MScsICc2MW8nKQ0KYWdlX2NhdCA8LSBjKDAuMjAsIDAuMTgsIDAuMjEsIDAuMjUpDQoNCm1hcnN0YXQgPC0gYygnMScsICcyJykNCm1hcnN0YXQgPC0gYygwLjUyLCAwLjQ4KQ0KDQp0YXJnZXRzIDwtIGxpc3Qoc2V4LCBhZ2VfY2F0LCBtYXJzdGF0KQ0KbmFtZXModGFyZ2V0cykgPC0gYygic2V4IiwgImFnZV9jYXQiLCAibWFyc3RhdCIpDQoNCmlvMjAyMHNlbCRjYXNlaWQgPC0gMTpsZW5ndGgoaW8yMDIwc2VsJHNleCkNCg0KIyBUbyB1c2UgYW5lc3Jha2VmaW5kZXIsIHRoZSB2YXJpYWJsZXMgaW4gdGhlIG9yaWdpbmFsIGRhdGFzZXQgaGF2ZSB0byBiZSBudW1lcmljDQppbzIwMjBzZWwkc2V4IDwtIGFzLm51bWVyaWMoaW8yMDIwc2VsJHNleCkNCmlvMjAyMHNlbCRtYXJzdGF0IDwtIGFzLm51bWVyaWMoaW8yMDIwc2VsJG1hcnN0YXQpDQoNCmFuZXNyYWtlZmluZGVyKHRhcmdldHMsIGlvMjAyMHNlbCwgY2hvb3NlbWV0aG9kID0gInRvdGFsIikNCg0Kb3V0c2F2ZSA8LSBhbmVzcmFrZSh0YXJnZXRzLCBpbzIwMjBzZWwsIGNhc2VpZCA9IGlvMjAyMHNlbCRjYXNlaWQsDQogIHZlcmJvc2U9IEZBTFNFLCBjYXAgPSA1LCBjaG9vc2VtZXRob2QgPSAidG90YWwiLA0KICB0eXBlID0gInBjdGxpbSIsIHBjdGxpbSA9IC4wNSAsIG5saW0gPSA1LA0KICBpdGVyYXRlID0gVFJVRSAsIGZvcmNlMSA9IFRSVUUpDQpzdW1tYXJ5KG91dHNhdmUpDQoNCmlvMjAyMHNlbCR3ZWlnaHR2ZWMgIDwtIHVubGlzdChvdXRzYXZlWzFdKQ0KDQpzYXZlKGlvMjAyMHNlbCwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9hbGxfd2F2ZXMvaW8yMDIwc2VsLlJkYXRhIikNCmBgYA0KDQoNCmBgYHtyfQ0KI0lvIDIwMjINCmxvYWQoaGVyZSgiLi9kYXRhL2FsbF93YXZlcyIsICJpbzIwMjJzZWwuUkRhdGEiKSkNCg0Kc2V4IDwtIGMoJ01hbGUnLCAnRmVtYWxlJykNCnNleCA8LSBjKDAuNTAsIDAuNTApDQoNCmF0dHJpYnV0ZXMoaW8yMDIyc2VsJGFnZSkNCmlvMjAyMnNlbCRhZ2VfY2F0W2lvMjAyMnNlbCRhZ2UgPj0xNSAmIGlvMjAyMnNlbCRhZ2UgPD0gMzBdIDwtIDENCmlvMjAyMnNlbCRhZ2VfY2F0W2lvMjAyMnNlbCRhZ2UgPj0zMSAmIGlvMjAyMnNlbCRhZ2UgPD0gNDVdIDwtIDINCmlvMjAyMnNlbCRhZ2VfY2F0W2lvMjAyMnNlbCRhZ2UgPj00NiAmIGlvMjAyMnNlbCRhZ2UgPD0gNjBdIDwtIDMNCmlvMjAyMnNlbCRhZ2VfY2F0W2lvMjAyMnNlbCRhZ2UgPj02MV0gPC0gNA0KDQphZ2VfY2F0IDwtIGMoJ3UzMCcsICczMTQ1JywgJzQ2NjEnLCAnNjFvJykNCmFnZV9jYXQgPC0gYygwLjIwLCAwLjE4LCAwLjIxLCAwLjI1KQ0KDQptYXJzdGF0IDwtIGMoJzEnLCAnMicpDQptYXJzdGF0IDwtIGMoMC41MSwgMC40OSkNCg0KdGFyZ2V0cyA8LSBsaXN0KHNleCwgYWdlX2NhdCwgbWFyc3RhdCkNCm5hbWVzKHRhcmdldHMpIDwtIGMoInNleCIsICJhZ2VfY2F0IiwgIm1hcnN0YXQiKQ0KDQppbzIwMjJzZWwkY2FzZWlkIDwtIDE6bGVuZ3RoKGlvMjAyMnNlbCRzZXgpDQoNCiMgVG8gdXNlIGFuZXNyYWtlZmluZGVyLCB0aGUgdmFyaWFibGVzIGluIHRoZSBvcmlnaW5hbCBkYXRhc2V0IGhhdmUgdG8gYmUgbnVtZXJpYw0KaW8yMDIyc2VsJHNleCA8LSBhcy5udW1lcmljKGlvMjAyMnNlbCRzZXgpDQppbzIwMjJzZWwkbWFyc3RhdCA8LSBhcy5udW1lcmljKGlvMjAyMnNlbCRtYXJzdGF0KQ0KDQphbmVzcmFrZWZpbmRlcih0YXJnZXRzLCBpbzIwMjJzZWwsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIpDQoNCm91dHNhdmUgPC0gYW5lc3Jha2UodGFyZ2V0cywgaW8yMDIyc2VsLCBjYXNlaWQgPSBpbzIwMjJzZWwkY2FzZWlkLA0KICB2ZXJib3NlPSBGQUxTRSwgY2FwID0gNSwgY2hvb3NlbWV0aG9kID0gInRvdGFsIiwNCiAgdHlwZSA9ICJwY3RsaW0iLCBwY3RsaW0gPSAuMDUgLCBubGltID0gNSwNCiAgaXRlcmF0ZSA9IFRSVUUgLCBmb3JjZTEgPSBUUlVFKQ0Kc3VtbWFyeShvdXRzYXZlKQ0KDQppbzIwMjJzZWwkd2VpZ2h0dmVjICA8LSB1bmxpc3Qob3V0c2F2ZVsxXSkNCg0Kc2F2ZShpbzIwMjJzZWwsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvYWxsX3dhdmVzL2lvMjAyMnNlbC5SZGF0YSIpDQoNCmBgYA0KDQojIyBFQiB7LX0NCg0KYGBge3J9DQojTGFzdGx5IEV1cm9iYXJvbWV0ZXIsIHdoaWNoIGhhcyBhIGxvdCBvZiB3YXZlcyBhbmQgdGh1cyBhIGxvdCBvZiByZXBldGl0aW9uLiBTdGlsbCBpdCBpcyBkaWZmaWN1bHQgdG8gd3JpdGUgYSBsb29wLCBhcyB0YXJnZXR3ZWlnaHRzIGRpZmZlciBlYWNoIHllYXIuIFNvIEltIGp1c3QgcmVwZWF0aW5nIHRoZSBzY3JpcHQgbWFueSB0aW1lcy4gDQpsb2FkKGhlcmUoIi4vZGF0YS9hbGxfd2F2ZXMiLCAiZWIxOTg2c2VsLlJEYXRhIikpDQoNCnNleCA8LSBjKCdNYWxlJywgJ0ZlbWFsZScpDQpzZXggPC0gYygwLjQ5LCAwLjUxKQ0KDQphdHRyaWJ1dGVzKGViMTk4NnNlbCRhZ2UpDQplYjE5ODZzZWwkYWdlX2NhdFtlYjE5ODZzZWwkYWdlID49MTUgJiBlYjE5ODZzZWwkYWdlIDw9IDMwXSA8LSAxDQplYjE5ODZzZWwkYWdlX2NhdFtlYjE5ODZzZWwkYWdlID49MzEgJiBlYjE5ODZzZWwkYWdlIDw9IDQ1XSA8LSAyDQplYjE5ODZzZWwkYWdlX2NhdFtlYjE5ODZzZWwkYWdlID49NDYgJiBlYjE5ODZzZWwkYWdlIDw9IDYwXSA8LSAzDQplYjE5ODZzZWwkYWdlX2NhdFtlYjE5ODZzZWwkYWdlID49NjFdIDwtIDQNCg0KYWdlX2NhdCA8LSBjKCd1MzAnLCAnMzE0NScsICc0NjYxJywgJzYxbycpDQphZ2VfY2F0IDwtIGMoMC4yNSwgMC4yNCwgMC4xNiwgMC4xNikNCg0KdGFyZ2V0cyA8LSBsaXN0KHNleCwgYWdlX2NhdCkNCm5hbWVzKHRhcmdldHMpIDwtIGMoInNleCIsICJhZ2VfY2F0IikNCg0KZWIxOTg2c2VsJGNhc2VpZCA8LSAxOmxlbmd0aChlYjE5ODZzZWwkc2V4KQ0KDQojIFRvIHVzZSBhbmVzcmFrZWZpbmRlciwgdGhlIHZhcmlhYmxlcyBpbiB0aGUgb3JpZ2luYWwgZGF0YXNldCBoYXZlIHRvIGJlIG51bWVyaWMNCmViMTk4NnNlbCRzZXggPC0gYXMubnVtZXJpYyhlYjE5ODZzZWwkc2V4KQ0KDQphbmVzcmFrZWZpbmRlcih0YXJnZXRzLCBlYjE5ODZzZWwsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIpDQoNCm91dHNhdmUgPC0gYW5lc3Jha2UodGFyZ2V0cywgZWIxOTg2c2VsLCBjYXNlaWQgPSBlYjE5ODZzZWwkY2FzZWlkLA0KICB2ZXJib3NlPSBGQUxTRSwgY2FwID0gNSwgY2hvb3NlbWV0aG9kID0gInRvdGFsIiwNCiAgdHlwZSA9ICJwY3RsaW0iLCBwY3RsaW0gPSAuMDUgLCBubGltID0gNSwNCiAgaXRlcmF0ZSA9IFRSVUUgLCBmb3JjZTEgPSBUUlVFKQ0Kc3VtbWFyeShvdXRzYXZlKQ0KDQplYjE5ODZzZWwkd2VpZ2h0dmVjICA8LSB1bmxpc3Qob3V0c2F2ZVsxXSkNCg0Kc2F2ZShlYjE5ODZzZWwsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvYWxsX3dhdmVzL2ViMTk4NnNlbC5SZGF0YSIpDQpgYGANCg0KDQpgYGB7cn0NCiMgRWIgMTk5Mg0KbG9hZChoZXJlKCIuL2RhdGEvYWxsX3dhdmVzIiwgImViMTk5MnNlbC5SRGF0YSIpKQ0KDQpzZXggPC0gYygnTWFsZScsICdGZW1hbGUnKQ0Kc2V4IDwtIGMoMC40OSwgMC41MSkNCg0KYXR0cmlidXRlcyhlYjE5OTJzZWwkYWdlKQ0KZWIxOTkyc2VsJGFnZV9jYXRbZWIxOTkyc2VsJGFnZSA+PTE1ICYgZWIxOTkyc2VsJGFnZSA8PSAzMF0gPC0gMQ0KZWIxOTkyc2VsJGFnZV9jYXRbZWIxOTkyc2VsJGFnZSA+PTMxICYgZWIxOTkyc2VsJGFnZSA8PSA0NV0gPC0gMg0KZWIxOTkyc2VsJGFnZV9jYXRbZWIxOTkyc2VsJGFnZSA+PTQ2ICYgZWIxOTkyc2VsJGFnZSA8PSA2MF0gPC0gMw0KZWIxOTkyc2VsJGFnZV9jYXRbZWIxOTkyc2VsJGFnZSA+PTYxXSA8LSA0DQoNCmFnZV9jYXQgPC0gYygndTMwJywgJzMxNDUnLCAnNDY2MScsICc2MW8nKQ0KYWdlX2NhdCA8LSBjKDAuMjUsIDAuMjQsIDAuMjQsIDAuMTYpDQoNCnRhcmdldHMgPC0gbGlzdChzZXgsIGFnZV9jYXQpDQpuYW1lcyh0YXJnZXRzKSA8LSBjKCJzZXgiLCAiYWdlX2NhdCIpDQoNCmViMTk5MnNlbCRjYXNlaWQgPC0gMTpsZW5ndGgoZWIxOTkyc2VsJHNleCkNCg0KIyBUbyB1c2UgYW5lc3Jha2VmaW5kZXIsIHRoZSB2YXJpYWJsZXMgaW4gdGhlIG9yaWdpbmFsIGRhdGFzZXQgaGF2ZSB0byBiZSBudW1lcmljDQplYjE5OTJzZWwkc2V4IDwtIGFzLm51bWVyaWMoZWIxOTkyc2VsJHNleCkNCg0KYW5lc3Jha2VmaW5kZXIodGFyZ2V0cywgZWIxOTkyc2VsLCBjaG9vc2VtZXRob2QgPSAidG90YWwiKQ0KDQpvdXRzYXZlIDwtIGFuZXNyYWtlKHRhcmdldHMsIGViMTk5MnNlbCwgY2FzZWlkID0gZWIxOTkyc2VsJGNhc2VpZCwNCiAgdmVyYm9zZT0gRkFMU0UsIGNhcCA9IDUsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIsDQogIHR5cGUgPSAicGN0bGltIiwgcGN0bGltID0gLjA1ICwgbmxpbSA9IDUsDQogIGl0ZXJhdGUgPSBUUlVFICwgZm9yY2UxID0gVFJVRSkNCnN1bW1hcnkob3V0c2F2ZSkNCg0KZWIxOTkyc2VsJHdlaWdodHZlYyAgPC0gdW5saXN0KG91dHNhdmVbMV0pDQoNCnNhdmUoZWIxOTkyc2VsLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9lYjE5OTJzZWwuUmRhdGEiKQ0KYGBgDQoNCg0KYGBge3J9DQojIEViIDE5OTUNCmxvYWQoaGVyZSgiLi9kYXRhL2FsbF93YXZlcyIsICJlYjE5OTVzZWwuUkRhdGEiKSkNCg0Kc2V4IDwtIGMoJ01hbGUnLCAnRmVtYWxlJykNCnNleCA8LSBjKDAuNDksIDAuNTEpDQoNCmF0dHJpYnV0ZXMoZWIxOTk1c2VsJGFnZSkNCmViMTk5NXNlbCRhZ2VfY2F0W2ViMTk5NXNlbCRhZ2UgPj0xNSAmIGViMTk5NXNlbCRhZ2UgPD0gMzBdIDwtIDENCmViMTk5NXNlbCRhZ2VfY2F0W2ViMTk5NXNlbCRhZ2UgPj0zMSAmIGViMTk5NXNlbCRhZ2UgPD0gNDVdIDwtIDINCmViMTk5NXNlbCRhZ2VfY2F0W2ViMTk5NXNlbCRhZ2UgPj00NiAmIGViMTk5NXNlbCRhZ2UgPD0gNjBdIDwtIDMNCmViMTk5NXNlbCRhZ2VfY2F0W2ViMTk5NXNlbCRhZ2UgPj02MV0gPC0gNA0KDQphZ2VfY2F0IDwtIGMoJ3UzMCcsICczMTQ1JywgJzQ2NjEnLCAnNjFvJykNCmFnZV9jYXQgPC0gYygwLjI0LCAwLjI0LCAwLjE4LCAwLjE3KQ0KDQptYXJzdGF0IDwtIGMoJzEnLCAnMicpDQptYXJzdGF0IDwtIGMoMC42LCAwLjQpDQoNCnRhcmdldHMgPC0gbGlzdChzZXgsIGFnZV9jYXQsIG1hcnN0YXQpDQpuYW1lcyh0YXJnZXRzKSA8LSBjKCJzZXgiLCAiYWdlX2NhdCIsICJtYXJzdGF0IikNCg0KZWIxOTk1c2VsJGNhc2VpZCA8LSAxOmxlbmd0aChlYjE5OTVzZWwkc2V4KQ0KDQojIFRvIHVzZSBhbmVzcmFrZWZpbmRlciwgdGhlIHZhcmlhYmxlcyBpbiB0aGUgb3JpZ2luYWwgZGF0YXNldCBoYXZlIHRvIGJlIG51bWVyaWMNCmViMTk5NXNlbCRzZXggPC0gYXMubnVtZXJpYyhlYjE5OTVzZWwkc2V4KQ0KZWIxOTk1c2VsJG1hcnN0YXQgPC0gYXMubnVtZXJpYyhlYjE5OTVzZWwkbWFyc3RhdCkNCg0KYW5lc3Jha2VmaW5kZXIodGFyZ2V0cywgZWIxOTk1c2VsLCBjaG9vc2VtZXRob2QgPSAidG90YWwiKQ0KDQpvdXRzYXZlIDwtIGFuZXNyYWtlKHRhcmdldHMsIGViMTk5NXNlbCwgY2FzZWlkID0gZWIxOTk1c2VsJGNhc2VpZCwNCiAgdmVyYm9zZT0gRkFMU0UsIGNhcCA9IDUsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIsDQogIHR5cGUgPSAicGN0bGltIiwgcGN0bGltID0gLjA1ICwgbmxpbSA9IDUsDQogIGl0ZXJhdGUgPSBUUlVFICwgZm9yY2UxID0gVFJVRSkNCnN1bW1hcnkob3V0c2F2ZSkNCg0KZWIxOTk1c2VsJHdlaWdodHZlYyAgPC0gdW5saXN0KG91dHNhdmVbMV0pDQoNCnNhdmUoZWIxOTk1c2VsLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9lYjE5OTVzZWwuUmRhdGEiKQ0KYGBgDQoNCg0KYGBge3J9DQojIDIwMDQNCmxvYWQoaGVyZSgiLi9kYXRhL2FsbF93YXZlcyIsICJlYjIwMDRzZWwuUkRhdGEiKSkNCg0Kc2V4IDwtIGMoJ01hbGUnLCAnRmVtYWxlJykNCnNleCA8LSBjKDAuNDksIDAuNTEpDQoNCmF0dHJpYnV0ZXMoZWIyMDA0c2VsJGFnZSkNCmViMjAwNHNlbCRhZ2VfY2F0W2ViMjAwNHNlbCRhZ2UgPj0xNSAmIGViMjAwNHNlbCRhZ2UgPD0gMzBdIDwtIDENCmViMjAwNHNlbCRhZ2VfY2F0W2ViMjAwNHNlbCRhZ2UgPj0zMSAmIGViMjAwNHNlbCRhZ2UgPD0gNDVdIDwtIDINCmViMjAwNHNlbCRhZ2VfY2F0W2ViMjAwNHNlbCRhZ2UgPj00NiAmIGViMjAwNHNlbCRhZ2UgPD0gNjBdIDwtIDMNCmViMjAwNHNlbCRhZ2VfY2F0W2ViMjAwNHNlbCRhZ2UgPj02MV0gPC0gNA0KDQphZ2VfY2F0IDwtIGMoJ3UzMCcsICczMTQ1JywgJzQ2NjEnLCAnNjFvJykNCmFnZV9jYXQgPC0gYygwLjIwLCAwLjI0LCAwLjIwLCAwLjE4KQ0KDQptYXJzdGF0IDwtIGMoJzEnLCAnMicpDQptYXJzdGF0IDwtIGMoMC41OCwgMC40MikNCg0KdXJiYW4gPC0gYygnTG93IHVyYmFuaXR5JywgJ01lZGl1bSB1cmJhbml0eScsICdIaWdoIHVyYmFuaXR5JykNCnVyYmFuIDwtIGMoMC40MSwgMC4xOCwgMC40MikNCg0KdGFyZ2V0cyA8LSBsaXN0KHNleCwgYWdlX2NhdCwgbWFyc3RhdCwgdXJiYW4pDQpuYW1lcyh0YXJnZXRzKSA8LSBjKCJzZXgiLCAiYWdlX2NhdCIsICJtYXJzdGF0IiwgInVyYmFuIikNCg0KZWIyMDA0c2VsJGNhc2VpZCA8LSAxOmxlbmd0aChlYjIwMDRzZWwkc2V4KQ0KDQojIFRvIHVzZSBhbmVzcmFrZWZpbmRlciwgdGhlIHZhcmlhYmxlcyBpbiB0aGUgb3JpZ2luYWwgZGF0YXNldCBoYXZlIHRvIGJlIG51bWVyaWMNCmViMjAwNHNlbCRzZXggPC0gYXMubnVtZXJpYyhlYjIwMDRzZWwkc2V4KQ0KZWIyMDA0c2VsJG1hcnN0YXQgPC0gYXMubnVtZXJpYyhlYjIwMDRzZWwkbWFyc3RhdCkNCmViMjAwNHNlbCR1cmJhbiA8LSBhcy5udW1lcmljKGViMjAwNHNlbCR1cmJhbikNCg0KYW5lc3Jha2VmaW5kZXIodGFyZ2V0cywgZWIyMDA0c2VsLCBjaG9vc2VtZXRob2QgPSAidG90YWwiKQ0KDQpvdXRzYXZlIDwtIGFuZXNyYWtlKHRhcmdldHMsIGViMjAwNHNlbCwgY2FzZWlkID0gZWIyMDA0c2VsJGNhc2VpZCwNCiAgdmVyYm9zZT0gRkFMU0UsIGNhcCA9IDUsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIsDQogIHR5cGUgPSAicGN0bGltIiwgcGN0bGltID0gLjA1ICwgbmxpbSA9IDUsDQogIGl0ZXJhdGUgPSBUUlVFICwgZm9yY2UxID0gVFJVRSkNCnN1bW1hcnkob3V0c2F2ZSkNCg0KZWIyMDA0c2VsJHdlaWdodHZlYyAgPC0gdW5saXN0KG91dHNhdmVbMV0pDQoNCnNhdmUoZWIyMDA0c2VsLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9lYjIwMDRzZWwuUmRhdGEiKQ0KYGBgDQoNCg0KYGBge3J9DQojIDIwMDcNCmxvYWQoaGVyZSgiLi9kYXRhL2FsbF93YXZlcyIsICJlYjIwMDdzZWwuUkRhdGEiKSkNCg0Kc2V4IDwtIGMoJ01hbGUnLCAnRmVtYWxlJykNCnNleCA8LSBjKDAuNDksIDAuNTEpDQoNCmF0dHJpYnV0ZXMoZWIyMDA3c2VsJGFnZSkNCmViMjAwN3NlbCRhZ2VfY2F0W2ViMjAwN3NlbCRhZ2UgPj0xNSAmIGViMjAwN3NlbCRhZ2UgPD0gMzBdIDwtIDENCmViMjAwN3NlbCRhZ2VfY2F0W2ViMjAwN3NlbCRhZ2UgPj0zMSAmIGViMjAwN3NlbCRhZ2UgPD0gNDVdIDwtIDINCmViMjAwN3NlbCRhZ2VfY2F0W2ViMjAwN3NlbCRhZ2UgPj00NiAmIGViMjAwN3NlbCRhZ2UgPD0gNjBdIDwtIDMNCmViMjAwN3NlbCRhZ2VfY2F0W2ViMjAwN3NlbCRhZ2UgPj02MV0gPC0gNA0KDQphZ2VfY2F0IDwtIGMoJ3UzMCcsICczMTQ1JywgJzQ2NjEnLCAnNjFvJykNCmFnZV9jYXQgPC0gYygwLjE5LCAwLjIzLCAwLjIxLCAwLjE5KQ0KDQptYXJzdGF0IDwtIGMoJzEnLCAnMicpDQptYXJzdGF0IDwtIGMoMC41NiwgMC40MykNCg0KdXJiYW4gPC0gYygnTG93IHVyYmFuaXR5JywgJ01lZGl1bSB1cmJhbml0eScsICdIaWdoIHVyYmFuaXR5JykNCnVyYmFuIDwtIGMoMC40MCwgMC4xOCwgMC40MikNCg0KdGFyZ2V0cyA8LSBsaXN0KHNleCwgYWdlX2NhdCwgbWFyc3RhdCwgdXJiYW4pDQpuYW1lcyh0YXJnZXRzKSA8LSBjKCJzZXgiLCAiYWdlX2NhdCIsICJtYXJzdGF0IiwgInVyYmFuIikNCg0KZWIyMDA3c2VsJGNhc2VpZCA8LSAxOmxlbmd0aChlYjIwMDdzZWwkc2V4KQ0KDQojIFRvIHVzZSBhbmVzcmFrZWZpbmRlciwgdGhlIHZhcmlhYmxlcyBpbiB0aGUgb3JpZ2luYWwgZGF0YXNldCBoYXZlIHRvIGJlIG51bWVyaWMNCmViMjAwN3NlbCRzZXggPC0gYXMubnVtZXJpYyhlYjIwMDdzZWwkc2V4KQ0KZWIyMDA3c2VsJG1hcnN0YXQgPC0gYXMubnVtZXJpYyhlYjIwMDdzZWwkbWFyc3RhdCkNCmViMjAwN3NlbCR1cmJhbiA8LSBhcy5udW1lcmljKGViMjAwN3NlbCR1cmJhbikNCg0KYW5lc3Jha2VmaW5kZXIodGFyZ2V0cywgZWIyMDA3c2VsLCBjaG9vc2VtZXRob2QgPSAidG90YWwiKQ0KDQpvdXRzYXZlIDwtIGFuZXNyYWtlKHRhcmdldHMsIGViMjAwN3NlbCwgY2FzZWlkID0gZWIyMDA3c2VsJGNhc2VpZCwNCiAgdmVyYm9zZT0gRkFMU0UsIGNhcCA9IDUsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIsDQogIHR5cGUgPSAicGN0bGltIiwgcGN0bGltID0gLjA1ICwgbmxpbSA9IDUsDQogIGl0ZXJhdGUgPSBUUlVFICwgZm9yY2UxID0gVFJVRSkNCnN1bW1hcnkob3V0c2F2ZSkNCg0KZWIyMDA3c2VsJHdlaWdodHZlYyAgPC0gdW5saXN0KG91dHNhdmVbMV0pDQoNCnNhdmUoZWIyMDA3c2VsLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9lYjIwMDdzZWwuUmRhdGEiKQ0KYGBgDQoNCg0KYGBge3J9DQojIDIwMDgNCmxvYWQoaGVyZSgiLi9kYXRhL2FsbF93YXZlcyIsICJlYjIwMDhzZWwuUkRhdGEiKSkNCg0Kc2V4IDwtIGMoJ01hbGUnLCAnRmVtYWxlJykNCnNleCA8LSBjKDAuNDksIDAuNTEpDQoNCmF0dHJpYnV0ZXMoZWIyMDA4c2VsJGFnZSkNCmViMjAwOHNlbCRhZ2VfY2F0W2ViMjAwOHNlbCRhZ2UgPj0xNSAmIGViMjAwOHNlbCRhZ2UgPD0gMzBdIDwtIDENCmViMjAwOHNlbCRhZ2VfY2F0W2ViMjAwOHNlbCRhZ2UgPj0zMSAmIGViMjAwOHNlbCRhZ2UgPD0gNDVdIDwtIDINCmViMjAwOHNlbCRhZ2VfY2F0W2ViMjAwOHNlbCRhZ2UgPj00NiAmIGViMjAwOHNlbCRhZ2UgPD0gNjBdIDwtIDMNCmViMjAwOHNlbCRhZ2VfY2F0W2ViMjAwOHNlbCRhZ2UgPj02MV0gPC0gNA0KDQphZ2VfY2F0IDwtIGMoJ3UzMCcsICczMTQ1JywgJzQ2NjEnLCAnNjFvJykNCmFnZV9jYXQgPC0gYygwLjE5LCAwLjIyLCAwLjIxLCAwLjE5KQ0KDQptYXJzdGF0IDwtIGMoJzEnLCAnMicpDQptYXJzdGF0IDwtIGMoMC41NiwgMC40NCkNCg0KdXJiYW4gPC0gYygnTG93IHVyYmFuaXR5JywgJ01lZGl1bSB1cmJhbml0eScsICdIaWdoIHVyYmFuaXR5JykNCnVyYmFuIDwtIGMoMC4zOSwgMC4xOCwgMC40MikNCg0KdGFyZ2V0cyA8LSBsaXN0KHNleCwgYWdlX2NhdCwgbWFyc3RhdCwgdXJiYW4pDQpuYW1lcyh0YXJnZXRzKSA8LSBjKCJzZXgiLCAiYWdlX2NhdCIsICJtYXJzdGF0IiwgInVyYmFuIikNCg0KZWIyMDA4c2VsJGNhc2VpZCA8LSAxOmxlbmd0aChlYjIwMDhzZWwkc2V4KQ0KDQojIFRvIHVzZSBhbmVzcmFrZWZpbmRlciwgdGhlIHZhcmlhYmxlcyBpbiB0aGUgb3JpZ2luYWwgZGF0YXNldCBoYXZlIHRvIGJlIG51bWVyaWMNCmViMjAwOHNlbCRzZXggPC0gYXMubnVtZXJpYyhlYjIwMDhzZWwkc2V4KQ0KZWIyMDA4c2VsJG1hcnN0YXQgPC0gYXMubnVtZXJpYyhlYjIwMDhzZWwkbWFyc3RhdCkNCmViMjAwOHNlbCR1cmJhbiA8LSBhcy5udW1lcmljKGViMjAwOHNlbCR1cmJhbikNCg0KYW5lc3Jha2VmaW5kZXIodGFyZ2V0cywgZWIyMDA4c2VsLCBjaG9vc2VtZXRob2QgPSAidG90YWwiKQ0KDQpvdXRzYXZlIDwtIGFuZXNyYWtlKHRhcmdldHMsIGViMjAwOHNlbCwgY2FzZWlkID0gZWIyMDA4c2VsJGNhc2VpZCwNCiAgdmVyYm9zZT0gRkFMU0UsIGNhcCA9IDUsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIsDQogIHR5cGUgPSAicGN0bGltIiwgcGN0bGltID0gLjA1ICwgbmxpbSA9IDUsDQogIGl0ZXJhdGUgPSBUUlVFICwgZm9yY2UxID0gVFJVRSkNCnN1bW1hcnkob3V0c2F2ZSkNCg0KZWIyMDA4c2VsJHdlaWdodHZlYyAgPC0gdW5saXN0KG91dHNhdmVbMV0pDQoNCnNhdmUoZWIyMDA4c2VsLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9lYjIwMDhzZWwuUmRhdGEiKQ0KYGBgDQoNCg0KYGBge3J9DQojIDIwMDkNCmxvYWQoaGVyZSgiLi9kYXRhL2FsbF93YXZlcyIsICJlYjIwMDlhc2VsLlJEYXRhIikpDQoNCnNleCA8LSBjKCdNYWxlJywgJ0ZlbWFsZScpDQpzZXggPC0gYygwLjQ5LCAwLjUxKQ0KDQphdHRyaWJ1dGVzKGViMjAwOWFzZWwkYWdlKQ0KZWIyMDA5YXNlbCRhZ2VfY2F0W2ViMjAwOWFzZWwkYWdlID49MTUgJiBlYjIwMDlhc2VsJGFnZSA8PSAzMF0gPC0gMQ0KZWIyMDA5YXNlbCRhZ2VfY2F0W2ViMjAwOWFzZWwkYWdlID49MzEgJiBlYjIwMDlhc2VsJGFnZSA8PSA0NV0gPC0gMg0KZWIyMDA5YXNlbCRhZ2VfY2F0W2ViMjAwOWFzZWwkYWdlID49NDYgJiBlYjIwMDlhc2VsJGFnZSA8PSA2MF0gPC0gMw0KZWIyMDA5YXNlbCRhZ2VfY2F0W2ViMjAwOWFzZWwkYWdlID49NjFdIDwtIDQNCg0KYWdlX2NhdCA8LSBjKCd1MzAnLCAnMzE0NScsICc0NjYxJywgJzYxbycpDQphZ2VfY2F0IDwtIGMoMC4xOSwgMC4yMiwgMC4yMSwgMC4yMCkNCg0KbWFyc3RhdCA8LSBjKCcxJywgJzInKQ0KbWFyc3RhdCA8LSBjKDAuNTYsIDAuNDQpDQoNCnVyYmFuIDwtIGMoJ0xvdyB1cmJhbml0eScsICdNZWRpdW0gdXJiYW5pdHknLCAnSGlnaCB1cmJhbml0eScpDQp1cmJhbiA8LSBjKDAuMzksIDAuMTgsIDAuNDMpDQoNCnRhcmdldHMgPC0gbGlzdChzZXgsIGFnZV9jYXQsIG1hcnN0YXQsIHVyYmFuKQ0KbmFtZXModGFyZ2V0cykgPC0gYygic2V4IiwgImFnZV9jYXQiLCAibWFyc3RhdCIsICJ1cmJhbiIpDQoNCmViMjAwOWFzZWwkY2FzZWlkIDwtIDE6bGVuZ3RoKGViMjAwOWFzZWwkc2V4KQ0KDQojIFRvIHVzZSBhbmVzcmFrZWZpbmRlciwgdGhlIHZhcmlhYmxlcyBpbiB0aGUgb3JpZ2luYWwgZGF0YXNldCBoYXZlIHRvIGJlIG51bWVyaWMNCmViMjAwOWFzZWwkc2V4IDwtIGFzLm51bWVyaWMoZWIyMDA5YXNlbCRzZXgpDQplYjIwMDlhc2VsJG1hcnN0YXQgPC0gYXMubnVtZXJpYyhlYjIwMDlhc2VsJG1hcnN0YXQpDQplYjIwMDlhc2VsJHVyYmFuIDwtIGFzLm51bWVyaWMoZWIyMDA5YXNlbCR1cmJhbikNCg0KYW5lc3Jha2VmaW5kZXIodGFyZ2V0cywgZWIyMDA5YXNlbCwgY2hvb3NlbWV0aG9kID0gInRvdGFsIikNCg0Kb3V0c2F2ZSA8LSBhbmVzcmFrZSh0YXJnZXRzLCBlYjIwMDlhc2VsLCBjYXNlaWQgPSBlYjIwMDlhc2VsJGNhc2VpZCwNCiAgdmVyYm9zZT0gRkFMU0UsIGNhcCA9IDUsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIsDQogIHR5cGUgPSAicGN0bGltIiwgcGN0bGltID0gLjA1ICwgbmxpbSA9IDUsDQogIGl0ZXJhdGUgPSBUUlVFICwgZm9yY2UxID0gVFJVRSkNCnN1bW1hcnkob3V0c2F2ZSkNCg0KZWIyMDA5YXNlbCR3ZWlnaHR2ZWMgIDwtIHVubGlzdChvdXRzYXZlWzFdKQ0KDQpzYXZlKGViMjAwOWFzZWwsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvYWxsX3dhdmVzL2ViMjAwOWFzZWwuUmRhdGEiKQ0KDQojIDIwMDliDQpsb2FkKGhlcmUoIi4vZGF0YS9hbGxfd2F2ZXMiLCAiZWIyMDA5YnNlbC5SRGF0YSIpKQ0KDQpzZXggPC0gYygnTWFsZScsICdGZW1hbGUnKQ0Kc2V4IDwtIGMoMC40OSwgMC41MSkNCg0KYXR0cmlidXRlcyhlYjIwMDlic2VsJGFnZSkNCmViMjAwOWJzZWwkYWdlX2NhdFtlYjIwMDlic2VsJGFnZSA+PTE1ICYgZWIyMDA5YnNlbCRhZ2UgPD0gMzBdIDwtIDENCmViMjAwOWJzZWwkYWdlX2NhdFtlYjIwMDlic2VsJGFnZSA+PTMxICYgZWIyMDA5YnNlbCRhZ2UgPD0gNDVdIDwtIDINCmViMjAwOWJzZWwkYWdlX2NhdFtlYjIwMDlic2VsJGFnZSA+PTQ2ICYgZWIyMDA5YnNlbCRhZ2UgPD0gNjBdIDwtIDMNCmViMjAwOWJzZWwkYWdlX2NhdFtlYjIwMDlic2VsJGFnZSA+PTYxXSA8LSA0DQoNCmFnZV9jYXQgPC0gYygndTMwJywgJzMxNDUnLCAnNDY2MScsICc2MW8nKQ0KYWdlX2NhdCA8LSBjKDAuMTksIDAuMjIsIDAuMjEsIDAuMjApDQoNCm1hcnN0YXQgPC0gYygnMScsICcyJykNCm1hcnN0YXQgPC0gYygwLjU2LCAwLjQ0KQ0KDQp1cmJhbiA8LSBjKCdMb3cgdXJiYW5pdHknLCAnTWVkaXVtIHVyYmFuaXR5JywgJ0hpZ2ggdXJiYW5pdHknKQ0KdXJiYW4gPC0gYygwLjM5LCAwLjE4LCAwLjQzKQ0KDQp0YXJnZXRzIDwtIGxpc3Qoc2V4LCBhZ2VfY2F0LCBtYXJzdGF0LCB1cmJhbikNCm5hbWVzKHRhcmdldHMpIDwtIGMoInNleCIsICJhZ2VfY2F0IiwgIm1hcnN0YXQiLCAidXJiYW4iKQ0KDQplYjIwMDlic2VsJGNhc2VpZCA8LSAxOmxlbmd0aChlYjIwMDlic2VsJHNleCkNCg0KIyBUbyB1c2UgYW5lc3Jha2VmaW5kZXIsIHRoZSB2YXJpYWJsZXMgaW4gdGhlIG9yaWdpbmFsIGRhdGFzZXQgaGF2ZSB0byBiZSBudW1lcmljDQplYjIwMDlic2VsJHNleCA8LSBhcy5udW1lcmljKGViMjAwOWJzZWwkc2V4KQ0KZWIyMDA5YnNlbCRtYXJzdGF0IDwtIGFzLm51bWVyaWMoZWIyMDA5YnNlbCRtYXJzdGF0KQ0KZWIyMDA5YnNlbCR1cmJhbiA8LSBhcy5udW1lcmljKGViMjAwOWJzZWwkdXJiYW4pDQoNCmFuZXNyYWtlZmluZGVyKHRhcmdldHMsIGViMjAwOWJzZWwsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIpDQoNCm91dHNhdmUgPC0gYW5lc3Jha2UodGFyZ2V0cywgZWIyMDA5YnNlbCwgY2FzZWlkID0gZWIyMDA5YnNlbCRjYXNlaWQsDQogIHZlcmJvc2U9IEZBTFNFLCBjYXAgPSA1LCBjaG9vc2VtZXRob2QgPSAidG90YWwiLA0KICB0eXBlID0gInBjdGxpbSIsIHBjdGxpbSA9IC4wNSAsIG5saW0gPSA1LA0KICBpdGVyYXRlID0gVFJVRSAsIGZvcmNlMSA9IFRSVUUpDQpzdW1tYXJ5KG91dHNhdmUpDQoNCmViMjAwOWJzZWwkd2VpZ2h0dmVjICA8LSB1bmxpc3Qob3V0c2F2ZVsxXSkNCg0Kc2F2ZShlYjIwMDlic2VsLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9lYjIwMDlic2VsLlJkYXRhIikNCmBgYA0KDQoNCmBgYHtyfQ0KIyAyMDExDQpsb2FkKGhlcmUoIi4vZGF0YS9hbGxfd2F2ZXMiLCAiZWIyMDExYXNlbC5SRGF0YSIpKQ0KDQpzZXggPC0gYygnTWFsZScsICdGZW1hbGUnKQ0Kc2V4IDwtIGMoMC40OSwgMC41MSkNCg0KYXR0cmlidXRlcyhlYjIwMTFhc2VsJGFnZSkNCmViMjAxMWFzZWwkYWdlX2NhdFtlYjIwMTFhc2VsJGFnZSA+PTE1ICYgZWIyMDExYXNlbCRhZ2UgPD0gMzBdIDwtIDENCmViMjAxMWFzZWwkYWdlX2NhdFtlYjIwMTFhc2VsJGFnZSA+PTMxICYgZWIyMDExYXNlbCRhZ2UgPD0gNDVdIDwtIDINCmViMjAxMWFzZWwkYWdlX2NhdFtlYjIwMTFhc2VsJGFnZSA+PTQ2ICYgZWIyMDExYXNlbCRhZ2UgPD0gNjBdIDwtIDMNCmViMjAxMWFzZWwkYWdlX2NhdFtlYjIwMTFhc2VsJGFnZSA+PTYxXSA8LSA0DQoNCmFnZV9jYXQgPC0gYygndTMwJywgJzMxNDUnLCAnNDY2MScsICc2MW8nKQ0KYWdlX2NhdCA8LSBjKDAuMjAsIDAuMjEsIDAuMjEsIDAuMjEpDQoNCm1hcnN0YXQgPC0gYygnMScsICcyJykNCm1hcnN0YXQgPC0gYygwLjU1LCAwLjQ1KQ0KDQp1cmJhbiA8LSBjKCdMb3cgdXJiYW5pdHknLCAnTWVkaXVtIHVyYmFuaXR5JywgJ0hpZ2ggdXJiYW5pdHknKQ0KdXJiYW4gPC0gYygwLjM4LCAwLjE4LCAwLjQ0KQ0KDQp0YXJnZXRzIDwtIGxpc3Qoc2V4LCBhZ2VfY2F0LCBtYXJzdGF0LCB1cmJhbikNCm5hbWVzKHRhcmdldHMpIDwtIGMoInNleCIsICJhZ2VfY2F0IiwgIm1hcnN0YXQiLCAidXJiYW4iKQ0KDQplYjIwMTFhc2VsJGNhc2VpZCA8LSAxOmxlbmd0aChlYjIwMTFhc2VsJHNleCkNCg0KIyBUbyB1c2UgYW5lc3Jha2VmaW5kZXIsIHRoZSB2YXJpYWJsZXMgaW4gdGhlIG9yaWdpbmFsIGRhdGFzZXQgaGF2ZSB0byBiZSBudW1lcmljDQplYjIwMTFhc2VsJHNleCA8LSBhcy5udW1lcmljKGViMjAxMWFzZWwkc2V4KQ0KZWIyMDExYXNlbCRtYXJzdGF0IDwtIGFzLm51bWVyaWMoZWIyMDExYXNlbCRtYXJzdGF0KQ0KZWIyMDExYXNlbCR1cmJhbiA8LSBhcy5udW1lcmljKGViMjAxMWFzZWwkdXJiYW4pDQoNCmFuZXNyYWtlZmluZGVyKHRhcmdldHMsIGViMjAxMWFzZWwsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIpDQoNCm91dHNhdmUgPC0gYW5lc3Jha2UodGFyZ2V0cywgZWIyMDExYXNlbCwgY2FzZWlkID0gZWIyMDExYXNlbCRjYXNlaWQsDQogIHZlcmJvc2U9IEZBTFNFLCBjYXAgPSA1LCBjaG9vc2VtZXRob2QgPSAidG90YWwiLA0KICB0eXBlID0gInBjdGxpbSIsIHBjdGxpbSA9IC4wNSAsIG5saW0gPSA1LA0KICBpdGVyYXRlID0gVFJVRSAsIGZvcmNlMSA9IFRSVUUpDQpzdW1tYXJ5KG91dHNhdmUpDQoNCmViMjAxMWFzZWwkd2VpZ2h0dmVjICA8LSB1bmxpc3Qob3V0c2F2ZVsxXSkNCg0Kc2F2ZShlYjIwMTFhc2VsLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9lYjIwMTFhc2VsLlJkYXRhIikNCg0KIzIwMTFiDQpsb2FkKGhlcmUoIi4vZGF0YS9hbGxfd2F2ZXMiLCAiZWIyMDExYnNlbC5SRGF0YSIpKQ0KDQpzZXggPC0gYygnTWFsZScsICdGZW1hbGUnKQ0Kc2V4IDwtIGMoMC40OSwgMC41MSkNCg0KYXR0cmlidXRlcyhlYjIwMTFic2VsJGFnZSkNCmViMjAxMWJzZWwkYWdlX2NhdFtlYjIwMTFic2VsJGFnZSA+PTE1ICYgZWIyMDExYnNlbCRhZ2UgPD0gMzBdIDwtIDENCmViMjAxMWJzZWwkYWdlX2NhdFtlYjIwMTFic2VsJGFnZSA+PTMxICYgZWIyMDExYnNlbCRhZ2UgPD0gNDVdIDwtIDINCmViMjAxMWJzZWwkYWdlX2NhdFtlYjIwMTFic2VsJGFnZSA+PTQ2ICYgZWIyMDExYnNlbCRhZ2UgPD0gNjBdIDwtIDMNCmViMjAxMWJzZWwkYWdlX2NhdFtlYjIwMTFic2VsJGFnZSA+PTYxXSA8LSA0DQoNCmFnZV9jYXQgPC0gYygndTMwJywgJzMxNDUnLCAnNDY2MScsICc2MW8nKQ0KYWdlX2NhdCA8LSBjKDAuMjAsIDAuMjEsIDAuMjEsIDAuMjEpDQoNCm1hcnN0YXQgPC0gYygnMScsICcyJykNCm1hcnN0YXQgPC0gYygwLjU1LCAwLjQ1KQ0KDQp1cmJhbiA8LSBjKCdMb3cgdXJiYW5pdHknLCAnTWVkaXVtIHVyYmFuaXR5JywgJ0hpZ2ggdXJiYW5pdHknKQ0KdXJiYW4gPC0gYygwLjM4LCAwLjE4LCAwLjQ0KQ0KDQp0YXJnZXRzIDwtIGxpc3Qoc2V4LCBhZ2VfY2F0LCBtYXJzdGF0LCB1cmJhbikNCm5hbWVzKHRhcmdldHMpIDwtIGMoInNleCIsICJhZ2VfY2F0IiwgIm1hcnN0YXQiLCAidXJiYW4iKQ0KDQplYjIwMTFic2VsJGNhc2VpZCA8LSAxOmxlbmd0aChlYjIwMTFic2VsJHNleCkNCg0KIyBUbyB1c2UgYW5lc3Jha2VmaW5kZXIsIHRoZSB2YXJpYWJsZXMgaW4gdGhlIG9yaWdpbmFsIGRhdGFzZXQgaGF2ZSB0byBiZSBudW1lcmljDQplYjIwMTFic2VsJHNleCA8LSBhcy5udW1lcmljKGViMjAxMWJzZWwkc2V4KQ0KZWIyMDExYnNlbCRtYXJzdGF0IDwtIGFzLm51bWVyaWMoZWIyMDExYnNlbCRtYXJzdGF0KQ0KZWIyMDExYnNlbCR1cmJhbiA8LSBhcy5udW1lcmljKGViMjAxMWJzZWwkdXJiYW4pDQoNCmFuZXNyYWtlZmluZGVyKHRhcmdldHMsIGViMjAxMWJzZWwsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIpDQoNCm91dHNhdmUgPC0gYW5lc3Jha2UodGFyZ2V0cywgZWIyMDExYnNlbCwgY2FzZWlkID0gZWIyMDExYnNlbCRjYXNlaWQsDQogIHZlcmJvc2U9IEZBTFNFLCBjYXAgPSA1LCBjaG9vc2VtZXRob2QgPSAidG90YWwiLA0KICB0eXBlID0gInBjdGxpbSIsIHBjdGxpbSA9IC4wNSAsIG5saW0gPSA1LA0KICBpdGVyYXRlID0gVFJVRSAsIGZvcmNlMSA9IFRSVUUpDQpzdW1tYXJ5KG91dHNhdmUpDQoNCmViMjAxMWJzZWwkd2VpZ2h0dmVjICA8LSB1bmxpc3Qob3V0c2F2ZVsxXSkNCg0Kc2F2ZShlYjIwMTFic2VsLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9lYjIwMTFic2VsLlJkYXRhIikNCmBgYA0KDQoNCmBgYHtyfQ0KIyAyMDEzDQpsb2FkKGhlcmUoIi4vZGF0YS9hbGxfd2F2ZXMiLCAiZWIyMDEzc2VsLlJEYXRhIikpDQoNCnNleCA8LSBjKCdNYWxlJywgJ0ZlbWFsZScpDQpzZXggPC0gYygwLjUwLCAwLjUwKQ0KDQphdHRyaWJ1dGVzKGViMjAxM3NlbCRhZ2UpDQplYjIwMTNzZWwkYWdlX2NhdFtlYjIwMTNzZWwkYWdlID49MTUgJiBlYjIwMTNzZWwkYWdlIDw9IDMwXSA8LSAxDQplYjIwMTNzZWwkYWdlX2NhdFtlYjIwMTNzZWwkYWdlID49MzEgJiBlYjIwMTNzZWwkYWdlIDw9IDQ1XSA8LSAyDQplYjIwMTNzZWwkYWdlX2NhdFtlYjIwMTNzZWwkYWdlID49NDYgJiBlYjIwMTNzZWwkYWdlIDw9IDYwXSA8LSAzDQplYjIwMTNzZWwkYWdlX2NhdFtlYjIwMTNzZWwkYWdlID49NjFdIDwtIDQNCg0KYWdlX2NhdCA8LSBjKCd1MzAnLCAnMzE0NScsICc0NjYxJywgJzYxbycpDQphZ2VfY2F0IDwtIGMoMC4yMCwgMC4yMCwgMC4yMSwgMC4yMikNCg0KbWFyc3RhdCA8LSBjKCcxJywgJzInKQ0KbWFyc3RhdCA8LSBjKDAuNTQsIDAuNDYpDQoNCnVyYmFuIDwtIGMoJ0xvdyB1cmJhbml0eScsICdNZWRpdW0gdXJiYW5pdHknLCAnSGlnaCB1cmJhbml0eScpDQp1cmJhbiA8LSBjKDAuMzcsIDAuMTgsIDAuNDUpDQoNCnRhcmdldHMgPC0gbGlzdChzZXgsIGFnZV9jYXQsIG1hcnN0YXQsIHVyYmFuKQ0KbmFtZXModGFyZ2V0cykgPC0gYygic2V4IiwgImFnZV9jYXQiLCAibWFyc3RhdCIsICJ1cmJhbiIpDQoNCmViMjAxM3NlbCRjYXNlaWQgPC0gMTpsZW5ndGgoZWIyMDEzc2VsJHNleCkNCg0KIyBUbyB1c2UgYW5lc3Jha2VmaW5kZXIsIHRoZSB2YXJpYWJsZXMgaW4gdGhlIG9yaWdpbmFsIGRhdGFzZXQgaGF2ZSB0byBiZSBudW1lcmljDQplYjIwMTNzZWwkc2V4IDwtIGFzLm51bWVyaWMoZWIyMDEzc2VsJHNleCkNCmViMjAxM3NlbCRtYXJzdGF0IDwtIGFzLm51bWVyaWMoZWIyMDEzc2VsJG1hcnN0YXQpDQplYjIwMTNzZWwkdXJiYW4gPC0gYXMubnVtZXJpYyhlYjIwMTNzZWwkdXJiYW4pDQoNCmFuZXNyYWtlZmluZGVyKHRhcmdldHMsIGViMjAxM3NlbCwgY2hvb3NlbWV0aG9kID0gInRvdGFsIikNCg0Kb3V0c2F2ZSA8LSBhbmVzcmFrZSh0YXJnZXRzLCBlYjIwMTNzZWwsIGNhc2VpZCA9IGViMjAxM3NlbCRjYXNlaWQsDQogIHZlcmJvc2U9IEZBTFNFLCBjYXAgPSA1LCBjaG9vc2VtZXRob2QgPSAidG90YWwiLA0KICB0eXBlID0gInBjdGxpbSIsIHBjdGxpbSA9IC4wNSAsIG5saW0gPSA1LA0KICBpdGVyYXRlID0gVFJVRSAsIGZvcmNlMSA9IFRSVUUpDQpzdW1tYXJ5KG91dHNhdmUpDQoNCmViMjAxM3NlbCR3ZWlnaHR2ZWMgIDwtIHVubGlzdChvdXRzYXZlWzFdKQ0KDQpzYXZlKGViMjAxM3NlbCwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9hbGxfd2F2ZXMvZWIyMDEzc2VsLlJkYXRhIikNCmBgYA0KDQoNCmBgYHtyfQ0KIyAyMDE0DQpsb2FkKGhlcmUoIi4vZGF0YS9hbGxfd2F2ZXMiLCAiZWIyMDE0c2VsLlJEYXRhIikpDQoNCnNleCA8LSBjKCdNYWxlJywgJ0ZlbWFsZScpDQpzZXggPC0gYygwLjUwLCAwLjUwKQ0KDQphdHRyaWJ1dGVzKGViMjAxNHNlbCRhZ2UpDQplYjIwMTRzZWwkYWdlX2NhdFtlYjIwMTRzZWwkYWdlID49MTUgJiBlYjIwMTRzZWwkYWdlIDw9IDMwXSA8LSAxDQplYjIwMTRzZWwkYWdlX2NhdFtlYjIwMTRzZWwkYWdlID49MzEgJiBlYjIwMTRzZWwkYWdlIDw9IDQ1XSA8LSAyDQplYjIwMTRzZWwkYWdlX2NhdFtlYjIwMTRzZWwkYWdlID49NDYgJiBlYjIwMTRzZWwkYWdlIDw9IDYwXSA8LSAzDQplYjIwMTRzZWwkYWdlX2NhdFtlYjIwMTRzZWwkYWdlID49NjFdIDwtIDQNCg0KYWdlX2NhdCA8LSBjKCd1MzAnLCAnMzE0NScsICc0NjYxJywgJzYxbycpDQphZ2VfY2F0IDwtIGMoMC4yMCwgMC4yMCwgMC4yMiwgMC4yMikNCg0KbWFyc3RhdCA8LSBjKCcxJywgJzInKQ0KbWFyc3RhdCA8LSBjKDAuNTQsIDAuNDYpDQoNCnVyYmFuIDwtIGMoJ0xvdyB1cmJhbml0eScsICdNZWRpdW0gdXJiYW5pdHknLCAnSGlnaCB1cmJhbml0eScpDQp1cmJhbiA8LSBjKDAuMzcsIDAuMTgsIDAuNDUpDQoNCnRhcmdldHMgPC0gbGlzdChzZXgsIGFnZV9jYXQsIG1hcnN0YXQsIHVyYmFuKQ0KbmFtZXModGFyZ2V0cykgPC0gYygic2V4IiwgImFnZV9jYXQiLCAibWFyc3RhdCIsICJ1cmJhbiIpDQoNCmViMjAxNHNlbCRjYXNlaWQgPC0gMTpsZW5ndGgoZWIyMDE0c2VsJHNleCkNCg0KIyBUbyB1c2UgYW5lc3Jha2VmaW5kZXIsIHRoZSB2YXJpYWJsZXMgaW4gdGhlIG9yaWdpbmFsIGRhdGFzZXQgaGF2ZSB0byBiZSBudW1lcmljDQplYjIwMTRzZWwkc2V4IDwtIGFzLm51bWVyaWMoZWIyMDE0c2VsJHNleCkNCmViMjAxNHNlbCRtYXJzdGF0IDwtIGFzLm51bWVyaWMoZWIyMDE0c2VsJG1hcnN0YXQpDQplYjIwMTRzZWwkdXJiYW4gPC0gYXMubnVtZXJpYyhlYjIwMTRzZWwkdXJiYW4pDQoNCmFuZXNyYWtlZmluZGVyKHRhcmdldHMsIGViMjAxNHNlbCwgY2hvb3NlbWV0aG9kID0gInRvdGFsIikNCg0Kb3V0c2F2ZSA8LSBhbmVzcmFrZSh0YXJnZXRzLCBlYjIwMTRzZWwsIGNhc2VpZCA9IGViMjAxNHNlbCRjYXNlaWQsDQogIHZlcmJvc2U9IEZBTFNFLCBjYXAgPSA1LCBjaG9vc2VtZXRob2QgPSAidG90YWwiLA0KICB0eXBlID0gInBjdGxpbSIsIHBjdGxpbSA9IC4wNSAsIG5saW0gPSA1LA0KICBpdGVyYXRlID0gVFJVRSAsIGZvcmNlMSA9IFRSVUUpDQpzdW1tYXJ5KG91dHNhdmUpDQoNCmViMjAxNHNlbCR3ZWlnaHR2ZWMgIDwtIHVubGlzdChvdXRzYXZlWzFdKQ0KDQpzYXZlKGViMjAxNHNlbCwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9hbGxfd2F2ZXMvZWIyMDE0c2VsLlJkYXRhIikNCmBgYA0KDQoNCmBgYHtyfQ0KIyAyMDE1DQpsb2FkKGhlcmUoIi4vZGF0YS9hbGxfd2F2ZXMiLCAiZWIyMDE1c2VsLlJEYXRhIikpDQoNCnNleCA8LSBjKCdNYWxlJywgJ0ZlbWFsZScpDQpzZXggPC0gYygwLjUwLCAwLjUwKQ0KDQphdHRyaWJ1dGVzKGViMjAxNXNlbCRhZ2UpDQplYjIwMTVzZWwkYWdlX2NhdFtlYjIwMTVzZWwkYWdlID49MTUgJiBlYjIwMTVzZWwkYWdlIDw9IDMwXSA8LSAxDQplYjIwMTVzZWwkYWdlX2NhdFtlYjIwMTVzZWwkYWdlID49MzEgJiBlYjIwMTVzZWwkYWdlIDw9IDQ1XSA8LSAyDQplYjIwMTVzZWwkYWdlX2NhdFtlYjIwMTVzZWwkYWdlID49NDYgJiBlYjIwMTVzZWwkYWdlIDw9IDYwXSA8LSAzDQplYjIwMTVzZWwkYWdlX2NhdFtlYjIwMTVzZWwkYWdlID49NjFdIDwtIDQNCg0KYWdlX2NhdCA8LSBjKCd1MzAnLCAnMzE0NScsICc0NjYxJywgJzYxbycpDQphZ2VfY2F0IDwtIGMoMC4yMCwgMC4yMCwgMC4yMiwgMC4yMikNCg0KbWFyc3RhdCA8LSBjKCcxJywgJzInKQ0KbWFyc3RhdCA8LSBjKDAuNTQsIDAuNDYpDQoNCnVyYmFuIDwtIGMoJ0xvdyB1cmJhbml0eScsICdNZWRpdW0gdXJiYW5pdHknLCAnSGlnaCB1cmJhbml0eScpDQp1cmJhbiA8LSBjKDAuMzcsIDAuMTgsIDAuNDUpDQoNCnRhcmdldHMgPC0gbGlzdChzZXgsIGFnZV9jYXQsIG1hcnN0YXQsIHVyYmFuKQ0KbmFtZXModGFyZ2V0cykgPC0gYygic2V4IiwgImFnZV9jYXQiLCAibWFyc3RhdCIsICJ1cmJhbiIpDQoNCmViMjAxNXNlbCRjYXNlaWQgPC0gMTpsZW5ndGgoZWIyMDE1c2VsJHNleCkNCg0KIyBUbyB1c2UgYW5lc3Jha2VmaW5kZXIsIHRoZSB2YXJpYWJsZXMgaW4gdGhlIG9yaWdpbmFsIGRhdGFzZXQgaGF2ZSB0byBiZSBudW1lcmljDQplYjIwMTVzZWwkc2V4IDwtIGFzLm51bWVyaWMoZWIyMDE1c2VsJHNleCkNCmViMjAxNXNlbCRtYXJzdGF0IDwtIGFzLm51bWVyaWMoZWIyMDE1c2VsJG1hcnN0YXQpDQplYjIwMTVzZWwkdXJiYW4gPC0gYXMubnVtZXJpYyhlYjIwMTVzZWwkdXJiYW4pDQoNCmFuZXNyYWtlZmluZGVyKHRhcmdldHMsIGViMjAxNXNlbCwgY2hvb3NlbWV0aG9kID0gInRvdGFsIikNCg0Kb3V0c2F2ZSA8LSBhbmVzcmFrZSh0YXJnZXRzLCBlYjIwMTVzZWwsIGNhc2VpZCA9IGViMjAxNXNlbCRjYXNlaWQsDQogIHZlcmJvc2U9IEZBTFNFLCBjYXAgPSA1LCBjaG9vc2VtZXRob2QgPSAidG90YWwiLA0KICB0eXBlID0gInBjdGxpbSIsIHBjdGxpbSA9IC4wNSAsIG5saW0gPSA1LA0KICBpdGVyYXRlID0gVFJVRSAsIGZvcmNlMSA9IFRSVUUpDQpzdW1tYXJ5KG91dHNhdmUpDQoNCmViMjAxNXNlbCR3ZWlnaHR2ZWMgIDwtIHVubGlzdChvdXRzYXZlWzFdKQ0KDQpzYXZlKGViMjAxNXNlbCwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9hbGxfd2F2ZXMvZWIyMDE1c2VsLlJkYXRhIikNCmBgYA0KDQoNCmBgYHtyfQ0KIzIwMTdhDQpsb2FkKGhlcmUoIi4vZGF0YS9hbGxfd2F2ZXMiLCAiZWIyMDE3YXNlbC5SRGF0YSIpKQ0KDQpzZXggPC0gYygnTWFsZScsICdGZW1hbGUnKQ0Kc2V4IDwtIGMoMC41MCwgMC41MCkNCg0KYXR0cmlidXRlcyhlYjIwMTdhc2VsJGFnZSkNCmViMjAxN2FzZWwkYWdlX2NhdFtlYjIwMTdhc2VsJGFnZSA+PTE1ICYgZWIyMDE3YXNlbCRhZ2UgPD0gMzBdIDwtIDENCmViMjAxN2FzZWwkYWdlX2NhdFtlYjIwMTdhc2VsJGFnZSA+PTMxICYgZWIyMDE3YXNlbCRhZ2UgPD0gNDVdIDwtIDINCmViMjAxN2FzZWwkYWdlX2NhdFtlYjIwMTdhc2VsJGFnZSA+PTQ2ICYgZWIyMDE3YXNlbCRhZ2UgPD0gNjBdIDwtIDMNCmViMjAxN2FzZWwkYWdlX2NhdFtlYjIwMTdhc2VsJGFnZSA+PTYxXSA8LSA0DQoNCmFnZV9jYXQgPC0gYygndTMwJywgJzMxNDUnLCAnNDY2MScsICc2MW8nKQ0KYWdlX2NhdCA8LSBjKDAuMjAsIDAuMTksIDAuMjIsIDAuMjMpDQoNCm1hcnN0YXQgPC0gYygnMScsICcyJykNCm1hcnN0YXQgPC0gYygwLjUzLCAwLjQ3KQ0KDQp1cmJhbiA8LSBjKCdMb3cgdXJiYW5pdHknLCAnTWVkaXVtIHVyYmFuaXR5JywgJ0hpZ2ggdXJiYW5pdHknKQ0KdXJiYW4gPC0gYygwLjM1LCAwLjE3LCAwLjQ4KQ0KDQp0YXJnZXRzIDwtIGxpc3Qoc2V4LCBhZ2VfY2F0LCBtYXJzdGF0LCB1cmJhbikNCm5hbWVzKHRhcmdldHMpIDwtIGMoInNleCIsICJhZ2VfY2F0IiwgIm1hcnN0YXQiLCAidXJiYW4iKQ0KDQplYjIwMTdhc2VsJGNhc2VpZCA8LSAxOmxlbmd0aChlYjIwMTdhc2VsJHNleCkNCg0KIyBUbyB1c2UgYW5lc3Jha2VmaW5kZXIsIHRoZSB2YXJpYWJsZXMgaW4gdGhlIG9yaWdpbmFsIGRhdGFzZXQgaGF2ZSB0byBiZSBudW1lcmljDQplYjIwMTdhc2VsJHNleCA8LSBhcy5udW1lcmljKGViMjAxN2FzZWwkc2V4KQ0KZWIyMDE3YXNlbCRtYXJzdGF0IDwtIGFzLm51bWVyaWMoZWIyMDE3YXNlbCRtYXJzdGF0KQ0KZWIyMDE3YXNlbCR1cmJhbiA8LSBhcy5udW1lcmljKGViMjAxN2FzZWwkdXJiYW4pDQoNCmFuZXNyYWtlZmluZGVyKHRhcmdldHMsIGViMjAxN2FzZWwsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIpDQoNCm91dHNhdmUgPC0gYW5lc3Jha2UodGFyZ2V0cywgZWIyMDE3YXNlbCwgY2FzZWlkID0gZWIyMDE3YXNlbCRjYXNlaWQsDQogIHZlcmJvc2U9IEZBTFNFLCBjYXAgPSA1LCBjaG9vc2VtZXRob2QgPSAidG90YWwiLA0KICB0eXBlID0gInBjdGxpbSIsIHBjdGxpbSA9IC4wNSAsIG5saW0gPSA1LA0KICBpdGVyYXRlID0gVFJVRSAsIGZvcmNlMSA9IFRSVUUpDQpzdW1tYXJ5KG91dHNhdmUpDQoNCmViMjAxN2FzZWwkd2VpZ2h0dmVjICA8LSB1bmxpc3Qob3V0c2F2ZVsxXSkNCg0Kc2F2ZShlYjIwMTdhc2VsLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9lYjIwMTdhc2VsLlJkYXRhIikNCg0KIzIwMTdiDQpsb2FkKGhlcmUoIi4vZGF0YS9hbGxfd2F2ZXMiLCAiZWIyMDE3YnNlbC5SRGF0YSIpKQ0KDQpzZXggPC0gYygnTWFsZScsICdGZW1hbGUnKQ0Kc2V4IDwtIGMoMC41MCwgMC41MCkNCg0KYXR0cmlidXRlcyhlYjIwMTdic2VsJGFnZSkNCmViMjAxN2JzZWwkYWdlX2NhdFtlYjIwMTdic2VsJGFnZSA+PTE1ICYgZWIyMDE3YnNlbCRhZ2UgPD0gMzBdIDwtIDENCmViMjAxN2JzZWwkYWdlX2NhdFtlYjIwMTdic2VsJGFnZSA+PTMxICYgZWIyMDE3YnNlbCRhZ2UgPD0gNDVdIDwtIDINCmViMjAxN2JzZWwkYWdlX2NhdFtlYjIwMTdic2VsJGFnZSA+PTQ2ICYgZWIyMDE3YnNlbCRhZ2UgPD0gNjBdIDwtIDMNCmViMjAxN2JzZWwkYWdlX2NhdFtlYjIwMTdic2VsJGFnZSA+PTYxXSA8LSA0DQoNCmFnZV9jYXQgPC0gYygndTMwJywgJzMxNDUnLCAnNDY2MScsICc2MW8nKQ0KYWdlX2NhdCA8LSBjKDAuMjAsIDAuMTksIDAuMjIsIDAuMjMpDQoNCm1hcnN0YXQgPC0gYygnMScsICcyJykNCm1hcnN0YXQgPC0gYygwLjUzLCAwLjQ3KQ0KDQp1cmJhbiA8LSBjKCdMb3cgdXJiYW5pdHknLCAnTWVkaXVtIHVyYmFuaXR5JywgJ0hpZ2ggdXJiYW5pdHknKQ0KdXJiYW4gPC0gYygwLjM1LCAwLjE3LCAwLjQ4KQ0KDQp0YXJnZXRzIDwtIGxpc3Qoc2V4LCBhZ2VfY2F0LCBtYXJzdGF0LCB1cmJhbikNCm5hbWVzKHRhcmdldHMpIDwtIGMoInNleCIsICJhZ2VfY2F0IiwgIm1hcnN0YXQiLCAidXJiYW4iKQ0KDQplYjIwMTdic2VsJGNhc2VpZCA8LSAxOmxlbmd0aChlYjIwMTdic2VsJHNleCkNCg0KIyBUbyB1c2UgYW5lc3Jha2VmaW5kZXIsIHRoZSB2YXJpYWJsZXMgaW4gdGhlIG9yaWdpbmFsIGRhdGFzZXQgaGF2ZSB0byBiZSBudW1lcmljDQplYjIwMTdic2VsJHNleCA8LSBhcy5udW1lcmljKGViMjAxN2JzZWwkc2V4KQ0KZWIyMDE3YnNlbCRtYXJzdGF0IDwtIGFzLm51bWVyaWMoZWIyMDE3YnNlbCRtYXJzdGF0KQ0KZWIyMDE3YnNlbCR1cmJhbiA8LSBhcy5udW1lcmljKGViMjAxN2JzZWwkdXJiYW4pDQoNCmFuZXNyYWtlZmluZGVyKHRhcmdldHMsIGViMjAxN2JzZWwsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIpDQoNCm91dHNhdmUgPC0gYW5lc3Jha2UodGFyZ2V0cywgZWIyMDE3YnNlbCwgY2FzZWlkID0gZWIyMDE3YnNlbCRjYXNlaWQsDQogIHZlcmJvc2U9IEZBTFNFLCBjYXAgPSA1LCBjaG9vc2VtZXRob2QgPSAidG90YWwiLA0KICB0eXBlID0gInBjdGxpbSIsIHBjdGxpbSA9IC4wNSAsIG5saW0gPSA1LA0KICBpdGVyYXRlID0gVFJVRSAsIGZvcmNlMSA9IFRSVUUpDQpzdW1tYXJ5KG91dHNhdmUpDQoNCmViMjAxN2JzZWwkd2VpZ2h0dmVjICA8LSB1bmxpc3Qob3V0c2F2ZVsxXSkNCg0Kc2F2ZShlYjIwMTdic2VsLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9lYjIwMTdic2VsLlJkYXRhIikNCmBgYA0KDQoNCmBgYHtyfQ0KIzIwMjENCmxvYWQoaGVyZSgiLi9kYXRhL2FsbF93YXZlcyIsICJlYjIwMjFzZWwuUkRhdGEiKSkNCg0Kc2V4IDwtIGMoJ01hbGUnLCAnRmVtYWxlJykNCnNleCA8LSBjKDAuNTAsIDAuNTApDQoNCmF0dHJpYnV0ZXMoZWIyMDIxc2VsJGFnZSkNCmViMjAyMXNlbCRhZ2VfY2F0W2ViMjAyMXNlbCRhZ2UgPj0xNSAmIGViMjAyMXNlbCRhZ2UgPD0gMzBdIDwtIDENCmViMjAyMXNlbCRhZ2VfY2F0W2ViMjAyMXNlbCRhZ2UgPj0zMSAmIGViMjAyMXNlbCRhZ2UgPD0gNDVdIDwtIDINCmViMjAyMXNlbCRhZ2VfY2F0W2ViMjAyMXNlbCRhZ2UgPj00NiAmIGViMjAyMXNlbCRhZ2UgPD0gNjBdIDwtIDMNCmViMjAyMXNlbCRhZ2VfY2F0W2ViMjAyMXNlbCRhZ2UgPj02MV0gPC0gNA0KDQphZ2VfY2F0IDwtIGMoJ3UzMCcsICczMTQ1JywgJzQ2NjEnLCAnNjFvJykNCmFnZV9jYXQgPC0gYygwLjIwLCAwLjE4LCAwLjIxLCAwLjI1KQ0KDQp1cmJhbiA8LSBjKCdMb3cgdXJiYW5pdHknLCAnTWVkaXVtIHVyYmFuaXR5JywgJ0hpZ2ggdXJiYW5pdHknKQ0KdXJiYW4gPC0gYygwLjM0LCAwLjE3LCAwLjQ5KQ0KDQp0YXJnZXRzIDwtIGxpc3Qoc2V4LCBhZ2VfY2F0LCB1cmJhbikNCm5hbWVzKHRhcmdldHMpIDwtIGMoInNleCIsICJhZ2VfY2F0IiwgInVyYmFuIikNCg0KZWIyMDIxc2VsJGNhc2VpZCA8LSAxOmxlbmd0aChlYjIwMjFzZWwkc2V4KQ0KDQojIFRvIHVzZSBhbmVzcmFrZWZpbmRlciwgdGhlIHZhcmlhYmxlcyBpbiB0aGUgb3JpZ2luYWwgZGF0YXNldCBoYXZlIHRvIGJlIG51bWVyaWMNCmViMjAyMXNlbCRzZXggPC0gYXMubnVtZXJpYyhlYjIwMjFzZWwkc2V4KQ0KZWIyMDIxc2VsJHVyYmFuIDwtIGFzLm51bWVyaWMoZWIyMDIxc2VsJHVyYmFuKQ0KDQphbmVzcmFrZWZpbmRlcih0YXJnZXRzLCBlYjIwMjFzZWwsIGNob29zZW1ldGhvZCA9ICJ0b3RhbCIpDQoNCm91dHNhdmUgPC0gYW5lc3Jha2UodGFyZ2V0cywgZWIyMDIxc2VsLCBjYXNlaWQgPSBlYjIwMjFzZWwkY2FzZWlkLA0KICB2ZXJib3NlPSBGQUxTRSwgY2FwID0gNSwgY2hvb3NlbWV0aG9kID0gInRvdGFsIiwNCiAgdHlwZSA9ICJwY3RsaW0iLCBwY3RsaW0gPSAuMDUgLCBubGltID0gNSwNCiAgaXRlcmF0ZSA9IFRSVUUgLCBmb3JjZTEgPSBUUlVFKQ0Kc3VtbWFyeShvdXRzYXZlKQ0KDQplYjIwMjFzZWwkd2VpZ2h0dmVjICA8LSB1bmxpc3Qob3V0c2F2ZVsxXSkNCg0Kc2F2ZShlYjIwMjFzZWwsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvYWxsX3dhdmVzL2ViMjAyMXNlbC5SZGF0YSIpDQpgYGANCg0K</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("weights.Rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
