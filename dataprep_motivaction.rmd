@@ -28,36 +28,62 @@ getwd()
 # Motivaction data {-}
 ```{r}
 #Load in motivaction trend file from local folder
-motivaction <- foreign::read.spss("C:/climate_data/motivaction.sav", use.value.labels = T,  to.data.frame = T)
+motivaction <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/motivaction.sav", use.value.labels = T,  to.data.frame = T)
+
+#Both years are in this dataset, I only want 2019. I also only include group A, as they have filled in the questions that I am interested in. 
+
+table(motivaction$nGroep)
+
+summary(motivaction$nKOP1)
+
+mot2019 <- motivaction %>% filter(nGroep == "Groep A")  %>%
+                filter (nKOP1 == "Meting 2019") %>%
+            select(nStedelijkheid, nHuishoudsamenstelling, nInkomencat, nGeslacht, xopleidvolt, nOplcatVolt, xlft, iQ20211_8, nQ40, nQ40Extra, iQ41_1:iQ41_5, iQ43, nQ46_1:nQ46_5, iQ50_1, iQ50_2, iQ51_1:iQ51_3, iQ52)
+
+table(mot2019$iQ20211_8, useNA = "always") #only missings so don't include
+table(mot2019$nQ40, useNA = "always")
+mot2019$cchange <- as.numeric(mot2019$nQ40)
+mot2019$cchange
+mot2019$cchange <- (as.numeric(mot2019$cchange) - 1)* (6/3) + 1
+
+table(mot2019$iQ41_1, useNA = "always")
+mot2019$worried <- as.numeric(mot2019$iQ41_1)
+mot2019$worried[mot2019$worried == 6] <- NA
+
+table(mot2019$iQ41_2, useNA = "always")
+mot2019$futuregen <- as.numeric(mot2019$iQ41_2)
+mot2019$futuregen[mot2019$futuregen == 6] <- NA
+
+table(mot2019$iQ41_3, useNA = "always")
+mot2019$nowor <- as.numeric(mot2019$iQ41_3)
+mot2019 <- mot2019 %>%
+  mutate(across(c(nowor), ~recode(., `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5` = 1)))
+table(mot2019$nowor, useNA = "always")
+mot2019$nowor[mot2019$nowor == 6] <- NA
+
+#Q41_4 is about Groningen, not really useful
+table(mot2019$iQ41_5, useNA = "always")
+mot2019$ontime <- as.numeric(mot2019$iQ41_5)
+mot2019$ontime[mot2019$ontime == 6] <- NA
+
+table(mot2019$iQ43, useNA = "always")
+mot2019$gov <- as.numeric(mot2019$iQ43)
+mot2019$gov[mot2019$gov == 6] <- NA
 
 
 
-# So apparently, in the Netherlands in 1981 and in 2017, the question for the dependent var was not asked. This means that I cannot use those years from the EVS. A pity. 
+#The following statements are about the responsibility of different groups. There is one answer category that states that the respondent doesn't think measures should be taken. I will code that together with the group "is not responsible" because it both means that you don't think those parties have to act to tackle climate change. 
+table(mot2019$nQ46_1, useNA = "always")
+mot2019$resp_gov <- as.numeric(mot2019$nQ46_1)
+mot2019$resp_gov[mot2019$resp_gov == 5] <- NA
+mot2019$resp_gov[mot2019$resp_gov == 4] <- 1
+table(mot2019$resp_gov, useNA = "always")
 
-evs$S003_n <- as.numeric(evs$S003)
-evs$S020 <- as.numeric(as.character(evs$S020))
-
-evssel <- evs %>% filter(S003_n == 31)  %>%
-                filter (S020 >1981 & S020 <2017) %>%
-            select(stdyno_w, S001, S002EVS, S006, S017, S018,S020, B001, X001, X002, X003, X003R, X003R2, X011, X023, X023R, X025, X025A, X025CSEVS, X007, G027A, X028, X047CS, X047_EVS, X047R_EVS, A006, E033)
-
-table(evssel$stdyno_w, evssel$X025CSEVS, useNA = "always")
-
-freq(evssel$X025CSEVS)
-
-attributes(evs$B001)
-table(evssel$B001, useNA = "always")
 
 #Recode it, because now a higher number means lower willingness to make sacrifices. I want everything in the direction that a higher score equals more positive attitudes towards the climate. 
 
 evssel$climate <- as.numeric(evssel$B001)
-evssel$religious <- as.numeric(evssel$A006)
-evssel <- evssel %>% 
-     mutate_at(c("climate", "religious"), funs(recode(., `1` = 4, `2` = 3, `3` = 2, `4` = 1)))
-evssel$climate5 <- (evssel$climate-1)*(4/3)+1
-evssel$religious[is.na(evssel$religious)] <- 88 #11 missings get value 88
-evssel$religious <- as.factor(evssel$religious)
-evssel$religious <- revalue(evssel$religious, c("1"="Not at all important", "2"="Not very important", "3"="Rather important", "4" = "Very important", "88"="Missing"))
+
 
 #Independent variables and missings
 table(evssel$X047_EVS, useNA = "always") #Scale of household incomes from 1 to 10, with 540 missings (gross)
