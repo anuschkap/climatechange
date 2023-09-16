@@ -78,100 +78,245 @@ mot2019$resp_gov <- as.numeric(mot2019$nQ46_1)
 mot2019$resp_gov[mot2019$resp_gov == 5] <- NA
 mot2019$resp_gov[mot2019$resp_gov == 4] <- 1
 table(mot2019$resp_gov, useNA = "always")
+mot2019$resp_gov <- (as.numeric(mot2019$resp_gov) - 1)* (6/3) + 1
+
+table(mot2019$nQ46_2, useNA = "always")
+mot2019$resp_comp <- as.numeric(mot2019$nQ46_2)
+mot2019$resp_comp[mot2019$resp_comp == 5] <- NA
+mot2019$resp_comp[mot2019$resp_comp == 4] <- 1
+table(mot2019$resp_comp, useNA = "always")
+mot2019$resp_comp <- (as.numeric(mot2019$resp_comp) - 1)* (6/3) + 1
+
+table(mot2019$nQ46_3, useNA = "always")
+mot2019$resp_mkb <- as.numeric(mot2019$nQ46_3)
+mot2019$resp_mkb[mot2019$resp_mkb == 5] <- NA
+mot2019$resp_mkb[mot2019$resp_mkb == 4] <- 1
+table(mot2019$resp_mkb, useNA = "always")
+mot2019$resp_mkb <- (as.numeric(mot2019$resp_mkb) - 1)* (6/3) + 1
+
+table(mot2019$nQ46_4, useNA = "always")
+mot2019$resp_citiz <- as.numeric(mot2019$nQ46_4)
+mot2019$resp_citiz[mot2019$resp_citiz == 5] <- NA
+mot2019$resp_citiz[mot2019$resp_citiz == 4] <- 1
+table(mot2019$resp_citiz, useNA = "always")
+mot2019$resp_citiz <- (as.numeric(mot2019$resp_citiz) - 1)* (6/3) + 1
+
+table(mot2019$nQ46_5, useNA = "always")
+mot2019$resp_you <- as.numeric(mot2019$nQ46_5)
+mot2019$resp_you[mot2019$resp_you == 5] <- NA
+mot2019$resp_you[mot2019$resp_you == 4] <- 1
+table(mot2019$resp_you, useNA = "always")
+mot2019$resp_you <- (as.numeric(mot2019$resp_you) - 1)* (6/3) + 1
 
 
-#Recode it, because now a higher number means lower willingness to make sacrifices. I want everything in the direction that a higher score equals more positive attitudes towards the climate. 
+table(mot2019$iQ50_1, useNA = "always")
+mot2019$pers_resp <- as.numeric(mot2019$iQ50_1)
+mot2019$pers_resp[mot2019$pers_resp == 6] <- NA
 
-evssel$climate <- as.numeric(evssel$B001)
+table(mot2019$iQ50_2, useNA = "always")
+mot2019$sust_choice <- as.numeric(mot2019$iQ50_2)
+mot2019$sust_choice[mot2019$sust_choice == 6] <- NA
 
+table(mot2019$iQ51_1, useNA = "always")
+mot2019$contr <- as.numeric(mot2019$iQ51_1)
+mot2019$contr[mot2019$contr == 6] <- NA
 
-#Independent variables and missings
-table(evssel$X047_EVS, useNA = "always") #Scale of household incomes from 1 to 10, with 540 missings (gross)
-# Fix income in quartiles 
+table(mot2019$iQ51_2, useNA = "always")
+mot2019$energy <- as.numeric(mot2019$iQ51_2)
+mot2019$energy[mot2019$energy == 6] <- NA
 
-# For the EVS I only have one variable for income, but of course the quantiles and mean can be different per year. 
-# So I have to take that into account. Following code is definitely not the most efficient way to do so, but it works
-evssel_w1 <- as.data.frame(evssel[evssel$S002EVS == "1990-1993", ])
-evssel_w1$income <- as.numeric(evssel_w1$X047_EVS)
-mean(evssel_w1$income, na.rm=T)
-evssel_w1$income[is.na(evssel_w1$income)] <- 5.614
-evssel_w1$income_quart <- with(evssel_w1, cut(income, 
-                                breaks=quantile(income, probs=seq(0,1, by=0.25), na.rm=TRUE), 
-                                include.lowest=TRUE))
-evssel_w1$income_quart <- as.numeric(evssel_w1$income_quart)
+table(mot2019$iQ51_3, useNA = "always")
+mot2019$noidea <- as.numeric(mot2019$iQ51_3)
+mot2019$noidea[mot2019$noidea == 6] <- NA
 
-evssel_w2 <- as.data.frame(evssel[evssel$S002EVS == "1999-2001", ])
-evssel_w2$income <- as.numeric(evssel_w2$X047_EVS)
-mean(evssel_w2$income, na.rm=T)
-evssel_w2$income[is.na(evssel_w2$income)] <- 6.403
-evssel_w2$income_quart <- with(evssel_w2, cut(income, 
-                                breaks=quantile(income, probs=seq(0,1, by=0.25), na.rm=TRUE), 
-                                include.lowest=TRUE))
-evssel_w2$income_quart <- as.numeric(evssel_w2$income_quart)
+table(mot2019$iQ52, useNA = "always")
+mot2019$motiv <- as.numeric(mot2019$iQ52)
+mot2019$motiv[mot2019$motiv == 6] <- NA
 
-evssel_w3 <- as.data.frame(evssel[evssel$S002EVS == "2008-2010", ])
-evssel_w3$income <- as.numeric(evssel_w3$X047_EVS)
-mean(evssel_w3$income, na.rm=T)
-evssel_w3$income[is.na(evssel_w3$income)] <- 5.277
-evssel_w3$income_quart <- with(evssel_w3, cut(income, 
-                                breaks=quantile(income, probs=seq(0,1, by=0.25), na.rm=TRUE), 
-                                include.lowest=TRUE))
-evssel_w3$income_quart <- as.numeric(evssel_w3$income_quart)
+# Independent variables
+# Gender, education, age, urbanity and marital status 
+table(mot2019$nGeslacht, useNA = "always")
+mot2019$sex <- revalue(mot2019$nGeslacht, c("Man"="1", "Vrouw"="2"))
 
-evssel_w1 <- rbind(evssel_w1, evssel_w2)
-evssel_w1 <- rbind(evssel_w1, evssel_w3)
-evssel_w1 <- evssel_w1 %>% select(income_quart)
-evssel <- cbind(evssel, evssel_w1)
+# 84 have a different marital status than single or living together. I don't want to throw them away, but as they're not living together at least (and have partner influence probably) I will code them in the category of single.
+table(mot2019$nHuishoudsamenstelling, useNA = "always")
+mot2019$nHuishoudsamenstelling <- as.numeric(mot2019$nHuishoudsamenstelling)
+mot2019$marstat[mot2019$nHuishoudsamenstelling ==2 ] <- 1 #Living together
+mot2019$marstat[mot2019$nHuishoudsamenstelling != 2] <- 2 #Not living together
+mot2019$marstat <- as.factor(mot2019$marstat)
+table(mot2019$marstat, useNA = "always")
 
+table(mot2019$xopleidvolt, useNA = "always")
+mot2019$educ <- as.numeric(mot2019$xopleidvolt)
+table(mot2019$educ, useNA = "always")
+mot2019$isced[mot2019$educ == 2 | mot2019$educ == 9] <- 5
+mot2019$isced[mot2019$educ == 1] <- 6
+mot2019$isced[mot2019$educ == 3 | mot2019$educ == 4] <- 3
+mot2019$isced[mot2019$educ == 5 | mot2019$educ == 6] <- 2
+mot2019$isced[mot2019$educ == 7] <- 1
+mot2019$isced[mot2019$educ == 8] <- 0
 
-evssel$sex <- revalue(evssel$X001, c("Male"="1", "Female"="2"))
-table(evssel$E033, useNA = "always")
-evssel$lrscale <- as.numeric(evssel$E033)
+mot2019$isced_cat[mot2019$isced <=2] <- "Basic"
+mot2019$isced_cat[mot2019$isced == 3 | mot2019$isced == 4] <- "Intermediate"
+mot2019$isced_cat[mot2019$isced >=5] <- "Advanced"
+mot2019$isced_cat <- factor(mot2019$isced_cat, levels=c("Basic", "Intermediate", "Advanced"), ordered=TRUE)
+table(mot2019$isced_cat)
 
-evssel$X007 <- as.numeric(evssel$X007)
-evssel$marstat[evssel$X007 <= 2] <- 1 #Living together
-evssel$marstat[evssel$X007 > 2] <- 2 #Not living together
-evssel$marstat <- as.factor(evssel$marstat)
+table(mot2019$nStedelijkheid, useNA = "always")
+mot2019$urban <- revalue(mot2019$nStedelijkheid, c("Niet stedelijk"= "Low urbanity", "Weinig stedelijk"= "Low urbanity", "Matig stedelijk"="Medium urbanity", "Sterk stedelijk" = "High urbanity", "Zeer sterk stedelijk" = "High urbanity" ))
+mot2019$urban  <- factor(mot2019$urban, levels=c("Low urbanity", "Medium urbanity", "High urbanity"), ordered=TRUE)
+table(mot2019$urban, useNA = "always") # Urbanity unknown is now a missing
 
-#You generally start school at 6
-evssel$edu_yrs <- as.numeric(as.character(evssel$X023))
-evssel$edu_yrs <- evssel$edu_yrs - 6
-table(evssel$edu_yrs, useNA = "always")
-mean(evssel$edu_yrs, na.rm=T)
-evssel$edu_yrs[is.na(evssel$edu_yrs)] <- 13.518
-#Education as isced
-evssel$isced[evssel$edu_yrs <=4] <- 0
-evssel$isced[evssel$edu_yrs > 4 & evssel$edu_yrs <= 6] <- 1
-evssel$isced[evssel$edu_yrs > 6 & evssel$edu_yrs <= 10] <- 2
-evssel$isced[evssel$edu_yrs > 10 & evssel$edu_yrs <= 13] <- 3
-evssel$isced[evssel$edu_yrs > 13 & evssel$edu_yrs <= 15] <- 4
-evssel$isced[evssel$edu_yrs > 15 & evssel$edu_yrs <= 18] <- 5
-evssel$isced[evssel$edu_yrs > 18] <- 6
-table(evssel$isced, useNA = "always")
-
-table(evssel$X003, useNA = "always")
-evssel$X003 <- revalue(evssel$X003, c("82 and more (in EVS 2017)" = "82"))
-evssel$age <- as.numeric(as.character(evssel$X003))
-table(evssel$age, useNA = "always")
-# 3 missings on age
-mean(evssel$age, na.rm=T)
-evssel$age[is.na(evssel$age)] <- 49.122
-
-# Missings can be done faster
-mis_vars <- c("lrscale", "edu_yrs") 
-
-for (var in mis_vars) {
-  evssel[is.na(evssel[,var]), var] <- mean(evssel[,var], na.rm = TRUE)
-}
-
+table(mot2019$xlft, useNA = "always") # no missings on age
 
 #Let's first save the prepped data. 
-save(evssel, file="/Users/anuschka/Documents/climatechange/climatechange//data/final_data/evssel.Rdata")
+#save(mot2019, file="/Users/anuschka/Documents/climatechange/climatechange//data/all_waves/mot2019.Rdata")
 
-evssel <- evssel %>% select(stdyno_w, S001, S002EVS, S006, S017, S018, S020, climate5, sex, X002, age, edu_yrs, isced,  religious, lrplace, income, income_quart, marstat, weightvec, X023, X023R, X047CS, X047_EVS, X047R_EVS) %>% 
-        dplyr::rename(surveyyear = S020)
 
-save(evssel, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/evssel.Rdata")
+# Now exactly the same for 2021
+#Load in motivaction trend file from local folder
+motivaction <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/motivaction.sav", use.value.labels = T,  to.data.frame = T)
+
+#Both years are in this dataset, I only want 2021. I also only include group A, as they have filled in the questions that I am interested in. 
+
+mot2021 <- motivaction %>% filter(nGroep == "Groep A")  %>%
+                filter (nKOP1 == "Meting 2021") %>%
+            select(nStedelijkheid, nHuishoudsamenstelling, nInkomencat, nGeslacht, xopleidvolt, nOplcatVolt, xlft, iQ20211_8, nQ40, nQ40Extra, iQ41_1:iQ41_5, iQ43, nQ46_1:nQ46_5, iQ50_1, iQ50_2, iQ51_1:iQ51_3, iQ52)
+
+table(mot2021$iQ20211_8, useNA = "always") #only missings so don't include
+table(mot2021$nQ40, useNA = "always")
+mot2021$cchange <- as.numeric(mot2021$nQ40)
+mot2021$cchange
+mot2021$cchange <- (as.numeric(mot2021$cchange) - 1)* (6/3) + 1
+
+table(mot2021$iQ41_1, useNA = "always")
+mot2021$worried <- as.numeric(mot2021$iQ41_1)
+mot2021$worried[mot2021$worried == 6] <- NA
+
+table(mot2021$iQ41_2, useNA = "always")
+mot2021$futuregen <- as.numeric(mot2021$iQ41_2)
+mot2021$futuregen[mot2021$futuregen == 6] <- NA
+
+table(mot2021$iQ41_3, useNA = "always")
+mot2021$nowor <- as.numeric(mot2021$iQ41_3)
+mot2021 <- mot2021 %>%
+  mutate(across(c(nowor), ~recode(., `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5` = 1)))
+table(mot2021$nowor, useNA = "always")
+mot2021$nowor[mot2021$nowor == 6] <- NA
+
+#Q41_4 is about Groningen, not really useful
+table(mot2021$iQ41_5, useNA = "always")
+mot2021$ontime <- as.numeric(mot2021$iQ41_5)
+mot2021$ontime[mot2021$ontime == 6] <- NA
+
+table(mot2021$iQ43, useNA = "always")
+mot2021$gov <- as.numeric(mot2021$iQ43)
+mot2021$gov[mot2021$gov == 6] <- NA
+
+
+
+#The following statements are about the responsibility of different groups. There is one answer category that states that the respondent doesn't think measures should be taken. I will code that together with the group "is not responsible" because it both means that you don't think those parties have to act to tackle climate change. 
+table(mot2021$nQ46_1, useNA = "always")
+mot2021$resp_gov <- as.numeric(mot2021$nQ46_1)
+mot2021$resp_gov[mot2021$resp_gov == 5] <- NA
+mot2021$resp_gov[mot2021$resp_gov == 4] <- 1
+table(mot2021$resp_gov, useNA = "always")
+mot2021$resp_gov <- (as.numeric(mot2021$resp_gov) - 1)* (6/3) + 1
+
+table(mot2021$nQ46_2, useNA = "always")
+mot2021$resp_comp <- as.numeric(mot2021$nQ46_2)
+mot2021$resp_comp[mot2021$resp_comp == 5] <- NA
+mot2021$resp_comp[mot2021$resp_comp == 4] <- 1
+table(mot2021$resp_comp, useNA = "always")
+mot2021$resp_comp <- (as.numeric(mot2021$resp_comp) - 1)* (6/3) + 1
+
+table(mot2021$nQ46_3, useNA = "always")
+mot2021$resp_mkb <- as.numeric(mot2021$nQ46_3)
+mot2021$resp_mkb[mot2021$resp_mkb == 5] <- NA
+mot2021$resp_mkb[mot2021$resp_mkb == 4] <- 1
+table(mot2021$resp_mkb, useNA = "always")
+mot2021$resp_mkb <- (as.numeric(mot2021$resp_mkb) - 1)* (6/3) + 1
+
+table(mot2021$nQ46_4, useNA = "always")
+mot2021$resp_citiz <- as.numeric(mot2021$nQ46_4)
+mot2021$resp_citiz[mot2021$resp_citiz == 5] <- NA
+mot2021$resp_citiz[mot2021$resp_citiz == 4] <- 1
+table(mot2021$resp_citiz, useNA = "always")
+mot2021$resp_citiz <- (as.numeric(mot2021$resp_citiz) - 1)* (6/3) + 1
+
+table(mot2021$nQ46_5, useNA = "always")
+mot2021$resp_you <- as.numeric(mot2021$nQ46_5)
+mot2021$resp_you[mot2021$resp_you == 5] <- NA
+mot2021$resp_you[mot2021$resp_you == 4] <- 1
+table(mot2021$resp_you, useNA = "always")
+mot2021$resp_you <- (as.numeric(mot2021$resp_you) - 1)* (6/3) + 1
+
+
+table(mot2021$iQ50_1, useNA = "always")
+mot2021$pers_resp <- as.numeric(mot2021$iQ50_1)
+mot2021$pers_resp[mot2021$pers_resp == 6] <- NA
+
+table(mot2021$iQ50_2, useNA = "always")
+mot2021$sust_choice <- as.numeric(mot2021$iQ50_2)
+mot2021$sust_choice[mot2021$sust_choice == 6] <- NA
+
+table(mot2021$iQ51_1, useNA = "always")
+mot2021$contr <- as.numeric(mot2021$iQ51_1)
+mot2021$contr[mot2021$contr == 6] <- NA
+
+table(mot2021$iQ51_2, useNA = "always")
+mot2021$energy <- as.numeric(mot2021$iQ51_2)
+mot2021$energy[mot2021$energy == 6] <- NA
+
+table(mot2021$iQ51_3, useNA = "always")
+mot2021$noidea <- as.numeric(mot2021$iQ51_3)
+mot2021$noidea[mot2021$noidea == 6] <- NA
+
+table(mot2021$iQ52, useNA = "always")
+mot2021$motiv <- as.numeric(mot2021$iQ52)
+mot2021$motiv[mot2021$motiv == 6] <- NA
+
+# Independent variables
+# Gender, education, age, urbanity and marital status 
+table(mot2021$nGeslacht, useNA = "always")
+mot2021$sex <- revalue(mot2021$nGeslacht, c("Man"="1", "Vrouw"="2"))
+
+# 84 have a different marital status than single or living together. I don't want to throw them away, but as they're not living together at least (and have partner influence probably) I will code them in the category of single.
+table(mot2021$nHuishoudsamenstelling, useNA = "always")
+mot2021$nHuishoudsamenstelling <- as.numeric(mot2021$nHuishoudsamenstelling)
+mot2021$marstat[mot2021$nHuishoudsamenstelling ==2 ] <- 1 #Living together
+mot2021$marstat[mot2021$nHuishoudsamenstelling != 2] <- 2 #Not living together
+mot2021$marstat <- as.factor(mot2021$marstat)
+table(mot2021$marstat, useNA = "always")
+
+table(mot2021$xopleidvolt, useNA = "always")
+mot2021$educ <- as.numeric(mot2021$xopleidvolt)
+table(mot2021$educ, useNA = "always")
+mot2021$isced[mot2021$educ == 2 | mot2021$educ == 9] <- 5
+mot2021$isced[mot2021$educ == 1] <- 6
+mot2021$isced[mot2021$educ == 3 | mot2021$educ == 4] <- 3
+mot2021$isced[mot2021$educ == 5 | mot2021$educ == 6] <- 2
+mot2021$isced[mot2021$educ == 7] <- 1
+mot2021$isced[mot2021$educ == 8] <- 0
+
+mot2021$isced_cat[mot2021$isced <=2] <- "Basic"
+mot2021$isced_cat[mot2021$isced == 3 | mot2021$isced == 4] <- "Intermediate"
+mot2021$isced_cat[mot2021$isced >=5] <- "Advanced"
+mot2021$isced_cat <- factor(mot2021$isced_cat, levels=c("Basic", "Intermediate", "Advanced"), ordered=TRUE)
+table(mot2021$isced_cat)
+
+table(mot2021$nStedelijkheid, useNA = "always")
+mot2021$urban <- revalue(mot2021$nStedelijkheid, c("Niet stedelijk"= "Low urbanity", "Weinig stedelijk"= "Low urbanity", "Matig stedelijk"="Medium urbanity", "Sterk stedelijk" = "High urbanity", "Zeer sterk stedelijk" = "High urbanity" ))
+mot2021$urban  <- factor(mot2021$urban, levels=c("Low urbanity", "Medium urbanity", "High urbanity"), ordered=TRUE)
+table(mot2021$urban, useNA = "always") # Urbanity unknown is now a missing
+
+table(mot2021$xlft, useNA = "always") # no missings on age
+
+#Let's first save the prepped data. 
+#save(mot2021, file="/Users/anuschka/Documents/climatechange/climatechange//data/all_waves/mot2021.Rdata")
+
+# STILL HAVE TO MERGE THE TWO DATASETS
+
 ```
 
 ## European Social Survey {-}
