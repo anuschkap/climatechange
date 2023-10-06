@@ -775,25 +775,361 @@ eb_results_df$mean_year[eb_results_df$dep_var == "prsaction"] <- 2014
 save(eb_results_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_results_df_w_new.RData" )
 ```
 
+## Motivaction {-}
+
+```{r}
+load("./data/final_data/regression_outputs/mot_list_empty_w.RData")
+
+mot_empty_df <- data.frame(dep_var = character())
+
+
+# Loop over the list of models
+for (i in seq_along(mot_list_empty)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(mot_list_empty[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(mot_list_empty[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[3]]
+  sigma_sd <- sum[[3,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[4]]
+  sig_time_sd <- sum[[4,2]]
+  
+  # Put the results 
+  mot_empty_df <- rbind(mot_empty_df, data.frame(dep_var = dep_var, mu_intercept = mu_int, mu_sd = mu_sd, sigma_intercept = sigma_int, sigma_sd = sigma_sd, mu_time = mu_time, mu_time_sd = mu_time_sd, sig_time = sig_time, sig_time_sd = sig_time_sd))
+}
+
+utils::View(mot_empty_df)
+
+load("./data/final_data/regression_outputs/mot_list_preds_w_new.RData")
+
+# This does mean that the estimates of the sigma are in a different place
+sum <- summary(mot_list_preds[[1]])
+
+# Store the results in a new dataframe
+mot_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(mot_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(mot_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(mot_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[7]]
+  sigma_sd <- sum[[7,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[8]]
+  sig_time_sd <- sum[[8,2]]
+  
+  # Put the results 
+  mot_preds_df <- rbind(mot_preds_df, data.frame(dep_var = dep_var, mu_intercept_pred = mu_int, mu_sd_pred = mu_sd, sigma_intercept_pred = sigma_int, sigma_sd_pred = sigma_sd, mu_time_pred = mu_time, mu_time_sd_pred = mu_time_sd, sig_time_pred = sig_time, sig_time_sd_pred = sig_time_sd))
+}
+
+
+# And then for the interaction model
+load("./data/final_data/regression_outputs/mot_list_interactions_w_new.RData")
+
+# Store the results in a new dataframe
+mot_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the number of dep vars in the list
+for (i in seq_along(mot_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(mot_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(mot_list_interactions[[i]])
+  
+  # Extract the info I need from the summary
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[11]]
+  sigma_sd <- sum[[11,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[12]]
+  sig_time_sd <- sum[[12,2]]
+  
+  # Put the results in a dataframe
+  mot_interactions_df <- rbind(mot_interactions_df, data.frame(dep_var = dep_var, mu_intercept_int = mu_int, mu_sd_int = mu_sd, sigma_intercept_int = sigma_int, sigma_sd_int = sigma_sd, mu_time_int = mu_time, mu_time_sd_int = mu_time_sd, sig_time_int = sig_time, sig_time_sd_int = sig_time_sd))
+}
+
+
+#For some reason left_join produces an error, but merge gives the same result
+#mot_results_df <- left_join(mot_empty_df, mot_preds_df)
+#mot_results_df <- left_join(mot_results_df, mot_interactions_df)
+
+mot_results_df <- merge(mot_empty_df, mot_preds_df)
+mot_results_df <- merge(mot_results_df, mot_interactions_df)
+utils::View(mot_results_df)
+
+mot_results_df$first_year <- 2019
+mot_results_df$mean_year <- 2020
+mot_results_df$data <- "MOT"
+
+save(mot_results_df, file="./data/final_data/regression_outputs/mot_results_df_w_new.RData")
+
+```
+
+## LISS {-}
+
+```{r}
+rm(list = ls())
+load("./data/final_data/regression_outputs/liss_list_empty_w.RData")
+
+liss_empty_df <- data.frame(dep_var = character())
+
+
+# Loop over the list of models
+for (i in seq_along(liss_list_empty)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(liss_list_empty[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(liss_list_empty[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[3]]
+  sigma_sd <- sum[[3,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[4]]
+  sig_time_sd <- sum[[4,2]]
+  
+  # Put the results 
+  liss_empty_df <- rbind(liss_empty_df, data.frame(dep_var = dep_var, mu_intercept = mu_int, mu_sd = mu_sd, sigma_intercept = sigma_int, sigma_sd = sigma_sd, mu_time = mu_time, mu_time_sd = mu_time_sd, sig_time = sig_time, sig_time_sd = sig_time_sd))
+}
+
+load("./data/final_data/regression_outputs/liss_list_preds_w_new.RData")
+
+# This does mean that the estimates of the sigma are in a different place
+sum <- summary(liss_list_preds[[1]])
+
+# Store the results in a new dataframe
+liss_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(liss_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(liss_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(liss_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[7]]
+  sigma_sd <- sum[[7,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[8]]
+  sig_time_sd <- sum[[8,2]]
+  
+  # Put the results 
+  liss_preds_df <- rbind(liss_preds_df, data.frame(dep_var = dep_var, mu_intercept_pred = mu_int, mu_sd_pred = mu_sd, sigma_intercept_pred = sigma_int, sigma_sd_pred = sigma_sd, mu_time_pred = mu_time, mu_time_sd_pred = mu_time_sd, sig_time_pred = sig_time, sig_time_sd_pred = sig_time_sd))
+}
+
+
+# And then for the interaction model
+load("./data/final_data/regression_outputs/liss_list_interactions_w_new.RData")
+
+# Store the results in a new dataframe
+liss_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the number of dep vars in the list
+for (i in seq_along(liss_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(liss_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(liss_list_interactions[[i]])
+  
+  # Extract the info I need from the summary
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[11]]
+  sigma_sd <- sum[[11,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[12]]
+  sig_time_sd <- sum[[12,2]]
+  
+  # Put the results in a dataframe
+  liss_interactions_df <- rbind(liss_interactions_df, data.frame(dep_var = dep_var, mu_intercept_int = mu_int, mu_sd_int = mu_sd, sigma_intercept_int = sigma_int, sigma_sd_int = sigma_sd, mu_time_int = mu_time, mu_time_sd_int = mu_time_sd, sig_time_int = sig_time, sig_time_sd_int = sig_time_sd))
+}
+
+
+#For some reason left_join produces an error, but merge gives the same result
+#liss_results_df <- left_join(liss_empty_df, liss_preds_df)
+#liss_results_df <- left_join(liss_results_df, liss_interactions_df)
+
+liss_results_df <- merge(liss_empty_df, liss_preds_df)
+liss_results_df <- merge(liss_results_df, liss_interactions_df)
+utils::View(liss_results_df)
+
+liss_results_df$first_year <- 2019
+liss_results_df$mean_year <- 2020
+liss_results_df$data <- "LISS"
+
+save(liss_results_df, file="./data/final_data/regression_outputs/liss_results_df_w_new.RData")
+
+```
+
+## SOCON {-}
+
+```{r}
+rm(list=ls())
+load("./data/final_data/regression_outputs/socon_list_empty_w.RData")
+
+socon_empty_df <- data.frame(dep_var = character())
+
+
+# Loop over the list of models
+for (i in seq_along(socon_list_empty)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(socon_list_empty[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(socon_list_empty[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[3]]
+  sigma_sd <- sum[[3,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[4]]
+  sig_time_sd <- sum[[4,2]]
+  
+  # Put the results 
+  socon_empty_df <- rbind(socon_empty_df, data.frame(dep_var = dep_var, mu_intercept = mu_int, mu_sd = mu_sd, sigma_intercept = sigma_int, sigma_sd = sigma_sd, mu_time = mu_time, mu_time_sd = mu_time_sd, sig_time = sig_time, sig_time_sd = sig_time_sd))
+}
+
+load("./data/final_data/regression_outputs/socon_list_preds_w_new.RData")
+
+# This does mean that the estimates of the sigma are in a different place
+sum <- summary(socon_list_preds[[1]])
+
+# Store the results in a new dataframe
+socon_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(socon_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(socon_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(socon_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[7]]
+  sigma_sd <- sum[[7,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[8]]
+  sig_time_sd <- sum[[8,2]]
+  
+  # Put the results 
+  socon_preds_df <- rbind(socon_preds_df, data.frame(dep_var = dep_var, mu_intercept_pred = mu_int, mu_sd_pred = mu_sd, sigma_intercept_pred = sigma_int, sigma_sd_pred = sigma_sd, mu_time_pred = mu_time, mu_time_sd_pred = mu_time_sd, sig_time_pred = sig_time, sig_time_sd_pred = sig_time_sd))
+}
+
+
+# And then for the interaction model
+load("./data/final_data/regression_outputs/socon_list_interactions_w_new.RData")
+
+# Store the results in a new dataframe
+socon_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the number of dep vars in the list
+for (i in seq_along(socon_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(socon_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(socon_list_interactions[[i]])
+  
+  # Extract the info I need from the summary
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[11]]
+  sigma_sd <- sum[[11,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[12]]
+  sig_time_sd <- sum[[12,2]]
+  
+  # Put the results in a dataframe
+  socon_interactions_df <- rbind(socon_interactions_df, data.frame(dep_var = dep_var, mu_intercept_int = mu_int, mu_sd_int = mu_sd, sigma_intercept_int = sigma_int, sigma_sd_int = sigma_sd, mu_time_int = mu_time, mu_time_sd_int = mu_time_sd, sig_time_int = sig_time, sig_time_sd_int = sig_time_sd))
+}
+
+
+#For some reason left_join produces an error, but merge gives the same result
+#socon_results_df <- left_join(socon_empty_df, socon_preds_df)
+#socon_results_df <- left_join(socon_results_df, socon_interactions_df)
+
+socon_results_df <- merge(socon_empty_df, socon_preds_df)
+socon_results_df <- merge(socon_results_df, socon_interactions_df)
+utils::View(socon_results_df)
+
+socon_results_df$first_year <- 2020
+socon_results_df$mean_year <- 2021
+socon_results_df$data <- "SOCON"
+
+save(socon_results_df, file="./data/final_data/regression_outputs/socon_results_df_w_new.RData")
+
+
+```
+
 ## Merge everything in one dataset {-}
 
 ```{r}
 # The final step is to merge all results into one dataframe
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "ess_results_df_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "evs_results_df_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "io_results_df_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "issp_results_df_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "issp_results_2_df_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_results_df_w_new.RData"))
+load("./data/final_data/regression_outputs/ess_results_df_w_new.RData")
+load("./data/final_data/regression_outputs/evs_results_df_w_new.RData")
+load("./data/final_data/regression_outputs/io_results_df_w_new.RData")
+load("./data/final_data/regression_outputs/issp_results_df_w_new.RData")
+load("./data/final_data/regression_outputs/issp_results_2_df_new.RData")
+load("./data/final_data/regression_outputs/eb_results_df_w_new.RData")
+load("./data/final_data/regression_outputs/mot_results_df_w_new.RData")
+load("./data/final_data/regression_outputs/liss_results_df_w_new.RData")
+load("./data/final_data/regression_outputs/socon_results_df_w_new.RData")
 
-total_reg_results <- rbind(eb_results_df, ess_results_df, evs_results_df, io_results_df, issp_results_df, issp_results_2_df)
+total_reg_results <- rbind(eb_results_df, ess_results_df, evs_results_df, io_results_df, issp_results_df, issp_results_2_df, mot_results_df, liss_results_df, socon_results_df)
 
-save(total_reg_results, file= "/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results_gam_w_new.RData" )
+save(total_reg_results, file= "./data/meta_analysis/total_reg_results_gam_w_new.RData" )
 ```
 
 ```{r}
-load(here("./data/meta_analysis", "total_reg_results_gam_w_new.RData"))
+rm(list=ls())
+load("./data/meta_analysis/total_reg_results_gam_w_new.RData")
 
 # I also want to add a variable that describes whether the dependent variable is mostly of affective, behavioral or cognitive nature 
 
@@ -806,7 +1142,14 @@ total_reg_results$attitude_cat[total_reg_results$dep_var == "dodiff"
                                | total_reg_results$dep_var == "worried"
                                | total_reg_results$dep_var == "worry_future"
                                | total_reg_results$dep_var == "frontrunner"
-                               | total_reg_results$dep_var == "min_contr"] <- "affective"
+                               | total_reg_results$dep_var == "min_contr"
+                               | total_reg_results$dep_var == "worried_mot"
+                               | total_reg_results$dep_var == "futuregen"
+                               | total_reg_results$dep_var == "nowor"
+                               | total_reg_results$dep_var == "motivr"
+                               | total_reg_results$dep_var == "fut_gen_socon"
+                               | total_reg_results$dep_var == "pers_resp_mot"] <- "affective"
+
 total_reg_results$attitude_cat[total_reg_results$dep_var == "willing_price" 
                                | total_reg_results$dep_var == "willing_tax"
                                | total_reg_results$dep_var == "willing_living"
@@ -815,7 +1158,11 @@ total_reg_results$attitude_cat[total_reg_results$dep_var == "willing_price"
                                | total_reg_results$dep_var == "climate5"
                                | total_reg_results$dep_var == "prsaction"
                                | total_reg_results$dep_var == "cc_prsact"
-                               | total_reg_results$dep_var == "buyprod"] <- "behavioral"
+                               | total_reg_results$dep_var == "buyprod"
+                                | total_reg_results$dep_var == "sust_choice"
+                                | total_reg_results$dep_var == "energy"
+                                | total_reg_results$dep_var == "lifestyle"] <- "behavioral"
+
 total_reg_results$attitude_cat[total_reg_results$dep_var == "worry_issp" 
                                | total_reg_results$dep_var == "lifeharm"
                                | total_reg_results$dep_var == "progharm"
@@ -853,7 +1200,17 @@ total_reg_results$attitude_cat[total_reg_results$dep_var == "worry_issp"
                                | total_reg_results$dep_var == "role_ind"
                                | total_reg_results$dep_var == "big_pol"
                                | total_reg_results$dep_var == "eff_daily"
-                               | total_reg_results$dep_var == "pers_imp"] <- "cognitive"
+                               | total_reg_results$dep_var == "pers_imp"
+                              | total_reg_results$dep_var == "cchange_mot"
+                              | total_reg_results$dep_var == "ontime"
+                              | total_reg_results$dep_var == "gov"
+                              | total_reg_results$dep_var == "resp_gov"
+                              | total_reg_results$dep_var == "resp_comp"
+                              | total_reg_results$dep_var == "resp_mkb"
+                              | total_reg_results$dep_var == "resp_citiz_mot"
+                              | total_reg_results$dep_var == "resp_you"
+                              | total_reg_results$dep_var == "contr"
+                              | total_reg_results$dep_var == "noidea"] <- "cognitive"
 
 #Create a variable that indicates whether the dependent variable can be interpreted in 2 ways (ambiguous)
 
@@ -873,7 +1230,8 @@ total_reg_results$ambiguous[total_reg_results$dep_var != "dodiff"
                             | total_reg_results$dep_var != "env_quallife"
                             | total_reg_results$dep_var != "cc_unstop"
                             | total_reg_results$dep_var != "cc_poseu"
-                            | total_reg_results$dep_var != "big_pol"] <- "No"
+                            | total_reg_results$dep_var != "big_pol"
+                            | total_reg_results$dep_var == "noidea"] <- "No"
 total_reg_results$ambiguous[total_reg_results$dep_var == "dodiff" 
                                | total_reg_results$dep_var == "frontrunner"
                                | total_reg_results$dep_var == "min_contr"
@@ -890,24 +1248,12 @@ total_reg_results$ambiguous[total_reg_results$dep_var == "dodiff"
                             | total_reg_results$dep_var == "env_quallife"
                             | total_reg_results$dep_var == "cc_unstop"
                             | total_reg_results$dep_var == "cc_poseu"
-                            | total_reg_results$dep_var == "big_pol"] <- "Yes"
+                            | total_reg_results$dep_var == "big_pol"
+                            | total_reg_results$dep_var == "noidea"] <- "Yes"
 
 table(total_reg_results$ambiguous, useNA = "always")
 
-# Create a variable about whether 2008 (financial crisis) is included in the time span of the data set/vars 
-total_reg_results$fin_crisis[total_reg_results$data == "EB"] <- 1
-total_reg_results$fin_crisis[total_reg_results$data == "EVS"] <- 1
-total_reg_results$fin_crisis[total_reg_results$data == "ISSP"] <- 1
-total_reg_results$fin_crisis[total_reg_results$data == "ESS"] <- 0
-total_reg_results$fin_crisis[total_reg_results$data == "IO"] <- 0
-
-# And the same for covid-19
-total_reg_results$covid[total_reg_results$data == "EB"] <- 1
-total_reg_results$covid[total_reg_results$data == "EVS"] <- 0
-total_reg_results$covid[total_reg_results$data == "ISSP"] <- 0
-total_reg_results$covid[total_reg_results$data == "ESS"] <- 1
-total_reg_results$covid[total_reg_results$data == "IO"] <- 1
-
-save(total_reg_results, file= "/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_reg_results_gam_w_new.RData" )
+save(total_reg_results, file= "./data/meta_analysis/total_reg_results_gam_w_new.RData" )
 ```
+
 

@@ -12,7 +12,7 @@ options(width = 100)
 colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
 ```
 
-In this script I use loops to perform gamlss regressions for all 52 attitudes. The lists that I will get as output are saved with all the information, after which - in another script - i will extract the raw effects sizes used as input for the meta-regressions. In this specific script, I will only include the effects of education and gender to test the idea of opposing effects of gender + education versus age. 
+In this script I use loops to perform gamlss regressions for all 52 attitudes. The lists that I will get as output are saved with all the information, after which - in another script - i will extract the raw effects sizes used as input for the meta-regressions.  
 
 ```{r}
 rm(list = ls())
@@ -20,11 +20,10 @@ rm(list = ls())
 library(gamlss)
 library(tidyverse)
 library(dplyr)
-library(here)
 library(fastDummies)
-library(here)
-here()
-here::i_am("scripts/analysis/single_regression.Rmd")
+#library(here)
+#here()
+#here::i_am("scripts/analysis/single_regression.Rmd")
 ```
 
 ## ESS {-}
@@ -1374,3 +1373,248 @@ summary(eb_list_interactions_doprot_city[[1]])
 
 save(eb_list_interactions_doprot_city, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_doprot_city_w_new.RData")
 ```
+
+
+## Motivaction {-}
+```{r}
+load("./data/final_data/mottotal.RData")
+
+# Gamlss cannot handle NAs, so I have to listwise delete all of them
+mot_complete <- mottotal %>% drop_na()
+mot_complete$time <- mot_complete$surveyyear - min(mot_complete$surveyyear)
+
+utils::View(mot_complete)
+# I want to build models. In the empty model, I only want to include time. 
+predictors <- c("time")
+deps <- c("cchange_mot", "worried_mot", "futuregen", "nowor", "ontime", "gov", "resp_gov", "resp_comp", "resp_mkb", "resp_citiz_mot", "resp_you", "pers_resp_mot", "sust_choice", "contr", "energy", "noidea", "motiv")
+
+mot_list_empty <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression. The sigma formula pastes every variable one by one and calculates variance, the other formula shows the mean attitudes effects
+  mot_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = mot_complete, weights = weightvec)
+  
+  mot_list_empty[[i]] <- mot_fit
+} 
+
+summary(mot_list_empty[[8]]) 
+
+save(mot_list_empty, file="./data/final_data/regression_outputs/mot_list_empty_w.RData")
+
+#Estimate a second model with the indicators + time
+predictors <- c("time", "sex", "isced_cat", "age")
+deps <- c("cchange_mot", "worried_mot", "futuregen", "nowor", "ontime", "gov", "resp_gov", "resp_comp", "resp_mkb", "resp_citiz_mot", "resp_you", "pers_resp_mot", "sust_choice", "contr", "energy", "noidea", "motiv")
+
+mot_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regrmotion
+  mot_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = mot_complete, weights = weightvec)
+  
+  mot_list_preds[[i]] <- mot_fit
+} 
+
+summary(mot_list_preds[[1]]) 
+
+save(mot_list_preds, file="./data/final_data/regression_outputs/mot_list_preds_w_new.RData")
+
+#Now the last model with interaction of time on predictor variables
+mot_complete$age_time <- mot_complete$age * mot_complete$time
+mot_complete$sex_time <- as.numeric(mot_complete$sex) * mot_complete$time
+mot_complete <- fastDummies::dummy_cols(mot_complete, select_columns = "isced_cat")
+mot_complete$isced_basic_time <- mot_complete$isced_cat_Basic * mot_complete$time
+mot_complete$isced_intermediate_time <- mot_complete$isced_cat_Intermediate * mot_complete$time
+mot_complete$isced_advanced_time <- mot_complete$isced_cat_Advanced * mot_complete$time
+
+interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
+
+
+mot_list_interactions <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regrmotion
+  mot_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = mot_complete, weights = weightvec)
+  
+  mot_list_interactions[[i]] <- mot_fit
+} 
+
+
+summary(mot_list_interactions[[1]]) 
+
+save(mot_list_interactions, file="./data/final_data/regression_outputs/mot_list_interactions_w_new.RData")
+
+```
+
+## LISS {-}
+```{r}
+rm(list=ls())
+load("./data/final_data/lisstotal.RData")
+
+# Gamlss cannot handle NAs, so I have to listwise delete all of them
+liss_complete <- lisstotal %>% drop_na()
+liss_complete$time <- liss_complete$surveyyear - min(liss_complete$surveyyear)
+
+utils::View(liss_complete)
+# I want to build models. In the empty model, I only want to include time. 
+predictors <- c("time")
+deps <- c("lifestyle")
+
+liss_list_empty <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression. The sigma formula pastes every variable one by one and calculates variance, the other formula shows the mean attitudes effects
+  liss_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = liss_complete, weights = weightvec)
+  
+  liss_list_empty[[i]] <- liss_fit
+} 
+
+summary(liss_list_empty[[1]]) 
+
+save(liss_list_empty, file="./data/final_data/regression_outputs/liss_list_empty_w.RData")
+
+#Estimate a second model with the indicators + time
+predictors <- c("time", "sex", "isced_cat", "age")
+deps <- c("lifestyle")
+
+
+liss_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regrlission
+  liss_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = liss_complete, weights = weightvec)
+  
+  liss_list_preds[[i]] <- liss_fit
+} 
+
+summary(liss_list_preds[[1]]) 
+
+save(liss_list_preds, file="./data/final_data/regression_outputs/liss_list_preds_w_new.RData")
+
+
+
+#Now the last model with interaction of time on predictor variables
+liss_complete$age_time <- liss_complete$age * liss_complete$time
+liss_complete$sex_time <- as.numeric(liss_complete$sex) * liss_complete$time
+liss_complete <- fastDummies::dummy_cols(liss_complete, select_columns = "isced_cat")
+liss_complete$isced_basic_time <- liss_complete$isced_cat_Basic * liss_complete$time
+liss_complete$isced_intermediate_time <- liss_complete$isced_cat_Intermediate * liss_complete$time
+liss_complete$isced_advanced_time <- liss_complete$isced_cat_Advanced * liss_complete$time
+
+interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
+
+liss_list_interactions <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regression
+  liss_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = liss_complete, weights = weightvec)
+  
+  liss_list_interactions[[i]] <- liss_fit
+} 
+
+
+summary(liss_list_interactions[[1]]) 
+
+save(liss_list_interactions, file="./data/final_data/regression_outputs/liss_list_interactions_w_new.RData")
+
+
+
+```
+
+## SOCON {-}
+```{r}
+rm(list=ls())
+load("./data/final_data/socontotal.RData")
+
+# Gamlss cannot handle NAs, so I have to listwise delete all of them
+socon_complete <- socontotal %>% drop_na()
+socon_complete$time <- socon_complete$surveyyear - min(socon_complete$surveyyear)
+
+utils::View(socon_complete)
+# I want to build models. In the empty model, I only want to include time. 
+predictors <- c("time")
+deps <- c("fut_gen_socon")
+
+
+socon_list_empty <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression. The sigma formula pastes every variable one by one and calculates variance, the other formula shows the mean attitudes effects
+  socon_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = socon_complete, weights = weightvec)
+  
+  socon_list_empty[[i]] <- socon_fit
+} 
+
+summary(socon_list_empty[[1]]) 
+
+save(socon_list_empty, file="./data/final_data/regression_outputs/socon_list_empty_w.RData")
+
+#Estimate a second model with the indicators + time
+predictors <- c("time", "sex", "isced_cat", "age")
+deps <- c("fut_gen_socon")
+
+
+socon_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  socon_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = socon_complete, weights = weightvec)
+  
+  socon_list_preds[[i]] <- socon_fit
+} 
+
+summary(socon_list_preds[[1]]) 
+
+save(socon_list_preds, file="./data/final_data/regression_outputs/socon_list_preds_w_new.RData")
+
+#Now the last model with interaction of time on predictor variables
+socon_complete$age_time <- socon_complete$age * socon_complete$time
+socon_complete$sex_time <- as.numeric(socon_complete$sex) * socon_complete$time
+socon_complete <- fastDummies::dummy_cols(socon_complete, select_columns = "isced_cat")
+socon_complete$isced_basic_time <- socon_complete$isced_cat_Basic * socon_complete$time
+socon_complete$isced_intermediate_time <- socon_complete$isced_cat_Intermediate * socon_complete$time
+socon_complete$isced_advanced_time <- socon_complete$isced_cat_Advanced * socon_complete$time
+
+interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
+
+
+socon_list_interactions <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regrsoconion
+  socon_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = socon_complete, weights = weightvec)
+  
+  socon_list_interactions[[i]] <- socon_fit
+} 
+
+
+summary(socon_list_interactions[[1]]) 
+
+save(socon_list_interactions, file="./data/final_data/regression_outputs/socon_list_interactions_w_new.RData")
+
+```
+
+

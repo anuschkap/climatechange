@@ -21,16 +21,16 @@ library(metafor)
 library(here)
 library(dplyr)
 library(kableExtra)
-here()
+
 set.seed(1)
-here::i_am("scripts/analysis/meta_analysis_gamlss_weigh.Rmd")
+
 ```
 
 ## Forest plots {-}
 
 ```{r, results='hide', warning=FALSE}
 # With the final data
-load(here("./data/meta_analysis", "total_reg_results_gam_w_new.RData"))
+load("./data/meta_analysis/total_reg_results_gam_w_new.RData")
 
 # Step 1. Estimate the empty model without moderators to make the forest plots. 
 model_step_1_att <- rma(yi = mu_time,
@@ -146,15 +146,13 @@ addpoly.rma(beh_model, row = -3, mlab = "Behavioral pooled", col = "#B0CC52")
 addpoly.rma(cog_model, row = -4, mlab = "Cognitive pooled", col = "#2980B9")
 }
 
-
-
 # The plot can only be saved outside of the codechunk, hence the code underneath
 ```
 
-Mean attitudes 
-png(file = "/Users/anuschka/Documents/climatechange/climatechange/output/forestplot_neg_to_pos_weight.png", width = 2800, height = 2400, res = 300)
+#Mean attitudes 
+png(file = "./output/forestplot_neg_to_pos_weight_NEW_OCTOBER.png", width = 2800, height = 2400, res = 300)
 
-{png <- forest(model_step_1_att, colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var_name, pch = 23,fonts = "Times", ylim = c(-4.5, 55), cex = 0.5, mlab = "Pooled estimate total", order = "yi")
+{png <- forest(model_step_1_att, , at=c(-0.1, 0, 0.1), colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var_name, pch = 23,fonts = "Times", ylim = c(-4.5, 55), cex = 0.5, mlab = "Pooled estimate total", order = "yi", ilab = mean_year, ilab.xpos = -4, xlim = c(-2, 2))
 
 addpoly.rma(aff_model, row = -2, mlab = "Affective pooled", col = "#CC5279")
 addpoly.rma(beh_model, row = -3, mlab = "Behavioral pooled", col = "#B0CC52")
@@ -200,14 +198,14 @@ addpoly.rma(cog_model_var, row = -4, mlab = "Cognitive pooled", col = "#2980B9")
 # And also make the forest plot for the variance
 ```
 
-Polarization attitudes
-png(file = "/Users/anuschka/Documents/climatechange/climatechange/output/forestplot_var_weight_year.png", width = 2800, height = 2400, res = 300)
+#Polarization attitudes
+png(file = "./output/forestplot_variance_NEW_OCTOBER.png", width = 2800, height = 2400, res = 300)
 
-png <- forest(model_step_1_var, colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect polarization", slab = total_reg_results$dep_var_name, pch = 23,fonts = "Times", cex = 0.5, ylim = c(-4.5, 55), mlab = "Pooled estimate total", order = "yi")
+{png <- forest(model_step_1_var, at=c(-0.1, 0, 0.1), colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect polarization", slab = total_reg_results$dep_var_name, pch = 23,fonts = "Times", cex = 0.5, ylim = c(-4.5, 55), mlab = "Pooled estimate total", order = "yi")
 
 addpoly.rma(aff_model_var, row = -2, mlab = "Affective pooled", col = "#CC5279")
 addpoly.rma(beh_model_var, row = -3, mlab = "Behavioral pooled", col = "#B0CC52")
-addpoly.rma(cog_model_var, row = -4, mlab = "Cognitive pooled", col = "#2980B9")
+addpoly.rma(cog_model_var, row = -4, mlab = "Cognitive pooled", col = "#2980B9")}
 
 dev.off()
 
@@ -218,7 +216,7 @@ dev.off()
 model_step_2_att <- rma(yi = mu_time,
               sei = mu_time_sd,
               data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              mods = ~ mean_year + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
@@ -242,7 +240,7 @@ model_step_2_att_cat # No, not significant
 model_step_2_var <- rma(yi = sig_time,
               sei = sig_time_sd,
               data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              mods = ~ mean_year + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
@@ -265,7 +263,7 @@ model_step_2_var_cat
 model_step_3_att <- rma(yi = mu_time_pred,
               sei = mu_time_sd_pred,
               data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              mods = ~ mean_year + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
@@ -277,7 +275,7 @@ model_step_3_att
 model_step_3_var <- rma(yi = sig_time_pred,
               sei = sig_time_sd_pred,
               data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              mods = ~ mean_year + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
@@ -289,7 +287,7 @@ model_step_3_var
 model_step_4_att <- rma(yi = mu_time_int,
               sei = mu_time_sd_int,
               data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              mods = ~ mean_year + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
@@ -301,7 +299,7 @@ model_step_4_att
 model_step_4_var <- rma(yi = sig_time_int,
               sei = sig_time_sd_int,
               data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              mods = ~ mean_year + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
@@ -318,10 +316,10 @@ options(knitr.kable.NA = '')
 # Make a kable table of all the models 
 # First the mean attitudes, that i want in the table next to each other
 # Time effect only model
-model_1_mean_df <- data.frame(matrix(ncol = 5, nrow = 7))
+model_1_mean_df <- data.frame(matrix(ncol = 5, nrow = 5))
 colnames(model_1_mean_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_1_mean_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
-model_1_mean_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "", "", "")
+model_1_mean_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)")
+model_1_mean_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "")
 
 model_1_mean_df$Estimate <- as.numeric(model_step_2_att$beta) #estimate
 model_1_mean_df$SE <- model_step_2_att$se #se indeed but as a row
@@ -345,10 +343,10 @@ model_1_mean_df <- rbind(model_1_mean_df, model_1_fit)
 
 
 # Independent variable model 
-model_2_mean_df <- data.frame(matrix(ncol = 5, nrow = 7))
+model_2_mean_df <- data.frame(matrix(ncol = 5, nrow = 5))
 colnames(model_2_mean_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_2_mean_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
-model_2_mean_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "", "", "")
+model_2_mean_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)")
+model_2_mean_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "")
 
 model_2_mean_df$Estimate <- as.numeric(model_step_3_att$beta) #estimate
 model_2_mean_df$SE <- model_step_3_att$se #se indeed but as a row
@@ -372,10 +370,10 @@ model_2_mean_df <- rbind(model_2_mean_df, model_2_fit)
 
 
 #And the interaction model
-model_3_mean_df <- data.frame(matrix(ncol = 5, nrow = 7))
+model_3_mean_df <- data.frame(matrix(ncol = 5, nrow = 5))
 colnames(model_3_mean_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_3_mean_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
-model_3_mean_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "", "", "")
+model_3_mean_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)")
+model_3_mean_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "")
 
 model_3_mean_df$Estimate <- as.numeric(model_step_4_att$beta) #estimate
 model_3_mean_df$SE <- model_step_4_att$se #se indeed but as a row
@@ -400,10 +398,10 @@ model_3_mean_df <- rbind(model_3_mean_df, model_3_fit)
 total_mean <- cbind(model_1_mean_df, model_2_mean_df, model_3_mean_df)
 
 # Now for the sigma
-model_1_var_df <- data.frame(matrix(ncol = 5, nrow = 7))
+model_1_var_df <- data.frame(matrix(ncol = 5, nrow = 5))
 colnames(model_1_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_1_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
-model_1_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "", "", "")
+model_1_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)")
+model_1_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "")
 
 model_1_var_df$Estimate <- as.numeric(model_step_2_var$beta) #estimate
 model_1_var_df$SE <- model_step_2_var$se #se indeed but as a row
@@ -427,10 +425,10 @@ model_1_var_df <- rbind(model_1_var_df, model_1_fit)
 
 
 # Independent variable model 
-model_2_var_df <- data.frame(matrix(ncol = 5, nrow = 7))
+model_2_var_df <- data.frame(matrix(ncol = 5, nrow = 5))
 colnames(model_2_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_2_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
-model_2_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "", "", "")
+model_2_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)")
+model_2_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "")
 
 model_2_var_df$Estimate <- as.numeric(model_step_3_var$beta) #estimate
 model_2_var_df$SE <- model_step_3_var$se #se indeed but as a row
@@ -454,10 +452,10 @@ model_2_var_df <- rbind(model_2_var_df, model_2_fit)
 
 
 #And the interaction model
-model_3_var_df <- data.frame(matrix(ncol = 5, nrow = 7))
+model_3_var_df <- data.frame(matrix(ncol = 5, nrow = 5))
 colnames(model_3_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_3_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
-model_3_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "", "", "")
+model_3_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)")
+model_3_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "")
 
 model_3_var_df$Estimate <- as.numeric(model_step_4_var$beta) #estimate
 model_3_var_df$SE <- model_step_4_var$se #se indeed but as a row
@@ -506,8 +504,8 @@ kable(total_meta, digits = 3, caption = "Table 3. Meta-regression on climate cha
     general = "*** = p < 0.001, ** = p < 0.01, * = p < 0.05",
     threeparttable = TRUE,
     footnote_as_chunk = TRUE
-    )#%>%
-    #save_kable("/Users/anuschka/Documents/climatechange/climatechange/output/meta_regression_table.html")
+    )%>%
+    save_kable("./output/meta_regression_table_NEW_OCTOBER.html")
 ```
 
 
