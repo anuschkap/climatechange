@@ -21,6 +21,7 @@ library(metafor)
 library(here)
 library(dplyr)
 library(kableExtra)
+library(fastDummies)
 
 set.seed(1)
 
@@ -139,7 +140,37 @@ total_reg_results$dep_var_name[total_reg_results$dep_var == "role_ind"] <- "Indi
 total_reg_results$dep_var_name[total_reg_results$dep_var == "eff_daily"] <- "Env issues affect daily life"
 total_reg_results$dep_var_name[total_reg_results$dep_var == "pers_imp"] <- "Personal importance"
 
-{png <- forest(model_step_1_att, , at=c(-0.1, 0, 0.1), colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var_name, pch = 23,fonts = "Times", ylim = c(-4.5, 55), cex = 0.5, mlab = "Pooled estimate total", order = "yi", ilab = mean_year, ilab.xpos = -4, xlim = c(-2, 2))
+# And the national datasets added
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cchange_mot"] <- "Think about climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "worried_mot"] <- "Worry status climate"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "futuregen"] <- "Worry future generations"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "nowor"] <- "Don't worry global warming"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "ontime"] <- "Still on time to do sth"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "gov"] <- "Evaluation government action"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_gov"] <- "Responsibility gov"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_comp"] <- "Responsibility big comp"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_mkb"] <- "Responsibility SME"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_citiz_mot"] <- "Responsibility citizen"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_you"] <- "Your responsibility"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "pers_resp_mot"] <- "Your responsibility CO2"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "sust_choice"] <- "Sustainability important"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "contr"] <- "Contribute to sustainable society"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "energy"] <- "Energy choices fight climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "noidea"] <- "No idea what to do"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "motiv"] <- "Motivated to fight climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "fut_gen_socon"] <- "Worry future generations"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "lifestyle"] <- "Importance changing lifestyle"
+
+
+
+
+
+
+?forest
+
+par(mar = c(5, 5, 2, 2))
+
+{png <- forest(model_step_1_att, , at=c(-0.1, 0, 0.1), colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var_name, pch = 23,fonts = "Times New Roman", ylim = c(-4.5, 75), cex = 0.25, mlab = "Pooled estimate total", order = "yi", ilab = mean_year, ilab.xpos = -4, xlim = c(-2, 2), width = 0.0001)
 
 addpoly.rma(aff_model, row = -2, mlab = "Affective pooled", col = "#CC5279")
 addpoly.rma(beh_model, row = -3, mlab = "Behavioral pooled", col = "#B0CC52")
@@ -150,9 +181,9 @@ addpoly.rma(cog_model, row = -4, mlab = "Cognitive pooled", col = "#2980B9")
 ```
 
 #Mean attitudes 
-png(file = "./output/forestplot_neg_to_pos_weight_NEW_OCTOBER.png", width = 2800, height = 2400, res = 300)
+png(file = "./output/forestplot_neg_to_pos_weight_NEW_NOVEMBER.png", width = 2800, height = 2400, res = 300)
 
-{png <- forest(model_step_1_att, , at=c(-0.1, 0, 0.1), colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var_name, pch = 23,fonts = "Times", ylim = c(-4.5, 55), cex = 0.5, mlab = "Pooled estimate total", order = "yi", ilab = mean_year, ilab.xpos = -4, xlim = c(-2, 2))
+{png <- forest(model_step_1_att, , at=c(-0.1, 0, 0.1), colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var_name, pch = 23,fonts = "Times", ylim = c(-4.5, 75), cex = 0.5, mlab = "Pooled estimate total", order = "yi", ilab = mean_year, ilab.xpos = -4, xlim = c(-2, 2))
 
 addpoly.rma(aff_model, row = -2, mlab = "Affective pooled", col = "#CC5279")
 addpoly.rma(beh_model, row = -3, mlab = "Behavioral pooled", col = "#B0CC52")
@@ -189,7 +220,8 @@ cog_model_var <- rma(yi = sig_time,
               method = "REML",
               test = "knha")
 
-{png <- forest(model_step_1_var, at=c(-0.1, 0, 0.1), colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect polarization", slab = total_reg_results$dep_var_name, pch = 23,fonts = "Times", cex = 0.5, ylim = c(-4.5, 55), mlab = "Pooled estimate total", order = "yi")
+
+{png <- forest(model_step_1_var, at=c(-0.1, 0, 0.1), colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect polarization", slab = total_reg_results$dep_var_name, pch = 23,fonts = "Times", cex = 0.25, ylim = c(-4.5, 75), mlab = "Pooled estimate total", order = "yi", ilab = mean_year, ilab.xpos = -4, xlim = c(-2, 2), width = 0.0001)
 
 addpoly.rma(aff_model_var, row = -2, mlab = "Affective pooled", col = "#CC5279")
 addpoly.rma(beh_model_var, row = -3, mlab = "Behavioral pooled", col = "#B0CC52")
@@ -199,9 +231,9 @@ addpoly.rma(cog_model_var, row = -4, mlab = "Cognitive pooled", col = "#2980B9")
 ```
 
 #Polarization attitudes
-png(file = "./output/forestplot_variance_NEW_OCTOBER.png", width = 2800, height = 2400, res = 300)
+png(file = "./output/forestplot_variance_NEW_NOVEMBER.png", width = 2800, height = 2400, res = 300)
 
-{png <- forest(model_step_1_var, at=c(-0.1, 0, 0.1), colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect polarization", slab = total_reg_results$dep_var_name, pch = 23,fonts = "Times", cex = 0.5, ylim = c(-4.5, 55), mlab = "Pooled estimate total", order = "yi")
+{png <- forest(model_step_1_var, at=c(-0.1, 0, 0.1), colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect polarization", slab = total_reg_results$dep_var_name, pch = 23,fonts = "Times", cex = 0.5, ylim = c(-4.5, 75), mlab = "Pooled estimate total", order = "yi", ilab = mean_year, ilab.xpos = -4, xlim = c(-2, 2))
 
 addpoly.rma(aff_model_var, row = -2, mlab = "Affective pooled", col = "#CC5279")
 addpoly.rma(beh_model_var, row = -3, mlab = "Behavioral pooled", col = "#B0CC52")
@@ -212,25 +244,44 @@ dev.off()
 ## Step 2 until 4 meta-regression {-}
 
 ```{r, results='hide', warning=FALSE}
-#Step 2. Empty model with meta-level indicators
+#Step 2. Empty model with meta-level indicators, first only with mean year. 
+# First I have to give mean_year a meaning
+table(total_reg_results$mean_year)
+total_reg_results$mean_year_centered <- total_reg_results$mean_year - mean(total_reg_results$mean_year)
+
+#From the plot we saw that behavioral shows something else than the other 2, so set that as the reference category.
+table(total_reg_results$attitude_cat)
+total_reg_results$attitude_cat <- factor(total_reg_results$attitude_cat)
+total_reg_results$attitude_cat <- relevel(total_reg_results$attitude_cat, ref = "behavioral")
+
 model_step_2_att <- rma(yi = mu_time,
               sei = mu_time_sd,
               data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous,
+              mods = ~ mean_year_centered + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
-model_step_2_att
+summary(model_step_2_att)
 
-# Check if the effects of attitude_cat are significant when other variables are not included
-model_step_2_att_cat <- rma(yi = mu_time,
+
+# Now I also want to see if taking the mean_year as dummies can change the results, as there may be a non-linear effect. 
+total_reg_results$mean_year
+
+total_reg_results <- fastDummies::dummy_cols(total_reg_results, select_columns = "mean_year")
+
+model_step_2_att_dum <- rma(yi = mu_time,
               sei = mu_time_sd,
               data = total_reg_results,
-              mods = ~ attitude_cat,
+              mods = ~ mean_year_2021 + ambiguous + attitude_cat,
               method = "REML",
               test = "knha")
 
-model_step_2_att_cat # No, not significant
+summary(model_step_2_att_dum)
+
+# With all the new variables I created, i might as well save my dataset once more.
+
+save(total_reg_results, file= "./data/meta_analysis/total_reg_results_gam_w_new.RData" )
+
 ```
 
 
@@ -240,21 +291,25 @@ model_step_2_att_cat # No, not significant
 model_step_2_var <- rma(yi = sig_time,
               sei = sig_time_sd,
               data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous,
+              mods = ~ mean_year_centered + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
 model_step_2_var
 
-# Attitude cat significant without the other variables?
-model_step_2_var_cat <- rma(yi = sig_time,
+
+#Cognitive attitude (ref behavioral) sig, ambiguous sig
+# Now I again want to know what happens when I include year as a dummy
+model_step_2_var_dum <- rma(yi = sig_time,
               sei = sig_time_sd,
               data = total_reg_results,
-              mods = ~ attitude_cat, 
+              mods = ~ mean_year_2021 + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
-model_step_2_var_cat
+model_step_2_var_dum
+
+
 
 ```
 
@@ -263,11 +318,12 @@ model_step_2_var_cat
 model_step_3_att <- rma(yi = mu_time_pred,
               sei = mu_time_sd_pred,
               data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous,
+              mods = ~ mean_year_centered + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
 model_step_3_att
+#Ambiguous sig
 ```
 
 ```{r, results='hide', warning=FALSE}
@@ -275,11 +331,12 @@ model_step_3_att
 model_step_3_var <- rma(yi = sig_time_pred,
               sei = sig_time_sd_pred,
               data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous,
+              mods = ~ mean_year_centered + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
 model_step_3_var
+#Cognitive (ref behavioral) and ambiguous sig
 ```
 
 ```{r, results='hide', warning=FALSE}
@@ -287,7 +344,7 @@ model_step_3_var
 model_step_4_att <- rma(yi = mu_time_int,
               sei = mu_time_sd_int,
               data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous,
+              mods = ~ mean_year_centered + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
@@ -299,11 +356,70 @@ model_step_4_att
 model_step_4_var <- rma(yi = sig_time_int,
               sei = sig_time_sd_int,
               data = total_reg_results,
-              mods = ~ mean_year + attitude_cat + ambiguous,
+              mods = ~ mean_year_centered + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
 model_step_4_var
+```
+
+```{r, results='hide', warning=FALSE}
+#Excluding ambiguous variables
+ex_amb_df <- subset(total_reg_results, subset = ambiguous == "No")
+
+model_step_2_att_amb <- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_reg_results,
+              mods = ~ mean_year_centered + attitude_cat,
+              method = "REML",
+              test = "knha")
+
+summary(model_step_2_att_amb)
+
+model_step_2_var_amb <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = ex_amb_df,
+              mods = ~ mean_year_centered + attitude_cat,
+              method = "REML",
+              test = "knha")
+
+model_step_2_var_amb
+
+model_step_3_att_amb <- rma(yi = mu_time_pred,
+              sei = mu_time_sd_pred,
+              data = ex_amb_df,
+              mods = ~ mean_year_centered + attitude_cat,
+              method = "REML",
+              test = "knha")
+
+model_step_3_att_amb
+
+model_step_3_var_amb <- rma(yi = sig_time_pred,
+              sei = sig_time_sd_pred,
+              data = ex_amb_df,
+              mods = ~ mean_year_centered + attitude_cat,
+              method = "REML",
+              test = "knha")
+
+model_step_3_var_amb
+
+model_step_4_att_amb <- rma(yi = mu_time_int,
+              sei = mu_time_sd_int,
+              data = ex_amb_df,
+              mods = ~ mean_year_centered + attitude_cat,
+              method = "REML",
+              test = "knha")
+
+model_step_4_att_amb
+
+model_step_4_var_amb <- rma(yi = sig_time_int,
+              sei = sig_time_sd_int,
+              data = ex_amb_df,
+              mods = ~ mean_year_centered + attitude_cat,
+              method = "REML",
+              test = "knha")
+
+model_step_4_var_amb
 ```
 
 ## Put the results in kable table {-}
@@ -318,7 +434,7 @@ options(knitr.kable.NA = '')
 # Time effect only model
 model_1_mean_df <- data.frame(matrix(ncol = 5, nrow = 5))
 colnames(model_1_mean_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_1_mean_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)")
+model_1_mean_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)")
 model_1_mean_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "")
 
 model_1_mean_df$Estimate <- as.numeric(model_step_2_att$beta) #estimate
@@ -345,7 +461,7 @@ model_1_mean_df <- rbind(model_1_mean_df, model_1_fit)
 # Independent variable model 
 model_2_mean_df <- data.frame(matrix(ncol = 5, nrow = 5))
 colnames(model_2_mean_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_2_mean_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)")
+model_2_mean_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)")
 model_2_mean_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "")
 
 model_2_mean_df$Estimate <- as.numeric(model_step_3_att$beta) #estimate
@@ -372,7 +488,7 @@ model_2_mean_df <- rbind(model_2_mean_df, model_2_fit)
 #And the interaction model
 model_3_mean_df <- data.frame(matrix(ncol = 5, nrow = 5))
 colnames(model_3_mean_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_3_mean_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)")
+model_3_mean_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)")
 model_3_mean_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "")
 
 model_3_mean_df$Estimate <- as.numeric(model_step_4_att$beta) #estimate
@@ -400,7 +516,7 @@ total_mean <- cbind(model_1_mean_df, model_2_mean_df, model_3_mean_df)
 # Now for the sigma
 model_1_var_df <- data.frame(matrix(ncol = 5, nrow = 5))
 colnames(model_1_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_1_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)")
+model_1_var_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)")
 model_1_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "")
 
 model_1_var_df$Estimate <- as.numeric(model_step_2_var$beta) #estimate
@@ -427,7 +543,7 @@ model_1_var_df <- rbind(model_1_var_df, model_1_fit)
 # Independent variable model 
 model_2_var_df <- data.frame(matrix(ncol = 5, nrow = 5))
 colnames(model_2_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_2_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)")
+model_2_var_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)")
 model_2_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "")
 
 model_2_var_df$Estimate <- as.numeric(model_step_3_var$beta) #estimate
@@ -454,7 +570,7 @@ model_2_var_df <- rbind(model_2_var_df, model_2_fit)
 #And the interaction model
 model_3_var_df <- data.frame(matrix(ncol = 5, nrow = 5))
 colnames(model_3_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_3_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)")
+model_3_var_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)")
 model_3_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "")
 
 model_3_var_df$Estimate <- as.numeric(model_step_4_var$beta) #estimate
@@ -505,7 +621,7 @@ kable(total_meta, digits = 3, caption = "Table 3. Meta-regression on climate cha
     threeparttable = TRUE,
     footnote_as_chunk = TRUE
     )%>%
-    save_kable("./output/meta_regression_table_NEW_OCTOBER.html")
+    save_kable("./output/meta_regression_table_NEW_NOVEMBER.html")
 ```
 
 

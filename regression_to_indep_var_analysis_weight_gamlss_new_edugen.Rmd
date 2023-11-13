@@ -782,22 +782,156 @@ eb_indep_preds_df <- rbind(eb_indep_preds_1986_df, eb_indep_preds_2007_df, eb_in
 save(eb_indep_preds_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/eb_indep_var_df_w_new_edugen.RData" )
 ```
 
+```{r}
+rm(list=ls())
+load("./data/final_data/regression_outputs/mot_list_preds_w_new_edugen.RData")
+
+# Store the results in a new dataframe
+mot_indep_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(mot_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(mot_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(mot_list_preds[[1]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+    mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+
+    # Variance
+  sig_time <- sum[[7]]
+  sig_time_sd <- sum[[7,2]]
+  sig_sex_est <- sum[[8]]
+  sig_sex_sd <- sum[[8,2]]
+  sig_isced_med_est <- sum[[9]]
+  sig_isced_med_sd <- sum[[9,2]]
+  sig_isced_high_est <- sum[[10]]
+  sig_isced_high_sd <- sum[[10,2]]
+  
+  # Put the results 
+  mot_indep_preds_df <- rbind(mot_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, sig_time, sig_time_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd))
+}
+
+save(mot_indep_preds_df, file="./data/final_data/indep_var/mot_indep_var_df_w_new_edugen.RData")
+
+```
+
+
+```{r}
+rm(list=ls())
+load("./data/final_data/regression_outputs/liss_list_preds_w_new_edugen.RData")
+
+# Store the results in a new dataframe
+liss_indep_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(liss_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(liss_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(liss_list_preds[[1]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+    mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+
+    # Variance
+  sig_time <- sum[[7]]
+  sig_time_sd <- sum[[7,2]]
+  sig_sex_est <- sum[[8]]
+  sig_sex_sd <- sum[[8,2]]
+  sig_isced_med_est <- sum[[9]]
+  sig_isced_med_sd <- sum[[9,2]]
+  sig_isced_high_est <- sum[[10]]
+  sig_isced_high_sd <- sum[[10,2]]
+  
+  # Put the results 
+  liss_indep_preds_df <- rbind(liss_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, sig_time, sig_time_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd))
+}
+
+save(liss_indep_preds_df, file="./data/final_data/indep_var/liss_indep_var_df_w_new_edugen.RData")
+
+```
+
+```{r}
+rm(list=ls())
+load("./data/final_data/regression_outputs/socon_list_preds_w_new_edugen.RData")
+
+# Store the results in a new dataframe
+socon_indep_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(socon_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(socon_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(socon_list_preds[[1]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+    mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+
+    # Variance
+  sig_time <- sum[[7]]
+  sig_time_sd <- sum[[7,2]]
+  sig_sex_est <- sum[[8]]
+  sig_sex_sd <- sum[[8,2]]
+  sig_isced_med_est <- sum[[9]]
+  sig_isced_med_sd <- sum[[9,2]]
+  sig_isced_high_est <- sum[[10]]
+  sig_isced_high_sd <- sum[[10,2]]
+  
+  # Put the results 
+  socon_indep_preds_df <- rbind(socon_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, sig_time, sig_time_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd))
+}
+
+save(socon_indep_preds_df, file="./data/final_data/indep_var/socon_indep_var_df_w_new_edugen.RData")
+
+```
 
 
 ```{r}
 # The final step is to merge all results into one dataframe
 rm(list=ls())
-load(here("./data/final_data/indep_var", "eb_indep_var_df_w_new_edugen.RData"))
-load(here("./data/final_data/indep_var", "ess_indep_var_df_w_new_edugen.RData"))
-load(here("./data/final_data/indep_var", "evs_indep_var_df_w_new_edugen.RData"))
-load(here("./data/final_data/indep_var", "io_indep_var_df_w_new_edugen.RData"))
-load(here("./data/final_data/indep_var", "issp_2_indep_var_df_w_new_edugen.RData"))
-load(here("./data/final_data/indep_var", "issp_indep_var_df_w_new_edugen.RData"))
+load("./data/final_data/indep_var/eb_indep_var_df_w_new_edugen.RData")
+load("./data/final_data/indep_var/ess_indep_var_df_w_new_edugen.RData")
+load("./data/final_data/indep_var/evs_indep_var_df_w_new_edugen.RData")
+load("./data/final_data/indep_var/io_indep_var_df_w_new_edugen.RData")
+load("./data/final_data/indep_var/issp_2_indep_var_df_w_new_edugen.RData")
+load("./data/final_data/indep_var/issp_indep_var_df_w_new_edugen.RData")
+load("./data/final_data/indep_var/mot_indep_var_df_w_new_edugen.RData")
+load("./data/final_data/indep_var/liss_indep_var_df_w_new_edugen.RData")
+load("./data/final_data/indep_var/socon_indep_var_df_w_new_edugen.RData")
 
-library(plyr) # I load the packages here so that they don't conflict with the here() package
-library(dplyr)
-total_indep_var_results <- rbind.fill(eb_indep_preds_df, ess_indep_preds_df, evs_indep_preds_df, io_indep_preds_df, issp_indep_preds_df, issp_2_indep_preds_df) 
+library(plyr) # I load the packages here so that they don't conflict with the 
+total_indep_var_results <- rbind.fill(eb_indep_preds_df, ess_indep_preds_df, evs_indep_preds_df, io_indep_preds_df, issp_indep_preds_df, issp_2_indep_preds_df, mot_indep_preds_df, liss_indep_preds_df, socon_indep_preds_df) 
 
-save(total_indep_var_results, file= "/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_indep_var_results_new_edugen.RData" )
+save(total_indep_var_results, file= "./data/meta_analysis/total_indep_var_results_new_edugen.RData" )
 ```
 

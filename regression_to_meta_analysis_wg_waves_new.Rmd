@@ -19,9 +19,6 @@ rm(list=ls())
 library(tidyverse)
 library(dplyr)
 library(gamlss)
-library(here)
-here()
-here::i_am("scripts/analysis/regression_to_meta_analysis_wg_waves_new.Rmd")
 ```
 
 ## EVS {-}
@@ -1418,7 +1415,509 @@ eb_results_interactions_df$waveset <- 5
 save(eb_results_interactions_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/eb_results_interactions_df5_new.RData" )
 ```
 
-## Merge everything into dataset
+## SOCON {-}
+```{r}
+# Now the same for the SOCON
+rm(list = ls())
+load("./data/final_data/regression_outputs/per_wave/socon_list_empty1.RData")
+
+# Store the results in a new dataframe
+socon_empty_df <- data.frame(dep_var = character())
+
+# Loop over the list for all the dep vars
+for (i in seq_along(socon_list_empty)) {
+
+  # Extract the name of the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(socon_list_empty[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(socon_list_empty[[i]])
+  
+  # Extract the info
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[3]]
+  sigma_sd <- sum[[3,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[4]]
+  sig_time_sd <- sum[[4,2]]
+  
+  # Put the results in a dataframe
+  socon_empty_df <- rbind(socon_empty_df, data.frame(dep_var = dep_var, mu_intercept = mu_int, mu_sd = mu_sd, sigma_intercept = sigma_int, sigma_sd = sigma_sd, mu_time = mu_time, mu_time_sd = mu_time_sd, sig_time = sig_time, sig_time_sd = sig_time_sd))
+}
+
+# And the predictor model
+load("./data/final_data/regression_outputs/per_wave/socon_list_preds1_new.RData")
+
+# Store the results in a new dataframe
+socon_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(socon_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(socon_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(socon_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[7]]
+  sigma_sd <- sum[[7,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[8]]
+  sig_time_sd <- sum[[8,2]]
+  
+  # Put the results 
+  socon_preds_df <- rbind(socon_preds_df, data.frame(dep_var = dep_var, mu_intercept_pred = mu_int, mu_sd_pred = mu_sd, sigma_intercept_pred = sigma_int, sigma_sd_pred = sigma_sd, mu_time_pred = mu_time, mu_time_sd_pred = mu_time_sd, sig_time_pred = sig_time, sig_time_sd_pred = sig_time_sd))
+}
+
+# And lastly the interaction model
+load("./data/final_data/regression_outputs/per_wave/socon_list_interactions1_new.RData")
+
+# Store the results in a new dataframe
+socon_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the number of dep vars in the list
+for (i in seq_along(socon_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(socon_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(socon_list_interactions[[i]])
+  
+  # Extract the info I need from the summary
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[11]]
+  sigma_sd <- sum[[11,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[12]]
+  sig_time_sd <- sum[[12,2]]
+  
+  # Put the results in a dataframe
+  socon_interactions_df <- rbind(socon_interactions_df, data.frame(dep_var = dep_var, mu_intercept_int = mu_int, mu_sd_int = mu_sd, sigma_intercept_int = sigma_int, sigma_sd_int = sigma_sd, mu_time_int = mu_time, mu_time_sd_int = mu_time_sd, sig_time_int = sig_time, sig_time_sd_int = sig_time_sd))
+}
+
+# Merge the results, and add some variables with extra information 
+socon_results_df <- merge(socon_empty_df, socon_preds_df)
+socon_results_df <- merge(socon_results_df, socon_interactions_df)
+socon_results_df$first_year <- 2020 
+socon_results_df$mean_year <- 2021
+socon_results_df$waveset <- 1
+socon_results_df$data <- "SOCON"
+
+save(socon_results_df, file="./data/final_data/regression_outputs/per_wave/socon_results_df1_new.RData")
+```
+
+```{r}
+# Now the same for the SOCON
+rm(list = ls())
+load("./data/final_data/regression_outputs/per_wave/socon_list_empty2.RData")
+
+# Store the results in a new dataframe
+socon_empty_df <- data.frame(dep_var = character())
+
+# Loop over the list for all the dep vars
+for (i in seq_along(socon_list_empty)) {
+
+  # Extract the name of the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(socon_list_empty[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(socon_list_empty[[i]])
+  
+  # Extract the info
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[3]]
+  sigma_sd <- sum[[3,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[4]]
+  sig_time_sd <- sum[[4,2]]
+  
+  # Put the results in a dataframe
+  socon_empty_df <- rbind(socon_empty_df, data.frame(dep_var = dep_var, mu_intercept = mu_int, mu_sd = mu_sd, sigma_intercept = sigma_int, sigma_sd = sigma_sd, mu_time = mu_time, mu_time_sd = mu_time_sd, sig_time = sig_time, sig_time_sd = sig_time_sd))
+}
+
+# And the predictor model
+load("./data/final_data/regression_outputs/per_wave/socon_list_preds2_new.RData")
+
+# Store the results in a new dataframe
+socon_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(socon_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(socon_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(socon_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[7]]
+  sigma_sd <- sum[[7,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[8]]
+  sig_time_sd <- sum[[8,2]]
+  
+  # Put the results 
+  socon_preds_df <- rbind(socon_preds_df, data.frame(dep_var = dep_var, mu_intercept_pred = mu_int, mu_sd_pred = mu_sd, sigma_intercept_pred = sigma_int, sigma_sd_pred = sigma_sd, mu_time_pred = mu_time, mu_time_sd_pred = mu_time_sd, sig_time_pred = sig_time, sig_time_sd_pred = sig_time_sd))
+}
+
+# And lastly the interaction model
+load("./data/final_data/regression_outputs/per_wave/socon_list_interactions2_new.RData")
+
+# Store the results in a new dataframe
+socon_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the number of dep vars in the list
+for (i in seq_along(socon_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(socon_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(socon_list_interactions[[i]])
+  
+  # Extract the info I need from the summary
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[11]]
+  sigma_sd <- sum[[11,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[12]]
+  sig_time_sd <- sum[[12,2]]
+  
+  # Put the results in a dataframe
+  socon_interactions_df <- rbind(socon_interactions_df, data.frame(dep_var = dep_var, mu_intercept_int = mu_int, mu_sd_int = mu_sd, sigma_intercept_int = sigma_int, sigma_sd_int = sigma_sd, mu_time_int = mu_time, mu_time_sd_int = mu_time_sd, sig_time_int = sig_time, sig_time_sd_int = sig_time_sd))
+}
+
+# Merge the results, and add some variables with extra information 
+socon_results_df <- merge(socon_empty_df, socon_preds_df)
+socon_results_df <- merge(socon_results_df, socon_interactions_df)
+socon_results_df$first_year <- 2021 
+socon_results_df$mean_year <- 2021
+socon_results_df$waveset <- 2
+socon_results_df$data <- "SOCON"
+
+save(socon_results_df, file="./data/final_data/regression_outputs/per_wave/socon_results_df2_new.RData")
+```
+
+## LISS {-}
+
+```{r}
+# Now the same for the LISS
+rm(list=ls())
+load("./data/final_data/regression_outputs/per_wave/liss_list_empty1.RData")
+
+# Store the results in a new dataframe
+liss_empty_df <- data.frame(dep_var = character())
+
+# Loop over the list for all the dep vars
+for (i in seq_along(liss_list_empty)) {
+
+  # Extract the name of the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(liss_list_empty[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(liss_list_empty[[i]])
+  
+  # Extract the info
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[3]]
+  sigma_sd <- sum[[3,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[4]]
+  sig_time_sd <- sum[[4,2]]
+  
+  # Put the results in a dataframe
+  liss_empty_df <- rbind(liss_empty_df, data.frame(dep_var = dep_var, mu_intercept = mu_int, mu_sd = mu_sd, sigma_intercept = sigma_int, sigma_sd = sigma_sd, mu_time = mu_time, mu_time_sd = mu_time_sd, sig_time = sig_time, sig_time_sd = sig_time_sd))
+}
+
+# And the predictor model
+load("./data/final_data/regression_outputs/per_wave/liss_list_preds1_new.RData")
+
+# Store the results in a new dataframe
+liss_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(liss_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(liss_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(liss_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[7]]
+  sigma_sd <- sum[[7,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[8]]
+  sig_time_sd <- sum[[8,2]]
+  
+  # Put the results 
+  liss_preds_df <- rbind(liss_preds_df, data.frame(dep_var = dep_var, mu_intercept_pred = mu_int, mu_sd_pred = mu_sd, sigma_intercept_pred = sigma_int, sigma_sd_pred = sigma_sd, mu_time_pred = mu_time, mu_time_sd_pred = mu_time_sd, sig_time_pred = sig_time, sig_time_sd_pred = sig_time_sd))
+}
+
+# And lastly the interaction model
+load("./data/final_data/regression_outputs/per_wave/liss_list_interactions1_new.RData")
+
+# Store the results in a new dataframe
+liss_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the number of dep vars in the list
+for (i in seq_along(liss_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(liss_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(liss_list_interactions[[i]])
+  
+  # Extract the info I need from the summary
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[11]]
+  sigma_sd <- sum[[11,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[12]]
+  sig_time_sd <- sum[[12,2]]
+  
+  # Put the results in a dataframe
+  liss_interactions_df <- rbind(liss_interactions_df, data.frame(dep_var = dep_var, mu_intercept_int = mu_int, mu_sd_int = mu_sd, sigma_intercept_int = sigma_int, sigma_sd_int = sigma_sd, mu_time_int = mu_time, mu_time_sd_int = mu_time_sd, sig_time_int = sig_time, sig_time_sd_int = sig_time_sd))
+}
+
+# Merge the results, and add some variables with extra information 
+liss_results_df <- merge(liss_empty_df, liss_preds_df)
+liss_results_df <- merge(liss_results_df, liss_interactions_df)
+liss_results_df$first_year <- 2019
+liss_results_df$mean_year <- 2020
+liss_results_df$waveset <- 1
+liss_results_df$data <- "LISS"
+
+save(liss_results_df, file="./data/final_data/regression_outputs/per_wave/liss_results_df1_new.RData")
+```
+
+```{r}
+# Now the same for the LISS
+rm(list=ls())
+load("./data/final_data/regression_outputs/per_wave/liss_list_empty2.RData")
+
+# Store the results in a new dataframe
+liss_empty_df <- data.frame(dep_var = character())
+
+# Loop over the list for all the dep vars
+for (i in seq_along(liss_list_empty)) {
+
+  # Extract the name of the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(liss_list_empty[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(liss_list_empty[[i]])
+  
+  # Extract the info
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[3]]
+  sigma_sd <- sum[[3,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[4]]
+  sig_time_sd <- sum[[4,2]]
+  
+  # Put the results in a dataframe
+  liss_empty_df <- rbind(liss_empty_df, data.frame(dep_var = dep_var, mu_intercept = mu_int, mu_sd = mu_sd, sigma_intercept = sigma_int, sigma_sd = sigma_sd, mu_time = mu_time, mu_time_sd = mu_time_sd, sig_time = sig_time, sig_time_sd = sig_time_sd))
+}
+
+# And the predictor model
+load("./data/final_data/regression_outputs/per_wave/liss_list_preds2_new.RData")
+
+# Store the results in a new dataframe
+liss_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(liss_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(liss_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(liss_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[7]]
+  sigma_sd <- sum[[7,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[8]]
+  sig_time_sd <- sum[[8,2]]
+  
+  # Put the results 
+  liss_preds_df <- rbind(liss_preds_df, data.frame(dep_var = dep_var, mu_intercept_pred = mu_int, mu_sd_pred = mu_sd, sigma_intercept_pred = sigma_int, sigma_sd_pred = sigma_sd, mu_time_pred = mu_time, mu_time_sd_pred = mu_time_sd, sig_time_pred = sig_time, sig_time_sd_pred = sig_time_sd))
+}
+
+# And lastly the interaction model
+load("./data/final_data/regression_outputs/per_wave/liss_list_interactions2_new.RData")
+
+# Store the results in a new dataframe
+liss_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the number of dep vars in the list
+for (i in seq_along(liss_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(liss_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(liss_list_interactions[[i]])
+  
+  # Extract the info I need from the summary
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[11]]
+  sigma_sd <- sum[[11,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[12]]
+  sig_time_sd <- sum[[12,2]]
+  
+  # Put the results in a dataframe
+  liss_interactions_df <- rbind(liss_interactions_df, data.frame(dep_var = dep_var, mu_intercept_int = mu_int, mu_sd_int = mu_sd, sigma_intercept_int = sigma_int, sigma_sd_int = sigma_sd, mu_time_int = mu_time, mu_time_sd_int = mu_time_sd, sig_time_int = sig_time, sig_time_sd_int = sig_time_sd))
+}
+
+# Merge the results, and add some variables with extra information 
+liss_results_df <- merge(liss_empty_df, liss_preds_df)
+liss_results_df <- merge(liss_results_df, liss_interactions_df)
+liss_results_df$first_year <- 2020
+liss_results_df$mean_year <- 2020
+liss_results_df$waveset <- 2
+liss_results_df$data <- "LISS"
+
+save(liss_results_df, file="./data/final_data/regression_outputs/per_wave/liss_results_df2_new.RData")
+```
+
+```{r}
+# Now the same for the LISS
+rm(list=ls())
+load("./data/final_data/regression_outputs/per_wave/liss_list_empty3.RData")
+
+# Store the results in a new dataframe
+liss_empty_df <- data.frame(dep_var = character())
+
+# Loop over the list for all the dep vars
+for (i in seq_along(liss_list_empty)) {
+
+  # Extract the name of the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(liss_list_empty[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(liss_list_empty[[i]])
+  
+  # Extract the info
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[3]]
+  sigma_sd <- sum[[3,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[4]]
+  sig_time_sd <- sum[[4,2]]
+  
+  # Put the results in a dataframe
+  liss_empty_df <- rbind(liss_empty_df, data.frame(dep_var = dep_var, mu_intercept = mu_int, mu_sd = mu_sd, sigma_intercept = sigma_int, sigma_sd = sigma_sd, mu_time = mu_time, mu_time_sd = mu_time_sd, sig_time = sig_time, sig_time_sd = sig_time_sd))
+}
+
+# And the predictor model
+load("./data/final_data/regression_outputs/per_wave/liss_list_preds3_new.RData")
+
+# Store the results in a new dataframe
+liss_preds_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(liss_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(liss_list_preds[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(liss_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[7]]
+  sigma_sd <- sum[[7,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[8]]
+  sig_time_sd <- sum[[8,2]]
+  
+  # Put the results 
+  liss_preds_df <- rbind(liss_preds_df, data.frame(dep_var = dep_var, mu_intercept_pred = mu_int, mu_sd_pred = mu_sd, sigma_intercept_pred = sigma_int, sigma_sd_pred = sigma_sd, mu_time_pred = mu_time, mu_time_sd_pred = mu_time_sd, sig_time_pred = sig_time, sig_time_sd_pred = sig_time_sd))
+}
+
+# And lastly the interaction model
+load("./data/final_data/regression_outputs/per_wave/liss_list_interactions3_new.RData")
+
+# Store the results in a new dataframe
+liss_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the number of dep vars in the list
+for (i in seq_along(liss_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(liss_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(liss_list_interactions[[i]])
+  
+  # Extract the info I need from the summary
+  mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+  sigma_int <- sum[[11]]
+  sigma_sd <- sum[[11,2]]
+  mu_time <- sum [[2]]
+  mu_time_sd <- sum[[2,2]]
+  sig_time <- sum[[12]]
+  sig_time_sd <- sum[[12,2]]
+  
+  # Put the results in a dataframe
+  liss_interactions_df <- rbind(liss_interactions_df, data.frame(dep_var = dep_var, mu_intercept_int = mu_int, mu_sd_int = mu_sd, sigma_intercept_int = sigma_int, sigma_sd_int = sigma_sd, mu_time_int = mu_time, mu_time_sd_int = mu_time_sd, sig_time_int = sig_time, sig_time_sd_int = sig_time_sd))
+}
+
+# Merge the results, and add some variables with extra information 
+liss_results_df <- merge(liss_empty_df, liss_preds_df)
+liss_results_df <- merge(liss_results_df, liss_interactions_df)
+liss_results_df$first_year <- 2020
+liss_results_df$mean_year <- 2021
+liss_results_df$waveset <- 3
+liss_results_df$data <- "LISS"
+
+save(liss_results_df, file="./data/final_data/regression_outputs/per_wave/liss_results_df3_new.RData")
+```
+
 
 ```{r}
 # Make one dataframe
@@ -1553,52 +2052,94 @@ save(io_results_df_waves, file= "/Users/anuschka/Documents/climatechange/climate
 
 # And ISSP
 rm(list=ls())
-issp_1 <- load(here("./data/final_data/regression_outputs/regression_outputs/per_wave", "issp_results_df1_new.RData"))
-issp_2 <- load(here("./data/final_data/regression_outputs/per_wave", "issp_results_df2_new.RData"))
+issp_1 <- load("./data/final_data/regression_outputs/per_wave/issp_results_df1_new.RData")
+issp_2 <- load("./data/final_data/regression_outputs/per_wave/issp_results_df2_new.RData")
 
 issp_results_df_waves <- rbind (issp_1, issp_2)
 issp_results_df_waves$dep_var_wave <- paste(issp_results_df_waves$dep_var, issp_results_df_waves$waveset, sep = "_")
 
 save(issp_results_df_waves, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/issp_results_df_waves_new.RData" )
+
+# SOCON
+rm(list=ls())
+load("./data/final_data/regression_outputs/per_wave/socon_results_df1_new.RData")
+socon_1_df <- socon_results_df
+load("./data/final_data/regression_outputs/per_wave/socon_results_df2_new.RData")
+socon_2_df <- socon_results_df
+
+socon_results_df_waves <- rbind (socon_1_df, socon_2_df)
+socon_results_df_waves$dep_var_wave <- paste(socon_results_df_waves$dep_var, socon_results_df_waves$waveset, sep = "_")
+
+save(socon_results_df_waves, file= "./data/final_data/regression_outputs/per_wave/socon_results_df_waves_new.RData" )
+
+# LISS
+rm(list=ls())
+load("./data/final_data/regression_outputs/per_wave/liss_results_df1_new.RData")
+liss_1_df <- liss_results_df
+load("./data/final_data/regression_outputs/per_wave/liss_results_df2_new.RData")
+liss_2_df <- liss_results_df
+load("./data/final_data/regression_outputs/per_wave/liss_results_df3_new.RData")
+liss_3_df <- liss_results_df
+
+liss_results_df_waves <- rbind (liss_1_df, liss_2_df, liss_3_df)
+liss_results_df_waves$dep_var_wave <- paste(liss_results_df_waves$dep_var, liss_results_df_waves$waveset, sep = "_")
+
+save(liss_results_df_waves, file= "./data/final_data/regression_outputs/per_wave/liss_results_df_waves_new.RData" )
+
 ```
 
 
 ```{r}
 # The final step is to merge all results into one dataframe
 rm(list=ls())
-load(here("./data/final_data/regression_outputs/regression_outputs", "ess_results_df_w_new.RData"))
+load("./data/final_data/regression_outputs/ess_results_df_w_new.RData")
 ess_results_df$waveset <- 1
 ess_results_df$dep_var_wave <- paste(ess_results_df$dep_var, ess_results_df$waveset, sep = "_")
 
-load(here("./data/final_data/regression_outputs/regression_outputs", "issp_results_2_df_new.RData"))
+load("./data/final_data/regression_outputs/issp_results_2_df_new.RData")
 
 issp_results_2_df$mean_year <- 2005
 issp_results_2_df$waveset <- 1
 issp_results_2_df$dep_var_wave <- paste(issp_results_2_df$dep_var, issp_results_2_df$waveset, sep = "_")
 
-load(here("./data/final_data/regression_outputs/regression_outputs/per_wave", "evs_results_df_waves_new.RData"))
-load(here("./data/final_data/regression_outputs/regression_outputs/per_wave", "io_results_df_waves_new.RData"))
-load(here("./data/final_data/regression_outputs/regression_outputs/per_wave", "issp_results_df_waves_new.RData"))
-load(here("./data/final_data/regression_outputs/regression_outputs/per_wave", "eb_results_df_waves_total_new.RData"))
+load("./data/final_data/regression_outputs/mot_results_df_w_new.RData")
+mot_results_df$waveset <- 1
+mot_results_df$dep_var_wave <- paste(mot_results_df$dep_var, mot_results_df$waveset, sep = "_")
 
-total_results_waves <- rbind(eb_results_df, ess_results_df, evs_results_df_waves, io_results_df_waves, issp_results_df_waves, issp_results_2_df) 
 
-save(total_results_waves, file= "/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_results_waves_new.RData" )
+load("./data/final_data/regression_outputs/per_wave/evs_results_df_waves_new.RData")
+load("./data/final_data/regression_outputs/per_wave/io_results_df_waves_new.RData")
+load("./data/final_data/regression_outputs/per_wave/issp_results_df_waves_new.RData")
+load("./data/final_data/regression_outputs/per_wave/eb_results_df_waves_total_new.RData")
+load("./data/final_data/regression_outputs/per_wave/socon_results_df_waves_new.RData")
+load("./data/final_data/regression_outputs/per_wave/liss_results_df_waves_new.RData")
+
+total_results_waves <- rbind(eb_results_df, ess_results_df, evs_results_df_waves, io_results_df_waves, issp_results_df_waves, issp_results_2_df, mot_results_df, socon_results_df_waves, liss_results_df_waves) 
+
+save(total_results_waves, file= "./data/meta_analysis/total_results_waves_new.RData" )
 ```
 
 ```{r}
 # I also want to add a variable that describes whether the dependent variable is mostly of affective, behavioral or cognitive nature 
 
-# 2 variables that are called worry, not handy 
+# 2 variables that are called worry, not handy
 total_results_waves$dep_var[total_results_waves$dep_var == "worry" & total_results_waves$data == "ISSP"] <- "worry_issp"
 
+# Category
 total_results_waves$attitude_cat[total_results_waves$dep_var == "dodiff" 
                                | total_results_waves$dep_var == "pers_resp"
                                | total_results_waves$dep_var == "worry"
                                | total_results_waves$dep_var == "worried"
                                | total_results_waves$dep_var == "worry_future"
                                | total_results_waves$dep_var == "frontrunner"
-                               | total_results_waves$dep_var == "min_contr"] <- "affective"
+                               | total_results_waves$dep_var == "min_contr"
+                               | total_results_waves$dep_var == "worried_mot"
+                               | total_results_waves$dep_var == "futuregen"
+                               | total_results_waves$dep_var == "nowor"
+                               | total_results_waves$dep_var == "motivr"
+                               | total_results_waves$dep_var == "fut_gen_socon"
+                               | total_results_waves$dep_var == "pers_resp_mot"] <- "affective"
+
 total_results_waves$attitude_cat[total_results_waves$dep_var == "willing_price" 
                                | total_results_waves$dep_var == "willing_tax"
                                | total_results_waves$dep_var == "willing_living"
@@ -1607,7 +2148,11 @@ total_results_waves$attitude_cat[total_results_waves$dep_var == "willing_price"
                                | total_results_waves$dep_var == "climate5"
                                | total_results_waves$dep_var == "prsaction"
                                | total_results_waves$dep_var == "cc_prsact"
-                               | total_results_waves$dep_var == "buyprod"] <- "behavioral"
+                               | total_results_waves$dep_var == "buyprod"
+                                | total_results_waves$dep_var == "sust_choice"
+                                | total_results_waves$dep_var == "energy"
+                                | total_results_waves$dep_var == "lifestyle"] <- "behavioral"
+
 total_results_waves$attitude_cat[total_results_waves$dep_var == "worry_issp" 
                                | total_results_waves$dep_var == "lifeharm"
                                | total_results_waves$dep_var == "progharm"
@@ -1645,9 +2190,20 @@ total_results_waves$attitude_cat[total_results_waves$dep_var == "worry_issp"
                                | total_results_waves$dep_var == "role_ind"
                                | total_results_waves$dep_var == "big_pol"
                                | total_results_waves$dep_var == "eff_daily"
-                               | total_results_waves$dep_var == "pers_imp"] <- "cognitive"
+                               | total_results_waves$dep_var == "pers_imp"
+                              | total_results_waves$dep_var == "cchange_mot"
+                              | total_results_waves$dep_var == "ontime"
+                              | total_results_waves$dep_var == "gov"
+                              | total_results_waves$dep_var == "resp_gov"
+                              | total_results_waves$dep_var == "resp_comp"
+                              | total_results_waves$dep_var == "resp_mkb"
+                              | total_results_waves$dep_var == "resp_citiz_mot"
+                              | total_results_waves$dep_var == "resp_you"
+                              | total_results_waves$dep_var == "contr"
+                              | total_results_waves$dep_var == "noidea"] <- "cognitive"
 
 #Create a variable that indicates whether the dependent variable can be interpreted in 2 ways (ambiguous)
+
 total_results_waves$ambiguous[total_results_waves$dep_var != "dodiff" 
                                | total_results_waves$dep_var != "frontrunner"
                                | total_results_waves$dep_var != "min_contr"
@@ -1664,7 +2220,8 @@ total_results_waves$ambiguous[total_results_waves$dep_var != "dodiff"
                             | total_results_waves$dep_var != "env_quallife"
                             | total_results_waves$dep_var != "cc_unstop"
                             | total_results_waves$dep_var != "cc_poseu"
-                            | total_results_waves$dep_var != "big_pol"] <- "No"
+                            | total_results_waves$dep_var != "big_pol"
+                            | total_results_waves$dep_var == "noidea"] <- "No"
 total_results_waves$ambiguous[total_results_waves$dep_var == "dodiff" 
                                | total_results_waves$dep_var == "frontrunner"
                                | total_results_waves$dep_var == "min_contr"
@@ -1681,38 +2238,11 @@ total_results_waves$ambiguous[total_results_waves$dep_var == "dodiff"
                             | total_results_waves$dep_var == "env_quallife"
                             | total_results_waves$dep_var == "cc_unstop"
                             | total_results_waves$dep_var == "cc_poseu"
-                            | total_results_waves$dep_var == "big_pol"] <- "Yes"
+                            | total_results_waves$dep_var == "big_pol"
+                            | total_results_waves$dep_var == "noidea"] <- "Yes"
 
 
-# Create a variable about whether 2008 (financial crisis) is included in the time span of the data set/vars 
-total_results_waves$fin_crisis[total_results_waves$data == "EVS" & total_results_waves$waveset == 2] <- 1
-total_results_waves$fin_crisis[total_results_waves$data == "EVS" & total_results_waves$waveset == 1] <- 0
-total_results_waves$fin_crisis[total_results_waves$data == "ISSP" & total_results_waves$first_year == 2000] <- 1
-total_results_waves$fin_crisis[total_results_waves$data == "ISSP" & total_results_waves$first_year == 1993] <- 0
-total_results_waves$fin_crisis[total_results_waves$data == "ESS"] <- 0
-total_results_waves$fin_crisis[total_results_waves$data == "IO"] <- 0
-# For the EB, this varies more
-total_results_waves$fin_crisis[total_results_waves$data == "EB"] <- 0
-total_results_waves$fin_crisis[total_results_waves$dep_var_wave == "env_quallife_2"] <- 1
-total_results_waves$fin_crisis[total_results_waves$dep_var_wave == "role_ind_1"] <- 1
-total_results_waves$fin_crisis[total_results_waves$dep_var_wave == "big_pol_1"] <- 1
-total_results_waves$fin_crisis[total_results_waves$dep_var_wave == "buyprod_1"] <- 1
-total_results_waves$fin_crisis[total_results_waves$dep_var_wave == "eff_daily_1"] <- 1
-total_results_waves$fin_crisis[total_results_waves$dep_var_wave == "cc_unstop_1"] <- 1
-total_results_waves$fin_crisis[total_results_waves$dep_var_wave == "cc_exag_1"] <- 1
-total_results_waves$fin_crisis[total_results_waves$dep_var_wave == "cc_prsact_1"] <- 1
 
-# And the same for covid-19
-total_results_waves$covid[total_results_waves$data == "EVS"] <- 0
-total_results_waves$covid[total_results_waves$data == "ISSP"] <- 0
-total_results_waves$covid[total_results_waves$data == "ESS"] <- 1
-total_results_waves$covid[total_results_waves$data == "IO"] <- 1
-total_results_waves$covid[total_results_waves$data == "EB"] <- 0
-total_results_waves$covid[total_results_waves$dep_var_wave == "ccpercept_5"] <- 1
-total_results_waves$covid[total_results_waves$dep_var_wave == "cchange_5"] <- 1
-total_results_waves$covid[total_results_waves$dep_var_wave == "cchange2_5"] <- 1
-total_results_waves$covid[total_results_waves$dep_var_wave == "cchangetot_5"] <- 1
-
-save(total_results_waves, file= "/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_results_waves_new.RData" )
+save(total_results_waves, file= "./data/meta_analysis/total_results_waves_new.RData" )
 ```
 

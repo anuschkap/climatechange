@@ -46,14 +46,16 @@ ess_list_empty <- list()
   # Specify the sigma formula
   sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
   # Perform the linear regression. The sigma formula pastes every variable one by one and calculates variance, the other formula shows the mean attitudes effects
-  ess_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = ess_complete, weights = weightvec)
+  ess_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), family=NO(mu.link = "identity", sigma.link = "identity"), data = ess_complete, weights = weightvec)
   
   ess_list_empty[[i]] <- ess_fit
 } 
 
+
 summary(ess_list_empty[[1]]) #Sig pos effect of surveyyear on both intercept and variance (worry)
 summary(ess_list_empty[[2]]) # Sig neg effect on intercept, sig pos effect on variance (cause)
 summary(ess_list_empty[[3]]) # Sig pos effect on intercept, sig neg effect on variance (pers_resp)
+
  
 save(ess_list_empty, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_empty_w.RData")
 
@@ -1604,7 +1606,7 @@ socon_list_interactions <- list()
  for (i in 1:length(deps)) {
   # Specify the sigma formula
   sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
-  # Perform the linear regrsoconion
+  # Perform the linear regression
   socon_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = socon_complete, weights = weightvec)
   
   socon_list_interactions[[i]] <- socon_fit

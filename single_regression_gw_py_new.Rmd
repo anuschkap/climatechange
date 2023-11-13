@@ -253,7 +253,6 @@ summary(io_list_interactions[[1]])
 save(io_list_interactions, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/per_wave/io_list_interactions1_new.RData")
 ```
 
-
 ```{r}
 # The other waves
 io_2 <- subset(io_complete, surveyyear == 2020 | surveyyear == 2022)
@@ -2587,3 +2586,364 @@ summary(eb_list_interactions_prsaction[[1]])
 
 save(eb_list_interactions_prsaction, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_prsaction3_new.RData")
 ```
+
+
+## SOCON {-}
+```{r}
+# Repeat the same process for SOCON
+load("./data/final_data/socontotal.RData")
+
+socon_complete <- socontotal %>% drop_na()
+
+socon_complete$time <- socon_complete$surveyyear - min(socon_complete$surveyyear)
+
+socon_1 <- subset(socon_complete, surveyyear == 2020 | surveyyear == 2021)
+
+predictors <- c("time")
+deps <- c("fut_gen_socon")
+
+socon_list_empty <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regresssoconn
+  socon_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = socon_1, weights = weightvec)
+  
+  socon_list_empty[[i]] <- socon_fit
+} 
+
+save(socon_list_empty, file="./data/final_data/regression_outputs/per_wave/socon_list_empty1.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced_cat", "age")
+
+socon_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regresssoconn
+  socon_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = socon_1, weights = weightvec)
+  
+  socon_list_preds[[i]] <- socon_fit
+} 
+
+summary(socon_list_preds[[1]]) 
+
+save(socon_list_preds, file="./data/final_data/regression_outputs/per_wave/socon_list_preds1_new.RData")
+
+# Model with interactions
+socon_1$age_time <- socon_1$age * socon_1$time
+socon_1$sex_time <- as.numeric(socon_1$sex) * socon_1$time
+socon_1 <- fastDummies::dummy_cols(socon_1, select_columns = "isced_cat")
+socon_1$isced_basic_time <- socon_1$isced_cat_Basic * socon_1$time
+socon_1$isced_intermediate_time <- socon_1$isced_cat_Intermediate * socon_1$time
+socon_1$isced_advanced_time <- socon_1$isced_cat_Advanced * socon_1$time
+
+interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
+
+socon_list_interactions <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regresssoconn
+  socon_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = socon_1, weights = weightvec)
+  
+  socon_list_interactions[[i]] <- socon_fit
+} 
+
+summary(socon_list_interactions[[1]]) 
+
+save(socon_list_interactions, file="./data/final_data/regression_outputs/per_wave/socon_list_interactions1_new.RData")
+```
+
+
+```{r}
+# Repeat the same process for SOCON
+socon_2 <- subset(socon_complete, surveyyear == 2021 | surveyyear == 2022)
+
+predictors <- c("time")
+deps <- c("fut_gen_socon")
+
+socon_list_empty <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regresssoconn
+  socon_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = socon_2, weights = weightvec)
+  
+  socon_list_empty[[i]] <- socon_fit
+} 
+
+save(socon_list_empty, file="./data/final_data/regression_outputs/per_wave/socon_list_empty2.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced_cat", "age")
+
+socon_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regresssoconn
+  socon_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = socon_2, weights = weightvec)
+  
+  socon_list_preds[[i]] <- socon_fit
+} 
+
+summary(socon_list_preds[[1]]) 
+
+save(socon_list_preds, file="./data/final_data/regression_outputs/per_wave/socon_list_preds2_new.RData")
+
+# Model with interactions
+socon_2$age_time <- socon_2$age * socon_2$time
+socon_2$sex_time <- as.numeric(socon_2$sex) * socon_2$time
+socon_2 <- fastDummies::dummy_cols(socon_2, select_columns = "isced_cat")
+socon_2$isced_basic_time <- socon_2$isced_cat_Basic * socon_2$time
+socon_2$isced_intermediate_time <- socon_2$isced_cat_Intermediate * socon_2$time
+socon_2$isced_advanced_time <- socon_2$isced_cat_Advanced * socon_2$time
+
+interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
+
+socon_list_interactions <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regresssoconn
+  socon_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = socon_2, weights = weightvec)
+  
+  socon_list_interactions[[i]] <- socon_fit
+} 
+
+summary(socon_list_interactions[[1]]) 
+
+save(socon_list_interactions, file="./data/final_data/regression_outputs/per_wave/socon_list_interactions2_new.RData")
+```
+
+
+## LISS {-}
+
+```{r}
+# Repeat the same process for LISS
+rm(list=ls())
+load("./data/final_data/lisstotal.RData")
+
+liss_complete <- lisstotal %>% drop_na()
+
+liss_complete$time <- liss_complete$surveyyear - min(liss_complete$surveyyear)
+table(liss_complete$surveyyear)
+
+liss_1 <- subset(liss_complete, surveyyear == 2019 | surveyyear == 2020.58)
+
+predictors <- c("time")
+deps <- c("lifestyle")
+
+liss_list_empty <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regresslissn
+  liss_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = liss_1, weights = weightvec)
+  
+  liss_list_empty[[i]] <- liss_fit
+} 
+
+save(liss_list_empty, file="./data/final_data/regression_outputs/per_wave/liss_list_empty1.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced_cat", "age")
+
+liss_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regresslissn
+  liss_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = liss_1, weights = weightvec)
+  
+  liss_list_preds[[i]] <- liss_fit
+} 
+
+summary(liss_list_preds[[1]]) 
+
+save(liss_list_preds, file="./data/final_data/regression_outputs/per_wave/liss_list_preds1_new.RData")
+
+# Model with interactions
+liss_1$age_time <- liss_1$age * liss_1$time
+liss_1$sex_time <- as.numeric(liss_1$sex) * liss_1$time
+liss_1 <- fastDummies::dummy_cols(liss_1, select_columns = "isced_cat")
+liss_1$isced_basic_time <- liss_1$isced_cat_Basic * liss_1$time
+liss_1$isced_intermediate_time <- liss_1$isced_cat_Intermediate * liss_1$time
+liss_1$isced_advanced_time <- liss_1$isced_cat_Advanced * liss_1$time
+
+interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
+
+liss_list_interactions <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regresslissn
+  liss_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = liss_1, weights = weightvec)
+  
+  liss_list_interactions[[i]] <- liss_fit
+} 
+
+summary(liss_list_interactions[[1]]) 
+
+save(liss_list_interactions, file="./data/final_data/regression_outputs/per_wave/liss_list_interactions1_new.RData")
+```
+
+
+```{r}
+# Repeat the same process for LISS
+table(liss_complete$surveyyear)
+
+liss_2 <- subset(liss_complete, surveyyear == 2020.58 | surveyyear == 2020.83)
+
+predictors <- c("time")
+deps <- c("lifestyle")
+
+liss_list_empty <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regresslissn
+  liss_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = liss_2, weights = weightvec)
+  
+  liss_list_empty[[i]] <- liss_fit
+} 
+
+save(liss_list_empty, file="./data/final_data/regression_outputs/per_wave/liss_list_empty2.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced_cat", "age")
+
+liss_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regresslissn
+  liss_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = liss_2, weights = weightvec)
+  
+  liss_list_preds[[i]] <- liss_fit
+} 
+
+summary(liss_list_preds[[1]]) 
+
+save(liss_list_preds, file="./data/final_data/regression_outputs/per_wave/liss_list_preds2_new.RData")
+
+# Model with interactions
+liss_2$age_time <- liss_2$age * liss_2$time
+liss_2$sex_time <- as.numeric(liss_2$sex) * liss_2$time
+liss_2 <- fastDummies::dummy_cols(liss_2, select_columns = "isced_cat")
+liss_2$isced_basic_time <- liss_2$isced_cat_Basic * liss_2$time
+liss_2$isced_intermediate_time <- liss_2$isced_cat_Intermediate * liss_2$time
+liss_2$isced_advanced_time <- liss_2$isced_cat_Advanced * liss_2$time
+
+interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
+
+liss_list_interactions <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regresslissn
+  liss_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = liss_2, weights = weightvec)
+  
+  liss_list_interactions[[i]] <- liss_fit
+} 
+
+summary(liss_list_interactions[[1]]) 
+
+save(liss_list_interactions, file="./data/final_data/regression_outputs/per_wave/liss_list_interactions2_new.RData")
+```
+
+```{r}
+# Repeat the same process for LISS
+table(liss_complete$surveyyear)
+
+liss_3 <- subset(liss_complete, surveyyear == 2020.83 | surveyyear == 2021)
+
+predictors <- c("time")
+deps <- c("lifestyle")
+
+liss_list_empty <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regresslissn
+  liss_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = liss_3, weights = weightvec)
+  
+  liss_list_empty[[i]] <- liss_fit
+} 
+
+save(liss_list_empty, file="./data/final_data/regression_outputs/per_wave/liss_list_empty3.RData")
+
+# Model with predictors
+predictors <- c("time", "sex", "isced_cat", "age")
+
+liss_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regresslissn
+  liss_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,
+                   family=NO(mu.link = "identity", sigma.link = "identity"), data = liss_3, weights = weightvec)
+  
+  liss_list_preds[[i]] <- liss_fit
+} 
+
+summary(liss_list_preds[[1]]) 
+
+save(liss_list_preds, file="./data/final_data/regression_outputs/per_wave/liss_list_preds3_new.RData")
+
+# Model with interactions
+liss_3$age_time <- liss_3$age * liss_3$time
+liss_3$sex_time <- as.numeric(liss_3$sex) * liss_3$time
+liss_3 <- fastDummies::dummy_cols(liss_3, select_columns = "isced_cat")
+liss_3$isced_basic_time <- liss_3$isced_cat_Basic * liss_3$time
+liss_3$isced_intermediate_time <- liss_3$isced_cat_Intermediate * liss_3$time
+liss_3$isced_advanced_time <- liss_3$isced_cat_Advanced * liss_3$time
+
+interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
+
+liss_list_interactions <- list()
+
+ for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = " + ")))
+  # Perform the linear regresslissn
+  liss_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "), " + ", paste(interactions, collapse = "+ "))), sigma.formula = sigma.formula," + ", family=NO(mu.link = "identity", sigma.link = "identity"), data = liss_3, weights = weightvec)
+  
+  liss_list_interactions[[i]] <- liss_fit
+} 
+
+summary(liss_list_interactions[[1]]) 
+
+save(liss_list_interactions, file="./data/final_data/regression_outputs/per_wave/liss_list_interactions3_new.RData")
+```
+

@@ -22,9 +22,6 @@ library(tidyverse)
 library(dplyr)
 library(here)
 library(fastDummies)
-library(here)
-here()
-here::i_am("scripts/analysis/single_regression_gamlss_weight_new_age.Rmd")
 ```
 ## ESS {-}
 
@@ -513,3 +510,97 @@ eb_list_preds_doprot_city <- list()
 
 save(eb_list_preds_doprot_city, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_doprot_city_w_new_age.RData")
 ```
+
+## Motivaction {-}
+```{r}
+rm(list=ls())
+load("./data/final_data/mottotal.RData")
+
+# Gamlss cannot handle NAs, so I have to listwise delete all of them
+mot_complete <- mottotal %>% drop_na()
+mot_complete$time <- mot_complete$surveyyear - min(mot_complete$surveyyear)
+
+#Estimate a second model with the indicators + time
+predictors <- c("time", "age")
+deps <- c("cchange_mot", "worried_mot", "futuregen", "nowor", "ontime", "gov", "resp_gov", "resp_comp", "resp_mkb", "resp_citiz_mot", "resp_you", "pers_resp_mot", "sust_choice", "contr", "energy", "noidea", "motiv")
+
+mot_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regrmotion
+  mot_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = mot_complete, weights = weightvec)
+  
+  mot_list_preds[[i]] <- mot_fit
+} 
+
+summary(mot_list_preds[[1]]) 
+
+save(mot_list_preds, file="./data/final_data/regression_outputs/mot_list_preds_w_new_age.RData")
+
+
+```
+
+
+```{r}
+rm(list=ls())
+load("./data/final_data/lisstotal.RData")
+
+# Gamlss cannot handle NAs, so I have to listwise delete all of them
+liss_complete <- lisstotal %>% drop_na()
+liss_complete$time <- liss_complete$surveyyear - min(liss_complete$surveyyear)
+
+#Estimate a second model with the indicators + time
+predictors <- c("time", "age")
+deps <- c("lifestyle")
+
+liss_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regrlission
+  liss_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = liss_complete, weights = weightvec)
+  
+  liss_list_preds[[i]] <- liss_fit
+} 
+
+summary(liss_list_preds[[1]]) 
+
+save(liss_list_preds, file="./data/final_data/regression_outputs/liss_list_preds_w_new_age.RData")
+
+```
+
+```{r}
+rm(list=ls())
+load("./data/final_data/socontotal.RData")
+
+# Gamlss cannot handle NAs, so I have to listwise delete all of them
+socon_complete <- socontotal %>% drop_na()
+socon_complete$time <- socon_complete$surveyyear - min(socon_complete$surveyyear)
+
+#Estimate a second model with the indicators + time
+predictors <- c("time", "age")
+deps <- c("fut_gen_socon")
+
+socon_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regrsoconion
+  socon_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = socon_complete, weights = weightvec)
+  
+  socon_list_preds[[i]] <- socon_fit
+} 
+
+summary(socon_list_preds[[1]]) 
+
+save(socon_list_preds, file="./data/final_data/regression_outputs/socon_list_preds_w_new_age.RData")
+
+```
+

@@ -21,12 +21,11 @@ library(here)
 library(dplyr)
 library(kableExtra)
 set.seed(1)
-here()
-here::i_am("scripts/analysis/meta_analysis_indep_var.Rmd")
+
 ```
 
 ```{r, results='hide', warning=FALSE}
-load(here("./data/meta_analysis", "total_indep_var_results_new.RData"))
+load("./data/meta_analysis/total_indep_var_results_new.RData")
 
 # Effects of mu's 
 # Gender 
@@ -130,6 +129,11 @@ total_indep_var_results$data[total_indep_var_results$dep_var=="worried" | total_
 total_indep_var_results$data[total_indep_var_results$dep_var=="worry" | total_indep_var_results$dep_var == "lifeharm" | total_indep_var_results$dep_var == "progharm" | total_indep_var_results$dep_var == "econprotect" | total_indep_var_results$dep_var == "growharm" | total_indep_var_results$dep_var == "willing_price" | total_indep_var_results$dep_var == "willing_tax" | total_indep_var_results$dep_var == "willing_living" | total_indep_var_results$dep_var == "dodiff" | total_indep_var_results$dep_var=="do_right" | total_indep_var_results$dep_var == "people_decide" | total_indep_var_results$dep_var == "moreimp" | total_indep_var_results$dep_var == "othersame" | total_indep_var_results$dep_var == "exag" | total_indep_var_results$dep_var == "country_effort"]  <- "ISSP"
 total_indep_var_results$data[is.na(total_indep_var_results$data)] <- "EB"
 
+
+total_indep_var_results$data[total_indep_var_results$dep_var=="cchange_mot" | total_indep_var_results$dep_var == "worried_mot" | total_indep_var_results$dep_var == "futuregen" | total_indep_var_results$dep_var == "nowor" | total_indep_var_results$dep_var == "ontime" | total_indep_var_results$dep_var == "gov" | total_indep_var_results$dep_var == "resp_gov" | total_indep_var_results$dep_var == "resp_comp" | total_indep_var_results$dep_var == "resp_mkb" | total_indep_var_results$dep_var=="resp_citiz_mot" | total_indep_var_results$dep_var == "resp_you" | total_indep_var_results$dep_var == "pers_resp_mot" | total_indep_var_results$dep_var == "sust_choice" | total_indep_var_results$dep_var == "contr" | total_indep_var_results$dep_var == "energy" | total_indep_var_results$dep_var == "energy" | total_indep_var_results$dep_var == "noidea" | total_indep_var_results$dep_var == "motiv"]  <- "MOT"
+total_indep_var_results$data[total_indep_var_results$dep_var=="fut_gen_socon"] <- "SOCON"
+total_indep_var_results$data[total_indep_var_results$dep_var=="lifestyle"] <- "LISS"
+
 total_indep_var_results$dep_var[total_indep_var_results$dep_var == "worry" & total_indep_var_results$data == "ISSP"] <- "worry_issp"
 
 total_indep_var_results$attitude_cat[total_indep_var_results$dep_var == "dodiff" 
@@ -138,7 +142,14 @@ total_indep_var_results$attitude_cat[total_indep_var_results$dep_var == "dodiff"
                                | total_indep_var_results$dep_var == "worried"
                                | total_indep_var_results$dep_var == "worry_future"
                                | total_indep_var_results$dep_var == "frontrunner"
-                               | total_indep_var_results$dep_var == "min_contr"] <- "affective"
+                               | total_indep_var_results$dep_var == "min_contr"
+                               | total_indep_var_results$dep_var == "worried_mot"
+                               | total_indep_var_results$dep_var == "futuregen"
+                               | total_indep_var_results$dep_var == "nowor"
+                               | total_indep_var_results$dep_var == "motivr"
+                               | total_indep_var_results$dep_var == "fut_gen_socon"
+                               | total_indep_var_results$dep_var == "pers_resp_mot"] <- "affective"
+
 total_indep_var_results$attitude_cat[total_indep_var_results$dep_var == "willing_price" 
                                | total_indep_var_results$dep_var == "willing_tax"
                                | total_indep_var_results$dep_var == "willing_living"
@@ -147,7 +158,11 @@ total_indep_var_results$attitude_cat[total_indep_var_results$dep_var == "willing
                                | total_indep_var_results$dep_var == "climate5"
                                | total_indep_var_results$dep_var == "prsaction"
                                | total_indep_var_results$dep_var == "cc_prsact"
-                               | total_indep_var_results$dep_var == "buyprod"] <- "behavioral"
+                               | total_indep_var_results$dep_var == "buyprod"
+                                | total_indep_var_results$dep_var == "sust_choice"
+                                | total_indep_var_results$dep_var == "energy"
+                                | total_indep_var_results$dep_var == "lifestyle"] <- "behavioral"
+
 total_indep_var_results$attitude_cat[total_indep_var_results$dep_var == "worry_issp" 
                                | total_indep_var_results$dep_var == "lifeharm"
                                | total_indep_var_results$dep_var == "progharm"
@@ -185,7 +200,17 @@ total_indep_var_results$attitude_cat[total_indep_var_results$dep_var == "worry_i
                                | total_indep_var_results$dep_var == "role_ind"
                                | total_indep_var_results$dep_var == "big_pol"
                                | total_indep_var_results$dep_var == "eff_daily"
-                               | total_indep_var_results$dep_var == "pers_imp"] <- "cognitive"
+                               | total_indep_var_results$dep_var == "pers_imp"
+                              | total_indep_var_results$dep_var == "cchange_mot"
+                              | total_indep_var_results$dep_var == "ontime"
+                              | total_indep_var_results$dep_var == "gov"
+                              | total_indep_var_results$dep_var == "resp_gov"
+                              | total_indep_var_results$dep_var == "resp_comp"
+                              | total_indep_var_results$dep_var == "resp_mkb"
+                              | total_indep_var_results$dep_var == "resp_citiz_mot"
+                              | total_indep_var_results$dep_var == "resp_you"
+                              | total_indep_var_results$dep_var == "contr"
+                              | total_indep_var_results$dep_var == "noidea"] <- "cognitive"
 
 #Create a variable that indicates whether the dependent variable can be interpreted in 2 ways (ambiguous)
 
@@ -205,7 +230,8 @@ total_indep_var_results$ambiguous[total_indep_var_results$dep_var != "dodiff"
                             | total_indep_var_results$dep_var != "env_quallife"
                             | total_indep_var_results$dep_var != "cc_unstop"
                             | total_indep_var_results$dep_var != "cc_poseu"
-                            | total_indep_var_results$dep_var != "big_pol"] <- "No"
+                            | total_indep_var_results$dep_var != "big_pol"
+                            | total_indep_var_results$dep_var == "noidea"] <- "No"
 total_indep_var_results$ambiguous[total_indep_var_results$dep_var == "dodiff" 
                                | total_indep_var_results$dep_var == "frontrunner"
                                | total_indep_var_results$dep_var == "min_contr"
@@ -222,23 +248,9 @@ total_indep_var_results$ambiguous[total_indep_var_results$dep_var == "dodiff"
                             | total_indep_var_results$dep_var == "env_quallife"
                             | total_indep_var_results$dep_var == "cc_unstop"
                             | total_indep_var_results$dep_var == "cc_poseu"
-                            | total_indep_var_results$dep_var == "big_pol"] <- "Yes"
+                            | total_indep_var_results$dep_var == "big_pol"
+                            | total_indep_var_results$dep_var == "noidea"] <- "Yes"
 
-table(total_indep_var_results$ambiguous, useNA = "always")
-
-# Create a variable about whether 2008 (financial crisis) is included in the time span of the data set/vars 
-total_indep_var_results$fin_crisis[total_indep_var_results$data == "EB"] <- 1
-total_indep_var_results$fin_crisis[total_indep_var_results$data == "EVS"] <- 1
-total_indep_var_results$fin_crisis[total_indep_var_results$data == "ISSP"] <- 1
-total_indep_var_results$fin_crisis[total_indep_var_results$data == "ESS"] <- 0
-total_indep_var_results$fin_crisis[total_indep_var_results$data == "IO"] <- 0
-
-# And the same for covid-19
-total_indep_var_results$covid[total_indep_var_results$data == "EB"] <- 1
-total_indep_var_results$covid[total_indep_var_results$data == "EVS"] <- 0
-total_indep_var_results$covid[total_indep_var_results$data == "ISSP"] <- 0
-total_indep_var_results$covid[total_indep_var_results$data == "ESS"] <- 1
-total_indep_var_results$covid[total_indep_var_results$data == "IO"] <- 1
 
 
 # This time, year is a bit more difficult, so I have to assign that per dep_var
@@ -274,6 +286,9 @@ total_indep_var_results$mean_year[total_indep_var_results$dep_var == "prsaction"
 total_indep_var_results$mean_year[total_indep_var_results$data == "I&O"] <- 2020
 total_indep_var_results$mean_year[total_indep_var_results$data == "EVS"] <- 1999
 total_indep_var_results$mean_year[total_indep_var_results$data == "ESS"] <- 2018
+total_indep_var_results$mean_year[total_indep_var_results$data == "MOT"] <- 2020
+total_indep_var_results$mean_year[total_indep_var_results$data == "SOCON"] <- 2021
+total_indep_var_results$mean_year[total_indep_var_results$data == "LISS"] <- 2020
 # For the ISSP, have to specify it per dependent variable
 total_indep_var_results$mean_year[total_indep_var_results$dep_var == "exag"] <- 2005
 total_indep_var_results$mean_year[total_indep_var_results$dep_var == "moreimp"] <- 2005
@@ -281,14 +296,22 @@ total_indep_var_results$mean_year[total_indep_var_results$dep_var == "othersame"
 total_indep_var_results$mean_year[total_indep_var_results$dep_var == "country_effort"] <- 2005
 total_indep_var_results$mean_year[total_indep_var_results$dep_var == "growharm"] <- 2005
 total_indep_var_results$mean_year[is.na(total_indep_var_results$mean_year)] <- 2002
+
+total_indep_var_results$mean_year_centered <- total_indep_var_results$mean_year - mean(total_indep_var_results$mean_year)
+
+save(total_indep_var_results, file= "./data/meta_analysis/total_indep_var_results_new.RData" )
+
 ```
 
 
 ```{r, results='hide', warning=FALSE}
+
+
+
 m1_gender <- rma(yi = mu_sex_est,
               sei = mu_sex_sd,
               data = total_indep_var_results,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              mods = ~ mean_year_centered + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
@@ -297,7 +320,7 @@ m1_gender
 m1_age <- rma(yi = mu_age_est,
               sei = mu_age_sd,
               data = total_indep_var_results,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              mods = ~ mean_year_centered + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
@@ -306,7 +329,7 @@ m1_age
 m1_isced_med <- rma(yi = mu_isced_med_est,
               sei = mu_isced_med_sd,
               data = total_indep_var_results,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              mods = ~ mean_year_centered + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
@@ -315,7 +338,7 @@ m1_isced_med
 m1_isced_high <- rma(yi = mu_isced_high_est,
               sei = mu_isced_high_sd,
               data = total_indep_var_results,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              mods = ~ mean_year_centered + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
@@ -325,7 +348,7 @@ m1_isced_high
 m1_gender_var <- rma(yi = sig_sex_est,
               sei = sig_sex_sd,
               data = total_indep_var_results,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              mods = ~ mean_year_centered + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
@@ -334,7 +357,7 @@ m1_gender_var
 m1_age_var <- rma(yi = sig_age_est,
               sei = sig_age_sd,
               data = total_indep_var_results,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              mods = ~ mean_year_centered + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
@@ -343,7 +366,7 @@ m1_age_var
 m1_isced_med_var <- rma(yi = sig_isced_med_est,
               sei = sig_isced_med_sd,
               data = total_indep_var_results,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              mods = ~ mean_year_centered + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
@@ -352,7 +375,7 @@ m1_isced_med_var
 m1_isced_high_var <- rma(yi = sig_isced_high_est,
               sei = sig_isced_high_sd,
               data = total_indep_var_results,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
+              mods = ~ mean_year_centered + attitude_cat + ambiguous,
               method = "REML",
               test = "knha")
 
@@ -368,10 +391,10 @@ options(knitr.kable.NA = '')
 
 ```{r}
 # Make a table of the above regression output
-indep_df <- data.frame(matrix(ncol = 14, nrow = 7))
+indep_df <- data.frame(matrix(ncol = 14, nrow = 5))
 colnames(indep_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p", "Estimate_1", "SE_1", "p_1", "Estimate_2", "SE_2", "p_2", "Estimate_3", "SE_3", "p_3")
-indep_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
-indep_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "", "", "")
+indep_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)")
+indep_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "")
 
 indep_df$Estimate <- as.numeric(m1_gender$beta) #estimate
 indep_df$SE <- m1_gender$se #se indeed but as a row
@@ -430,10 +453,10 @@ indep_df <- select(indep_df, `Mu/Sigma`, Variable, Estimate, SE, p_text, Estimat
 indep_df <- rbind(indep_df, model_1_fit)
 
 # Variance
-indep_var_df <- data.frame(matrix(ncol = 14, nrow = 7))
+indep_var_df <- data.frame(matrix(ncol = 14, nrow = 5))
 colnames(indep_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p", "Estimate_1", "SE_1", "p_1", "Estimate_2", "SE_2", "p_2", "Estimate_3", "SE_3", "p_3")
-indep_var_df$Variable <- c("Intercept", "Mean year", "Attitude behavioral (ref = aff)", "Attitude cognitive", "Ambigious (ref = no)", "Financial crisis", "Covid-19")
-indep_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "", "", "")
+indep_var_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)")
+indep_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "")
 
 indep_var_df$Estimate <- as.numeric(m1_gender_var$beta) #estimate
 indep_var_df$SE <- m1_gender_var$se #se indeed but as a row
@@ -508,9 +531,8 @@ kable(indep_df_total, digits = 3, caption = "Appendix E. Meta-regression on clim
     general = "*** = p < 0.001, ** = p < 0.01, * = p < 0.05",
     threeparttable = TRUE,
     footnote_as_chunk = TRUE
-    ) #%>%
-    #save_kable("/Users/anuschka/Documents/climatechange/climatechange/output/meta_regression_indepvar_table.html")
-
+    ) %>%
+    save_kable("./output/meta_regression_indepvar_table_NOVEMBER.html")
 
 ```
 
