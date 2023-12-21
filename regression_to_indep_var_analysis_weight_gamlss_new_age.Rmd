@@ -24,7 +24,7 @@ library(gamlss)
 ## ESS {-}
 
 ```{r}
-load(here("./data/final_data/regression_outputs", "ess_list_preds_w_new_age.RData"))
+load("./data/final_data/regression_outputs/ess_list_preds_w_new_age.RData")
 
 # Store the results in a new dataframe
 ess_indep_preds_df <- data.frame(dep_var = character())
@@ -54,7 +54,7 @@ for (i in seq_along(ess_list_preds)) {
   ess_indep_preds_df <- rbind(ess_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
 }
 
-save(ess_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/ess_indep_var_df_w_new_age.RData")
+save(ess_indep_preds_df, file="./data/final_data/indep_var/ess_indep_var_df_w_new_age.RData")
 
 ```
 
@@ -63,7 +63,7 @@ save(ess_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatech
 ```{r}
 # Now the same for the EVS
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "evs_list_preds_w_new_age.RData"))
+load("./data/final_data/regression_outputs/evs_list_preds_w_new_age.RData")
 
 # Store the results in a new dataframe
 evs_indep_preds_df <- data.frame(dep_var = character())
@@ -93,14 +93,14 @@ for (i in seq_along(evs_list_preds)) {
   evs_indep_preds_df <- rbind(evs_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
 }
 
-save(evs_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/evs_indep_var_df_w_new_age.RData")
+save(evs_indep_preds_df, file="./data/final_data/indep_var/evs_indep_var_df_w_new_age.RData")
 ```
 
 
 ```{r}
 # Now for I&O research
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "io_list_preds_w_new_age.RData"))
+load("./data/final_data/regression_outputs/io_list_preds_w_new_age.RData")
 
 # Store the results in a new dataframe
 io_indep_preds_df <- data.frame(dep_var = character())
@@ -131,7 +131,7 @@ for (i in seq_along(io_list_preds)) {
   io_indep_preds_df <- rbind(io_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
 }
 
-save(io_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/io_indep_var_df_w_new_age.RData")
+save(io_indep_preds_df, file="./data/final_data/indep_var/io_indep_var_df_w_new_age.RData")
 ```
 
 ## ISSP {-}
@@ -139,7 +139,7 @@ save(io_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatecha
 ```{r}
 # Now for ISSP, which has to happen twice (bc 2 substs based on dependent vars)
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "issp_list_preds_w_new_age.RData"))
+load("./data/final_data/regression_outputs/issp_list_preds_w_new_age.RData")
 
 # Store the results in a new dataframe
 issp_indep_preds_df <- data.frame(dep_var = character())
@@ -169,10 +169,10 @@ for (i in seq_along(issp_list_preds)) {
   issp_indep_preds_df <- rbind(issp_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
 }
 
-save(issp_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/issp_indep_var_df_w_new_age.RData")
+save(issp_indep_preds_df, file="./data/final_data/indep_var/issp_indep_var_df_w_new_age.RData")
 
 # For the other indep vars as well
-load(here("./data/final_data/regression_outputs", "issp_list_preds_2_waves_w_new_age.RData"))
+load("./data/final_data/regression_outputs/issp_list_preds_2_waves_w_new_age.RData")
 
 # Store the results in a new dataframe
 issp_2_indep_preds_df <- data.frame(dep_var = character())
@@ -203,7 +203,7 @@ for (i in seq_along(issp_list_preds_2_waves)) {
   issp_2_indep_preds_df <- rbind(issp_2_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_age_est, mu_age_sd, sig_time, sig_time_sd, sig_age_est, sig_age_sd))
 }
 
-save(issp_2_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/issp_2_indep_var_df_w_new_age.RData")
+save(issp_2_indep_preds_df, file="./data/final_data/indep_var/issp_2_indep_var_df_w_new_age.RData")
 ```
 
 ## EB {-}
@@ -211,19 +211,20 @@ save(issp_2_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climat
 # For all the eurobarometer waves, exactly the same needs to be done each time. Therefore I want to loop over these waves
 # For some reason this didn't work anymore later on, so I run them by one by one in the code below
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "eb_list_preds_1986_w_new_age.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_2007_w_new_age.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_2008_w_new_age.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_2009_w_new_age.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_2011_w_new_age.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_buyprod_w_new_age.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_cchange2_w_new_age.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_doprot_w_new_age.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_eff_daily_w_new_age.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_pers_imp_w_new_age.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_prsaction_w_new_age.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_quallife_w_new_age.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_doprot_city_w_new_age.RData"))
+load("./data/final_data/regression_outputs/eb_list_preds_1986_w_new_age.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_2007_w_new_age.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_2008_w_new_age.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_2009_w_new_age.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_2011_w_new_age.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_buyprod_w_new_age.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_cchange2_w_new_age.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_doprot_w_new_age.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_eff_daily_w_new_age.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_pers_imp_w_new_age.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_prsaction_w_new_age.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_quallife_w_new_age.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_doprot_city_w_new_age.RData")
+
 ```
 
 ```{r}
@@ -636,7 +637,7 @@ for (i in seq_along(eb_list_preds_quallife)) {
 
 eb_indep_preds_df <- rbind(eb_indep_preds_1986_df, eb_indep_preds_2007_df, eb_indep_preds_2008_df, eb_indep_preds_2009_df, eb_indep_preds_2011_df, eb_indep_preds_buyprod_df, eb_indep_preds_cchange2_df, eb_indep_preds_doprot_city_df, eb_indep_preds_doprot_df, eb_indep_preds_eff_daily_df, eb_indep_preds_pers_imp_df, eb_indep_preds_prsaction_df, eb_indep_preds_quallife_df)
 
-save(eb_indep_preds_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/eb_indep_var_df_w_new_age.RData" )
+save(eb_indep_preds_df, file= "./data/final_data/indep_var/eb_indep_var_df_w_new_age.RData" )
 ```
 
 ```{r}
@@ -762,7 +763,7 @@ load("./data/final_data/indep_var/mot_indep_var_df_w_new_age.RData")
 load("./data/final_data/indep_var/liss_indep_var_df_w_new_age.RData")
 load("./data/final_data/indep_var/socon_indep_var_df_w_new_age.RData")
 
-library(plyr) # I load the packages here so that they don't conflict with the here() package
+library(plyr) 
 library(dplyr)
 total_indep_var_results <- rbind.fill(eb_indep_preds_df, ess_indep_preds_df, evs_indep_preds_df, io_indep_preds_df, issp_indep_preds_df, issp_2_indep_preds_df, mot_indep_preds_df, liss_indep_preds_df, socon_indep_preds_df) 
 

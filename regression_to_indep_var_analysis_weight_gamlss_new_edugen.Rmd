@@ -15,6 +15,7 @@ colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", co
 In this script I extract the coefficients for gender, age and education and put them in a dataset together, to use them as input for the meta-regression. In this script, I only select the coefficients of gender and education, as I use the models without age as a predictor variable. 
 
 ```{r}
+rm(list=ls())
 library(tidyverse)
 library(dplyr)
 library(gamlss)
@@ -23,7 +24,7 @@ library(gamlss)
 ## ESS {-}
 
 ```{r}
-load(here("./data/final_data/regression_outputs", "ess_list_preds_w_new_edugen.RData"))
+load("./data/final_data/regression_outputs/ess_list_preds_w_new_edugen.RData")
 
 # Store the results in a new dataframe
 ess_indep_preds_df <- data.frame(dep_var = character())
@@ -61,7 +62,7 @@ for (i in seq_along(ess_list_preds)) {
   ess_indep_preds_df <- rbind(ess_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, sig_time, sig_time_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd))
 }
 
-save(ess_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/ess_indep_var_df_w_new_edugen.RData")
+save(ess_indep_preds_df, file="./data/final_data/indep_var/ess_indep_var_df_w_new_edugen.RData")
 
 ```
 
@@ -70,7 +71,7 @@ save(ess_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatech
 ```{r}
 # Now the same for the EVS
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "evs_list_preds_w_new_edugen.RData"))
+load("./data/final_data/regression_outputs/evs_list_preds_w_new_edugen.RData")
 
 # Store the results in a new dataframe
 evs_indep_preds_df <- data.frame(dep_var = character())
@@ -108,14 +109,14 @@ for (i in seq_along(evs_list_preds)) {
   evs_indep_preds_df <- rbind(evs_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, sig_time, sig_time_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd))
 }
 
-save(evs_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/evs_indep_var_df_w_new_edugen.RData")
+save(evs_indep_preds_df, file="./data/final_data/indep_var/evs_indep_var_df_w_new_edugen.RData")
 ```
 
 
 ```{r}
 # Now for I&O research
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "io_list_preds_w_new_edugen.RData"))
+load("./data/final_data/regression_outputs/io_list_preds_w_new_edugen.RData")
 
 # Store the results in a new dataframe
 io_indep_preds_df <- data.frame(dep_var = character())
@@ -154,7 +155,7 @@ for (i in seq_along(io_list_preds)) {
   io_indep_preds_df <- rbind(io_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, sig_time, sig_time_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd))
 }
 
-save(io_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/io_indep_var_df_w_new_edugen.RData")
+save(io_indep_preds_df, file="./data/final_data/indep_var/io_indep_var_df_w_new_edugen.RData")
 ```
 
 ## ISSP {-}
@@ -162,7 +163,7 @@ save(io_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatecha
 ```{r}
 # Now for ISSP, which has to happen twice (bc 2 substs based on dependent vars)
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "issp_list_preds_w_new_edugen.RData"))
+load("./data/final_data/regression_outputs/issp_list_preds_w_new_edugen.RData")
 
 # Store the results in a new dataframe
 issp_indep_preds_df <- data.frame(dep_var = character())
@@ -200,10 +201,10 @@ for (i in seq_along(issp_list_preds)) {
   issp_indep_preds_df <- rbind(issp_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, sig_time, sig_time_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd))
 }
 
-save(issp_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/issp_indep_var_df_w_new_edugen.RData")
+save(issp_indep_preds_df, file="./data/final_data/indep_var/issp_indep_var_df_w_new_edugen.RData")
 
 # For the other indep vars as well
-load(here("./data/final_data/regression_outputs", "issp_list_preds_2_waves_w_new_edugen.RData"))
+load("./data/final_data/regression_outputs/issp_list_preds_2_waves_w_new_edugen.RData")
 
 # Store the results in a new dataframe
 issp_2_indep_preds_df <- data.frame(dep_var = character())
@@ -242,7 +243,7 @@ for (i in seq_along(issp_list_preds_2_waves)) {
   issp_2_indep_preds_df <- rbind(issp_2_indep_preds_df, data.frame(dep_var = dep_var, mu_time, mu_time_sd, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, sig_time, sig_time_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd))
 }
 
-save(issp_2_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/issp_2_indep_var_df_w_new_edugen.RData")
+save(issp_2_indep_preds_df, file="./data/final_data/indep_var/issp_2_indep_var_df_w_new_edugen.RData")
 ```
 
 ## EB {-}
@@ -250,19 +251,20 @@ save(issp_2_indep_preds_df, file="/Users/anuschka/Documents/climatechange/climat
 # For all the eurobarometer waves, exactly the same needs to be done each time. Therefore I want to loop over these waves
 # For some reason this didn't work anymore later on, so I run them by one by one in the code below
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "eb_list_preds_1986_w_new_edugen.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_2007_w_new_edugen.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_2008_w_new_edugen.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_2009_w_new_edugen.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_2011_w_new_edugen.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_buyprod_w_new_edugen.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_cchange2_w_new_edugen.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_doprot_w_new_edugen.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_eff_daily_w_new_edugen.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_pers_imp_w_new_edugen.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_prsaction_w_new_edugen.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_quallife_w_new_edugen.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_doprot_city_w_new_edugen.RData"))
+load("./data/final_data/regression_outputs/eb_list_preds_1986_w_new_edugen.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_2007_w_new_edugen.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_2008_w_new_edugen.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_2009_w_new_edugen.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_2011_w_new_edugen.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_buyprod_w_new_edugen.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_cchange2_w_new_edugen.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_doprot_w_new_edugen.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_eff_daily_w_new_edugen.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_pers_imp_w_new_edugen.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_prsaction_w_new_edugen.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_quallife_w_new_edugen.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_doprot_city_w_new_edugen.RData")
+
 ```
 
 ```{r}
@@ -779,8 +781,10 @@ for (i in seq_along(eb_list_preds_quallife)) {
 
 eb_indep_preds_df <- rbind(eb_indep_preds_1986_df, eb_indep_preds_2007_df, eb_indep_preds_2008_df, eb_indep_preds_2009_df, eb_indep_preds_2011_df, eb_indep_preds_buyprod_df, eb_indep_preds_cchange2_df, eb_indep_preds_doprot_city_df, eb_indep_preds_doprot_df, eb_indep_preds_eff_daily_df, eb_indep_preds_pers_imp_df, eb_indep_preds_prsaction_df, eb_indep_preds_quallife_df)
 
-save(eb_indep_preds_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/eb_indep_var_df_w_new_edugen.RData" )
+save(eb_indep_preds_df, file= "./data/final_data/indep_var/eb_indep_var_df_w_new_edugen.RData" )
 ```
+
+## MOT {-}
 
 ```{r}
 rm(list=ls())
@@ -826,6 +830,7 @@ save(mot_indep_preds_df, file="./data/final_data/indep_var/mot_indep_var_df_w_ne
 
 ```
 
+## LISS {-}
 
 ```{r}
 rm(list=ls())
@@ -870,6 +875,8 @@ for (i in seq_along(liss_list_preds)) {
 save(liss_indep_preds_df, file="./data/final_data/indep_var/liss_indep_var_df_w_new_edugen.RData")
 
 ```
+
+## SOCON {-}
 
 ```{r}
 rm(list=ls())
@@ -929,7 +936,7 @@ load("./data/final_data/indep_var/mot_indep_var_df_w_new_edugen.RData")
 load("./data/final_data/indep_var/liss_indep_var_df_w_new_edugen.RData")
 load("./data/final_data/indep_var/socon_indep_var_df_w_new_edugen.RData")
 
-library(plyr) # I load the packages here so that they don't conflict with the 
+library(plyr) 
 total_indep_var_results <- rbind.fill(eb_indep_preds_df, ess_indep_preds_df, evs_indep_preds_df, io_indep_preds_df, issp_indep_preds_df, issp_2_indep_preds_df, mot_indep_preds_df, liss_indep_preds_df, socon_indep_preds_df) 
 
 save(total_indep_var_results, file= "./data/meta_analysis/total_indep_var_results_new_edugen.RData" )

@@ -51,10 +51,10 @@ Last compiled on `r format(Sys.time(), '%B, %Y')`
 
 
 ## Welcome {-}
-Welcome to the replication website that comes with the article on climate change attitudes and polarization, based on my thesis. 
+Welcome to the replication website that comes with the article on climate change attitudes and polarization. 
 
 ## How to use this website {-}
 
-In the top menu, you can navigate through different parts of this project. Under "scripts" you will find all the scripts to replicate the data preparation and analyses of this thesis yourself. Under "blog" you will find the blog post accompanying this thesis (in Dutch). 
+In the top menu, you can scroll through the different scripts that are used for this project. 
 
 

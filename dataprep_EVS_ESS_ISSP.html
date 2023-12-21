@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Anuschka Peelen" />
+
+<meta name="date" content="2023-12-21" />
+
+<title>Data preparation EVS, ESS and ISSP</title>
+
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="tweaks.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Scripts data preparation
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="dataprep_EB.html">Data preparation Eurobarometer</a>
+    </li>
+    <li>
+      <a href="dataprep_EVS_ESS_ISSP.html">Data preparation EVS, ESS, ISSP</a>
+    </li>
+    <li>
+      <a href="dataprep_I-O.html">Data preparation I&amp;O Research</a>
+    </li>
+    <li>
+      <a href="dataprep_motivaction_LISS_socon.html">Data preparation Motivaction, LISS, Socon</a>
+    </li>
+    <li>
+      <a href="weights.html">Weighing data</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Scripts descriptives and analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="descriptives.html">Descriptives and pooled table</a>
+    </li>
+    <li>
+      <a href="single_regression_gamlss_weigh_new.html">Gamlss regressions weighted</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_weight_gamlss_new.html">Extract coefficients gamlss regressions</a>
+    </li>
+    <li>
+      <a href="regression_to_indep_var_analysis_weight_gamlss_new.html">Extract coefficients independent var model</a>
+    </li>
+    <li>
+      <a href="regression_to_interact_analysis_weight_gamlss_new.html">Extract coefficients interaction model</a>
+    </li>
+    <li>
+      <a href="DEC23_meta_analysis_gamlss_weigh.html">Meta-analysis weighted gamlss</a>
+    </li>
+    <li>
+      <a href="meta_analysis_indep_var.html">Meta-analysis independent variables</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Appendix
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="single_regression_gw_py_new.html">Gamlss regression shorter time spans</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_wg_waves_new.html">Extract coefficients shorter time spans</a>
+    </li>
+    <li>
+      <a href="meta_analysis_gw_waves.html">Meta-analysis shorter time spans</a>
+    </li>
+    <li>
+      <a></a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/apeelen/climatechange">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Data preparation EVS, ESS and ISSP</h1>
+<h4 class="author">Anuschka Peelen</h4>
+<h4 class="date">2023-12-21</h4>
+
+</div>
+
+
+<p>In this script, I select, recode and create variables of the European
+Values Survey, European Social Survey and International Social Survey
+Program.</p>
+<pre class="r"><code>rm(list = ls())
+library(plyr)
+library(dplyr)
+library(foreign)
+library(tidyverse)
+library(labelled)
+library(questionr)
+library(psych)</code></pre>
+<div id="european-values-survey" class="section level1 unnumbered">
+<h1 class="unnumbered">European Values Survey</h1>
+<pre class="r"><code>#Load in EVS trend file
+evs &lt;- foreign::read.spss(&quot;/Users/anuschka/Documents/gesis_dir/evs/ZA7503_v2-0-0.sav&quot;, use.value.labels = T,  to.data.frame = T)
+
+# So apparently, in the Netherlands in 1981 and in 2017, the question for the dependent var was not asked. This means that I cannot use those years from the EVS. A pity. 
+
+evs$S003_n &lt;- as.numeric(evs$S003)
+evs$S020 &lt;- as.numeric(as.character(evs$S020))
+
+evssel &lt;- evs %&gt;% filter(S003_n == 31)  %&gt;%
+                filter (S020 &gt;1981 &amp; S020 &lt;2017) %&gt;%
+            select(stdyno_w, S001, S002EVS, S006, S017, S018,S020, B001, X001, X002, X003, X003R, X003R2, X011, X023, X023R, X025, X025A, X025CSEVS, X007, G027A, X028, X047CS, X047_EVS, X047R_EVS, A006, E033)
+
+table(evssel$stdyno_w, evssel$X025CSEVS, useNA = &quot;always&quot;)
+
+freq(evssel$X025CSEVS)
+
+attributes(evs$B001)
+table(evssel$B001, useNA = &quot;always&quot;)
+
+#Recode it, because now a higher number means lower willingness to make sacrifices. I want everything in the direction that a higher score equals more positive attitudes towards the climate. 
+
+evssel$climate &lt;- as.numeric(evssel$B001)
+evssel$religious &lt;- as.numeric(evssel$A006)
+evssel &lt;- evssel %&gt;% 
+     mutate_at(c(&quot;climate&quot;, &quot;religious&quot;), funs(recode(., `1` = 4, `2` = 3, `3` = 2, `4` = 1)))
+evssel$climate5 &lt;- (evssel$climate-1)*(4/3)+1
+evssel$religious[is.na(evssel$religious)] &lt;- 88 #11 missings get value 88
+evssel$religious &lt;- as.factor(evssel$religious)
+evssel$religious &lt;- revalue(evssel$religious, c(&quot;1&quot;=&quot;Not at all important&quot;, &quot;2&quot;=&quot;Not very important&quot;, &quot;3&quot;=&quot;Rather important&quot;, &quot;4&quot; = &quot;Very important&quot;, &quot;88&quot;=&quot;Missing&quot;))
+
+#Independent variables and missings
+table(evssel$X047_EVS, useNA = &quot;always&quot;) #Scale of household incomes from 1 to 10, with 540 missings (gross)
+# Fix income in quartiles 
+
+# For the EVS I only have one variable for income, but of course the quantiles and mean can be different per year. 
+# So I have to take that into account. Following code is definitely not the most efficient way to do so, but it works
+evssel_w1 &lt;- as.data.frame(evssel[evssel$S002EVS == &quot;1990-1993&quot;, ])
+evssel_w1$income &lt;- as.numeric(evssel_w1$X047_EVS)
+mean(evssel_w1$income, na.rm=T)
+evssel_w1$income[is.na(evssel_w1$income)] &lt;- 5.614
+evssel_w1$income_quart &lt;- with(evssel_w1, cut(income, 
+                                breaks=quantile(income, probs=seq(0,1, by=0.25), na.rm=TRUE), 
+                                include.lowest=TRUE))
+evssel_w1$income_quart &lt;- as.numeric(evssel_w1$income_quart)
+
+evssel_w2 &lt;- as.data.frame(evssel[evssel$S002EVS == &quot;1999-2001&quot;, ])
+evssel_w2$income &lt;- as.numeric(evssel_w2$X047_EVS)
+mean(evssel_w2$income, na.rm=T)
+evssel_w2$income[is.na(evssel_w2$income)] &lt;- 6.403
+evssel_w2$income_quart &lt;- with(evssel_w2, cut(income, 
+                                breaks=quantile(income, probs=seq(0,1, by=0.25), na.rm=TRUE), 
+                                include.lowest=TRUE))
+evssel_w2$income_quart &lt;- as.numeric(evssel_w2$income_quart)
+
+evssel_w3 &lt;- as.data.frame(evssel[evssel$S002EVS == &quot;2008-2010&quot;, ])
+evssel_w3$income &lt;- as.numeric(evssel_w3$X047_EVS)
+mean(evssel_w3$income, na.rm=T)
+evssel_w3$income[is.na(evssel_w3$income)] &lt;- 5.277
+evssel_w3$income_quart &lt;- with(evssel_w3, cut(income, 
+                                breaks=quantile(income, probs=seq(0,1, by=0.25), na.rm=TRUE), 
+                                include.lowest=TRUE))
+evssel_w3$income_quart &lt;- as.numeric(evssel_w3$income_quart)
+
+evssel_w1 &lt;- rbind(evssel_w1, evssel_w2)
+evssel_w1 &lt;- rbind(evssel_w1, evssel_w3)
+evssel_w1 &lt;- evssel_w1 %&gt;% select(income_quart)
+evssel &lt;- cbind(evssel, evssel_w1)
+
+
+evssel$sex &lt;- revalue(evssel$X001, c(&quot;Male&quot;=&quot;1&quot;, &quot;Female&quot;=&quot;2&quot;))
+evssel$sex &lt;- evssel$sex - 1
+table(evssel$sex)
+table(evssel$E033, useNA = &quot;always&quot;)
+evssel$lrscale &lt;- as.numeric(evssel$E033)
+
+evssel$X007 &lt;- as.numeric(evssel$X007)
+evssel$marstat[evssel$X007 &lt;= 2] &lt;- 1 #Living together
+evssel$marstat[evssel$X007 &gt; 2] &lt;- 2 #Not living together
+evssel$marstat &lt;- as.factor(evssel$marstat)
+
+#You generally start school at 6
+evssel$edu_yrs &lt;- as.numeric(as.character(evssel$X023))
+evssel$edu_yrs &lt;- evssel$edu_yrs - 6
+table(evssel$edu_yrs, useNA = &quot;always&quot;)
+mean(evssel$edu_yrs, na.rm=T)
+evssel$edu_yrs[is.na(evssel$edu_yrs)] &lt;- 13.518
+#Education as isced
+evssel$isced[evssel$edu_yrs &lt;=4] &lt;- 0
+evssel$isced[evssel$edu_yrs &gt; 4 &amp; evssel$edu_yrs &lt;= 6] &lt;- 1
+evssel$isced[evssel$edu_yrs &gt; 6 &amp; evssel$edu_yrs &lt;= 10] &lt;- 2
+evssel$isced[evssel$edu_yrs &gt; 10 &amp; evssel$edu_yrs &lt;= 13] &lt;- 3
+evssel$isced[evssel$edu_yrs &gt; 13 &amp; evssel$edu_yrs &lt;= 15] &lt;- 4
+evssel$isced[evssel$edu_yrs &gt; 15 &amp; evssel$edu_yrs &lt;= 18] &lt;- 5
+evssel$isced[evssel$edu_yrs &gt; 18] &lt;- 6
+table(evssel$isced, useNA = &quot;always&quot;)
+
+table(evssel$X003, useNA = &quot;always&quot;)
+evssel$X003 &lt;- revalue(evssel$X003, c(&quot;82 and more (in EVS 2017)&quot; = &quot;82&quot;))
+evssel$age &lt;- as.numeric(as.character(evssel$X003))
+table(evssel$age, useNA = &quot;always&quot;)
+# 3 missings on age
+mean(evssel$age, na.rm=T)
+evssel$age[is.na(evssel$age)] &lt;- 49.122
+
+# Missings can be done faster
+mis_vars &lt;- c(&quot;lrscale&quot;, &quot;edu_yrs&quot;) 
+
+for (var in mis_vars) {
+  evssel[is.na(evssel[,var]), var] &lt;- mean(evssel[,var], na.rm = TRUE)
+}
+
+
+#Let&#39;s first save the prepped data. 
+save(evssel, file=&quot;./data/final_data/evssel.Rdata&quot;)
+
+evssel &lt;- evssel %&gt;% select(stdyno_w, S001, S002EVS, S006, S017, S018, S020, climate5, sex, X002, age, edu_yrs, isced,  religious, lrplace, income, income_quart, marstat, weightvec, X023, X023R, X047CS, X047_EVS, X047R_EVS) %&gt;% 
+        dplyr::rename(surveyyear = S020)
+
+save(evssel, file=&quot;./data/final_data/evssel.Rdata&quot;)</code></pre>
+<div id="european-social-survey" class="section level2 unnumbered">
+<h2 class="unnumbered">European Social Survey</h2>
+<pre class="r"><code># Let&#39;s do the same with the ESS, for which I will use the 2016 and 2020 wave. 
+ess2016 &lt;- foreign::read.spss(&quot;/Users/anuschka/Documents/gesis_dir/ess/ESS8e02_2.sav&quot;, use.value.labels = T,  to.data.frame = T)
+
+ess16sel &lt;- ess2016 %&gt;% filter(cntry==&quot;Netherlands&quot;)  %&gt;%
+            select(name, essround, proddate, idno, ccnthum, ccrdprs, wrclmch, edulvlb, edlvenl, eduyrs, mainact, gndr, agea, yrbrn, lrscale, domicil, hinctnta, rlgatnd, marsts, brncntr)
+
+
+#Climate change caused by natural processes, human activity, or both. 4 people who do not believe are missing
+attributes(ess16sel$ccnthum)
+table(ess16sel$cause, useNA = &quot;always&quot;)
+ess16sel$cause &lt;- as.numeric(ess16sel$ccnthum)
+ess16sel$cause[ess16sel$cause==6] &lt;- NA
+
+#Personal responsibility to reduce climate change
+attributes(ess16sel$ccrdprs)
+table(ess16sel$pers_resp, useNA = &quot;always&quot;)
+ess16sel$pers_resp &lt;- (as.numeric(ess16sel$ccrdprs) - 1)* (4/10) + 1
+
+#How worried about climate change
+table(ess16sel$wrclmch, useNA = &quot;always&quot;)
+ess16sel$worry &lt;- as.numeric(ess16sel$wrclmch)
+
+save(ess16sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess16sel.Rdata&quot;)
+load(&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess16sel.Rdata&quot;)
+
+
+#Independent vars
+table(ess16sel$eduyrs, useNA = &quot;always&quot;)
+ess16sel$eduyrs &lt;- as.numeric(as.character(ess16sel$eduyrs))
+table(ess16sel$edulvlb, useNA = &quot;always&quot;)
+ess16sel$edulvlb &lt;- as.numeric(ess16sel$edulvlb)
+#Education as isced
+ess16sel$isced[ess16sel$edulvlb &lt;=1] &lt;- 0
+ess16sel$isced[ess16sel$edulvlb ==2] &lt;- 1
+ess16sel$isced[ess16sel$edulvlb &gt; 2 &amp; ess16sel$edulvlb &lt;= 5] &lt;- 2
+ess16sel$isced[ess16sel$edulvlb &gt; 5 &amp; ess16sel$edulvlb &lt;= 15] &lt;- 3
+ess16sel$isced[ess16sel$edulvlb &gt; 15 &amp; ess16sel$edulvlb &lt;= 20] &lt;- 4
+ess16sel$isced[ess16sel$edulvlb &gt; 20 &amp; ess16sel$edulvlb &lt;= 26] &lt;- 5
+ess16sel$isced[ess16sel$edulvlb ==27] &lt;- 6
+ess16sel$isced[ess16sel$edulvlb ==28] &lt;- NA
+table(ess16sel$isced, useNA = &quot;always&quot;)
+
+table(ess16sel$gndr, useNA = &quot;always&quot;)
+ess16sel$sex &lt;- revalue(ess16sel$gndr, c(&quot;Male&quot;=&quot;1&quot;, &quot;Female&quot;=&quot;2&quot;))
+table(ess16sel$lrscale, useNA = &quot;always&quot;)
+ess16sel$lrscale &lt;- as.numeric(ess16sel$lrscale)
+ess16sel$lrscale &lt;- (ess16sel$lrscale - 1) * (9/10) + 1
+attributes(ess16sel$urban)
+ess16sel$urban &lt;- revalue(ess16sel$domicil, c(&quot;Farm or home in countryside&quot;= &quot;Low urbanity&quot;, &quot;Country village&quot;=&quot;Low urbanity&quot;, &quot;Town or small city&quot;=&quot;Medium urbanity&quot;, &quot;Suburbs or outskirts of big city&quot;=&quot;High urbanity&quot;, &quot;A big city&quot;=&quot;High urbanity&quot;))
+ess16sel$urban &lt;- factor(ess16sel$urban, levels=c(&quot;Low urbanity&quot;, &quot;Medium urbanity&quot;, &quot;High urbanity&quot;), ordered=TRUE)
+ess16sel$ch_attend &lt;- as.numeric(ess16sel$rlgatnd)
+ess16sel &lt;- ess16sel %&gt;% 
+     mutate_at(c(&quot;ch_attend&quot;), funs(recode(., `1` = 7, `2` = 6, `3` = 5, `4` = 4, `5` = 3, `6` = 2, `7` =1)))
+table(ess16sel$ch_attend, useNA = &quot;always&quot;)
+ess16sel$income &lt;- as.numeric(ess16sel$hinctnta) #On a scale from 1 to 10, household income
+
+mean(ess16sel$income, na.rm=T)
+ess16sel$income[is.na(ess16sel$income)] &lt;- 5.993
+ess16sel$income_quart &lt;- with(ess16sel, cut(income, 
+                                breaks=quantile(income, probs=seq(0,1, by=0.25), na.rm=TRUE), 
+                                include.lowest=TRUE))
+ess16sel$income_quart &lt;- as.numeric(ess16sel$income_quart)
+
+table(ess16sel$marsts, useNA = &quot;always&quot;)                    
+ess16sel$marsts &lt;- as.numeric(ess16sel$marsts)
+ess16sel$marstat[ess16sel$marsts &lt;= 2] &lt;- 1 #Living together
+ess16sel$marstat[ess16sel$marsts &gt; 2] &lt;- 2 #Not living together
+ess16sel$marstat[is.na(ess16sel$marsts)] &lt;- 3 #821 missings on this variable...
+ess16sel$marstat &lt;- as.factor(ess16sel$marstat)
+ess16sel$age &lt;- as.numeric(as.character(ess16sel$agea))
+
+#Substitution of missings
+lapply(ess16sel, table, useNA = &quot;always&quot;)
+
+mis_vars &lt;- c(&quot;lrscale&quot;) 
+
+for (var in mis_vars) {
+  ess16sel[is.na(ess16sel[,var]), var] &lt;- mean(ess16sel[,var], na.rm = TRUE)
+}
+
+save(ess16sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess16sel.Rdata&quot;)
+
+
+ess2020 &lt;- foreign::read.spss(&quot;/Users/anuschka/Documents/gesis_dir/ess/ESS10.sav&quot;, use.value.labels = T,  to.data.frame = T)
+
+ess20sel &lt;- ess2020 %&gt;% filter(cntry==&quot;Netherlands&quot;)  %&gt;%
+            select(name, essround, proddate, idno, ccnthum, ccrdprs, wrclmch, edulvlb, edlvenl, eduyrs,gndr, agea, yrbrn, prtvthnl, lrscale, domicil, hinctnta, rlgatnd, marsts, brncntr)
+
+#Recode the dependent vars just like the previous wave
+attributes(ess20sel$ccnthum)
+table(ess20sel$cause, useNA = &quot;always&quot;)
+ess20sel$cause &lt;- as.numeric(ess20sel$ccnthum)
+ess20sel$cause[ess20sel$cause==6] &lt;- NA
+
+#Personal responsibility to reduce climate change
+attributes(ess20sel$ccrdprs)
+table(ess20sel$pers_resp, useNA = &quot;always&quot;)
+ess20sel$pers_resp &lt;- (as.numeric(ess20sel$ccrdprs) - 1)* (4/10) + 1
+
+#How worried about climate change
+table(ess20sel$wrclmch, useNA = &quot;always&quot;)
+ess20sel$worry &lt;- as.numeric(ess20sel$wrclmch)
+
+save(ess20sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/ess20sel.Rdata&quot;)
+
+# Independent vars 
+table(ess20sel$eduyrs, useNA = &quot;always&quot;)
+ess20sel$eduyrs &lt;- as.numeric(as.character(ess20sel$eduyrs))
+table(as.numeric(ess20sel$edulvlb), useNA = &quot;always&quot;)
+ess20sel$edulvlb &lt;- as.numeric(ess20sel$edulvlb)
+ess20sel$isced[ess20sel$edulvlb &lt;=1] &lt;- 0
+ess20sel$isced[ess20sel$edulvlb ==2] &lt;- 1
+ess20sel$isced[ess20sel$edulvlb &gt; 2 &amp; ess20sel$edulvlb &lt;= 5] &lt;- 2
+ess20sel$isced[ess20sel$edulvlb &gt; 5 &amp; ess20sel$edulvlb &lt;= 15] &lt;- 3
+ess20sel$isced[ess20sel$edulvlb &gt; 15 &amp; ess20sel$edulvlb &lt;= 20] &lt;- 4
+ess20sel$isced[ess20sel$edulvlb &gt; 20 &amp; ess20sel$edulvlb &lt;= 26] &lt;- 5
+ess20sel$isced[ess20sel$edulvlb ==27] &lt;- 6
+ess20sel$isced[ess20sel$edulvlb ==28] &lt;- NA
+table(ess20sel$isced, useNA = &quot;always&quot;)
+
+table(ess20sel$gndr, useNA = &quot;always&quot;)
+ess20sel$sex &lt;- revalue(ess20sel$gndr, c(&quot;Male&quot;=&quot;1&quot;, &quot;Female&quot;=&quot;2&quot;))
+table(ess20sel$lrscale, useNA = &quot;always&quot;)
+ess20sel$lrscale &lt;- as.numeric(ess20sel$lrscale)
+ess20sel$lrscale &lt;- (ess20sel$lrscale - 1) * (9/10) + 1
+attributes(ess20sel$domicil)
+ess20sel$urban &lt;- revalue(ess20sel$domicil, c(&quot;Farm or home in countryside&quot;= &quot;Low urbanity&quot;, &quot;Country village&quot;=&quot;Low urbanity&quot;, &quot;Town or small city&quot;=&quot;Medium urbanity&quot;, &quot;Suburbs or outskirts of big city&quot;=&quot;High urbanity&quot;, &quot;A big city&quot;=&quot;High urbanity&quot;))
+ess20sel$urban &lt;- factor(ess20sel$urban, levels=c(&quot;Low urbanity&quot;, &quot;Medium urbanity&quot;, &quot;High urbanity&quot;), ordered=TRUE)
+ess20sel$ch_attend &lt;- as.numeric(ess20sel$rlgatnd)
+ess20sel &lt;- ess20sel %&gt;% 
+     mutate_at(c(&quot;ch_attend&quot;), funs(recode(., `1` = 7, `2` = 6, `3` = 5, `4` = 4, `5` = 3, `6` = 2, `7` =1)))
+table(ess20sel$ch_attend, useNA = &quot;always&quot;)
+ess20sel$income &lt;- as.numeric(ess20sel$hinctnta) 
+table(ess20sel$income, useNA = &quot;always&quot;) #152 missings on income.
+mean(ess20sel$income, na.rm=T)
+ess20sel$income[is.na(ess20sel$income)] &lt;- 6.455
+ess20sel$income_quart &lt;- with(ess20sel, cut(income, 
+                                breaks=quantile(income, probs=seq(0,1, by=0.25), na.rm=TRUE), 
+                                include.lowest=TRUE))
+ess20sel$income_quart &lt;- as.numeric(ess20sel$income_quart)
+
+ess20sel$age &lt;- as.numeric(as.character(ess20sel$agea))
+table(ess20sel$marsts, useNA = &quot;always&quot;)                    
+ess20sel$marsts &lt;- as.numeric(ess20sel$marsts)
+ess20sel$marstat[ess20sel$marsts &lt;= 2] &lt;- 1 #Living together
+ess20sel$marstat[ess20sel$marsts &gt; 2] &lt;- 2 #Not living together
+ess20sel$marstat[is.na(ess20sel$marsts)] &lt;- 3 #732 missings on this variable...
+ess20sel$marstat &lt;- as.factor(ess20sel$marstat)
+
+# Missings
+lapply(ess20sel, table, useNA = &quot;always&quot;)
+
+mis_vars &lt;- c(&quot;lrscale&quot;, &quot;age&quot;) 
+
+for (var in mis_vars) {
+  ess20sel[is.na(ess20sel[,var]), var] &lt;- mean(ess20sel[,var], na.rm = TRUE)
+}
+
+save(ess20sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess20sel.Rdata&quot;)
+load(&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess20sel.Rdata&quot;)
+
+#Merge data 2016 and 2020
+load(&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess16sel.Rdata&quot;)
+
+#Select the variables that I want to keep
+ess16sel &lt;- ess16sel %&gt;% select(name, essround, proddate, idno, worry, cause, pers_resp, sex, eduyrs, isced,urban, ch_attend, income, income_quart, yrbrn, lrscale, age, marstat, brncntr, weightvec)
+                                
+ess20sel &lt;- ess20sel %&gt;% select(name, essround, proddate, idno, worry, cause, pers_resp, sex, eduyrs, isced,urban, ch_attend, income, income_quart, yrbrn, lrscale, age, marstat, brncntr, weightvec)
+
+#First check whether the levels/attributes of variables are the same
+attributes(ess16sel$worry)
+attributes(ess20sel$worry) 
+# Also did this for the other variables, they&#39;re the same so I can merge
+
+esstotal &lt;- dplyr::bind_rows(ess16sel, ess20sel)
+
+esstotal$surveyyear[esstotal$essround==8] &lt;- 2016
+esstotal$surveyyear[esstotal$essround==10] &lt;- 2020
+esstotal$surveyyear &lt;- as.numeric(esstotal$surveyyear)
+table(esstotal$surveyyear, useNA = &quot;always&quot;)
+esstotal$sex &lt;- esstotal$sex - 1
+table(esstotal$sex)
+save(esstotal, file=&quot;./data/final_data/esstotal.Rdata&quot;)
+
+# One time it did not correctly apply esstotal
+#esstotal$urban &lt;- as.factor(esstotal$urban)
+#esstotal$urban &lt;- revalue(esstotal$urban, c(&quot;1&quot;=&quot;Low urbanity&quot;, &quot;2&quot;=&quot;Medium urbanity&quot;, &quot;3&quot;=&quot;High urbanity&quot;))
+#esstotal$urban &lt;- factor(esstotal$urban, levels=c(&quot;Low urbanity&quot;, &quot;Medium urbanity&quot;, &quot;High urbanity&quot;), ordered=TRUE)</code></pre>
+</div>
+<div id="international-social-survey-program"
+class="section level2 unnumbered">
+<h2 class="unnumbered">International Social Survey Program</h2>
+<pre class="r"><code>issp1993 &lt;- foreign::read.spss(&quot;/Users/anuschka/Documents/gesis_dir/issp/ISSP1993.sav&quot;, use.value.labels = T,  to.data.frame = T)
+
+issp93sel &lt;- issp1993 %&gt;% filter(V3==&quot;Netherlands - NL&quot;)  %&gt;%
+            select(V1, V2, V13, V14, V17, V19, V24, V25, V26, V27, V28, V54, V55, V200, V201, V202, V204, V205, V281, V253, V268, V277, V352, V411)
+
+attributes(issp93sel$V13) #Higher score means more positive (then you think we don&#39;t worry too much)
+issp93sel$worry &lt;- as.numeric(issp93sel$V13)
+attributes(issp93sel$V14) #Higher score means that you don&#39;t think that everything in modern life harms the environment. SO I want to recode this variable
+attributes(issp93sel$V24) #Willing to pay higher prices in order to protect environment. Very unwilling is negative so I recode this var. Then a higher score means very willing. Same applies for v25 and v26. 
+attributes(issp93sel$V28) # I do what is right for the environment, even if it costs a little bit extra time. Strongly agree is more positive attitude, so recode. 
+issp93sel$lifeharm &lt;- as.numeric(issp93sel$V14)
+issp93sel$willing_price &lt;- as.numeric(issp93sel$V24)
+issp93sel$willing_tax &lt;- as.numeric(issp93sel$V25)
+issp93sel$willing_living &lt;- as.numeric(issp93sel$V26)
+issp93sel$do_right &lt;- as.numeric(issp93sel$V28)
+
+issp93sel &lt;- issp93sel %&gt;% 
+     mutate_at(c(&quot;lifeharm&quot;, &quot;willing_price&quot;, &quot;willing_tax&quot;, &quot;willing_living&quot;, &quot;do_right&quot;), funs(recode(., `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5`= 1)))
+
+attributes(issp93sel$V17) #Higher score means that you don&#39;t think we worry too much about human progress harming the environment. A low score means you think we worry too much, so that represents more negative attitudes. No recoding.
+issp93sel$progharm &lt;- as.numeric(issp93sel$V17)
+attributes(issp93sel$V19) #Difficult one. &quot;In order to protect the environment, we need economic growth&quot;. A higher score does not necessarily mean worse or better attitudes. So I leave this one as it is. 
+issp93sel$econprotect &lt;- as.numeric(issp93sel$V19)
+attributes(issp93sel$V27) #Too difficult for someone like me to do sth about the environment. This also a difficult one. If you are worried but pessimistic, you may believe that you can&#39;t solve it on your own. If you then strongly agree, it means you do care about the environment. However, it can also be interpreted as sth of an excuse, you don&#39;t have to do anything bc as an individual you can&#39;t do much anyway. I will interpret it as the last one; Strongly disagree means you&#39;re optimistic and maybe positive about climate change. No recode necessary. 
+issp93sel$dodiff &lt;- as.numeric(issp93sel$V27)
+attributes(issp93sel$V54) #Score 1 means that ordinary people should decide how to tackle env. problems, score 2 means that government should pass laws. 
+issp93sel$people_decide &lt;- as.numeric(issp93sel$V54)
+issp93sel$people_decide &lt;- (issp93sel$people_decide - 1) * (4/1) + 1
+attributes(issp93sel$V55) #Same as previous one, but then for businesses. I think for these statements, there is not one side that expresses more positive attitudes. 
+issp93sel$bus_decide &lt;- as.numeric(issp93sel$V55)
+issp93sel$bus_decide &lt;- (issp93sel$bus_decide - 1) * (4/1) + 1
+
+
+#Independent vars
+table(issp93sel$V204)
+issp93sel$V204 &lt;- revalue(issp93sel$V204 , c(&quot;No formal schooling, NAV&quot;= &quot;0&quot;, &quot;1 year&quot;=&quot;1&quot;, &quot;GB:10 or less&quot;=&quot;10&quot;, &quot;GB:14 or more&quot;=&quot;14&quot;, &quot;AUS: 20 or more&quot;=&quot;20&quot;, &quot;43 years&quot; = &quot;43&quot;, &quot;Still school J:high s&quot; = &quot;0&quot;, &quot;Still college,uni&quot; = &quot;0&quot;, &quot;Other answer&quot; = &quot;0&quot;))
+issp93sel$eduyrs &lt;- as.numeric(as.character(issp93sel$V204))
+issp93sel$isced[issp93sel$eduyrs &lt;=4] &lt;- 0
+issp93sel$isced[issp93sel$eduyrs &gt; 4 &amp; issp93sel$eduyrs &lt;= 6] &lt;- 1
+issp93sel$isced[issp93sel$eduyrs &gt; 6 &amp; issp93sel$eduyrs &lt;= 10] &lt;- 2
+issp93sel$isced[issp93sel$eduyrs &gt; 10 &amp; issp93sel$eduyrs &lt;= 13] &lt;- 3
+issp93sel$isced[issp93sel$eduyrs &gt; 13 &amp; issp93sel$eduyrs &lt;= 15] &lt;- 4
+issp93sel$isced[issp93sel$eduyrs &gt; 15 &amp; issp93sel$eduyrs &lt;= 18] &lt;- 5
+issp93sel$isced[issp93sel$eduyrs &gt; 18] &lt;- 6
+table(issp93sel$isced, useNA = &quot;always&quot;)
+
+table(issp93sel$V200, useNA = &quot;always&quot;)
+issp93sel$sex &lt;- revalue(issp93sel$V200, c(&quot;Male&quot;=&quot;1&quot;, &quot;Female&quot;=&quot;2&quot;))
+table(issp93sel$lrscale, useNA = &quot;always&quot;)
+issp93sel$lrscale &lt;- as.numeric(issp93sel$V281)
+issp93sel$lrscale &lt;- (issp93sel$lrscale - 1) * (9/4) + 1
+issp93sel$lrscale[issp93sel$lrscale==12.25 | issp93sel$lrscale ==14.5] &lt;- 11
+
+table(issp93sel$urban, useNA = &quot;always&quot;)
+issp93sel$urban &lt;- revalue(issp93sel$V352, c(&quot;Rural&quot;= &quot;Low urbanity&quot;, &quot;Suburbs, city-town&quot;=&quot;Medium urbanity&quot;, &quot;Urban&quot;=&quot;High urbanity&quot;))
+issp93sel$urban &lt;- factor(issp93sel$urban, levels=c(&quot;Low urbanity&quot;, &quot;Medium urbanity&quot;, &quot;High urbanity&quot;), ordered=TRUE)
+table(issp93sel$V277)
+issp93sel$ch_attend &lt;- as.numeric(issp93sel$V277)
+issp93sel &lt;- issp93sel %&gt;% 
+     mutate_at(c(&quot;ch_attend&quot;), funs(recode(., `1` = 6, `2` = 5, `3` = 4, `4` = 3, `5` = 2, `6` = 1)))
+table(issp93sel$ch_attend, useNA = &quot;always&quot;)
+table(issp93sel$V268, useNA = &quot;always&quot;)
+
+issp93sel$income &lt;- as.numeric(issp93sel$V268) #Family income in categories (guilders). 526 missings
+table(issp93sel$income, useNA = &quot;always&quot;)
+mean(issp93sel$income, na.rm=T) #Income is ordinal here, while in the other datasets it is interval
+issp93sel$income[is.na(issp93sel$income)] &lt;- 12.014
+ 
+issp93sel$income_quart &lt;- with(issp93sel, cut(income, 
+                                breaks=quantile(income, probs=seq(0,1, by=0.25), na.rm=TRUE), 
+                                include.lowest=TRUE))
+issp93sel$income_quart &lt;- as.numeric(issp93sel$income_quart)
+
+table(issp93sel$age, useNA = &quot;always&quot;)
+issp93sel$age &lt;- as.numeric(as.character(issp93sel$V201))
+issp93sel$V202 &lt;- as.numeric(issp93sel$V202)
+issp93sel$marstat[issp93sel$V202 &lt; 2] &lt;- 1 #Living together
+issp93sel$marstat[issp93sel$V202 &gt;= 2] &lt;- 2 #Not living together
+
+
+save(issp93sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp93sel.Rdata&quot;)
+load(&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp93sel.Rdata&quot;)</code></pre>
+<pre class="r"><code>#Now 2000. 
+issp2000 &lt;- foreign::read.spss(&quot;/Users/anuschka/Documents/gesis_dir/issp/ISSP2000.sav&quot;, use.value.labels = T,  to.data.frame = T)
+
+issp00sel &lt;- issp2000 %&gt;% filter(V3==&quot;NL-Netherlands&quot;)  %&gt;%
+            select(V1, V2, V11, V12, V13, V14, V16, V17, V19, V20, V21, V22, V23, V40, V41, V24, V25, V26, V42, V200, V201, V202, V204, V205, V246, V241, V242, V243, V262, V274)
+
+
+ #Dependent variables
+issp00sel$lifeharm &lt;- as.numeric(issp00sel$V12)
+issp00sel$willing_price &lt;- as.numeric(issp00sel$V19)
+issp00sel$willing_tax &lt;- as.numeric(issp00sel$V20)
+issp00sel$willing_living &lt;- as.numeric(issp00sel$V21)
+issp00sel$do_right &lt;- as.numeric(issp00sel$V23)
+issp00sel$growharm &lt;- as.numeric(issp00sel$V16)
+
+issp00sel &lt;- issp00sel %&gt;% 
+     mutate_at(c(&quot;lifeharm&quot;, &quot;willing_price&quot;, &quot;willing_tax&quot;, &quot;willing_living&quot;, &quot;do_right&quot;, &quot;growharm&quot;), funs(recode(., `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5`= 1)))
+
+issp00sel$worry &lt;- as.numeric(issp00sel$V11)
+issp00sel$progharm &lt;- as.numeric(issp00sel$V13)
+issp00sel$econprotect &lt;- as.numeric(issp00sel$V14)
+issp00sel$dodiff &lt;- as.numeric(issp00sel$V22)
+issp00sel$people_decide &lt;- as.numeric(issp00sel$V40)
+issp00sel$people_decide &lt;- (issp00sel$people_decide - 1) * (4/1) + 1
+issp00sel$bus_decide &lt;- as.numeric(issp00sel$V41)
+issp00sel$bus_decide &lt;- (issp00sel$bus_decide - 1) * (4/1) + 1
+
+table(issp00sel$V24, useNA = &quot;always&quot;) #More important things in life than protecting the environment. Higher score (strongly disagree) means that you care more about the environment than strongly disagree. 
+issp00sel$moreimp &lt;- as.numeric(issp00sel$V24)
+table(issp00sel$V25, useNA = &quot;always&quot;) #There&#39;s no point in doing what I can for the environment unless others do the same. Higher score means more positive attitudes, although again (like mentioned at the other statement) you can also interpret strongly agree as caring about the environment but not knowing what to do. 
+issp00sel$othersame &lt;- as.numeric(issp00sel$V25)
+table(issp00sel$V26, useNA = &quot;always&quot;) #Many of the claims exaggerated. Higher score means strongly disagree so more positive attitudes. 
+issp00sel$exag &lt;- as.numeric(issp00sel$V26)
+table(issp00sel$V42, useNA = &quot;always&quot;) #Higher score means that government is doing too little, which expresses worry and that we should do sth. 
+issp00sel$country_effort &lt;- as.numeric(issp00sel$V42)
+
+#Independent vars 
+table(issp00sel$V204, useNA = &quot;always&quot;)
+issp00sel$V204 &lt;- revalue(issp00sel$V204 , c(&quot;No form school&quot;= &quot;0&quot;, &quot;AUS: 0 or 1 yr&quot;=&quot;0&quot;, &quot;NZ:1-8 yrs&quot;=&quot;8&quot;, &quot;N:7-9 yrs&quot;=&quot;9&quot;, &quot;NZ:9-11 yrs&quot;=&quot;11&quot;, &quot;NZ:12-13 yrs&quot; = &quot;13&quot;, &quot;NZ:14-16 yrs&quot; = &quot;15&quot;, &quot;NZ:17+ yrs&quot; = &quot;17&quot;, &quot;Other educ,other answer&quot; = &quot;0&quot;, &quot;Still at college,uni&quot; = &quot;20&quot;, &quot;Still at school,N:+uni&quot; = &quot;20&quot;))
+issp00sel$eduyrs &lt;- as.numeric(as.character(issp00sel$V204))
+issp00sel$isced[issp00sel$eduyrs &lt;=4] &lt;- 0
+issp00sel$isced[issp00sel$eduyrs &gt; 4 &amp; issp00sel$eduyrs &lt;= 6] &lt;- 1
+issp00sel$isced[issp00sel$eduyrs &gt; 6 &amp; issp00sel$eduyrs &lt;= 10] &lt;- 2
+issp00sel$isced[issp00sel$eduyrs &gt; 10 &amp; issp00sel$eduyrs &lt;= 13] &lt;- 3
+issp00sel$isced[issp00sel$eduyrs &gt; 13 &amp; issp00sel$eduyrs &lt;= 15] &lt;- 4
+issp00sel$isced[issp00sel$eduyrs &gt; 15 &amp; issp00sel$eduyrs &lt;= 18] &lt;- 5
+issp00sel$isced[issp00sel$eduyrs &gt; 18] &lt;- 6
+table(issp00sel$isced, useNA = &quot;always&quot;)
+
+table(issp00sel$V200, useNA = &quot;always&quot;)
+issp00sel$sex &lt;- revalue(issp00sel$V200, c(&quot;Male&quot;=&quot;1&quot;, &quot;Female&quot;=&quot;2&quot;))
+table(issp00sel$lrscale, useNA = &quot;always&quot;)
+issp00sel$lrscale &lt;- as.numeric(issp00sel$V246)
+issp00sel$lrscale[issp00sel$lrscale==6 | issp00sel$lrscale ==7] &lt;- 11
+issp00sel$lrscale &lt;- (issp00sel$lrscale - 1) * (9/4) + 1
+issp00sel$lrscale[issp00sel$lrscale==23.5] &lt;- 11
+table(issp00sel$V274, useNA = &quot;always&quot;)
+issp00sel$urban &lt;- revalue(issp00sel$V274, c(&quot;Rural,RP:total rur&quot;= &quot;Low urbanity&quot;, &quot;Suburb,city,town,county seat&quot;=&quot;Medium urbanity&quot;, &quot;Urban,RP:total urb&quot;=&quot;High urbanity&quot;))
+issp00sel$urban &lt;- factor(issp00sel$urban, levels=c(&quot;Low urbanity&quot;, &quot;Medium urbanity&quot;, &quot;High urbanity&quot;), ordered=TRUE)
+table(issp00sel$V243)
+issp00sel$ch_attend &lt;- as.numeric(issp00sel$V243)
+issp00sel &lt;- issp00sel %&gt;% 
+     mutate_at(c(&quot;ch_attend&quot;), funs(recode(., `1` = 6, `2` = 5, `3` = 4, `4` = 3, `5` = 2, `6` = 1)))
+table(issp00sel$ch_attend, useNA = &quot;always&quot;)
+table(issp00sel$V241, useNA = &quot;always&quot;) 
+
+issp00sel$income &lt;- as.numeric(as.character(issp00sel$V241)) #Family income absolute (so different than previous wave). But with the same number of categories (17) as previous wave
+table(issp00sel$income, useNA = &quot;always&quot;)
+mean(issp00sel$income, na.rm=T) 
+issp00sel$income[is.na(issp00sel$income)] &lt;- 65201.6
+ 
+issp00sel$income_quart &lt;- with(issp00sel, cut(income, 
+                                breaks=quantile(income, probs=seq(0,1, by=0.25), na.rm=TRUE), 
+                                include.lowest=TRUE))
+issp00sel$income_quart &lt;- as.numeric(issp00sel$income_quart)
+
+table(issp00sel$V201, useNA = &quot;always&quot;)
+issp00sel$V201 &lt;- revalue(issp00sel$V201, c(&quot;16 years&quot;= &quot;16&quot;, &quot;GB:18 yrs or above&quot;=&quot;18&quot;))
+issp00sel$age &lt;- as.numeric(as.character(issp00sel$V201))
+table(issp00sel$age, useNA = &quot;always&quot;)
+table(issp00sel$marstat, useNA = &quot;always&quot;)
+issp00sel$V202 &lt;- as.numeric(issp00sel$V202)
+issp00sel$marstat[issp00sel$V202 &lt; 2] &lt;- 1 #Living together
+issp00sel$marstat[issp00sel$V202 &gt;= 2] &lt;- 2 #Not living together
+
+
+#Missings -----
+lapply(issp00sel, table, useNA = &quot;always&quot;)
+
+mis_vars &lt;- c(&quot;lrscale&quot;) 
+
+for (var in mis_vars) {
+  issp00sel[is.na(issp00sel[,var]), var] &lt;- mean(issp00sel[,var], na.rm = TRUE)
+}
+
+save(issp00sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp00sel.Rdata&quot;)
+load(&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp00sel.Rdata&quot;)
+
+
+#Last dataset of 2010. 
+issp2010 &lt;- foreign::read.spss(&quot;/Users/anuschka/Documents/gesis_dir/issp/ISSP2010.sav&quot;, use.value.labels = T,  to.data.frame = T)
+
+issp10sel &lt;- issp2010 %&gt;% filter(country==&quot;NL-Netherlands&quot;) %&gt;%
+            select(studyno, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v46, v47, v34, v35, v36, v48, SEX, AGE, EDUCYRS, PARTY_LR, NL_INC, ATTEND, URBRURAL, MARITAL)
+
+#Dependent variables 
+issp10sel$lifeharm &lt;- as.numeric(issp10sel$v24)
+issp10sel$willing_price &lt;- as.numeric(issp10sel$v29)
+issp10sel$willing_tax &lt;- as.numeric(issp10sel$v30)
+issp10sel$willing_living &lt;- as.numeric(issp10sel$v31)
+issp10sel$do_right &lt;- as.numeric(issp10sel$v33)
+issp10sel$growharm &lt;- as.numeric(issp10sel$v27)
+
+issp10sel &lt;- issp10sel %&gt;% 
+     mutate_at(c(&quot;lifeharm&quot;, &quot;willing_price&quot;, &quot;willing_tax&quot;, &quot;willing_living&quot;, &quot;do_right&quot;, &quot;growharm&quot;), funs(recode(., `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5`= 1)))
+
+issp10sel$worry &lt;- as.numeric(issp10sel$v23)
+issp10sel$progharm &lt;- as.numeric(issp10sel$v25)
+issp10sel$econprotect &lt;- as.numeric(issp10sel$v26)
+issp10sel$dodiff &lt;- as.numeric(issp10sel$v32)
+issp10sel$people_decide &lt;- as.numeric(issp10sel$v46)
+issp10sel$people_decide &lt;- (issp10sel$people_decide - 1) * (4/1) + 1
+issp10sel$bus_decide &lt;- as.numeric(issp10sel$v47)
+issp10sel$bus_decide &lt;- (issp10sel$bus_decide - 1) * (4/1) + 1
+issp10sel$moreimp &lt;- as.numeric(issp10sel$v34)
+issp10sel$othersame &lt;- as.numeric(issp10sel$v35)
+issp10sel$exag &lt;- as.numeric(issp10sel$v36)
+issp10sel$country_effort &lt;- as.numeric(issp10sel$v48)
+
+
+#Independent vars
+table(issp10sel$EDUCYRS, useNA = &quot;always&quot;)
+issp10sel$EDUCYRS &lt;- revalue(issp10sel$EDUCYRS , c(&quot;No formal schooling, no years at school&quot;= &quot;0&quot;, &quot;8 years, NZ: primary&quot;=&quot;8&quot;, &quot;11 years, NZ: secondary school less than 3 years&quot;=&quot;11&quot;, &quot;13 years, NZ: secondary school more han 4 years&quot;=&quot;13&quot;, &quot;16 years, NZ: university less than 3 years&quot;=&quot;16&quot;, &quot;18 years, NZ: university more than 4 years&quot; = &quot;18&quot;, &quot;Still at college, university, in vocational training&quot; = &quot;20&quot;))
+issp10sel$eduyrs &lt;- as.numeric(as.character(issp10sel$EDUCYRS)) #170 missings on education
+mean(issp10sel$eduyrs, na.rm = T)
+issp10sel$eduyrs[is.na(issp10sel$eduyrs)] &lt;- 13.694
+issp10sel$isced[issp10sel$eduyrs &lt;=4] &lt;- 0
+issp10sel$isced[issp10sel$eduyrs &gt; 4 &amp; issp10sel$eduyrs &lt;= 6] &lt;- 1
+issp10sel$isced[issp10sel$eduyrs &gt; 6 &amp; issp10sel$eduyrs &lt;= 10] &lt;- 2
+issp10sel$isced[issp10sel$eduyrs &gt; 10 &amp; issp10sel$eduyrs &lt;= 13] &lt;- 3
+issp10sel$isced[issp10sel$eduyrs &gt; 13 &amp; issp10sel$eduyrs &lt;= 15] &lt;- 4
+issp10sel$isced[issp10sel$eduyrs &gt; 15 &amp; issp10sel$eduyrs &lt;= 18] &lt;- 5
+issp10sel$isced[issp10sel$eduyrs &gt; 18] &lt;- 6
+table(issp10sel$isced, useNA = &quot;always&quot;)
+table(issp10sel$SEX, useNA = &quot;always&quot;)
+issp10sel$sex &lt;- revalue(issp10sel$SEX, c(&quot;Male&quot;=&quot;1&quot;, &quot;Female&quot;=&quot;2&quot;))
+table(issp10sel$lrscale, useNA = &quot;always&quot;)
+issp10sel$lrscale &lt;- as.numeric(issp10sel$PARTY_LR)
+
+issp10sel$lrscale &lt;- (issp10sel$lrscale - 1) * (9/4) + 1
+issp10sel$lrscale[issp10sel$lrscale==12.25] &lt;- 11
+table(issp10sel$URBRURAL, useNA = &quot;always&quot;) #24 missings 
+issp10sel$urban &lt;- revalue(issp10sel$URBRURAL, c(&quot;A farm or home in the country&quot;= &quot;Low urbanity&quot;,&quot;A country village&quot; = &quot;Low urbanity&quot;,  &quot;A town or a small city&quot;=&quot;Medium urbanity&quot;, &quot;The suburbs or outskirts of a big city&quot; = &quot;High urbanity&quot;, &quot;A big city&quot;=&quot;High urbanity&quot;))
+issp10sel$urban &lt;- factor(issp10sel$urban, levels=c(&quot;Low urbanity&quot;, &quot;Medium urbanity&quot;, &quot;High urbanity&quot;), ordered=TRUE)
+table(issp00sel$V243) #See how I can recode them to be the same as in previous waves
+issp10sel$ch_attend &lt;- as.numeric(issp10sel$ATTEND)
+issp10sel &lt;- issp10sel %&gt;% 
+     mutate_at(c(&quot;ch_attend&quot;), funs(recode(., `1` = 6, `2` = 6, `3` = 5, `4` = 4, `5` = 3, `6` = 2, `7` = 2, `8`= 1)))
+table(issp10sel$ch_attend, useNA = &quot;always&quot;)
+issp10sel$income &lt;- as.numeric(issp10sel$NL_INC)
+table(issp10sel$income, useNA = &quot;always&quot;)
+mean(issp10sel$income, na.rm=T) 
+issp10sel$income[is.na(issp10sel$income)] &lt;- 8.461
+ 
+issp10sel$income_quart &lt;- with(issp10sel, cut(income, 
+                                breaks=quantile(income, probs=seq(0,1, by=0.25), na.rm=TRUE), 
+                                include.lowest=TRUE))
+issp10sel$income_quart &lt;- as.numeric(issp10sel$income_quart)
+
+table(issp10sel$AGE, useNA = &quot;always&quot;)
+issp10sel$age &lt;- as.numeric(as.character(issp10sel$AGE))
+table(issp10sel$age, useNA = &quot;always&quot;)
+
+issp10sel$MARITAL &lt;- as.numeric(issp10sel$MARITAL)
+issp10sel$marstat[issp10sel$MARITAL &lt; 2] &lt;- 1 #Living together
+issp10sel$marstat[issp10sel$MARITAL &gt;= 2] &lt;- 2 #Not living together
+
+save(issp10sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp10sel.Rdata&quot;)
+
+#Missings later ----------------------------------
+lapply(issp10sel, table, useNA = &quot;always&quot;)
+
+mis_vars &lt;- c(&quot;lrscale&quot;) 
+
+for (var in mis_vars) {
+  issp10sel[is.na(issp10sel[,var]), var] &lt;- mean(issp10sel[,var], na.rm = TRUE)
+}
+
+save(issp10sel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp10sel.Rdata&quot;)</code></pre>
+<pre class="r"><code>#Now I have to make one datafile of these three datasets. 
+load(&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp93sel.Rdata&quot;)
+load(&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp00sel.Rdata&quot;)
+load(&quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp10sel.Rdata&quot;)
+
+issp93sel &lt;- issp93sel %&gt;% select(V1, worry, lifeharm, willing_price, willing_tax, willing_living, do_right, progharm, econprotect, people_decide, bus_decide, eduyrs, isced, sex, lrscale, urban, ch_attend, income, income_quart, age, marstat, weightvec)
+                                  
+issp00sel &lt;- issp00sel %&gt;% select(V1, worry, lifeharm, willing_price, willing_tax, willing_living, do_right, progharm, econprotect, people_decide, bus_decide, exag, moreimp, othersame, country_effort, growharm, eduyrs, isced, sex, lrscale, urban, ch_attend, income_a, income, income_quart, age, marstat, weightvec)
+
+issp10sel &lt;- issp10sel %&gt;% select(studyno, worry, lifeharm, willing_price, willing_tax, willing_living, do_right, progharm, econprotect, people_decide, bus_decide, exag, moreimp, othersame, country_effort, growharm, eduyrs, isced, sex, lrscale, urban, ch_attend, income, income_quart, NL_INC, age, marstat, weightvec) 
+
+issp93sel &lt;- issp93sel %&gt;% rename(studyno = V1)
+issp00sel &lt;- issp00sel %&gt;% rename(studyno = V1)
+
+#Check again whether variables have the same levels etc. (should be)
+attributes(issp93sel$worry)
+attributes(issp00sel$worry)
+attributes(issp10sel$worry) #etc etc 
+
+#Bind rows
+issptotal &lt;- plyr::rbind.fill(issp93sel, issp00sel, issp10sel)
+
+table(issptotal$bus_decide, useNA = &quot;always&quot;)
+
+issptotal$surveyyear[issptotal$studyno==2450] &lt;- 1993
+issptotal$surveyyear[issptotal$studyno==3440] &lt;- 2000
+issptotal$surveyyear[issptotal$studyno==&quot;GESIS Data Archive Study Number ZA5500&quot;] &lt;- 2010
+
+# Change order of variables
+issptotal &lt;- issptotal %&gt;% select(surveyyear, worry:growharm, income_a, studyno, NL_INC, weightvec)
+
+table(issptotal$urban, useNA = &quot;always&quot;)
+issptotal$urban &lt;- revalue(issptotal$urban, c(&quot;1&quot;= &quot;Low urbanity&quot;, &quot;2&quot;=&quot;Medium urbanity&quot;, &quot;3&quot; = &quot;High urbanity&quot;))
+issptotal$urban &lt;- factor(issptotal$urban, levels=c(&quot;Low urbanity&quot;, &quot;Medium urbanity&quot;, &quot;High urbanity&quot;), ordered=TRUE)
+issptotal$sex &lt;- issptotal$sex - 1
+save(issptotal, file=&quot;./data/final_data/issptotal.Rdata&quot;)</code></pre>
+</div>
+<div id="merging-all-the-data-into-large-datasets"
+class="section level2 unnumbered">
+<h2 class="unnumbered">Merging all the data into large datasets</h2>
+<pre class="r"><code># For the three datasets, change the isced into isced cat
+load(&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/evssel.Rdata&quot;)
+
+
+table(evssel$isced)
+evssel$isced_cat[evssel$isced &lt;=2] &lt;- &quot;Basic&quot;
+evssel$isced_cat[evssel$isced == 3 | evssel$isced == 4] &lt;- &quot;Intermediate&quot;
+evssel$isced_cat[evssel$isced &gt;=5] &lt;- &quot;Advanced&quot;
+evssel$isced_cat &lt;- factor(evssel$isced_cat, levels=c(&quot;Basic&quot;, &quot;Intermediate&quot;, &quot;Advanced&quot;), ordered=TRUE)
+table(evssel$isced_cat)
+
+save(evssel, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/evssel.Rdata&quot;)
+
+
+load(&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/esstotal.Rdata&quot;)
+
+
+table(esstotal$isced)
+esstotal$isced_cat[esstotal$isced &lt;=2] &lt;- &quot;Basic&quot;
+esstotal$isced_cat[esstotal$isced == 3 | esstotal$isced == 4] &lt;- &quot;Intermediate&quot;
+esstotal$isced_cat[esstotal$isced &gt;=5] &lt;- &quot;Advanced&quot;
+esstotal$isced_cat &lt;- factor(esstotal$isced_cat, levels=c(&quot;Basic&quot;, &quot;Intermediate&quot;, &quot;Advanced&quot;), ordered=TRUE)
+table(esstotal$isced_cat)
+
+save(esstotal, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/esstotal.Rdata&quot;)
+
+load(&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/issptotal.Rdata&quot;)
+
+
+table(issptotal$isced)
+issptotal$isced_cat[issptotal$isced &lt;=2] &lt;- &quot;Basic&quot;
+issptotal$isced_cat[issptotal$isced == 3 | issptotal$isced == 4] &lt;- &quot;Intermediate&quot;
+issptotal$isced_cat[issptotal$isced &gt;=5] &lt;- &quot;Advanced&quot;
+issptotal$isced_cat &lt;- factor(issptotal$isced_cat, levels=c(&quot;Basic&quot;, &quot;Intermediate&quot;, &quot;Advanced&quot;), ordered=TRUE)
+table(issptotal$isced_cat)
+
+save(issptotal, file=&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/issptotal.Rdata&quot;)</code></pre>
+</div>
+</div>
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRhdGEgcHJlcGFyYXRpb24gRVZTLCBFU1MgYW5kIElTU1AiDQphdXRob3I6ICJBbnVzY2hrYSBQZWVsZW4iDQpkYXRlOiAiYHIgU3lzLkRhdGUoKWAiDQpvdXRwdXQ6IGh0bWxfZG9jdW1lbnQNCi0tLQ0KDQpgYGB7ciwgZWNobz1GQUxTRX0NCmtuaXRyOjpvcHRzX2NodW5rJHNldChldmFsID0gRkFMU0UpDQpvcHRpb25zKHdpZHRoID0gMTAwKQ0KY29sb3JpemUgPC0gZnVuY3Rpb24oeCwgY29sb3IpIHtzcHJpbnRmKCI8c3BhbiBzdHlsZT0nY29sb3I6ICVzOyc+JXM8L3NwYW4+IiwgY29sb3IsIHgpIH0NCmBgYA0KDQpJbiB0aGlzIHNjcmlwdCwgSSBzZWxlY3QsIHJlY29kZSBhbmQgY3JlYXRlIHZhcmlhYmxlcyBvZiB0aGUgRXVyb3BlYW4gVmFsdWVzIFN1cnZleSwgRXVyb3BlYW4gU29jaWFsIFN1cnZleSBhbmQgSW50ZXJuYXRpb25hbCBTb2NpYWwgU3VydmV5IFByb2dyYW0uDQoNCmBgYHtyfQ0Kcm0obGlzdCA9IGxzKCkpDQpsaWJyYXJ5KHBseXIpDQpsaWJyYXJ5KGRwbHlyKQ0KbGlicmFyeShmb3JlaWduKQ0KbGlicmFyeSh0aWR5dmVyc2UpDQpsaWJyYXJ5KGxhYmVsbGVkKQ0KbGlicmFyeShxdWVzdGlvbnIpDQpsaWJyYXJ5KHBzeWNoKQ0KYGBgDQoNCiMgRXVyb3BlYW4gVmFsdWVzIFN1cnZleSB7LX0NCmBgYHtyfQ0KI0xvYWQgaW4gRVZTIHRyZW5kIGZpbGUNCmV2cyA8LSBmb3JlaWduOjpyZWFkLnNwc3MoIi9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvZ2VzaXNfZGlyL2V2cy9aQTc1MDNfdjItMC0wLnNhdiIsIHVzZS52YWx1ZS5sYWJlbHMgPSBULCAgdG8uZGF0YS5mcmFtZSA9IFQpDQoNCiMgU28gYXBwYXJlbnRseSwgaW4gdGhlIE5ldGhlcmxhbmRzIGluIDE5ODEgYW5kIGluIDIwMTcsIHRoZSBxdWVzdGlvbiBmb3IgdGhlIGRlcGVuZGVudCB2YXIgd2FzIG5vdCBhc2tlZC4gVGhpcyBtZWFucyB0aGF0IEkgY2Fubm90IHVzZSB0aG9zZSB5ZWFycyBmcm9tIHRoZSBFVlMuIEEgcGl0eS4gDQoNCmV2cyRTMDAzX24gPC0gYXMubnVtZXJpYyhldnMkUzAwMykNCmV2cyRTMDIwIDwtIGFzLm51bWVyaWMoYXMuY2hhcmFjdGVyKGV2cyRTMDIwKSkNCg0KZXZzc2VsIDwtIGV2cyAlPiUgZmlsdGVyKFMwMDNfbiA9PSAzMSkgICU+JQ0KICAgICAgICAgICAgICAgIGZpbHRlciAoUzAyMCA+MTk4MSAmIFMwMjAgPDIwMTcpICU+JQ0KICAgICAgICAgICAgc2VsZWN0KHN0ZHlub193LCBTMDAxLCBTMDAyRVZTLCBTMDA2LCBTMDE3LCBTMDE4LFMwMjAsIEIwMDEsIFgwMDEsIFgwMDIsIFgwMDMsIFgwMDNSLCBYMDAzUjIsIFgwMTEsIFgwMjMsIFgwMjNSLCBYMDI1LCBYMDI1QSwgWDAyNUNTRVZTLCBYMDA3LCBHMDI3QSwgWDAyOCwgWDA0N0NTLCBYMDQ3X0VWUywgWDA0N1JfRVZTLCBBMDA2LCBFMDMzKQ0KDQp0YWJsZShldnNzZWwkc3RkeW5vX3csIGV2c3NlbCRYMDI1Q1NFVlMsIHVzZU5BID0gImFsd2F5cyIpDQoNCmZyZXEoZXZzc2VsJFgwMjVDU0VWUykNCg0KYXR0cmlidXRlcyhldnMkQjAwMSkNCnRhYmxlKGV2c3NlbCRCMDAxLCB1c2VOQSA9ICJhbHdheXMiKQ0KDQojUmVjb2RlIGl0LCBiZWNhdXNlIG5vdyBhIGhpZ2hlciBudW1iZXIgbWVhbnMgbG93ZXIgd2lsbGluZ25lc3MgdG8gbWFrZSBzYWNyaWZpY2VzLiBJIHdhbnQgZXZlcnl0aGluZyBpbiB0aGUgZGlyZWN0aW9uIHRoYXQgYSBoaWdoZXIgc2NvcmUgZXF1YWxzIG1vcmUgcG9zaXRpdmUgYXR0aXR1ZGVzIHRvd2FyZHMgdGhlIGNsaW1hdGUuIA0KDQpldnNzZWwkY2xpbWF0ZSA8LSBhcy5udW1lcmljKGV2c3NlbCRCMDAxKQ0KZXZzc2VsJHJlbGlnaW91cyA8LSBhcy5udW1lcmljKGV2c3NlbCRBMDA2KQ0KZXZzc2VsIDwtIGV2c3NlbCAlPiUgDQogICAgIG11dGF0ZV9hdChjKCJjbGltYXRlIiwgInJlbGlnaW91cyIpLCBmdW5zKHJlY29kZSguLCBgMWAgPSA0LCBgMmAgPSAzLCBgM2AgPSAyLCBgNGAgPSAxKSkpDQpldnNzZWwkY2xpbWF0ZTUgPC0gKGV2c3NlbCRjbGltYXRlLTEpKig0LzMpKzENCmV2c3NlbCRyZWxpZ2lvdXNbaXMubmEoZXZzc2VsJHJlbGlnaW91cyldIDwtIDg4ICMxMSBtaXNzaW5ncyBnZXQgdmFsdWUgODgNCmV2c3NlbCRyZWxpZ2lvdXMgPC0gYXMuZmFjdG9yKGV2c3NlbCRyZWxpZ2lvdXMpDQpldnNzZWwkcmVsaWdpb3VzIDwtIHJldmFsdWUoZXZzc2VsJHJlbGlnaW91cywgYygiMSI9Ik5vdCBhdCBhbGwgaW1wb3J0YW50IiwgIjIiPSJOb3QgdmVyeSBpbXBvcnRhbnQiLCAiMyI9IlJhdGhlciBpbXBvcnRhbnQiLCAiNCIgPSAiVmVyeSBpbXBvcnRhbnQiLCAiODgiPSJNaXNzaW5nIikpDQoNCiNJbmRlcGVuZGVudCB2YXJpYWJsZXMgYW5kIG1pc3NpbmdzDQp0YWJsZShldnNzZWwkWDA0N19FVlMsIHVzZU5BID0gImFsd2F5cyIpICNTY2FsZSBvZiBob3VzZWhvbGQgaW5jb21lcyBmcm9tIDEgdG8gMTAsIHdpdGggNTQwIG1pc3NpbmdzIChncm9zcykNCiMgRml4IGluY29tZSBpbiBxdWFydGlsZXMgDQoNCiMgRm9yIHRoZSBFVlMgSSBvbmx5IGhhdmUgb25lIHZhcmlhYmxlIGZvciBpbmNvbWUsIGJ1dCBvZiBjb3Vyc2UgdGhlIHF1YW50aWxlcyBhbmQgbWVhbiBjYW4gYmUgZGlmZmVyZW50IHBlciB5ZWFyLiANCiMgU28gSSBoYXZlIHRvIHRha2UgdGhhdCBpbnRvIGFjY291bnQuIEZvbGxvd2luZyBjb2RlIGlzIGRlZmluaXRlbHkgbm90IHRoZSBtb3N0IGVmZmljaWVudCB3YXkgdG8gZG8gc28sIGJ1dCBpdCB3b3Jrcw0KZXZzc2VsX3cxIDwtIGFzLmRhdGEuZnJhbWUoZXZzc2VsW2V2c3NlbCRTMDAyRVZTID09ICIxOTkwLTE5OTMiLCBdKQ0KZXZzc2VsX3cxJGluY29tZSA8LSBhcy5udW1lcmljKGV2c3NlbF93MSRYMDQ3X0VWUykNCm1lYW4oZXZzc2VsX3cxJGluY29tZSwgbmEucm09VCkNCmV2c3NlbF93MSRpbmNvbWVbaXMubmEoZXZzc2VsX3cxJGluY29tZSldIDwtIDUuNjE0DQpldnNzZWxfdzEkaW5jb21lX3F1YXJ0IDwtIHdpdGgoZXZzc2VsX3cxLCBjdXQoaW5jb21lLCANCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYnJlYWtzPXF1YW50aWxlKGluY29tZSwgcHJvYnM9c2VxKDAsMSwgYnk9MC4yNSksIG5hLnJtPVRSVUUpLCANCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW5jbHVkZS5sb3dlc3Q9VFJVRSkpDQpldnNzZWxfdzEkaW5jb21lX3F1YXJ0IDwtIGFzLm51bWVyaWMoZXZzc2VsX3cxJGluY29tZV9xdWFydCkNCg0KZXZzc2VsX3cyIDwtIGFzLmRhdGEuZnJhbWUoZXZzc2VsW2V2c3NlbCRTMDAyRVZTID09ICIxOTk5LTIwMDEiLCBdKQ0KZXZzc2VsX3cyJGluY29tZSA8LSBhcy5udW1lcmljKGV2c3NlbF93MiRYMDQ3X0VWUykNCm1lYW4oZXZzc2VsX3cyJGluY29tZSwgbmEucm09VCkNCmV2c3NlbF93MiRpbmNvbWVbaXMubmEoZXZzc2VsX3cyJGluY29tZSldIDwtIDYuNDAzDQpldnNzZWxfdzIkaW5jb21lX3F1YXJ0IDwtIHdpdGgoZXZzc2VsX3cyLCBjdXQoaW5jb21lLCANCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYnJlYWtzPXF1YW50aWxlKGluY29tZSwgcHJvYnM9c2VxKDAsMSwgYnk9MC4yNSksIG5hLnJtPVRSVUUpLCANCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW5jbHVkZS5sb3dlc3Q9VFJVRSkpDQpldnNzZWxfdzIkaW5jb21lX3F1YXJ0IDwtIGFzLm51bWVyaWMoZXZzc2VsX3cyJGluY29tZV9xdWFydCkNCg0KZXZzc2VsX3czIDwtIGFzLmRhdGEuZnJhbWUoZXZzc2VsW2V2c3NlbCRTMDAyRVZTID09ICIyMDA4LTIwMTAiLCBdKQ0KZXZzc2VsX3czJGluY29tZSA8LSBhcy5udW1lcmljKGV2c3NlbF93MyRYMDQ3X0VWUykNCm1lYW4oZXZzc2VsX3czJGluY29tZSwgbmEucm09VCkNCmV2c3NlbF93MyRpbmNvbWVbaXMubmEoZXZzc2VsX3czJGluY29tZSldIDwtIDUuMjc3DQpldnNzZWxfdzMkaW5jb21lX3F1YXJ0IDwtIHdpdGgoZXZzc2VsX3czLCBjdXQoaW5jb21lLCANCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYnJlYWtzPXF1YW50aWxlKGluY29tZSwgcHJvYnM9c2VxKDAsMSwgYnk9MC4yNSksIG5hLnJtPVRSVUUpLCANCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW5jbHVkZS5sb3dlc3Q9VFJVRSkpDQpldnNzZWxfdzMkaW5jb21lX3F1YXJ0IDwtIGFzLm51bWVyaWMoZXZzc2VsX3czJGluY29tZV9xdWFydCkNCg0KZXZzc2VsX3cxIDwtIHJiaW5kKGV2c3NlbF93MSwgZXZzc2VsX3cyKQ0KZXZzc2VsX3cxIDwtIHJiaW5kKGV2c3NlbF93MSwgZXZzc2VsX3czKQ0KZXZzc2VsX3cxIDwtIGV2c3NlbF93MSAlPiUgc2VsZWN0KGluY29tZV9xdWFydCkNCmV2c3NlbCA8LSBjYmluZChldnNzZWwsIGV2c3NlbF93MSkNCg0KDQpldnNzZWwkc2V4IDwtIHJldmFsdWUoZXZzc2VsJFgwMDEsIGMoIk1hbGUiPSIxIiwgIkZlbWFsZSI9IjIiKSkNCmV2c3NlbCRzZXggPC0gZXZzc2VsJHNleCAtIDENCnRhYmxlKGV2c3NlbCRzZXgpDQp0YWJsZShldnNzZWwkRTAzMywgdXNlTkEgPSAiYWx3YXlzIikNCmV2c3NlbCRscnNjYWxlIDwtIGFzLm51bWVyaWMoZXZzc2VsJEUwMzMpDQoNCmV2c3NlbCRYMDA3IDwtIGFzLm51bWVyaWMoZXZzc2VsJFgwMDcpDQpldnNzZWwkbWFyc3RhdFtldnNzZWwkWDAwNyA8PSAyXSA8LSAxICNMaXZpbmcgdG9nZXRoZXINCmV2c3NlbCRtYXJzdGF0W2V2c3NlbCRYMDA3ID4gMl0gPC0gMiAjTm90IGxpdmluZyB0b2dldGhlcg0KZXZzc2VsJG1hcnN0YXQgPC0gYXMuZmFjdG9yKGV2c3NlbCRtYXJzdGF0KQ0KDQojWW91IGdlbmVyYWxseSBzdGFydCBzY2hvb2wgYXQgNg0KZXZzc2VsJGVkdV95cnMgPC0gYXMubnVtZXJpYyhhcy5jaGFyYWN0ZXIoZXZzc2VsJFgwMjMpKQ0KZXZzc2VsJGVkdV95cnMgPC0gZXZzc2VsJGVkdV95cnMgLSA2DQp0YWJsZShldnNzZWwkZWR1X3lycywgdXNlTkEgPSAiYWx3YXlzIikNCm1lYW4oZXZzc2VsJGVkdV95cnMsIG5hLnJtPVQpDQpldnNzZWwkZWR1X3lyc1tpcy5uYShldnNzZWwkZWR1X3lycyldIDwtIDEzLjUxOA0KI0VkdWNhdGlvbiBhcyBpc2NlZA0KZXZzc2VsJGlzY2VkW2V2c3NlbCRlZHVfeXJzIDw9NF0gPC0gMA0KZXZzc2VsJGlzY2VkW2V2c3NlbCRlZHVfeXJzID4gNCAmIGV2c3NlbCRlZHVfeXJzIDw9IDZdIDwtIDENCmV2c3NlbCRpc2NlZFtldnNzZWwkZWR1X3lycyA+IDYgJiBldnNzZWwkZWR1X3lycyA8PSAxMF0gPC0gMg0KZXZzc2VsJGlzY2VkW2V2c3NlbCRlZHVfeXJzID4gMTAgJiBldnNzZWwkZWR1X3lycyA8PSAxM10gPC0gMw0KZXZzc2VsJGlzY2VkW2V2c3NlbCRlZHVfeXJzID4gMTMgJiBldnNzZWwkZWR1X3lycyA8PSAxNV0gPC0gNA0KZXZzc2VsJGlzY2VkW2V2c3NlbCRlZHVfeXJzID4gMTUgJiBldnNzZWwkZWR1X3lycyA8PSAxOF0gPC0gNQ0KZXZzc2VsJGlzY2VkW2V2c3NlbCRlZHVfeXJzID4gMThdIDwtIDYNCnRhYmxlKGV2c3NlbCRpc2NlZCwgdXNlTkEgPSAiYWx3YXlzIikNCg0KdGFibGUoZXZzc2VsJFgwMDMsIHVzZU5BID0gImFsd2F5cyIpDQpldnNzZWwkWDAwMyA8LSByZXZhbHVlKGV2c3NlbCRYMDAzLCBjKCI4MiBhbmQgbW9yZSAoaW4gRVZTIDIwMTcpIiA9ICI4MiIpKQ0KZXZzc2VsJGFnZSA8LSBhcy5udW1lcmljKGFzLmNoYXJhY3RlcihldnNzZWwkWDAwMykpDQp0YWJsZShldnNzZWwkYWdlLCB1c2VOQSA9ICJhbHdheXMiKQ0KIyAzIG1pc3NpbmdzIG9uIGFnZQ0KbWVhbihldnNzZWwkYWdlLCBuYS5ybT1UKQ0KZXZzc2VsJGFnZVtpcy5uYShldnNzZWwkYWdlKV0gPC0gNDkuMTIyDQoNCiMgTWlzc2luZ3MgY2FuIGJlIGRvbmUgZmFzdGVyDQptaXNfdmFycyA8LSBjKCJscnNjYWxlIiwgImVkdV95cnMiKSANCg0KZm9yICh2YXIgaW4gbWlzX3ZhcnMpIHsNCiAgZXZzc2VsW2lzLm5hKGV2c3NlbFssdmFyXSksIHZhcl0gPC0gbWVhbihldnNzZWxbLHZhcl0sIG5hLnJtID0gVFJVRSkNCn0NCg0KDQojTGV0J3MgZmlyc3Qgc2F2ZSB0aGUgcHJlcHBlZCBkYXRhLiANCnNhdmUoZXZzc2VsLCBmaWxlPSIuL2RhdGEvZmluYWxfZGF0YS9ldnNzZWwuUmRhdGEiKQ0KDQpldnNzZWwgPC0gZXZzc2VsICU+JSBzZWxlY3Qoc3RkeW5vX3csIFMwMDEsIFMwMDJFVlMsIFMwMDYsIFMwMTcsIFMwMTgsIFMwMjAsIGNsaW1hdGU1LCBzZXgsIFgwMDIsIGFnZSwgZWR1X3lycywgaXNjZWQsICByZWxpZ2lvdXMsIGxycGxhY2UsIGluY29tZSwgaW5jb21lX3F1YXJ0LCBtYXJzdGF0LCB3ZWlnaHR2ZWMsIFgwMjMsIFgwMjNSLCBYMDQ3Q1MsIFgwNDdfRVZTLCBYMDQ3Ul9FVlMpICU+JSANCiAgICAgICAgZHBseXI6OnJlbmFtZShzdXJ2ZXl5ZWFyID0gUzAyMCkNCg0Kc2F2ZShldnNzZWwsIGZpbGU9Ii4vZGF0YS9maW5hbF9kYXRhL2V2c3NlbC5SZGF0YSIpDQpgYGANCg0KIyMgRXVyb3BlYW4gU29jaWFsIFN1cnZleSB7LX0NCmBgYHtyfQ0KIyBMZXQncyBkbyB0aGUgc2FtZSB3aXRoIHRoZSBFU1MsIGZvciB3aGljaCBJIHdpbGwgdXNlIHRoZSAyMDE2IGFuZCAyMDIwIHdhdmUuIA0KZXNzMjAxNiA8LSBmb3JlaWduOjpyZWFkLnNwc3MoIi9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvZ2VzaXNfZGlyL2Vzcy9FU1M4ZTAyXzIuc2F2IiwgdXNlLnZhbHVlLmxhYmVscyA9IFQsICB0by5kYXRhLmZyYW1lID0gVCkNCg0KZXNzMTZzZWwgPC0gZXNzMjAxNiAlPiUgZmlsdGVyKGNudHJ5PT0iTmV0aGVybGFuZHMiKSAgJT4lDQogICAgICAgICAgICBzZWxlY3QobmFtZSwgZXNzcm91bmQsIHByb2RkYXRlLCBpZG5vLCBjY250aHVtLCBjY3JkcHJzLCB3cmNsbWNoLCBlZHVsdmxiLCBlZGx2ZW5sLCBlZHV5cnMsIG1haW5hY3QsIGduZHIsIGFnZWEsIHlyYnJuLCBscnNjYWxlLCBkb21pY2lsLCBoaW5jdG50YSwgcmxnYXRuZCwgbWFyc3RzLCBicm5jbnRyKQ0KDQoNCiNDbGltYXRlIGNoYW5nZSBjYXVzZWQgYnkgbmF0dXJhbCBwcm9jZXNzZXMsIGh1bWFuIGFjdGl2aXR5LCBvciBib3RoLiA0IHBlb3BsZSB3aG8gZG8gbm90IGJlbGlldmUgYXJlIG1pc3NpbmcNCmF0dHJpYnV0ZXMoZXNzMTZzZWwkY2NudGh1bSkNCnRhYmxlKGVzczE2c2VsJGNhdXNlLCB1c2VOQSA9ICJhbHdheXMiKQ0KZXNzMTZzZWwkY2F1c2UgPC0gYXMubnVtZXJpYyhlc3MxNnNlbCRjY250aHVtKQ0KZXNzMTZzZWwkY2F1c2VbZXNzMTZzZWwkY2F1c2U9PTZdIDwtIE5BDQoNCiNQZXJzb25hbCByZXNwb25zaWJpbGl0eSB0byByZWR1Y2UgY2xpbWF0ZSBjaGFuZ2UNCmF0dHJpYnV0ZXMoZXNzMTZzZWwkY2NyZHBycykNCnRhYmxlKGVzczE2c2VsJHBlcnNfcmVzcCwgdXNlTkEgPSAiYWx3YXlzIikNCmVzczE2c2VsJHBlcnNfcmVzcCA8LSAoYXMubnVtZXJpYyhlc3MxNnNlbCRjY3JkcHJzKSAtIDEpKiAoNC8xMCkgKyAxDQoNCiNIb3cgd29ycmllZCBhYm91dCBjbGltYXRlIGNoYW5nZQ0KdGFibGUoZXNzMTZzZWwkd3JjbG1jaCwgdXNlTkEgPSAiYWx3YXlzIikNCmVzczE2c2VsJHdvcnJ5IDwtIGFzLm51bWVyaWMoZXNzMTZzZWwkd3JjbG1jaCkNCg0Kc2F2ZShlc3MxNnNlbCwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9hbGxfd2F2ZXMvZXNzMTZzZWwuUmRhdGEiKQ0KbG9hZCgiL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9hbGxfd2F2ZXMvZXNzMTZzZWwuUmRhdGEiKQ0KDQoNCiNJbmRlcGVuZGVudCB2YXJzDQp0YWJsZShlc3MxNnNlbCRlZHV5cnMsIHVzZU5BID0gImFsd2F5cyIpDQplc3MxNnNlbCRlZHV5cnMgPC0gYXMubnVtZXJpYyhhcy5jaGFyYWN0ZXIoZXNzMTZzZWwkZWR1eXJzKSkNCnRhYmxlKGVzczE2c2VsJGVkdWx2bGIsIHVzZU5BID0gImFsd2F5cyIpDQplc3MxNnNlbCRlZHVsdmxiIDwtIGFzLm51bWVyaWMoZXNzMTZzZWwkZWR1bHZsYikNCiNFZHVjYXRpb24gYXMgaXNjZWQNCmVzczE2c2VsJGlzY2VkW2VzczE2c2VsJGVkdWx2bGIgPD0xXSA8LSAwDQplc3MxNnNlbCRpc2NlZFtlc3MxNnNlbCRlZHVsdmxiID09Ml0gPC0gMQ0KZXNzMTZzZWwkaXNjZWRbZXNzMTZzZWwkZWR1bHZsYiA+IDIgJiBlc3MxNnNlbCRlZHVsdmxiIDw9IDVdIDwtIDINCmVzczE2c2VsJGlzY2VkW2VzczE2c2VsJGVkdWx2bGIgPiA1ICYgZXNzMTZzZWwkZWR1bHZsYiA8PSAxNV0gPC0gMw0KZXNzMTZzZWwkaXNjZWRbZXNzMTZzZWwkZWR1bHZsYiA+IDE1ICYgZXNzMTZzZWwkZWR1bHZsYiA8PSAyMF0gPC0gNA0KZXNzMTZzZWwkaXNjZWRbZXNzMTZzZWwkZWR1bHZsYiA+IDIwICYgZXNzMTZzZWwkZWR1bHZsYiA8PSAyNl0gPC0gNQ0KZXNzMTZzZWwkaXNjZWRbZXNzMTZzZWwkZWR1bHZsYiA9PTI3XSA8LSA2DQplc3MxNnNlbCRpc2NlZFtlc3MxNnNlbCRlZHVsdmxiID09MjhdIDwtIE5BDQp0YWJsZShlc3MxNnNlbCRpc2NlZCwgdXNlTkEgPSAiYWx3YXlzIikNCg0KdGFibGUoZXNzMTZzZWwkZ25kciwgdXNlTkEgPSAiYWx3YXlzIikNCmVzczE2c2VsJHNleCA8LSByZXZhbHVlKGVzczE2c2VsJGduZHIsIGMoIk1hbGUiPSIxIiwgIkZlbWFsZSI9IjIiKSkNCnRhYmxlKGVzczE2c2VsJGxyc2NhbGUsIHVzZU5BID0gImFsd2F5cyIpDQplc3MxNnNlbCRscnNjYWxlIDwtIGFzLm51bWVyaWMoZXNzMTZzZWwkbHJzY2FsZSkNCmVzczE2c2VsJGxyc2NhbGUgPC0gKGVzczE2c2VsJGxyc2NhbGUgLSAxKSAqICg5LzEwKSArIDENCmF0dHJpYnV0ZXMoZXNzMTZzZWwkdXJiYW4pDQplc3MxNnNlbCR1cmJhbiA8LSByZXZhbHVlKGVzczE2c2VsJGRvbWljaWwsIGMoIkZhcm0gb3IgaG9tZSBpbiBjb3VudHJ5c2lkZSI9ICJMb3cgdXJiYW5pdHkiLCAiQ291bnRyeSB2aWxsYWdlIj0iTG93IHVyYmFuaXR5IiwgIlRvd24gb3Igc21hbGwgY2l0eSI9Ik1lZGl1bSB1cmJhbml0eSIsICJTdWJ1cmJzIG9yIG91dHNraXJ0cyBvZiBiaWcgY2l0eSI9IkhpZ2ggdXJiYW5pdHkiLCAiQSBiaWcgY2l0eSI9IkhpZ2ggdXJiYW5pdHkiKSkNCmVzczE2c2VsJHVyYmFuIDwtIGZhY3Rvcihlc3MxNnNlbCR1cmJhbiwgbGV2ZWxzPWMoIkxvdyB1cmJhbml0eSIsICJNZWRpdW0gdXJiYW5pdHkiLCAiSGlnaCB1cmJhbml0eSIpLCBvcmRlcmVkPVRSVUUpDQplc3MxNnNlbCRjaF9hdHRlbmQgPC0gYXMubnVtZXJpYyhlc3MxNnNlbCRybGdhdG5kKQ0KZXNzMTZzZWwgPC0gZXNzMTZzZWwgJT4lIA0KICAgICBtdXRhdGVfYXQoYygiY2hfYXR0ZW5kIiksIGZ1bnMocmVjb2RlKC4sIGAxYCA9IDcsIGAyYCA9IDYsIGAzYCA9IDUsIGA0YCA9IDQsIGA1YCA9IDMsIGA2YCA9IDIsIGA3YCA9MSkpKQ0KdGFibGUoZXNzMTZzZWwkY2hfYXR0ZW5kLCB1c2VOQSA9ICJhbHdheXMiKQ0KZXNzMTZzZWwkaW5jb21lIDwtIGFzLm51bWVyaWMoZXNzMTZzZWwkaGluY3RudGEpICNPbiBhIHNjYWxlIGZyb20gMSB0byAxMCwgaG91c2Vob2xkIGluY29tZQ0KDQptZWFuKGVzczE2c2VsJGluY29tZSwgbmEucm09VCkNCmVzczE2c2VsJGluY29tZVtpcy5uYShlc3MxNnNlbCRpbmNvbWUpXSA8LSA1Ljk5Mw0KZXNzMTZzZWwkaW5jb21lX3F1YXJ0IDwtIHdpdGgoZXNzMTZzZWwsIGN1dChpbmNvbWUsIA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBicmVha3M9cXVhbnRpbGUoaW5jb21lLCBwcm9icz1zZXEoMCwxLCBieT0wLjI1KSwgbmEucm09VFJVRSksIA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbmNsdWRlLmxvd2VzdD1UUlVFKSkNCmVzczE2c2VsJGluY29tZV9xdWFydCA8LSBhcy5udW1lcmljKGVzczE2c2VsJGluY29tZV9xdWFydCkNCg0KdGFibGUoZXNzMTZzZWwkbWFyc3RzLCB1c2VOQSA9ICJhbHdheXMiKSAgICAgICAgICAgICAgICAgICAgDQplc3MxNnNlbCRtYXJzdHMgPC0gYXMubnVtZXJpYyhlc3MxNnNlbCRtYXJzdHMpDQplc3MxNnNlbCRtYXJzdGF0W2VzczE2c2VsJG1hcnN0cyA8PSAyXSA8LSAxICNMaXZpbmcgdG9nZXRoZXINCmVzczE2c2VsJG1hcnN0YXRbZXNzMTZzZWwkbWFyc3RzID4gMl0gPC0gMiAjTm90IGxpdmluZyB0b2dldGhlcg0KZXNzMTZzZWwkbWFyc3RhdFtpcy5uYShlc3MxNnNlbCRtYXJzdHMpXSA8LSAzICM4MjEgbWlzc2luZ3Mgb24gdGhpcyB2YXJpYWJsZS4uLg0KZXNzMTZzZWwkbWFyc3RhdCA8LSBhcy5mYWN0b3IoZXNzMTZzZWwkbWFyc3RhdCkNCmVzczE2c2VsJGFnZSA8LSBhcy5udW1lcmljKGFzLmNoYXJhY3Rlcihlc3MxNnNlbCRhZ2VhKSkNCg0KI1N1YnN0aXR1dGlvbiBvZiBtaXNzaW5ncw0KbGFwcGx5KGVzczE2c2VsLCB0YWJsZSwgdXNlTkEgPSAiYWx3YXlzIikNCg0KbWlzX3ZhcnMgPC0gYygibHJzY2FsZSIpIA0KDQpmb3IgKHZhciBpbiBtaXNfdmFycykgew0KICBlc3MxNnNlbFtpcy5uYShlc3MxNnNlbFssdmFyXSksIHZhcl0gPC0gbWVhbihlc3MxNnNlbFssdmFyXSwgbmEucm0gPSBUUlVFKQ0KfQ0KDQpzYXZlKGVzczE2c2VsLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9lc3MxNnNlbC5SZGF0YSIpDQoNCg0KZXNzMjAyMCA8LSBmb3JlaWduOjpyZWFkLnNwc3MoIi9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvZ2VzaXNfZGlyL2Vzcy9FU1MxMC5zYXYiLCB1c2UudmFsdWUubGFiZWxzID0gVCwgIHRvLmRhdGEuZnJhbWUgPSBUKQ0KDQplc3MyMHNlbCA8LSBlc3MyMDIwICU+JSBmaWx0ZXIoY250cnk9PSJOZXRoZXJsYW5kcyIpICAlPiUNCiAgICAgICAgICAgIHNlbGVjdChuYW1lLCBlc3Nyb3VuZCwgcHJvZGRhdGUsIGlkbm8sIGNjbnRodW0sIGNjcmRwcnMsIHdyY2xtY2gsIGVkdWx2bGIsIGVkbHZlbmwsIGVkdXlycyxnbmRyLCBhZ2VhLCB5cmJybiwgcHJ0dnRobmwsIGxyc2NhbGUsIGRvbWljaWwsIGhpbmN0bnRhLCBybGdhdG5kLCBtYXJzdHMsIGJybmNudHIpDQoNCiNSZWNvZGUgdGhlIGRlcGVuZGVudCB2YXJzIGp1c3QgbGlrZSB0aGUgcHJldmlvdXMgd2F2ZQ0KYXR0cmlidXRlcyhlc3MyMHNlbCRjY250aHVtKQ0KdGFibGUoZXNzMjBzZWwkY2F1c2UsIHVzZU5BID0gImFsd2F5cyIpDQplc3MyMHNlbCRjYXVzZSA8LSBhcy5udW1lcmljKGVzczIwc2VsJGNjbnRodW0pDQplc3MyMHNlbCRjYXVzZVtlc3MyMHNlbCRjYXVzZT09Nl0gPC0gTkENCg0KI1BlcnNvbmFsIHJlc3BvbnNpYmlsaXR5IHRvIHJlZHVjZSBjbGltYXRlIGNoYW5nZQ0KYXR0cmlidXRlcyhlc3MyMHNlbCRjY3JkcHJzKQ0KdGFibGUoZXNzMjBzZWwkcGVyc19yZXNwLCB1c2VOQSA9ICJhbHdheXMiKQ0KZXNzMjBzZWwkcGVyc19yZXNwIDwtIChhcy5udW1lcmljKGVzczIwc2VsJGNjcmRwcnMpIC0gMSkqICg0LzEwKSArIDENCg0KI0hvdyB3b3JyaWVkIGFib3V0IGNsaW1hdGUgY2hhbmdlDQp0YWJsZShlc3MyMHNlbCR3cmNsbWNoLCB1c2VOQSA9ICJhbHdheXMiKQ0KZXNzMjBzZWwkd29ycnkgPC0gYXMubnVtZXJpYyhlc3MyMHNlbCR3cmNsbWNoKQ0KDQpzYXZlKGVzczIwc2VsLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9lc3MyMHNlbC5SZGF0YSIpDQoNCiMgSW5kZXBlbmRlbnQgdmFycyANCnRhYmxlKGVzczIwc2VsJGVkdXlycywgdXNlTkEgPSAiYWx3YXlzIikNCmVzczIwc2VsJGVkdXlycyA8LSBhcy5udW1lcmljKGFzLmNoYXJhY3Rlcihlc3MyMHNlbCRlZHV5cnMpKQ0KdGFibGUoYXMubnVtZXJpYyhlc3MyMHNlbCRlZHVsdmxiKSwgdXNlTkEgPSAiYWx3YXlzIikNCmVzczIwc2VsJGVkdWx2bGIgPC0gYXMubnVtZXJpYyhlc3MyMHNlbCRlZHVsdmxiKQ0KZXNzMjBzZWwkaXNjZWRbZXNzMjBzZWwkZWR1bHZsYiA8PTFdIDwtIDANCmVzczIwc2VsJGlzY2VkW2VzczIwc2VsJGVkdWx2bGIgPT0yXSA8LSAxDQplc3MyMHNlbCRpc2NlZFtlc3MyMHNlbCRlZHVsdmxiID4gMiAmIGVzczIwc2VsJGVkdWx2bGIgPD0gNV0gPC0gMg0KZXNzMjBzZWwkaXNjZWRbZXNzMjBzZWwkZWR1bHZsYiA+IDUgJiBlc3MyMHNlbCRlZHVsdmxiIDw9IDE1XSA8LSAzDQplc3MyMHNlbCRpc2NlZFtlc3MyMHNlbCRlZHVsdmxiID4gMTUgJiBlc3MyMHNlbCRlZHVsdmxiIDw9IDIwXSA8LSA0DQplc3MyMHNlbCRpc2NlZFtlc3MyMHNlbCRlZHVsdmxiID4gMjAgJiBlc3MyMHNlbCRlZHVsdmxiIDw9IDI2XSA8LSA1DQplc3MyMHNlbCRpc2NlZFtlc3MyMHNlbCRlZHVsdmxiID09MjddIDwtIDYNCmVzczIwc2VsJGlzY2VkW2VzczIwc2VsJGVkdWx2bGIgPT0yOF0gPC0gTkENCnRhYmxlKGVzczIwc2VsJGlzY2VkLCB1c2VOQSA9ICJhbHdheXMiKQ0KDQp0YWJsZShlc3MyMHNlbCRnbmRyLCB1c2VOQSA9ICJhbHdheXMiKQ0KZXNzMjBzZWwkc2V4IDwtIHJldmFsdWUoZXNzMjBzZWwkZ25kciwgYygiTWFsZSI9IjEiLCAiRmVtYWxlIj0iMiIpKQ0KdGFibGUoZXNzMjBzZWwkbHJzY2FsZSwgdXNlTkEgPSAiYWx3YXlzIikNCmVzczIwc2VsJGxyc2NhbGUgPC0gYXMubnVtZXJpYyhlc3MyMHNlbCRscnNjYWxlKQ0KZXNzMjBzZWwkbHJzY2FsZSA8LSAoZXNzMjBzZWwkbHJzY2FsZSAtIDEpICogKDkvMTApICsgMQ0KYXR0cmlidXRlcyhlc3MyMHNlbCRkb21pY2lsKQ0KZXNzMjBzZWwkdXJiYW4gPC0gcmV2YWx1ZShlc3MyMHNlbCRkb21pY2lsLCBjKCJGYXJtIG9yIGhvbWUgaW4gY291bnRyeXNpZGUiPSAiTG93IHVyYmFuaXR5IiwgIkNvdW50cnkgdmlsbGFnZSI9IkxvdyB1cmJhbml0eSIsICJUb3duIG9yIHNtYWxsIGNpdHkiPSJNZWRpdW0gdXJiYW5pdHkiLCAiU3VidXJicyBvciBvdXRza2lydHMgb2YgYmlnIGNpdHkiPSJIaWdoIHVyYmFuaXR5IiwgIkEgYmlnIGNpdHkiPSJIaWdoIHVyYmFuaXR5IikpDQplc3MyMHNlbCR1cmJhbiA8LSBmYWN0b3IoZXNzMjBzZWwkdXJiYW4sIGxldmVscz1jKCJMb3cgdXJiYW5pdHkiLCAiTWVkaXVtIHVyYmFuaXR5IiwgIkhpZ2ggdXJiYW5pdHkiKSwgb3JkZXJlZD1UUlVFKQ0KZXNzMjBzZWwkY2hfYXR0ZW5kIDwtIGFzLm51bWVyaWMoZXNzMjBzZWwkcmxnYXRuZCkNCmVzczIwc2VsIDwtIGVzczIwc2VsICU+JSANCiAgICAgbXV0YXRlX2F0KGMoImNoX2F0dGVuZCIpLCBmdW5zKHJlY29kZSguLCBgMWAgPSA3LCBgMmAgPSA2LCBgM2AgPSA1LCBgNGAgPSA0LCBgNWAgPSAzLCBgNmAgPSAyLCBgN2AgPTEpKSkNCnRhYmxlKGVzczIwc2VsJGNoX2F0dGVuZCwgdXNlTkEgPSAiYWx3YXlzIikNCmVzczIwc2VsJGluY29tZSA8LSBhcy5udW1lcmljKGVzczIwc2VsJGhpbmN0bnRhKSANCnRhYmxlKGVzczIwc2VsJGluY29tZSwgdXNlTkEgPSAiYWx3YXlzIikgIzE1MiBtaXNzaW5ncyBvbiBpbmNvbWUuDQptZWFuKGVzczIwc2VsJGluY29tZSwgbmEucm09VCkNCmVzczIwc2VsJGluY29tZVtpcy5uYShlc3MyMHNlbCRpbmNvbWUpXSA8LSA2LjQ1NQ0KZXNzMjBzZWwkaW5jb21lX3F1YXJ0IDwtIHdpdGgoZXNzMjBzZWwsIGN1dChpbmNvbWUsIA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBicmVha3M9cXVhbnRpbGUoaW5jb21lLCBwcm9icz1zZXEoMCwxLCBieT0wLjI1KSwgbmEucm09VFJVRSksIA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbmNsdWRlLmxvd2VzdD1UUlVFKSkNCmVzczIwc2VsJGluY29tZV9xdWFydCA8LSBhcy5udW1lcmljKGVzczIwc2VsJGluY29tZV9xdWFydCkNCg0KZXNzMjBzZWwkYWdlIDwtIGFzLm51bWVyaWMoYXMuY2hhcmFjdGVyKGVzczIwc2VsJGFnZWEpKQ0KdGFibGUoZXNzMjBzZWwkbWFyc3RzLCB1c2VOQSA9ICJhbHdheXMiKSAgICAgICAgICAgICAgICAgICAgDQplc3MyMHNlbCRtYXJzdHMgPC0gYXMubnVtZXJpYyhlc3MyMHNlbCRtYXJzdHMpDQplc3MyMHNlbCRtYXJzdGF0W2VzczIwc2VsJG1hcnN0cyA8PSAyXSA8LSAxICNMaXZpbmcgdG9nZXRoZXINCmVzczIwc2VsJG1hcnN0YXRbZXNzMjBzZWwkbWFyc3RzID4gMl0gPC0gMiAjTm90IGxpdmluZyB0b2dldGhlcg0KZXNzMjBzZWwkbWFyc3RhdFtpcy5uYShlc3MyMHNlbCRtYXJzdHMpXSA8LSAzICM3MzIgbWlzc2luZ3Mgb24gdGhpcyB2YXJpYWJsZS4uLg0KZXNzMjBzZWwkbWFyc3RhdCA8LSBhcy5mYWN0b3IoZXNzMjBzZWwkbWFyc3RhdCkNCg0KIyBNaXNzaW5ncw0KbGFwcGx5KGVzczIwc2VsLCB0YWJsZSwgdXNlTkEgPSAiYWx3YXlzIikNCg0KbWlzX3ZhcnMgPC0gYygibHJzY2FsZSIsICJhZ2UiKSANCg0KZm9yICh2YXIgaW4gbWlzX3ZhcnMpIHsNCiAgZXNzMjBzZWxbaXMubmEoZXNzMjBzZWxbLHZhcl0pLCB2YXJdIDwtIG1lYW4oZXNzMjBzZWxbLHZhcl0sIG5hLnJtID0gVFJVRSkNCn0NCg0Kc2F2ZShlc3MyMHNlbCwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9hbGxfd2F2ZXMvZXNzMjBzZWwuUmRhdGEiKQ0KbG9hZCgiL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9hbGxfd2F2ZXMvZXNzMjBzZWwuUmRhdGEiKQ0KDQojTWVyZ2UgZGF0YSAyMDE2IGFuZCAyMDIwDQpsb2FkKCIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9lc3MxNnNlbC5SZGF0YSIpDQoNCiNTZWxlY3QgdGhlIHZhcmlhYmxlcyB0aGF0IEkgd2FudCB0byBrZWVwDQplc3MxNnNlbCA8LSBlc3MxNnNlbCAlPiUgc2VsZWN0KG5hbWUsIGVzc3JvdW5kLCBwcm9kZGF0ZSwgaWRubywgd29ycnksIGNhdXNlLCBwZXJzX3Jlc3AsIHNleCwgZWR1eXJzLCBpc2NlZCx1cmJhbiwgY2hfYXR0ZW5kLCBpbmNvbWUsIGluY29tZV9xdWFydCwgeXJicm4sIGxyc2NhbGUsIGFnZSwgbWFyc3RhdCwgYnJuY250ciwgd2VpZ2h0dmVjKQ0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICANCmVzczIwc2VsIDwtIGVzczIwc2VsICU+JSBzZWxlY3QobmFtZSwgZXNzcm91bmQsIHByb2RkYXRlLCBpZG5vLCB3b3JyeSwgY2F1c2UsIHBlcnNfcmVzcCwgc2V4LCBlZHV5cnMsIGlzY2VkLHVyYmFuLCBjaF9hdHRlbmQsIGluY29tZSwgaW5jb21lX3F1YXJ0LCB5cmJybiwgbHJzY2FsZSwgYWdlLCBtYXJzdGF0LCBicm5jbnRyLCB3ZWlnaHR2ZWMpDQoNCiNGaXJzdCBjaGVjayB3aGV0aGVyIHRoZSBsZXZlbHMvYXR0cmlidXRlcyBvZiB2YXJpYWJsZXMgYXJlIHRoZSBzYW1lDQphdHRyaWJ1dGVzKGVzczE2c2VsJHdvcnJ5KQ0KYXR0cmlidXRlcyhlc3MyMHNlbCR3b3JyeSkgDQojIEFsc28gZGlkIHRoaXMgZm9yIHRoZSBvdGhlciB2YXJpYWJsZXMsIHRoZXkncmUgdGhlIHNhbWUgc28gSSBjYW4gbWVyZ2UNCg0KZXNzdG90YWwgPC0gZHBseXI6OmJpbmRfcm93cyhlc3MxNnNlbCwgZXNzMjBzZWwpDQoNCmVzc3RvdGFsJHN1cnZleXllYXJbZXNzdG90YWwkZXNzcm91bmQ9PThdIDwtIDIwMTYNCmVzc3RvdGFsJHN1cnZleXllYXJbZXNzdG90YWwkZXNzcm91bmQ9PTEwXSA8LSAyMDIwDQplc3N0b3RhbCRzdXJ2ZXl5ZWFyIDwtIGFzLm51bWVyaWMoZXNzdG90YWwkc3VydmV5eWVhcikNCnRhYmxlKGVzc3RvdGFsJHN1cnZleXllYXIsIHVzZU5BID0gImFsd2F5cyIpDQplc3N0b3RhbCRzZXggPC0gZXNzdG90YWwkc2V4IC0gMQ0KdGFibGUoZXNzdG90YWwkc2V4KQ0Kc2F2ZShlc3N0b3RhbCwgZmlsZT0iLi9kYXRhL2ZpbmFsX2RhdGEvZXNzdG90YWwuUmRhdGEiKQ0KDQojIE9uZSB0aW1lIGl0IGRpZCBub3QgY29ycmVjdGx5IGFwcGx5IGVzc3RvdGFsDQojZXNzdG90YWwkdXJiYW4gPC0gYXMuZmFjdG9yKGVzc3RvdGFsJHVyYmFuKQ0KI2Vzc3RvdGFsJHVyYmFuIDwtIHJldmFsdWUoZXNzdG90YWwkdXJiYW4sIGMoIjEiPSJMb3cgdXJiYW5pdHkiLCAiMiI9Ik1lZGl1bSB1cmJhbml0eSIsICIzIj0iSGlnaCB1cmJhbml0eSIpKQ0KI2Vzc3RvdGFsJHVyYmFuIDwtIGZhY3Rvcihlc3N0b3RhbCR1cmJhbiwgbGV2ZWxzPWMoIkxvdyB1cmJhbml0eSIsICJNZWRpdW0gdXJiYW5pdHkiLCAiSGlnaCB1cmJhbml0eSIpLCBvcmRlcmVkPVRSVUUpDQoNCmBgYA0KDQojIyBJbnRlcm5hdGlvbmFsIFNvY2lhbCBTdXJ2ZXkgUHJvZ3JhbSB7LX0NCmBgYHtyfQ0KaXNzcDE5OTMgPC0gZm9yZWlnbjo6cmVhZC5zcHNzKCIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2dlc2lzX2Rpci9pc3NwL0lTU1AxOTkzLnNhdiIsIHVzZS52YWx1ZS5sYWJlbHMgPSBULCAgdG8uZGF0YS5mcmFtZSA9IFQpDQoNCmlzc3A5M3NlbCA8LSBpc3NwMTk5MyAlPiUgZmlsdGVyKFYzPT0iTmV0aGVybGFuZHMgLSBOTCIpICAlPiUNCiAgICAgICAgICAgIHNlbGVjdChWMSwgVjIsIFYxMywgVjE0LCBWMTcsIFYxOSwgVjI0LCBWMjUsIFYyNiwgVjI3LCBWMjgsIFY1NCwgVjU1LCBWMjAwLCBWMjAxLCBWMjAyLCBWMjA0LCBWMjA1LCBWMjgxLCBWMjUzLCBWMjY4LCBWMjc3LCBWMzUyLCBWNDExKQ0KDQphdHRyaWJ1dGVzKGlzc3A5M3NlbCRWMTMpICNIaWdoZXIgc2NvcmUgbWVhbnMgbW9yZSBwb3NpdGl2ZSAodGhlbiB5b3UgdGhpbmsgd2UgZG9uJ3Qgd29ycnkgdG9vIG11Y2gpDQppc3NwOTNzZWwkd29ycnkgPC0gYXMubnVtZXJpYyhpc3NwOTNzZWwkVjEzKQ0KYXR0cmlidXRlcyhpc3NwOTNzZWwkVjE0KSAjSGlnaGVyIHNjb3JlIG1lYW5zIHRoYXQgeW91IGRvbid0IHRoaW5rIHRoYXQgZXZlcnl0aGluZyBpbiBtb2Rlcm4gbGlmZSBoYXJtcyB0aGUgZW52aXJvbm1lbnQuIFNPIEkgd2FudCB0byByZWNvZGUgdGhpcyB2YXJpYWJsZQ0KYXR0cmlidXRlcyhpc3NwOTNzZWwkVjI0KSAjV2lsbGluZyB0byBwYXkgaGlnaGVyIHByaWNlcyBpbiBvcmRlciB0byBwcm90ZWN0IGVudmlyb25tZW50LiBWZXJ5IHVud2lsbGluZyBpcyBuZWdhdGl2ZSBzbyBJIHJlY29kZSB0aGlzIHZhci4gVGhlbiBhIGhpZ2hlciBzY29yZSBtZWFucyB2ZXJ5IHdpbGxpbmcuIFNhbWUgYXBwbGllcyBmb3IgdjI1IGFuZCB2MjYuIA0KYXR0cmlidXRlcyhpc3NwOTNzZWwkVjI4KSAjIEkgZG8gd2hhdCBpcyByaWdodCBmb3IgdGhlIGVudmlyb25tZW50LCBldmVuIGlmIGl0IGNvc3RzIGEgbGl0dGxlIGJpdCBleHRyYSB0aW1lLiBTdHJvbmdseSBhZ3JlZSBpcyBtb3JlIHBvc2l0aXZlIGF0dGl0dWRlLCBzbyByZWNvZGUuIA0KaXNzcDkzc2VsJGxpZmVoYXJtIDwtIGFzLm51bWVyaWMoaXNzcDkzc2VsJFYxNCkNCmlzc3A5M3NlbCR3aWxsaW5nX3ByaWNlIDwtIGFzLm51bWVyaWMoaXNzcDkzc2VsJFYyNCkNCmlzc3A5M3NlbCR3aWxsaW5nX3RheCA8LSBhcy5udW1lcmljKGlzc3A5M3NlbCRWMjUpDQppc3NwOTNzZWwkd2lsbGluZ19saXZpbmcgPC0gYXMubnVtZXJpYyhpc3NwOTNzZWwkVjI2KQ0KaXNzcDkzc2VsJGRvX3JpZ2h0IDwtIGFzLm51bWVyaWMoaXNzcDkzc2VsJFYyOCkNCg0KaXNzcDkzc2VsIDwtIGlzc3A5M3NlbCAlPiUgDQogICAgIG11dGF0ZV9hdChjKCJsaWZlaGFybSIsICJ3aWxsaW5nX3ByaWNlIiwgIndpbGxpbmdfdGF4IiwgIndpbGxpbmdfbGl2aW5nIiwgImRvX3JpZ2h0IiksIGZ1bnMocmVjb2RlKC4sIGAxYCA9IDUsIGAyYCA9IDQsIGAzYCA9IDMsIGA0YCA9IDIsIGA1YD0gMSkpKQ0KDQphdHRyaWJ1dGVzKGlzc3A5M3NlbCRWMTcpICNIaWdoZXIgc2NvcmUgbWVhbnMgdGhhdCB5b3UgZG9uJ3QgdGhpbmsgd2Ugd29ycnkgdG9vIG11Y2ggYWJvdXQgaHVtYW4gcHJvZ3Jlc3MgaGFybWluZyB0aGUgZW52aXJvbm1lbnQuIEEgbG93IHNjb3JlIG1lYW5zIHlvdSB0aGluayB3ZSB3b3JyeSB0b28gbXVjaCwgc28gdGhhdCByZXByZXNlbnRzIG1vcmUgbmVnYXRpdmUgYXR0aXR1ZGVzLiBObyByZWNvZGluZy4NCmlzc3A5M3NlbCRwcm9naGFybSA8LSBhcy5udW1lcmljKGlzc3A5M3NlbCRWMTcpDQphdHRyaWJ1dGVzKGlzc3A5M3NlbCRWMTkpICNEaWZmaWN1bHQgb25lLiAiSW4gb3JkZXIgdG8gcHJvdGVjdCB0aGUgZW52aXJvbm1lbnQsIHdlIG5lZWQgZWNvbm9taWMgZ3Jvd3RoIi4gQSBoaWdoZXIgc2NvcmUgZG9lcyBub3QgbmVjZXNzYXJpbHkgbWVhbiB3b3JzZSBvciBiZXR0ZXIgYXR0aXR1ZGVzLiBTbyBJIGxlYXZlIHRoaXMgb25lIGFzIGl0IGlzLiANCmlzc3A5M3NlbCRlY29ucHJvdGVjdCA8LSBhcy5udW1lcmljKGlzc3A5M3NlbCRWMTkpDQphdHRyaWJ1dGVzKGlzc3A5M3NlbCRWMjcpICNUb28gZGlmZmljdWx0IGZvciBzb21lb25lIGxpa2UgbWUgdG8gZG8gc3RoIGFib3V0IHRoZSBlbnZpcm9ubWVudC4gVGhpcyBhbHNvIGEgZGlmZmljdWx0IG9uZS4gSWYgeW91IGFyZSB3b3JyaWVkIGJ1dCBwZXNzaW1pc3RpYywgeW91IG1heSBiZWxpZXZlIHRoYXQgeW91IGNhbid0IHNvbHZlIGl0IG9uIHlvdXIgb3duLiBJZiB5b3UgdGhlbiBzdHJvbmdseSBhZ3JlZSwgaXQgbWVhbnMgeW91IGRvIGNhcmUgYWJvdXQgdGhlIGVudmlyb25tZW50LiBIb3dldmVyLCBpdCBjYW4gYWxzbyBiZSBpbnRlcnByZXRlZCBhcyBzdGggb2YgYW4gZXhjdXNlLCB5b3UgZG9uJ3QgaGF2ZSB0byBkbyBhbnl0aGluZyBiYyBhcyBhbiBpbmRpdmlkdWFsIHlvdSBjYW4ndCBkbyBtdWNoIGFueXdheS4gSSB3aWxsIGludGVycHJldCBpdCBhcyB0aGUgbGFzdCBvbmU7IFN0cm9uZ2x5IGRpc2FncmVlIG1lYW5zIHlvdSdyZSBvcHRpbWlzdGljIGFuZCBtYXliZSBwb3NpdGl2ZSBhYm91dCBjbGltYXRlIGNoYW5nZS4gTm8gcmVjb2RlIG5lY2Vzc2FyeS4gDQppc3NwOTNzZWwkZG9kaWZmIDwtIGFzLm51bWVyaWMoaXNzcDkzc2VsJFYyNykNCmF0dHJpYnV0ZXMoaXNzcDkzc2VsJFY1NCkgI1Njb3JlIDEgbWVhbnMgdGhhdCBvcmRpbmFyeSBwZW9wbGUgc2hvdWxkIGRlY2lkZSBob3cgdG8gdGFja2xlIGVudi4gcHJvYmxlbXMsIHNjb3JlIDIgbWVhbnMgdGhhdCBnb3Zlcm5tZW50IHNob3VsZCBwYXNzIGxhd3MuIA0KaXNzcDkzc2VsJHBlb3BsZV9kZWNpZGUgPC0gYXMubnVtZXJpYyhpc3NwOTNzZWwkVjU0KQ0KaXNzcDkzc2VsJHBlb3BsZV9kZWNpZGUgPC0gKGlzc3A5M3NlbCRwZW9wbGVfZGVjaWRlIC0gMSkgKiAoNC8xKSArIDENCmF0dHJpYnV0ZXMoaXNzcDkzc2VsJFY1NSkgI1NhbWUgYXMgcHJldmlvdXMgb25lLCBidXQgdGhlbiBmb3IgYnVzaW5lc3Nlcy4gSSB0aGluayBmb3IgdGhlc2Ugc3RhdGVtZW50cywgdGhlcmUgaXMgbm90IG9uZSBzaWRlIHRoYXQgZXhwcmVzc2VzIG1vcmUgcG9zaXRpdmUgYXR0aXR1ZGVzLiANCmlzc3A5M3NlbCRidXNfZGVjaWRlIDwtIGFzLm51bWVyaWMoaXNzcDkzc2VsJFY1NSkNCmlzc3A5M3NlbCRidXNfZGVjaWRlIDwtIChpc3NwOTNzZWwkYnVzX2RlY2lkZSAtIDEpICogKDQvMSkgKyAxDQoNCg0KI0luZGVwZW5kZW50IHZhcnMNCnRhYmxlKGlzc3A5M3NlbCRWMjA0KQ0KaXNzcDkzc2VsJFYyMDQgPC0gcmV2YWx1ZShpc3NwOTNzZWwkVjIwNCAsIGMoIk5vIGZvcm1hbCBzY2hvb2xpbmcsIE5BViI9ICIwIiwgIjEgeWVhciI9IjEiLCAiR0I6MTAgb3IgbGVzcyI9IjEwIiwgIkdCOjE0IG9yIG1vcmUiPSIxNCIsICJBVVM6IDIwIG9yIG1vcmUiPSIyMCIsICI0MyB5ZWFycyIgPSAiNDMiLCAiU3RpbGwgc2Nob29sIEo6aGlnaCBzIiA9ICIwIiwgIlN0aWxsIGNvbGxlZ2UsdW5pIiA9ICIwIiwgIk90aGVyIGFuc3dlciIgPSAiMCIpKQ0KaXNzcDkzc2VsJGVkdXlycyA8LSBhcy5udW1lcmljKGFzLmNoYXJhY3Rlcihpc3NwOTNzZWwkVjIwNCkpDQppc3NwOTNzZWwkaXNjZWRbaXNzcDkzc2VsJGVkdXlycyA8PTRdIDwtIDANCmlzc3A5M3NlbCRpc2NlZFtpc3NwOTNzZWwkZWR1eXJzID4gNCAmIGlzc3A5M3NlbCRlZHV5cnMgPD0gNl0gPC0gMQ0KaXNzcDkzc2VsJGlzY2VkW2lzc3A5M3NlbCRlZHV5cnMgPiA2ICYgaXNzcDkzc2VsJGVkdXlycyA8PSAxMF0gPC0gMg0KaXNzcDkzc2VsJGlzY2VkW2lzc3A5M3NlbCRlZHV5cnMgPiAxMCAmIGlzc3A5M3NlbCRlZHV5cnMgPD0gMTNdIDwtIDMNCmlzc3A5M3NlbCRpc2NlZFtpc3NwOTNzZWwkZWR1eXJzID4gMTMgJiBpc3NwOTNzZWwkZWR1eXJzIDw9IDE1XSA8LSA0DQppc3NwOTNzZWwkaXNjZWRbaXNzcDkzc2VsJGVkdXlycyA+IDE1ICYgaXNzcDkzc2VsJGVkdXlycyA8PSAxOF0gPC0gNQ0KaXNzcDkzc2VsJGlzY2VkW2lzc3A5M3NlbCRlZHV5cnMgPiAxOF0gPC0gNg0KdGFibGUoaXNzcDkzc2VsJGlzY2VkLCB1c2VOQSA9ICJhbHdheXMiKQ0KDQp0YWJsZShpc3NwOTNzZWwkVjIwMCwgdXNlTkEgPSAiYWx3YXlzIikNCmlzc3A5M3NlbCRzZXggPC0gcmV2YWx1ZShpc3NwOTNzZWwkVjIwMCwgYygiTWFsZSI9IjEiLCAiRmVtYWxlIj0iMiIpKQ0KdGFibGUoaXNzcDkzc2VsJGxyc2NhbGUsIHVzZU5BID0gImFsd2F5cyIpDQppc3NwOTNzZWwkbHJzY2FsZSA8LSBhcy5udW1lcmljKGlzc3A5M3NlbCRWMjgxKQ0KaXNzcDkzc2VsJGxyc2NhbGUgPC0gKGlzc3A5M3NlbCRscnNjYWxlIC0gMSkgKiAoOS80KSArIDENCmlzc3A5M3NlbCRscnNjYWxlW2lzc3A5M3NlbCRscnNjYWxlPT0xMi4yNSB8IGlzc3A5M3NlbCRscnNjYWxlID09MTQuNV0gPC0gMTENCg0KdGFibGUoaXNzcDkzc2VsJHVyYmFuLCB1c2VOQSA9ICJhbHdheXMiKQ0KaXNzcDkzc2VsJHVyYmFuIDwtIHJldmFsdWUoaXNzcDkzc2VsJFYzNTIsIGMoIlJ1cmFsIj0gIkxvdyB1cmJhbml0eSIsICJTdWJ1cmJzLCBjaXR5LXRvd24iPSJNZWRpdW0gdXJiYW5pdHkiLCAiVXJiYW4iPSJIaWdoIHVyYmFuaXR5IikpDQppc3NwOTNzZWwkdXJiYW4gPC0gZmFjdG9yKGlzc3A5M3NlbCR1cmJhbiwgbGV2ZWxzPWMoIkxvdyB1cmJhbml0eSIsICJNZWRpdW0gdXJiYW5pdHkiLCAiSGlnaCB1cmJhbml0eSIpLCBvcmRlcmVkPVRSVUUpDQp0YWJsZShpc3NwOTNzZWwkVjI3NykNCmlzc3A5M3NlbCRjaF9hdHRlbmQgPC0gYXMubnVtZXJpYyhpc3NwOTNzZWwkVjI3NykNCmlzc3A5M3NlbCA8LSBpc3NwOTNzZWwgJT4lIA0KICAgICBtdXRhdGVfYXQoYygiY2hfYXR0ZW5kIiksIGZ1bnMocmVjb2RlKC4sIGAxYCA9IDYsIGAyYCA9IDUsIGAzYCA9IDQsIGA0YCA9IDMsIGA1YCA9IDIsIGA2YCA9IDEpKSkNCnRhYmxlKGlzc3A5M3NlbCRjaF9hdHRlbmQsIHVzZU5BID0gImFsd2F5cyIpDQp0YWJsZShpc3NwOTNzZWwkVjI2OCwgdXNlTkEgPSAiYWx3YXlzIikNCg0KaXNzcDkzc2VsJGluY29tZSA8LSBhcy5udW1lcmljKGlzc3A5M3NlbCRWMjY4KSAjRmFtaWx5IGluY29tZSBpbiBjYXRlZ29yaWVzIChndWlsZGVycykuIDUyNiBtaXNzaW5ncw0KdGFibGUoaXNzcDkzc2VsJGluY29tZSwgdXNlTkEgPSAiYWx3YXlzIikNCm1lYW4oaXNzcDkzc2VsJGluY29tZSwgbmEucm09VCkgI0luY29tZSBpcyBvcmRpbmFsIGhlcmUsIHdoaWxlIGluIHRoZSBvdGhlciBkYXRhc2V0cyBpdCBpcyBpbnRlcnZhbA0KaXNzcDkzc2VsJGluY29tZVtpcy5uYShpc3NwOTNzZWwkaW5jb21lKV0gPC0gMTIuMDE0DQogDQppc3NwOTNzZWwkaW5jb21lX3F1YXJ0IDwtIHdpdGgoaXNzcDkzc2VsLCBjdXQoaW5jb21lLCANCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYnJlYWtzPXF1YW50aWxlKGluY29tZSwgcHJvYnM9c2VxKDAsMSwgYnk9MC4yNSksIG5hLnJtPVRSVUUpLCANCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW5jbHVkZS5sb3dlc3Q9VFJVRSkpDQppc3NwOTNzZWwkaW5jb21lX3F1YXJ0IDwtIGFzLm51bWVyaWMoaXNzcDkzc2VsJGluY29tZV9xdWFydCkNCg0KdGFibGUoaXNzcDkzc2VsJGFnZSwgdXNlTkEgPSAiYWx3YXlzIikNCmlzc3A5M3NlbCRhZ2UgPC0gYXMubnVtZXJpYyhhcy5jaGFyYWN0ZXIoaXNzcDkzc2VsJFYyMDEpKQ0KaXNzcDkzc2VsJFYyMDIgPC0gYXMubnVtZXJpYyhpc3NwOTNzZWwkVjIwMikNCmlzc3A5M3NlbCRtYXJzdGF0W2lzc3A5M3NlbCRWMjAyIDwgMl0gPC0gMSAjTGl2aW5nIHRvZ2V0aGVyDQppc3NwOTNzZWwkbWFyc3RhdFtpc3NwOTNzZWwkVjIwMiA+PSAyXSA8LSAyICNOb3QgbGl2aW5nIHRvZ2V0aGVyDQoNCg0Kc2F2ZShpc3NwOTNzZWwsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvYWxsX3dhdmVzL2lzc3A5M3NlbC5SZGF0YSIpDQpsb2FkKCIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9pc3NwOTNzZWwuUmRhdGEiKQ0KDQpgYGANCg0KDQpgYGB7cn0NCiNOb3cgMjAwMC4gDQppc3NwMjAwMCA8LSBmb3JlaWduOjpyZWFkLnNwc3MoIi9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvZ2VzaXNfZGlyL2lzc3AvSVNTUDIwMDAuc2F2IiwgdXNlLnZhbHVlLmxhYmVscyA9IFQsICB0by5kYXRhLmZyYW1lID0gVCkNCg0KaXNzcDAwc2VsIDwtIGlzc3AyMDAwICU+JSBmaWx0ZXIoVjM9PSJOTC1OZXRoZXJsYW5kcyIpICAlPiUNCiAgICAgICAgICAgIHNlbGVjdChWMSwgVjIsIFYxMSwgVjEyLCBWMTMsIFYxNCwgVjE2LCBWMTcsIFYxOSwgVjIwLCBWMjEsIFYyMiwgVjIzLCBWNDAsIFY0MSwgVjI0LCBWMjUsIFYyNiwgVjQyLCBWMjAwLCBWMjAxLCBWMjAyLCBWMjA0LCBWMjA1LCBWMjQ2LCBWMjQxLCBWMjQyLCBWMjQzLCBWMjYyLCBWMjc0KQ0KDQoNCiAjRGVwZW5kZW50IHZhcmlhYmxlcw0KaXNzcDAwc2VsJGxpZmVoYXJtIDwtIGFzLm51bWVyaWMoaXNzcDAwc2VsJFYxMikNCmlzc3AwMHNlbCR3aWxsaW5nX3ByaWNlIDwtIGFzLm51bWVyaWMoaXNzcDAwc2VsJFYxOSkNCmlzc3AwMHNlbCR3aWxsaW5nX3RheCA8LSBhcy5udW1lcmljKGlzc3AwMHNlbCRWMjApDQppc3NwMDBzZWwkd2lsbGluZ19saXZpbmcgPC0gYXMubnVtZXJpYyhpc3NwMDBzZWwkVjIxKQ0KaXNzcDAwc2VsJGRvX3JpZ2h0IDwtIGFzLm51bWVyaWMoaXNzcDAwc2VsJFYyMykNCmlzc3AwMHNlbCRncm93aGFybSA8LSBhcy5udW1lcmljKGlzc3AwMHNlbCRWMTYpDQoNCmlzc3AwMHNlbCA8LSBpc3NwMDBzZWwgJT4lIA0KICAgICBtdXRhdGVfYXQoYygibGlmZWhhcm0iLCAid2lsbGluZ19wcmljZSIsICJ3aWxsaW5nX3RheCIsICJ3aWxsaW5nX2xpdmluZyIsICJkb19yaWdodCIsICJncm93aGFybSIpLCBmdW5zKHJlY29kZSguLCBgMWAgPSA1LCBgMmAgPSA0LCBgM2AgPSAzLCBgNGAgPSAyLCBgNWA9IDEpKSkNCg0KaXNzcDAwc2VsJHdvcnJ5IDwtIGFzLm51bWVyaWMoaXNzcDAwc2VsJFYxMSkNCmlzc3AwMHNlbCRwcm9naGFybSA8LSBhcy5udW1lcmljKGlzc3AwMHNlbCRWMTMpDQppc3NwMDBzZWwkZWNvbnByb3RlY3QgPC0gYXMubnVtZXJpYyhpc3NwMDBzZWwkVjE0KQ0KaXNzcDAwc2VsJGRvZGlmZiA8LSBhcy5udW1lcmljKGlzc3AwMHNlbCRWMjIpDQppc3NwMDBzZWwkcGVvcGxlX2RlY2lkZSA8LSBhcy5udW1lcmljKGlzc3AwMHNlbCRWNDApDQppc3NwMDBzZWwkcGVvcGxlX2RlY2lkZSA8LSAoaXNzcDAwc2VsJHBlb3BsZV9kZWNpZGUgLSAxKSAqICg0LzEpICsgMQ0KaXNzcDAwc2VsJGJ1c19kZWNpZGUgPC0gYXMubnVtZXJpYyhpc3NwMDBzZWwkVjQxKQ0KaXNzcDAwc2VsJGJ1c19kZWNpZGUgPC0gKGlzc3AwMHNlbCRidXNfZGVjaWRlIC0gMSkgKiAoNC8xKSArIDENCg0KdGFibGUoaXNzcDAwc2VsJFYyNCwgdXNlTkEgPSAiYWx3YXlzIikgI01vcmUgaW1wb3J0YW50IHRoaW5ncyBpbiBsaWZlIHRoYW4gcHJvdGVjdGluZyB0aGUgZW52aXJvbm1lbnQuIEhpZ2hlciBzY29yZSAoc3Ryb25nbHkgZGlzYWdyZWUpIG1lYW5zIHRoYXQgeW91IGNhcmUgbW9yZSBhYm91dCB0aGUgZW52aXJvbm1lbnQgdGhhbiBzdHJvbmdseSBkaXNhZ3JlZS4gDQppc3NwMDBzZWwkbW9yZWltcCA8LSBhcy5udW1lcmljKGlzc3AwMHNlbCRWMjQpDQp0YWJsZShpc3NwMDBzZWwkVjI1LCB1c2VOQSA9ICJhbHdheXMiKSAjVGhlcmUncyBubyBwb2ludCBpbiBkb2luZyB3aGF0IEkgY2FuIGZvciB0aGUgZW52aXJvbm1lbnQgdW5sZXNzIG90aGVycyBkbyB0aGUgc2FtZS4gSGlnaGVyIHNjb3JlIG1lYW5zIG1vcmUgcG9zaXRpdmUgYXR0aXR1ZGVzLCBhbHRob3VnaCBhZ2FpbiAobGlrZSBtZW50aW9uZWQgYXQgdGhlIG90aGVyIHN0YXRlbWVudCkgeW91IGNhbiBhbHNvIGludGVycHJldCBzdHJvbmdseSBhZ3JlZSBhcyBjYXJpbmcgYWJvdXQgdGhlIGVudmlyb25tZW50IGJ1dCBub3Qga25vd2luZyB3aGF0IHRvIGRvLiANCmlzc3AwMHNlbCRvdGhlcnNhbWUgPC0gYXMubnVtZXJpYyhpc3NwMDBzZWwkVjI1KQ0KdGFibGUoaXNzcDAwc2VsJFYyNiwgdXNlTkEgPSAiYWx3YXlzIikgI01hbnkgb2YgdGhlIGNsYWltcyBleGFnZ2VyYXRlZC4gSGlnaGVyIHNjb3JlIG1lYW5zIHN0cm9uZ2x5IGRpc2FncmVlIHNvIG1vcmUgcG9zaXRpdmUgYXR0aXR1ZGVzLiANCmlzc3AwMHNlbCRleGFnIDwtIGFzLm51bWVyaWMoaXNzcDAwc2VsJFYyNikNCnRhYmxlKGlzc3AwMHNlbCRWNDIsIHVzZU5BID0gImFsd2F5cyIpICNIaWdoZXIgc2NvcmUgbWVhbnMgdGhhdCBnb3Zlcm5tZW50IGlzIGRvaW5nIHRvbyBsaXR0bGUsIHdoaWNoIGV4cHJlc3NlcyB3b3JyeSBhbmQgdGhhdCB3ZSBzaG91bGQgZG8gc3RoLiANCmlzc3AwMHNlbCRjb3VudHJ5X2VmZm9ydCA8LSBhcy5udW1lcmljKGlzc3AwMHNlbCRWNDIpDQoNCiNJbmRlcGVuZGVudCB2YXJzIA0KdGFibGUoaXNzcDAwc2VsJFYyMDQsIHVzZU5BID0gImFsd2F5cyIpDQppc3NwMDBzZWwkVjIwNCA8LSByZXZhbHVlKGlzc3AwMHNlbCRWMjA0ICwgYygiTm8gZm9ybSBzY2hvb2wiPSAiMCIsICJBVVM6IDAgb3IgMSB5ciI9IjAiLCAiTlo6MS04IHlycyI9IjgiLCAiTjo3LTkgeXJzIj0iOSIsICJOWjo5LTExIHlycyI9IjExIiwgIk5aOjEyLTEzIHlycyIgPSAiMTMiLCAiTlo6MTQtMTYgeXJzIiA9ICIxNSIsICJOWjoxNysgeXJzIiA9ICIxNyIsICJPdGhlciBlZHVjLG90aGVyIGFuc3dlciIgPSAiMCIsICJTdGlsbCBhdCBjb2xsZWdlLHVuaSIgPSAiMjAiLCAiU3RpbGwgYXQgc2Nob29sLE46K3VuaSIgPSAiMjAiKSkNCmlzc3AwMHNlbCRlZHV5cnMgPC0gYXMubnVtZXJpYyhhcy5jaGFyYWN0ZXIoaXNzcDAwc2VsJFYyMDQpKQ0KaXNzcDAwc2VsJGlzY2VkW2lzc3AwMHNlbCRlZHV5cnMgPD00XSA8LSAwDQppc3NwMDBzZWwkaXNjZWRbaXNzcDAwc2VsJGVkdXlycyA+IDQgJiBpc3NwMDBzZWwkZWR1eXJzIDw9IDZdIDwtIDENCmlzc3AwMHNlbCRpc2NlZFtpc3NwMDBzZWwkZWR1eXJzID4gNiAmIGlzc3AwMHNlbCRlZHV5cnMgPD0gMTBdIDwtIDINCmlzc3AwMHNlbCRpc2NlZFtpc3NwMDBzZWwkZWR1eXJzID4gMTAgJiBpc3NwMDBzZWwkZWR1eXJzIDw9IDEzXSA8LSAzDQppc3NwMDBzZWwkaXNjZWRbaXNzcDAwc2VsJGVkdXlycyA+IDEzICYgaXNzcDAwc2VsJGVkdXlycyA8PSAxNV0gPC0gNA0KaXNzcDAwc2VsJGlzY2VkW2lzc3AwMHNlbCRlZHV5cnMgPiAxNSAmIGlzc3AwMHNlbCRlZHV5cnMgPD0gMThdIDwtIDUNCmlzc3AwMHNlbCRpc2NlZFtpc3NwMDBzZWwkZWR1eXJzID4gMThdIDwtIDYNCnRhYmxlKGlzc3AwMHNlbCRpc2NlZCwgdXNlTkEgPSAiYWx3YXlzIikNCg0KdGFibGUoaXNzcDAwc2VsJFYyMDAsIHVzZU5BID0gImFsd2F5cyIpDQppc3NwMDBzZWwkc2V4IDwtIHJldmFsdWUoaXNzcDAwc2VsJFYyMDAsIGMoIk1hbGUiPSIxIiwgIkZlbWFsZSI9IjIiKSkNCnRhYmxlKGlzc3AwMHNlbCRscnNjYWxlLCB1c2VOQSA9ICJhbHdheXMiKQ0KaXNzcDAwc2VsJGxyc2NhbGUgPC0gYXMubnVtZXJpYyhpc3NwMDBzZWwkVjI0NikNCmlzc3AwMHNlbCRscnNjYWxlW2lzc3AwMHNlbCRscnNjYWxlPT02IHwgaXNzcDAwc2VsJGxyc2NhbGUgPT03XSA8LSAxMQ0KaXNzcDAwc2VsJGxyc2NhbGUgPC0gKGlzc3AwMHNlbCRscnNjYWxlIC0gMSkgKiAoOS80KSArIDENCmlzc3AwMHNlbCRscnNjYWxlW2lzc3AwMHNlbCRscnNjYWxlPT0yMy41XSA8LSAxMQ0KdGFibGUoaXNzcDAwc2VsJFYyNzQsIHVzZU5BID0gImFsd2F5cyIpDQppc3NwMDBzZWwkdXJiYW4gPC0gcmV2YWx1ZShpc3NwMDBzZWwkVjI3NCwgYygiUnVyYWwsUlA6dG90YWwgcnVyIj0gIkxvdyB1cmJhbml0eSIsICJTdWJ1cmIsY2l0eSx0b3duLGNvdW50eSBzZWF0Ij0iTWVkaXVtIHVyYmFuaXR5IiwgIlVyYmFuLFJQOnRvdGFsIHVyYiI9IkhpZ2ggdXJiYW5pdHkiKSkNCmlzc3AwMHNlbCR1cmJhbiA8LSBmYWN0b3IoaXNzcDAwc2VsJHVyYmFuLCBsZXZlbHM9YygiTG93IHVyYmFuaXR5IiwgIk1lZGl1bSB1cmJhbml0eSIsICJIaWdoIHVyYmFuaXR5IiksIG9yZGVyZWQ9VFJVRSkNCnRhYmxlKGlzc3AwMHNlbCRWMjQzKQ0KaXNzcDAwc2VsJGNoX2F0dGVuZCA8LSBhcy5udW1lcmljKGlzc3AwMHNlbCRWMjQzKQ0KaXNzcDAwc2VsIDwtIGlzc3AwMHNlbCAlPiUgDQogICAgIG11dGF0ZV9hdChjKCJjaF9hdHRlbmQiKSwgZnVucyhyZWNvZGUoLiwgYDFgID0gNiwgYDJgID0gNSwgYDNgID0gNCwgYDRgID0gMywgYDVgID0gMiwgYDZgID0gMSkpKQ0KdGFibGUoaXNzcDAwc2VsJGNoX2F0dGVuZCwgdXNlTkEgPSAiYWx3YXlzIikNCnRhYmxlKGlzc3AwMHNlbCRWMjQxLCB1c2VOQSA9ICJhbHdheXMiKSANCg0KaXNzcDAwc2VsJGluY29tZSA8LSBhcy5udW1lcmljKGFzLmNoYXJhY3Rlcihpc3NwMDBzZWwkVjI0MSkpICNGYW1pbHkgaW5jb21lIGFic29sdXRlIChzbyBkaWZmZXJlbnQgdGhhbiBwcmV2aW91cyB3YXZlKS4gQnV0IHdpdGggdGhlIHNhbWUgbnVtYmVyIG9mIGNhdGVnb3JpZXMgKDE3KSBhcyBwcmV2aW91cyB3YXZlDQp0YWJsZShpc3NwMDBzZWwkaW5jb21lLCB1c2VOQSA9ICJhbHdheXMiKQ0KbWVhbihpc3NwMDBzZWwkaW5jb21lLCBuYS5ybT1UKSANCmlzc3AwMHNlbCRpbmNvbWVbaXMubmEoaXNzcDAwc2VsJGluY29tZSldIDwtIDY1MjAxLjYNCiANCmlzc3AwMHNlbCRpbmNvbWVfcXVhcnQgPC0gd2l0aChpc3NwMDBzZWwsIGN1dChpbmNvbWUsIA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBicmVha3M9cXVhbnRpbGUoaW5jb21lLCBwcm9icz1zZXEoMCwxLCBieT0wLjI1KSwgbmEucm09VFJVRSksIA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbmNsdWRlLmxvd2VzdD1UUlVFKSkNCmlzc3AwMHNlbCRpbmNvbWVfcXVhcnQgPC0gYXMubnVtZXJpYyhpc3NwMDBzZWwkaW5jb21lX3F1YXJ0KQ0KDQp0YWJsZShpc3NwMDBzZWwkVjIwMSwgdXNlTkEgPSAiYWx3YXlzIikNCmlzc3AwMHNlbCRWMjAxIDwtIHJldmFsdWUoaXNzcDAwc2VsJFYyMDEsIGMoIjE2IHllYXJzIj0gIjE2IiwgIkdCOjE4IHlycyBvciBhYm92ZSI9IjE4IikpDQppc3NwMDBzZWwkYWdlIDwtIGFzLm51bWVyaWMoYXMuY2hhcmFjdGVyKGlzc3AwMHNlbCRWMjAxKSkNCnRhYmxlKGlzc3AwMHNlbCRhZ2UsIHVzZU5BID0gImFsd2F5cyIpDQp0YWJsZShpc3NwMDBzZWwkbWFyc3RhdCwgdXNlTkEgPSAiYWx3YXlzIikNCmlzc3AwMHNlbCRWMjAyIDwtIGFzLm51bWVyaWMoaXNzcDAwc2VsJFYyMDIpDQppc3NwMDBzZWwkbWFyc3RhdFtpc3NwMDBzZWwkVjIwMiA8IDJdIDwtIDEgI0xpdmluZyB0b2dldGhlcg0KaXNzcDAwc2VsJG1hcnN0YXRbaXNzcDAwc2VsJFYyMDIgPj0gMl0gPC0gMiAjTm90IGxpdmluZyB0b2dldGhlcg0KDQoNCiNNaXNzaW5ncyAtLS0tLQ0KbGFwcGx5KGlzc3AwMHNlbCwgdGFibGUsIHVzZU5BID0gImFsd2F5cyIpDQoNCm1pc192YXJzIDwtIGMoImxyc2NhbGUiKSANCg0KZm9yICh2YXIgaW4gbWlzX3ZhcnMpIHsNCiAgaXNzcDAwc2VsW2lzLm5hKGlzc3AwMHNlbFssdmFyXSksIHZhcl0gPC0gbWVhbihpc3NwMDBzZWxbLHZhcl0sIG5hLnJtID0gVFJVRSkNCn0NCg0Kc2F2ZShpc3NwMDBzZWwsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvYWxsX3dhdmVzL2lzc3AwMHNlbC5SZGF0YSIpDQpsb2FkKCIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9pc3NwMDBzZWwuUmRhdGEiKQ0KDQoNCiNMYXN0IGRhdGFzZXQgb2YgMjAxMC4gDQppc3NwMjAxMCA8LSBmb3JlaWduOjpyZWFkLnNwc3MoIi9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvZ2VzaXNfZGlyL2lzc3AvSVNTUDIwMTAuc2F2IiwgdXNlLnZhbHVlLmxhYmVscyA9IFQsICB0by5kYXRhLmZyYW1lID0gVCkNCg0KaXNzcDEwc2VsIDwtIGlzc3AyMDEwICU+JSBmaWx0ZXIoY291bnRyeT09Ik5MLU5ldGhlcmxhbmRzIikgJT4lDQogICAgICAgICAgICBzZWxlY3Qoc3R1ZHlubywgdjIzLCB2MjQsIHYyNSwgdjI2LCB2MjcsIHYyOCwgdjI5LCB2MzAsIHYzMSwgdjMyLCB2MzMsIHY0NiwgdjQ3LCB2MzQsIHYzNSwgdjM2LCB2NDgsIFNFWCwgQUdFLCBFRFVDWVJTLCBQQVJUWV9MUiwgTkxfSU5DLCBBVFRFTkQsIFVSQlJVUkFMLCBNQVJJVEFMKQ0KDQojRGVwZW5kZW50IHZhcmlhYmxlcyANCmlzc3AxMHNlbCRsaWZlaGFybSA8LSBhcy5udW1lcmljKGlzc3AxMHNlbCR2MjQpDQppc3NwMTBzZWwkd2lsbGluZ19wcmljZSA8LSBhcy5udW1lcmljKGlzc3AxMHNlbCR2MjkpDQppc3NwMTBzZWwkd2lsbGluZ190YXggPC0gYXMubnVtZXJpYyhpc3NwMTBzZWwkdjMwKQ0KaXNzcDEwc2VsJHdpbGxpbmdfbGl2aW5nIDwtIGFzLm51bWVyaWMoaXNzcDEwc2VsJHYzMSkNCmlzc3AxMHNlbCRkb19yaWdodCA8LSBhcy5udW1lcmljKGlzc3AxMHNlbCR2MzMpDQppc3NwMTBzZWwkZ3Jvd2hhcm0gPC0gYXMubnVtZXJpYyhpc3NwMTBzZWwkdjI3KQ0KDQppc3NwMTBzZWwgPC0gaXNzcDEwc2VsICU+JSANCiAgICAgbXV0YXRlX2F0KGMoImxpZmVoYXJtIiwgIndpbGxpbmdfcHJpY2UiLCAid2lsbGluZ190YXgiLCAid2lsbGluZ19saXZpbmciLCAiZG9fcmlnaHQiLCAiZ3Jvd2hhcm0iKSwgZnVucyhyZWNvZGUoLiwgYDFgID0gNSwgYDJgID0gNCwgYDNgID0gMywgYDRgID0gMiwgYDVgPSAxKSkpDQoNCmlzc3AxMHNlbCR3b3JyeSA8LSBhcy5udW1lcmljKGlzc3AxMHNlbCR2MjMpDQppc3NwMTBzZWwkcHJvZ2hhcm0gPC0gYXMubnVtZXJpYyhpc3NwMTBzZWwkdjI1KQ0KaXNzcDEwc2VsJGVjb25wcm90ZWN0IDwtIGFzLm51bWVyaWMoaXNzcDEwc2VsJHYyNikNCmlzc3AxMHNlbCRkb2RpZmYgPC0gYXMubnVtZXJpYyhpc3NwMTBzZWwkdjMyKQ0KaXNzcDEwc2VsJHBlb3BsZV9kZWNpZGUgPC0gYXMubnVtZXJpYyhpc3NwMTBzZWwkdjQ2KQ0KaXNzcDEwc2VsJHBlb3BsZV9kZWNpZGUgPC0gKGlzc3AxMHNlbCRwZW9wbGVfZGVjaWRlIC0gMSkgKiAoNC8xKSArIDENCmlzc3AxMHNlbCRidXNfZGVjaWRlIDwtIGFzLm51bWVyaWMoaXNzcDEwc2VsJHY0NykNCmlzc3AxMHNlbCRidXNfZGVjaWRlIDwtIChpc3NwMTBzZWwkYnVzX2RlY2lkZSAtIDEpICogKDQvMSkgKyAxDQppc3NwMTBzZWwkbW9yZWltcCA8LSBhcy5udW1lcmljKGlzc3AxMHNlbCR2MzQpDQppc3NwMTBzZWwkb3RoZXJzYW1lIDwtIGFzLm51bWVyaWMoaXNzcDEwc2VsJHYzNSkNCmlzc3AxMHNlbCRleGFnIDwtIGFzLm51bWVyaWMoaXNzcDEwc2VsJHYzNikNCmlzc3AxMHNlbCRjb3VudHJ5X2VmZm9ydCA8LSBhcy5udW1lcmljKGlzc3AxMHNlbCR2NDgpDQoNCg0KI0luZGVwZW5kZW50IHZhcnMNCnRhYmxlKGlzc3AxMHNlbCRFRFVDWVJTLCB1c2VOQSA9ICJhbHdheXMiKQ0KaXNzcDEwc2VsJEVEVUNZUlMgPC0gcmV2YWx1ZShpc3NwMTBzZWwkRURVQ1lSUyAsIGMoIk5vIGZvcm1hbCBzY2hvb2xpbmcsIG5vIHllYXJzIGF0IHNjaG9vbCI9ICIwIiwgIjggeWVhcnMsIE5aOiBwcmltYXJ5Ij0iOCIsICIxMSB5ZWFycywgTlo6IHNlY29uZGFyeSBzY2hvb2wgbGVzcyB0aGFuIDMgeWVhcnMiPSIxMSIsICIxMyB5ZWFycywgTlo6IHNlY29uZGFyeSBzY2hvb2wgbW9yZSBoYW4gNCB5ZWFycyI9IjEzIiwgIjE2IHllYXJzLCBOWjogdW5pdmVyc2l0eSBsZXNzIHRoYW4gMyB5ZWFycyI9IjE2IiwgIjE4IHllYXJzLCBOWjogdW5pdmVyc2l0eSBtb3JlIHRoYW4gNCB5ZWFycyIgPSAiMTgiLCAiU3RpbGwgYXQgY29sbGVnZSwgdW5pdmVyc2l0eSwgaW4gdm9jYXRpb25hbCB0cmFpbmluZyIgPSAiMjAiKSkNCmlzc3AxMHNlbCRlZHV5cnMgPC0gYXMubnVtZXJpYyhhcy5jaGFyYWN0ZXIoaXNzcDEwc2VsJEVEVUNZUlMpKSAjMTcwIG1pc3NpbmdzIG9uIGVkdWNhdGlvbg0KbWVhbihpc3NwMTBzZWwkZWR1eXJzLCBuYS5ybSA9IFQpDQppc3NwMTBzZWwkZWR1eXJzW2lzLm5hKGlzc3AxMHNlbCRlZHV5cnMpXSA8LSAxMy42OTQNCmlzc3AxMHNlbCRpc2NlZFtpc3NwMTBzZWwkZWR1eXJzIDw9NF0gPC0gMA0KaXNzcDEwc2VsJGlzY2VkW2lzc3AxMHNlbCRlZHV5cnMgPiA0ICYgaXNzcDEwc2VsJGVkdXlycyA8PSA2XSA8LSAxDQppc3NwMTBzZWwkaXNjZWRbaXNzcDEwc2VsJGVkdXlycyA+IDYgJiBpc3NwMTBzZWwkZWR1eXJzIDw9IDEwXSA8LSAyDQppc3NwMTBzZWwkaXNjZWRbaXNzcDEwc2VsJGVkdXlycyA+IDEwICYgaXNzcDEwc2VsJGVkdXlycyA8PSAxM10gPC0gMw0KaXNzcDEwc2VsJGlzY2VkW2lzc3AxMHNlbCRlZHV5cnMgPiAxMyAmIGlzc3AxMHNlbCRlZHV5cnMgPD0gMTVdIDwtIDQNCmlzc3AxMHNlbCRpc2NlZFtpc3NwMTBzZWwkZWR1eXJzID4gMTUgJiBpc3NwMTBzZWwkZWR1eXJzIDw9IDE4XSA8LSA1DQppc3NwMTBzZWwkaXNjZWRbaXNzcDEwc2VsJGVkdXlycyA+IDE4XSA8LSA2DQp0YWJsZShpc3NwMTBzZWwkaXNjZWQsIHVzZU5BID0gImFsd2F5cyIpDQp0YWJsZShpc3NwMTBzZWwkU0VYLCB1c2VOQSA9ICJhbHdheXMiKQ0KaXNzcDEwc2VsJHNleCA8LSByZXZhbHVlKGlzc3AxMHNlbCRTRVgsIGMoIk1hbGUiPSIxIiwgIkZlbWFsZSI9IjIiKSkNCnRhYmxlKGlzc3AxMHNlbCRscnNjYWxlLCB1c2VOQSA9ICJhbHdheXMiKQ0KaXNzcDEwc2VsJGxyc2NhbGUgPC0gYXMubnVtZXJpYyhpc3NwMTBzZWwkUEFSVFlfTFIpDQoNCmlzc3AxMHNlbCRscnNjYWxlIDwtIChpc3NwMTBzZWwkbHJzY2FsZSAtIDEpICogKDkvNCkgKyAxDQppc3NwMTBzZWwkbHJzY2FsZVtpc3NwMTBzZWwkbHJzY2FsZT09MTIuMjVdIDwtIDExDQp0YWJsZShpc3NwMTBzZWwkVVJCUlVSQUwsIHVzZU5BID0gImFsd2F5cyIpICMyNCBtaXNzaW5ncyANCmlzc3AxMHNlbCR1cmJhbiA8LSByZXZhbHVlKGlzc3AxMHNlbCRVUkJSVVJBTCwgYygiQSBmYXJtIG9yIGhvbWUgaW4gdGhlIGNvdW50cnkiPSAiTG93IHVyYmFuaXR5IiwiQSBjb3VudHJ5IHZpbGxhZ2UiID0gIkxvdyB1cmJhbml0eSIsICAiQSB0b3duIG9yIGEgc21hbGwgY2l0eSI9Ik1lZGl1bSB1cmJhbml0eSIsICJUaGUgc3VidXJicyBvciBvdXRza2lydHMgb2YgYSBiaWcgY2l0eSIgPSAiSGlnaCB1cmJhbml0eSIsICJBIGJpZyBjaXR5Ij0iSGlnaCB1cmJhbml0eSIpKQ0KaXNzcDEwc2VsJHVyYmFuIDwtIGZhY3Rvcihpc3NwMTBzZWwkdXJiYW4sIGxldmVscz1jKCJMb3cgdXJiYW5pdHkiLCAiTWVkaXVtIHVyYmFuaXR5IiwgIkhpZ2ggdXJiYW5pdHkiKSwgb3JkZXJlZD1UUlVFKQ0KdGFibGUoaXNzcDAwc2VsJFYyNDMpICNTZWUgaG93IEkgY2FuIHJlY29kZSB0aGVtIHRvIGJlIHRoZSBzYW1lIGFzIGluIHByZXZpb3VzIHdhdmVzDQppc3NwMTBzZWwkY2hfYXR0ZW5kIDwtIGFzLm51bWVyaWMoaXNzcDEwc2VsJEFUVEVORCkNCmlzc3AxMHNlbCA8LSBpc3NwMTBzZWwgJT4lIA0KICAgICBtdXRhdGVfYXQoYygiY2hfYXR0ZW5kIiksIGZ1bnMocmVjb2RlKC4sIGAxYCA9IDYsIGAyYCA9IDYsIGAzYCA9IDUsIGA0YCA9IDQsIGA1YCA9IDMsIGA2YCA9IDIsIGA3YCA9IDIsIGA4YD0gMSkpKQ0KdGFibGUoaXNzcDEwc2VsJGNoX2F0dGVuZCwgdXNlTkEgPSAiYWx3YXlzIikNCmlzc3AxMHNlbCRpbmNvbWUgPC0gYXMubnVtZXJpYyhpc3NwMTBzZWwkTkxfSU5DKQ0KdGFibGUoaXNzcDEwc2VsJGluY29tZSwgdXNlTkEgPSAiYWx3YXlzIikNCm1lYW4oaXNzcDEwc2VsJGluY29tZSwgbmEucm09VCkgDQppc3NwMTBzZWwkaW5jb21lW2lzLm5hKGlzc3AxMHNlbCRpbmNvbWUpXSA8LSA4LjQ2MQ0KIA0KaXNzcDEwc2VsJGluY29tZV9xdWFydCA8LSB3aXRoKGlzc3AxMHNlbCwgY3V0KGluY29tZSwgDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJyZWFrcz1xdWFudGlsZShpbmNvbWUsIHByb2JzPXNlcSgwLDEsIGJ5PTAuMjUpLCBuYS5ybT1UUlVFKSwgDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGluY2x1ZGUubG93ZXN0PVRSVUUpKQ0KaXNzcDEwc2VsJGluY29tZV9xdWFydCA8LSBhcy5udW1lcmljKGlzc3AxMHNlbCRpbmNvbWVfcXVhcnQpDQoNCnRhYmxlKGlzc3AxMHNlbCRBR0UsIHVzZU5BID0gImFsd2F5cyIpDQppc3NwMTBzZWwkYWdlIDwtIGFzLm51bWVyaWMoYXMuY2hhcmFjdGVyKGlzc3AxMHNlbCRBR0UpKQ0KdGFibGUoaXNzcDEwc2VsJGFnZSwgdXNlTkEgPSAiYWx3YXlzIikNCg0KaXNzcDEwc2VsJE1BUklUQUwgPC0gYXMubnVtZXJpYyhpc3NwMTBzZWwkTUFSSVRBTCkNCmlzc3AxMHNlbCRtYXJzdGF0W2lzc3AxMHNlbCRNQVJJVEFMIDwgMl0gPC0gMSAjTGl2aW5nIHRvZ2V0aGVyDQppc3NwMTBzZWwkbWFyc3RhdFtpc3NwMTBzZWwkTUFSSVRBTCA+PSAyXSA8LSAyICNOb3QgbGl2aW5nIHRvZ2V0aGVyDQoNCnNhdmUoaXNzcDEwc2VsLCBmaWxlPSIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9pc3NwMTBzZWwuUmRhdGEiKQ0KDQojTWlzc2luZ3MgbGF0ZXIgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KbGFwcGx5KGlzc3AxMHNlbCwgdGFibGUsIHVzZU5BID0gImFsd2F5cyIpDQoNCm1pc192YXJzIDwtIGMoImxyc2NhbGUiKSANCg0KZm9yICh2YXIgaW4gbWlzX3ZhcnMpIHsNCiAgaXNzcDEwc2VsW2lzLm5hKGlzc3AxMHNlbFssdmFyXSksIHZhcl0gPC0gbWVhbihpc3NwMTBzZWxbLHZhcl0sIG5hLnJtID0gVFJVRSkNCn0NCg0Kc2F2ZShpc3NwMTBzZWwsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvYWxsX3dhdmVzL2lzc3AxMHNlbC5SZGF0YSIpDQoNCmBgYA0KDQpgYGB7cn0NCiNOb3cgSSBoYXZlIHRvIG1ha2Ugb25lIGRhdGFmaWxlIG9mIHRoZXNlIHRocmVlIGRhdGFzZXRzLiANCmxvYWQoIi9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvYWxsX3dhdmVzL2lzc3A5M3NlbC5SZGF0YSIpDQpsb2FkKCIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9pc3NwMDBzZWwuUmRhdGEiKQ0KbG9hZCgiL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9hbGxfd2F2ZXMvaXNzcDEwc2VsLlJkYXRhIikNCg0KaXNzcDkzc2VsIDwtIGlzc3A5M3NlbCAlPiUgc2VsZWN0KFYxLCB3b3JyeSwgbGlmZWhhcm0sIHdpbGxpbmdfcHJpY2UsIHdpbGxpbmdfdGF4LCB3aWxsaW5nX2xpdmluZywgZG9fcmlnaHQsIHByb2doYXJtLCBlY29ucHJvdGVjdCwgcGVvcGxlX2RlY2lkZSwgYnVzX2RlY2lkZSwgZWR1eXJzLCBpc2NlZCwgc2V4LCBscnNjYWxlLCB1cmJhbiwgY2hfYXR0ZW5kLCBpbmNvbWUsIGluY29tZV9xdWFydCwgYWdlLCBtYXJzdGF0LCB3ZWlnaHR2ZWMpDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQppc3NwMDBzZWwgPC0gaXNzcDAwc2VsICU+JSBzZWxlY3QoVjEsIHdvcnJ5LCBsaWZlaGFybSwgd2lsbGluZ19wcmljZSwgd2lsbGluZ190YXgsIHdpbGxpbmdfbGl2aW5nLCBkb19yaWdodCwgcHJvZ2hhcm0sIGVjb25wcm90ZWN0LCBwZW9wbGVfZGVjaWRlLCBidXNfZGVjaWRlLCBleGFnLCBtb3JlaW1wLCBvdGhlcnNhbWUsIGNvdW50cnlfZWZmb3J0LCBncm93aGFybSwgZWR1eXJzLCBpc2NlZCwgc2V4LCBscnNjYWxlLCB1cmJhbiwgY2hfYXR0ZW5kLCBpbmNvbWVfYSwgaW5jb21lLCBpbmNvbWVfcXVhcnQsIGFnZSwgbWFyc3RhdCwgd2VpZ2h0dmVjKQ0KDQppc3NwMTBzZWwgPC0gaXNzcDEwc2VsICU+JSBzZWxlY3Qoc3R1ZHlubywgd29ycnksIGxpZmVoYXJtLCB3aWxsaW5nX3ByaWNlLCB3aWxsaW5nX3RheCwgd2lsbGluZ19saXZpbmcsIGRvX3JpZ2h0LCBwcm9naGFybSwgZWNvbnByb3RlY3QsIHBlb3BsZV9kZWNpZGUsIGJ1c19kZWNpZGUsIGV4YWcsIG1vcmVpbXAsIG90aGVyc2FtZSwgY291bnRyeV9lZmZvcnQsIGdyb3doYXJtLCBlZHV5cnMsIGlzY2VkLCBzZXgsIGxyc2NhbGUsIHVyYmFuLCBjaF9hdHRlbmQsIGluY29tZSwgaW5jb21lX3F1YXJ0LCBOTF9JTkMsIGFnZSwgbWFyc3RhdCwgd2VpZ2h0dmVjKSANCg0KaXNzcDkzc2VsIDwtIGlzc3A5M3NlbCAlPiUgcmVuYW1lKHN0dWR5bm8gPSBWMSkNCmlzc3AwMHNlbCA8LSBpc3NwMDBzZWwgJT4lIHJlbmFtZShzdHVkeW5vID0gVjEpDQoNCiNDaGVjayBhZ2FpbiB3aGV0aGVyIHZhcmlhYmxlcyBoYXZlIHRoZSBzYW1lIGxldmVscyBldGMuIChzaG91bGQgYmUpDQphdHRyaWJ1dGVzKGlzc3A5M3NlbCR3b3JyeSkNCmF0dHJpYnV0ZXMoaXNzcDAwc2VsJHdvcnJ5KQ0KYXR0cmlidXRlcyhpc3NwMTBzZWwkd29ycnkpICNldGMgZXRjIA0KDQojQmluZCByb3dzDQppc3NwdG90YWwgPC0gcGx5cjo6cmJpbmQuZmlsbChpc3NwOTNzZWwsIGlzc3AwMHNlbCwgaXNzcDEwc2VsKQ0KDQp0YWJsZShpc3NwdG90YWwkYnVzX2RlY2lkZSwgdXNlTkEgPSAiYWx3YXlzIikNCg0KaXNzcHRvdGFsJHN1cnZleXllYXJbaXNzcHRvdGFsJHN0dWR5bm89PTI0NTBdIDwtIDE5OTMNCmlzc3B0b3RhbCRzdXJ2ZXl5ZWFyW2lzc3B0b3RhbCRzdHVkeW5vPT0zNDQwXSA8LSAyMDAwDQppc3NwdG90YWwkc3VydmV5eWVhcltpc3NwdG90YWwkc3R1ZHlubz09IkdFU0lTIERhdGEgQXJjaGl2ZSBTdHVkeSBOdW1iZXIgWkE1NTAwIl0gPC0gMjAxMA0KDQojIENoYW5nZSBvcmRlciBvZiB2YXJpYWJsZXMNCmlzc3B0b3RhbCA8LSBpc3NwdG90YWwgJT4lIHNlbGVjdChzdXJ2ZXl5ZWFyLCB3b3JyeTpncm93aGFybSwgaW5jb21lX2EsIHN0dWR5bm8sIE5MX0lOQywgd2VpZ2h0dmVjKQ0KDQp0YWJsZShpc3NwdG90YWwkdXJiYW4sIHVzZU5BID0gImFsd2F5cyIpDQppc3NwdG90YWwkdXJiYW4gPC0gcmV2YWx1ZShpc3NwdG90YWwkdXJiYW4sIGMoIjEiPSAiTG93IHVyYmFuaXR5IiwgIjIiPSJNZWRpdW0gdXJiYW5pdHkiLCAiMyIgPSAiSGlnaCB1cmJhbml0eSIpKQ0KaXNzcHRvdGFsJHVyYmFuIDwtIGZhY3Rvcihpc3NwdG90YWwkdXJiYW4sIGxldmVscz1jKCJMb3cgdXJiYW5pdHkiLCAiTWVkaXVtIHVyYmFuaXR5IiwgIkhpZ2ggdXJiYW5pdHkiKSwgb3JkZXJlZD1UUlVFKQ0KaXNzcHRvdGFsJHNleCA8LSBpc3NwdG90YWwkc2V4IC0gMQ0Kc2F2ZShpc3NwdG90YWwsIGZpbGU9Ii4vZGF0YS9maW5hbF9kYXRhL2lzc3B0b3RhbC5SZGF0YSIpDQpgYGANCg0KIyMgTWVyZ2luZyBhbGwgdGhlIGRhdGEgaW50byBsYXJnZSBkYXRhc2V0cyB7LX0NCmBgYHtyfQ0KIyBGb3IgdGhlIHRocmVlIGRhdGFzZXRzLCBjaGFuZ2UgdGhlIGlzY2VkIGludG8gaXNjZWQgY2F0DQpsb2FkKCIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2ZpbmFsX2RhdGEvZXZzc2VsLlJkYXRhIikNCg0KDQp0YWJsZShldnNzZWwkaXNjZWQpDQpldnNzZWwkaXNjZWRfY2F0W2V2c3NlbCRpc2NlZCA8PTJdIDwtICJCYXNpYyINCmV2c3NlbCRpc2NlZF9jYXRbZXZzc2VsJGlzY2VkID09IDMgfCBldnNzZWwkaXNjZWQgPT0gNF0gPC0gIkludGVybWVkaWF0ZSINCmV2c3NlbCRpc2NlZF9jYXRbZXZzc2VsJGlzY2VkID49NV0gPC0gIkFkdmFuY2VkIg0KZXZzc2VsJGlzY2VkX2NhdCA8LSBmYWN0b3IoZXZzc2VsJGlzY2VkX2NhdCwgbGV2ZWxzPWMoIkJhc2ljIiwgIkludGVybWVkaWF0ZSIsICJBZHZhbmNlZCIpLCBvcmRlcmVkPVRSVUUpDQp0YWJsZShldnNzZWwkaXNjZWRfY2F0KQ0KDQpzYXZlKGV2c3NlbCwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL2V2c3NlbC5SZGF0YSIpDQoNCg0KbG9hZCgiL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL2Vzc3RvdGFsLlJkYXRhIikNCg0KDQp0YWJsZShlc3N0b3RhbCRpc2NlZCkNCmVzc3RvdGFsJGlzY2VkX2NhdFtlc3N0b3RhbCRpc2NlZCA8PTJdIDwtICJCYXNpYyINCmVzc3RvdGFsJGlzY2VkX2NhdFtlc3N0b3RhbCRpc2NlZCA9PSAzIHwgZXNzdG90YWwkaXNjZWQgPT0gNF0gPC0gIkludGVybWVkaWF0ZSINCmVzc3RvdGFsJGlzY2VkX2NhdFtlc3N0b3RhbCRpc2NlZCA+PTVdIDwtICJBZHZhbmNlZCINCmVzc3RvdGFsJGlzY2VkX2NhdCA8LSBmYWN0b3IoZXNzdG90YWwkaXNjZWRfY2F0LCBsZXZlbHM9YygiQmFzaWMiLCAiSW50ZXJtZWRpYXRlIiwgIkFkdmFuY2VkIiksIG9yZGVyZWQ9VFJVRSkNCnRhYmxlKGVzc3RvdGFsJGlzY2VkX2NhdCkNCg0Kc2F2ZShlc3N0b3RhbCwgZmlsZT0iL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL2Vzc3RvdGFsLlJkYXRhIikNCg0KbG9hZCgiL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL2lzc3B0b3RhbC5SZGF0YSIpDQoNCg0KdGFibGUoaXNzcHRvdGFsJGlzY2VkKQ0KaXNzcHRvdGFsJGlzY2VkX2NhdFtpc3NwdG90YWwkaXNjZWQgPD0yXSA8LSAiQmFzaWMiDQppc3NwdG90YWwkaXNjZWRfY2F0W2lzc3B0b3RhbCRpc2NlZCA9PSAzIHwgaXNzcHRvdGFsJGlzY2VkID09IDRdIDwtICJJbnRlcm1lZGlhdGUiDQppc3NwdG90YWwkaXNjZWRfY2F0W2lzc3B0b3RhbCRpc2NlZCA+PTVdIDwtICJBZHZhbmNlZCINCmlzc3B0b3RhbCRpc2NlZF9jYXQgPC0gZmFjdG9yKGlzc3B0b3RhbCRpc2NlZF9jYXQsIGxldmVscz1jKCJCYXNpYyIsICJJbnRlcm1lZGlhdGUiLCAiQWR2YW5jZWQiKSwgb3JkZXJlZD1UUlVFKQ0KdGFibGUoaXNzcHRvdGFsJGlzY2VkX2NhdCkNCg0Kc2F2ZShpc3NwdG90YWwsIGZpbGU9Ii9Vc2Vycy9hbnVzY2hrYS9Eb2N1bWVudHMvY2xpbWF0ZWNoYW5nZS9jbGltYXRlY2hhbmdlL2RhdGEvZmluYWxfZGF0YS9pc3NwdG90YWwuUmRhdGEiKQ0KDQpgYGANCg0K</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("dataprep_EVS_ESS_ISSP.rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

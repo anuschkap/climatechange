@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Anuschka Peelen" />
+
+<meta name="date" content="2023-12-21" />
+
+<title>Blog</title>
+
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="tweaks.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Scripts data preparation
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="dataprep_EB.html">Data preparation Eurobarometer</a>
+    </li>
+    <li>
+      <a href="dataprep_EVS_ESS_ISSP.html">Data preparation EVS, ESS, ISSP</a>
+    </li>
+    <li>
+      <a href="dataprep_I-O.html">Data preparation I&amp;O Research</a>
+    </li>
+    <li>
+      <a href="dataprep_motivaction_LISS_socon.html">Data preparation Motivaction, LISS, Socon</a>
+    </li>
+    <li>
+      <a href="weights.html">Weighing data</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Scripts descriptives and analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="descriptives.html">Descriptives and pooled table</a>
+    </li>
+    <li>
+      <a href="single_regression_gamlss_weigh_new.html">Gamlss regressions weighted</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_weight_gamlss_new.html">Extract coefficients gamlss regressions</a>
+    </li>
+    <li>
+      <a href="regression_to_indep_var_analysis_weight_gamlss_new.html">Extract coefficients independent var model</a>
+    </li>
+    <li>
+      <a href="regression_to_interact_analysis_weight_gamlss_new.html">Extract coefficients interaction model</a>
+    </li>
+    <li>
+      <a href="meta_analysis_gamlss_weigh.html">Meta-analysis weighted gamlss</a>
+    </li>
+    <li>
+      <a href="meta_analysis_indep_var.html">Meta-analysis independent variables</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Appendix
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="single_regression_gw_py_new.html">Gamlss regression shorter time spans</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_wg_waves_new.html">Extract coefficients shorter time spans</a>
+    </li>
+    <li>
+      <a href="meta_analysis_gw_waves.html">Meta-analysis shorter time spans</a>
+    </li>
+    <li>
+      <a></a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/apeelen/climatechange">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Blog</h1>
+<h4 class="author">Anuschka Peelen</h4>
+<h4 class="date">2023-12-21</h4>
+
+</div>
+
+
+<div id="klimaatpolarisatie-is-het-echt-zo-erg"
+class="section level1 unnumbered">
+<h1 class="unnumbered">Klimaatpolarisatie, is het echt zo erg?</h1>
+<p>De nieuwe SIRE-campagne “Verlies elkaar niet als polarisatie dichtbij
+komt” waarschuwt voor de uiteendrijvende werking van verschillende
+politiek beladen thema’s, waaronder het klimaat. Als we de reacties op
+nieuwsartikelen over het klimaat op sociale media mogen geloven, staan
+Nederlanders steeds meer lijnrecht tegenover elkaar in hun opvattingen.
+De “lijmacties” van klimaatactivisten in verschillende landen in Europa
+leidden tot veel onbegrip in de Nederlandse samenleving, net als de
+boerenprotesten. Het lijkt alsof de samenleving uiteenvalt in twee
+groepen, de ene die het klimaat steeds belangrijker vindt, en de andere
+die zich steeds verder afzet tegen klimaatbeleid en -wetenschap. Het
+idee van een toenemende polarisatie is vooral gebaseerd op wat de media
+ons voorschotelen, maar wat is nu het wetenschappelijk bewijs voor
+toenemende polarisatie met betrekking tot klimaathoudingen?</p>
+<p><strong><em>Klimaathoudingen en -polarisatie, wat zijn dat
+precies?</em></strong></p>
+<p>In ons onderzoek hebben we 52 verschillende opvattingen rondom het
+klimaat – gevraagd aan verschillende steekproeven onder de Nederlandse
+bevolking in verschillende jaren – samengevoegd om te kunnen vergelijken
+over de tijd. Het gaat dan om uiteenlopende stellingen, zoals “Het heeft
+geen zin om mijn best te doen voor het klimaat als anderen niet
+hetzelfde doen” of “Hoe ambitieus vindt u het beleid van het Kabinet
+Rutte III om klimaatverandering tegen te gaan?”. In de onderstaande
+figuur zien we hoe de gemiddelde mening voor klimaatzorgen, een van deze
+52 stellingen, verandert over de tijd. Dit hebben we berekend voor elk
+van deze klimaatstellingen.</p>
+<p>Al deze stellingen waren grof onder te verdelen in drie categorieën:
+affectief, gedragsmatig en cognitief. Affectief gaat over gevoelens,
+zoals angst of bezorgdheid. Een voorbeeld van een affectieve stelling is
+“Hoe bezorgd bent u over klimaatverandering?”. Gedragsmatige stellingen
+gaan – zoals de naam doet vermoeden – over gedrag. De stelling “Hoe
+bereid bent u om uw levensstandaard aan te passen om het klimaat te
+beschermen?” is hier een voorbeeld van. Tenslotte gaan cognitieve
+houdingen vooral over overtuigingen, zoals wordt uitgedrukt in de
+stelling: “Veel uitspraken over klimaatverandering zijn overdreven”.</p>
+<p>We interpreteren houdingen als ‘positief’ wanneer mensen bijvoorbeeld
+vinden dat klimaat een probleem is dat serieus genomen moet worden, dat
+we ons gedrag moeten aanpassen, of überhaupt dat klimaatverandering
+bestaat. Polarisatie in deze houdingen treedt op wanneer deze houdingen
+over de tijd verder uit elkaar komen te liggen. In andere woorden: men
+is het steeds minder met elkaar eens in klimaatopvattingen.
+Geïllustreerd door de onderstaande figuur zou dit betekenen dat de drie
+betrouwbaarheidsintervallen (verticale lijnen) die we zien over de tijd
+wijder zouden worden.</p>
+<p><img src="blog_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><strong><em>Polarisatie afgenomen</em></strong></p>
+<p>Ons onderzoek laat zien dat het met de klimaatpolarisatie in
+Nederland allemaal wel meevalt. Tussen 1986 en 2022 is polarisatie in
+klimaathoudingen niet toegenomen. Sterker nog, alle 52
+klimaatopvattingen samengenomen, is er zelfs sprake van een afname in
+polarisatie. In de onderstaande figuur zien we dat het diamantje
+‘totaal’ aan de linkerkant van de centrale verticale lijn ligt, wat
+betekent dat er sprake is van een afname van polarisatie over de tijd.
+Nederlanders zijn dus niet in steeds verdere mate in te delen in twee
+kampen met betrekking tot hun klimaathoudingen. Verder zien we in de
+onderstaande figuur ook dat het diamantje ‘cognitief’ zich het meest aan
+de linkerkant bevindt. De afname in polarisatie komt daarom
+waarschijnlijk door een afname in polarisatie van stellingen over
+overtuigingen. Nederlanders zijn het steeds meer eens over stellingen
+die bijvoorbeeld gaan over het belang van het klimaatprobleem, de rol
+die de overheid zou moeten spelen, en menselijke verantwoordelijkheid
+voor klimaatverandering.</p>
+<pre><code>## Warning in axis(...): font family not found in Windows font database</code></pre>
+<pre><code>## Warning in text.default(...): font family not found in Windows font database
+
+## Warning in text.default(...): font family not found in Windows font database</code></pre>
+<p><img src="blog_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><strong><em>Invloed van media</em></strong></p>
+<p>Maar hoe komt het dan dat polarisatie niet is toegenomen, maar dit
+wel het algemene gevoel is in de Nederlandse samenleving? Een recent
+rapport van het SCP (Miltenburg et al., 2022) laat zien dat driekwart
+van de Nederlandse burgers denkt dat meningsverschillen over
+maatschappelijke problemen toenemen. Dit terwijl, zoals ook de auteurs
+van dit rapport aangeven, er geen wetenschappelijk bewijs is voor een
+toename in polarisatie. Mensen ervaren een verharde toon in de politiek
+en op sociale media, en vinden dat men vaak niet meer in debat gaat,
+maar enkel het eigen gelijk wil halen. De voorbeelden die we aanhaalden
+in onze introductie, suggereren een grote rol van de (sociale)
+media.</p>
+<p><strong><em>Verschillen tussen groepen in Nederland</em></strong></p>
+<p>Het feit dat de polarisatie niet is toegenomen, betekent natuurlijk
+niet dat alle Nederlanders er hetzelfde over denken. Verschillen tussen
+groepen in de Nederlandse samenleving zijn er zeker wel. Zo staan
+vrouwen positiever tegenover het klimaat dan mannen. Tegen beweringen
+van jongeren naar “boomers” in, vonden we dat klimaathoudingen
+positiever worden met leeftijd. Ouderen hebben dus positievere
+opvattingen over het klimaat dan jongeren. Tenslotte zijn er ook
+verschillen tussen opleidingsgroepen. Hogere opleidingsgroepen hebben
+positievere houdingen dan de laagste opleidingsgroep. Bestaande
+verschillen zijn echter niet groter worden.</p>
+<p><strong><em>Goed nieuws</em></strong></p>
+<p>Uit ons onderzoek kunnen we een belangrijke conclusie trekken. Al
+schetsen de media een ander beeld, polarisatie in klimaathoudingen is
+afgenomen. Dit betekent dat er nog steeds een mogelijkheid is om ideeën
+van Nederlandse burgers te verzoenen en gezamenlijk te strijden tegen
+klimaatverandering. Het zou helpen als de SIRE-campagne hierbij niet
+alleen waarschuwt voor de gevolgen van polarisatie, maar ook voor het
+verkeerde beeld dat de media schetsen over deze polarisatie.</p>
+<p><strong><em>Referenties</em></strong></p>
+<p>Miltenburg, E., Geurkink, B., Tunderman, S., Beekers, D., &amp;
+Ridder, J. den. (2022). Burgerperspectieven 2022 | bericht 2. Sociaal
+Cultureel Planbureau.</p>
+</div>
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkJsb2ciDQphdXRob3I6ICJBbnVzY2hrYSBQZWVsZW4iDQpkYXRlOiAiYHIgU3lzLkRhdGUoKWAiDQpvdXRwdXQ6IGh0bWxfZG9jdW1lbnQNCmVkaXRvcl9vcHRpb25zOiANCiAgbWFya2Rvd246IA0KICAgIHdyYXA6IDcyDQotLS0NCg0KYGBge3IsIGVjaG89RkFMU0V9DQprbml0cjo6b3B0c19jaHVuayRzZXQobnVtYmVyX3NlY3Rpb25zID0gRkFMU0UpDQoja25pdHI6Om9wdHNfY2h1bmskc2V0KGV2YWwgPSBGQUxTRSkNCm9wdGlvbnMod2lkdGggPSAxMDApDQpjb2xvcml6ZSA8LSBmdW5jdGlvbih4LCBjb2xvcikge3NwcmludGYoIjxzcGFuIHN0eWxlPSdjb2xvcjogJXM7Jz4lczwvc3Bhbj4iLCBjb2xvciwgeCkgfQ0KDQpgYGANCg0KYGBge3IscmVzdWx0cz0naGlkZScsIHdhcm5pbmc9RkFMU0UsIG1lc3NhZ2U9RkFMU0UsIGVjaG89RkFMU0V9DQpsaWJyYXJ5KGRwbHlyKQ0KbGlicmFyeShoZXJlKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeSh0aWR5dmVyc2UpDQpsaWJyYXJ5KG1ldGFmb3IpDQpoZXJlKCkNCmhlcmU6OmlfYW0oImJsb2cuUm1kIikNCmBgYA0KDQojIEtsaW1hYXRwb2xhcmlzYXRpZSwgaXMgaGV0IGVjaHQgem8gZXJnPyB7LX0NCg0KRGUgbmlldXdlIFNJUkUtY2FtcGFnbmUgIlZlcmxpZXMgZWxrYWFyIG5pZXQgYWxzIHBvbGFyaXNhdGllIGRpY2h0YmlqDQprb210IiB3YWFyc2NodXd0IHZvb3IgZGUgdWl0ZWVuZHJpanZlbmRlIHdlcmtpbmcgdmFuIHZlcnNjaGlsbGVuZGUNCnBvbGl0aWVrIGJlbGFkZW4gdGhlbWEncywgd2Fhcm9uZGVyIGhldCBrbGltYWF0LiBBbHMgd2UgZGUgcmVhY3RpZXMgb3ANCm5pZXV3c2FydGlrZWxlbiBvdmVyIGhldCBrbGltYWF0IG9wIHNvY2lhbGUgbWVkaWEgbW9nZW4gZ2Vsb3Zlbiwgc3RhYW4NCk5lZGVybGFuZGVycyBzdGVlZHMgbWVlciBsaWpucmVjaHQgdGVnZW5vdmVyIGVsa2FhciBpbiBodW4gb3B2YXR0aW5nZW4uDQpEZSAibGlqbWFjdGllcyIgdmFuIGtsaW1hYXRhY3RpdmlzdGVuIGluIHZlcnNjaGlsbGVuZGUgbGFuZGVuIGluIEV1cm9wYQ0KbGVpZGRlbiB0b3QgdmVlbCBvbmJlZ3JpcCBpbiBkZSBOZWRlcmxhbmRzZSBzYW1lbmxldmluZywgbmV0IGFscyBkZQ0KYm9lcmVucHJvdGVzdGVuLiBIZXQgbGlqa3QgYWxzb2YgZGUgc2FtZW5sZXZpbmcgdWl0ZWVudmFsdCBpbiB0d2VlDQpncm9lcGVuLCBkZSBlbmUgZGllIGhldCBrbGltYWF0IHN0ZWVkcyBiZWxhbmdyaWprZXIgdmluZHQsIGVuIGRlIGFuZGVyZQ0KZGllIHppY2ggc3RlZWRzIHZlcmRlciBhZnpldCB0ZWdlbiBrbGltYWF0YmVsZWlkIGVuIC13ZXRlbnNjaGFwLiBIZXQNCmlkZWUgdmFuIGVlbiB0b2VuZW1lbmRlIHBvbGFyaXNhdGllIGlzIHZvb3JhbCBnZWJhc2VlcmQgb3Agd2F0IGRlIG1lZGlhDQpvbnMgdm9vcnNjaG90ZWxlbiwgbWFhciB3YXQgaXMgbnUgaGV0IHdldGVuc2NoYXBwZWxpamsgYmV3aWpzIHZvb3INCnRvZW5lbWVuZGUgcG9sYXJpc2F0aWUgbWV0IGJldHJla2tpbmcgdG90IGtsaW1hYXRob3VkaW5nZW4/DQoNCioqKktsaW1hYXRob3VkaW5nZW4gZW4gLXBvbGFyaXNhdGllLCB3YXQgemlqbiBkYXQgcHJlY2llcz8qKioNCg0KSW4gb25zIG9uZGVyem9layBoZWJiZW4gd2UgNTIgdmVyc2NoaWxsZW5kZSBvcHZhdHRpbmdlbiByb25kb20gaGV0DQprbGltYWF0IC0tIGdldnJhYWdkIGFhbiB2ZXJzY2hpbGxlbmRlIHN0ZWVrcHJvZXZlbiBvbmRlciBkZSBOZWRlcmxhbmRzZQ0KYmV2b2xraW5nIGluIHZlcnNjaGlsbGVuZGUgamFyZW4gLS0gc2FtZW5nZXZvZWdkIG9tIHRlIGt1bm5lbg0KdmVyZ2VsaWprZW4gb3ZlciBkZSB0aWpkLiBIZXQgZ2FhdCBkYW4gb20gdWl0ZWVubG9wZW5kZSBzdGVsbGluZ2VuLA0Kem9hbHMgIkhldCBoZWVmdCBnZWVuIHppbiBvbSBtaWpuIGJlc3QgdGUgZG9lbiB2b29yIGhldCBrbGltYWF0IGFscw0KYW5kZXJlbiBuaWV0IGhldHplbGZkZSBkb2VuIiBvZiAiSG9lIGFtYml0aWV1cyB2aW5kdCB1IGhldCBiZWxlaWQgdmFuDQpoZXQgS2FiaW5ldCBSdXR0ZSBJSUkgb20ga2xpbWFhdHZlcmFuZGVyaW5nIHRlZ2VuIHRlIGdhYW4/Ii4gSW4gZGUNCm9uZGVyc3RhYW5kZSBmaWd1dXIgemllbiB3ZSBob2UgZGUgZ2VtaWRkZWxkZSBtZW5pbmcgdm9vciBrbGltYWF0em9yZ2VuLA0KZWVuIHZhbiBkZXplIDUyIHN0ZWxsaW5nZW4sIHZlcmFuZGVydCBvdmVyIGRlIHRpamQuIERpdCBoZWJiZW4gd2UNCmJlcmVrZW5kIHZvb3IgZWxrIHZhbiBkZXplIGtsaW1hYXRzdGVsbGluZ2VuLg0KDQpBbCBkZXplIHN0ZWxsaW5nZW4gd2FyZW4gZ3JvZiBvbmRlciB0ZSB2ZXJkZWxlbiBpbiBkcmllIGNhdGVnb3JpZcOrbjoNCmFmZmVjdGllZiwgZ2VkcmFnc21hdGlnIGVuIGNvZ25pdGllZi4gQWZmZWN0aWVmIGdhYXQgb3ZlciBnZXZvZWxlbnMsDQp6b2FscyBhbmdzdCBvZiBiZXpvcmdkaGVpZC4gRWVuIHZvb3JiZWVsZCB2YW4gZWVuIGFmZmVjdGlldmUgc3RlbGxpbmcgaXMNCiJIb2UgYmV6b3JnZCBiZW50IHUgb3ZlciBrbGltYWF0dmVyYW5kZXJpbmc/Ii4gR2VkcmFnc21hdGlnZSBzdGVsbGluZ2VuDQpnYWFuIC0tIHpvYWxzIGRlIG5hYW0gZG9ldCB2ZXJtb2VkZW4gLS0gb3ZlciBnZWRyYWcuIERlIHN0ZWxsaW5nICJIb2UNCmJlcmVpZCBiZW50IHUgb20gdXcgbGV2ZW5zc3RhbmRhYXJkIGFhbiB0ZSBwYXNzZW4gb20gaGV0IGtsaW1hYXQgdGUNCmJlc2NoZXJtZW4/IiBpcyBoaWVyIGVlbiB2b29yYmVlbGQgdmFuLiBUZW5zbG90dGUgZ2FhbiBjb2duaXRpZXZlDQpob3VkaW5nZW4gdm9vcmFsIG92ZXIgb3ZlcnR1aWdpbmdlbiwgem9hbHMgd29yZHQgdWl0Z2VkcnVrdCBpbiBkZQ0Kc3RlbGxpbmc6ICJWZWVsIHVpdHNwcmFrZW4gb3ZlciBrbGltYWF0dmVyYW5kZXJpbmcgemlqbiBvdmVyZHJldmVuIi4NCg0KV2UgaW50ZXJwcmV0ZXJlbiBob3VkaW5nZW4gYWxzICdwb3NpdGllZicgd2FubmVlciBtZW5zZW4gYmlqdm9vcmJlZWxkDQp2aW5kZW4gZGF0IGtsaW1hYXQgZWVuIHByb2JsZWVtIGlzIGRhdCBzZXJpZXVzIGdlbm9tZW4gbW9ldCB3b3JkZW4sIGRhdA0Kd2Ugb25zIGdlZHJhZyBtb2V0ZW4gYWFucGFzc2VuLCBvZiDDvGJlcmhhdXB0IGRhdCBrbGltYWF0dmVyYW5kZXJpbmcNCmJlc3RhYXQuIFBvbGFyaXNhdGllIGluIGRlemUgaG91ZGluZ2VuIHRyZWVkdCBvcCB3YW5uZWVyIGRlemUgaG91ZGluZ2VuDQpvdmVyIGRlIHRpamQgdmVyZGVyIHVpdCBlbGthYXIga29tZW4gdGUgbGlnZ2VuLiBJbiBhbmRlcmUgd29vcmRlbjogbWVuDQppcyBoZXQgc3RlZWRzIG1pbmRlciBtZXQgZWxrYWFyIGVlbnMgaW4ga2xpbWFhdG9wdmF0dGluZ2VuLg0KR2XDr2xsdXN0cmVlcmQgZG9vciBkZSBvbmRlcnN0YWFuZGUgZmlndXVyIHpvdSBkaXQgYmV0ZWtlbmVuIGRhdCBkZSBkcmllDQpiZXRyb3V3YmFhcmhlaWRzaW50ZXJ2YWxsZW4gKHZlcnRpY2FsZSBsaWpuZW4pIGRpZSB3ZSB6aWVuIG92ZXIgZGUgdGlqZA0Kd2lqZGVyIHpvdWRlbiB3b3JkZW4uDQoNCmBgYHtyLCBlY2hvPUZBTFNFLCBtZXNzYWdlPUZBTFNFLCB3YXJuaW5nPUZBTFNFfQ0KbG9hZChoZXJlKCIuL2RhdGEvZmluYWxfZGF0YSIsICJpc3NwdG90YWwuUkRhdGEiKSkNCg0KcGxvdF9kYXRhIDwtIHNlbGVjdChpc3NwdG90YWwsIHdvcnJ5LCBzdXJ2ZXl5ZWFyKQ0KbWVhbl9wbG90IDwtIHBsb3RfZGF0YSAlPiUNCiAgZ3JvdXBfYnkoc3VydmV5eWVhcikgJT4lDQogICAgICAgICAgc3VtbWFyaXNlKG1lYW5fd29ycnkgPSBtZWFuKHdvcnJ5LCBuYS5ybT1UKSwNCiAgICAgICAgICAgICAgICAgICAgc2Rfd29ycnkgPSBzZCh3b3JyeSwgbmEucm09VCkpDQptZWFuX3Bsb3Qkc3VydmV5eWVhcltpcy5uYShtZWFuX3Bsb3Qkc3VydmV5eWVhcildIDwtIDIwMTANCg0KbWVhbnBsb3QgPC0gZ2dwbG90KGRhdGEgPSBtZWFuX3Bsb3QsIGFlcyh4ID0gc3VydmV5eWVhciwgeSA9IG1lYW5fd29ycnkpKSArDQogIGdlb21fbGluZShsaW5ld2lkdGggPSAxLCBjb2xvciA9ICIjMjk4MzJEIikgKw0KIGdlb21fZXJyb3JiYXIoYWVzKHltaW4gPSBtZWFuX3dvcnJ5IC0gc2Rfd29ycnksIHltYXggPSBtZWFuX3dvcnJ5ICsgc2Rfd29ycnkpLA0KICAgICAgICAgICAgICAgIHdpZHRoID0gMC4yLCBjb2xvciA9ICIjMjk4MzJEIikgKw0KICBnZW9tX3BvaW50KGRhdGEgPSBtZWFuX3Bsb3QsIGFlcyh4ID0gc3VydmV5eWVhciwgeSA9IG1lYW5fd29ycnkpKSArDQogIHlsaW0oMSw1KSArIA0KICB4bGltKDE5OTIsIDIwMTEpICsgDQogIGxhYnModGl0bGUgPSAiS2xpbWFhdHpvcmdlbiBwZXIgamFhciwgSVNTUCAxOTkzLTIwMDAiLA0KICAgICAgIHggPSAiSmFhciIsDQogICAgICAgeSA9ICJNYXRlIHZhbiBrbGltYWF0em9yZ2VuIikgKw0KICBzY2FsZV94X2NvbnRpbnVvdXMoYnJlYWtzID0gYygxOTkzLCAyMDAwLCAyMDEwKSkrIA0KICB0aGVtZV9jbGFzc2ljKCkgKw0KICB0aGVtZSh0ZXh0ID0gZWxlbWVudF90ZXh0KGZhbWlseSA9ICJUaW1lcyBOZXcgUm9tYW4iKSkNCg0KbWVhbnBsb3QgDQoNCiNnZ3NhdmUoImJsb2dwbG90LnBuZyIsIHdpZHRoID0gNywgaGVpZ2h0ID0gNSwgcGF0aCA9ICIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9vdXRwdXQvYmxvZ3Bsb3QucG5nIikNCg0KYGBgDQoNCioqKlBvbGFyaXNhdGllIGFmZ2Vub21lbioqKg0KDQpPbnMgb25kZXJ6b2VrIGxhYXQgemllbiBkYXQgaGV0IG1ldCBkZSBrbGltYWF0cG9sYXJpc2F0aWUgaW4gTmVkZXJsYW5kDQphbGxlbWFhbCB3ZWwgbWVldmFsdC4gVHVzc2VuIDE5ODYgZW4gMjAyMiBpcyBwb2xhcmlzYXRpZSBpbg0Ka2xpbWFhdGhvdWRpbmdlbiBuaWV0IHRvZWdlbm9tZW4uIFN0ZXJrZXIgbm9nLCBhbGxlIDUyDQprbGltYWF0b3B2YXR0aW5nZW4gc2FtZW5nZW5vbWVuLCBpcyBlciB6ZWxmcyBzcHJha2UgdmFuIGVlbiBhZm5hbWUgaW4NCnBvbGFyaXNhdGllLiBJbiBkZSBvbmRlcnN0YWFuZGUgZmlndXVyIHppZW4gd2UgZGF0IGhldCBkaWFtYW50amUNCid0b3RhYWwnIGFhbiBkZSBsaW5rZXJrYW50IHZhbiBkZSBjZW50cmFsZSB2ZXJ0aWNhbGUgbGlqbiBsaWd0LCB3YXQNCmJldGVrZW50IGRhdCBlciBzcHJha2UgaXMgdmFuIGVlbiBhZm5hbWUgdmFuIHBvbGFyaXNhdGllIG92ZXIgZGUgdGlqZC4NCk5lZGVybGFuZGVycyB6aWpuIGR1cyBuaWV0IGluIHN0ZWVkcyB2ZXJkZXJlIG1hdGUgaW4gdGUgZGVsZW4gaW4gdHdlZQ0Ka2FtcGVuIG1ldCBiZXRyZWtraW5nIHRvdCBodW4ga2xpbWFhdGhvdWRpbmdlbi4gVmVyZGVyIHppZW4gd2UgaW4gZGUNCm9uZGVyc3RhYW5kZSBmaWd1dXIgb29rIGRhdCBoZXQgZGlhbWFudGplICdjb2duaXRpZWYnIHppY2ggaGV0IG1lZXN0IGFhbg0KZGUgbGlua2Vya2FudCBiZXZpbmR0LiBEZSBhZm5hbWUgaW4gcG9sYXJpc2F0aWUga29tdCBkYWFyb20NCndhYXJzY2hpam5saWprIGRvb3IgZWVuIGFmbmFtZSBpbiBwb2xhcmlzYXRpZSB2YW4gc3RlbGxpbmdlbiBvdmVyDQpvdmVydHVpZ2luZ2VuLiBOZWRlcmxhbmRlcnMgemlqbiBoZXQgc3RlZWRzIG1lZXIgZWVucyBvdmVyIHN0ZWxsaW5nZW4NCmRpZSBiaWp2b29yYmVlbGQgZ2FhbiBvdmVyIGhldCBiZWxhbmcgdmFuIGhldCBrbGltYWF0cHJvYmxlZW0sIGRlIHJvbA0KZGllIGRlIG92ZXJoZWlkIHpvdSBtb2V0ZW4gc3BlbGVuLCBlbiBtZW5zZWxpamtlIHZlcmFudHdvb3JkZWxpamtoZWlkDQp2b29yIGtsaW1hYXR2ZXJhbmRlcmluZy4NCg0KYGBge3IsIHJlc3VsdHM9J2hpZGUnLCB3YXJuaW5nPUZBTFNFLCBlY2hvPUZBTFNFfQ0KbG9hZChoZXJlKCIuL2RhdGEvbWV0YV9hbmFseXNpcyIsICJ0b3RhbF9yZWdfcmVzdWx0c19nYW1fd19uZXcuUkRhdGEiKSkNCg0KIyBTdGVwIDEuIEVzdGltYXRlIHRoZSBlbXB0eSBtb2RlbCB3aXRob3V0IG1vZGVyYXRvcnMgdG8gbWFrZSB0aGUgZm9yZXN0IHBsb3RzLiANCm1vZGVsX3N0ZXBfMV9hdHQgPC0gcm1hKHlpID0gbXVfdGltZSwNCiAgICAgICAgICAgICAgc2VpID0gbXVfdGltZV9zZCwNCiAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX3JlZ19yZXN1bHRzLA0KICAgICAgICAgICAgICBtZXRob2QgPSAiUkVNTCIsDQogICAgICAgICAgICAgIHRlc3QgPSAia25oYSIpDQojIEkgd2FudCB0byBhc3NpZ24gZGlmZmVyZW50IGNvbG9ycyB0byB0aGUgZGlmZmVyZW50IHR5cGVzIG9mIGRlcGVuZGVudCB2YXJpYWJsZXMsIHNvIHRoYXQgb25lIGNhbiBlYXNpbHkgZGlzdGluZ3Vpc2ggDQojIHRoZSB0eXBlcyBvZiBhdHRpdHVkZXMgYnkgY29sb3JzIGluIHRoZSBmb3Jlc3QgcGxvdA0KdG90YWxfcmVnX3Jlc3VsdHMkY29sb3VyIDwtIE5BDQp0b3RhbF9yZWdfcmVzdWx0cyRjb2xvdXJbdG90YWxfcmVnX3Jlc3VsdHMkYXR0aXR1ZGVfY2F0PT0iY29nbml0aXZlIl0gPC0gIiMyOTgwQjkiICMgYmx1ZQ0KdG90YWxfcmVnX3Jlc3VsdHMkY29sb3VyW3RvdGFsX3JlZ19yZXN1bHRzJGF0dGl0dWRlX2NhdD09ImFmZmVjdGl2ZSJdIDwtICIjQ0M1Mjc5IiAjIHBpbmsNCnRvdGFsX3JlZ19yZXN1bHRzJGNvbG91clt0b3RhbF9yZWdfcmVzdWx0cyRhdHRpdHVkZV9jYXQ9PSJiZWhhdmlvcmFsIl0gPC0gIiNCMENDNTIiICMgZ3JlZW4NCg0KY29sb3VyLnBhbGV0dGUgPC0gYXMudmVjdG9yKHRvdGFsX3JlZ19yZXN1bHRzJGNvbG91cikNCg0KIyBSZXBlYXQgc3RlcCAxLCBidXQgdGhlbiBmb3IgdGhlIHBvbGFyaXphdGlvbiAodmFyaWFuY2UpDQptb2RlbF9zdGVwXzFfdmFyIDwtIHJtYSh5aSA9IHNpZ190aW1lLA0KICAgICAgICAgICAgICBzZWkgPSBzaWdfdGltZV9zZCwNCiAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX3JlZ19yZXN1bHRzLA0KICAgICAgICAgICAgICBtZXRob2QgPSAiUkVNTCIsDQogICAgICAgICAgICAgIHRlc3QgPSAia25oYSIpDQoNCm1vZGVsX3N0ZXBfMV92YXINCg0KYWZmZWN0aXZlIDwtIHN1YnNldCh0b3RhbF9yZWdfcmVzdWx0cywgYXR0aXR1ZGVfY2F0ID09ICJhZmZlY3RpdmUiKQ0KDQoNCmFmZl9tb2RlbF92YXIgPC0gcm1hKHlpID0gc2lnX3RpbWUsDQogICAgICAgICAgICAgIHNlaSA9IHNpZ190aW1lX3NkLA0KICAgICAgICAgICAgICBkYXRhID0gYWZmZWN0aXZlLA0KICAgICAgICAgICAgICBtZXRob2QgPSAiUkVNTCIsDQogICAgICAgICAgICAgIHRlc3QgPSAia25oYSIpDQoNCmJlaGF2aW9yYWwgPC0gc3Vic2V0KHRvdGFsX3JlZ19yZXN1bHRzLCBhdHRpdHVkZV9jYXQgPT0gImJlaGF2aW9yYWwiKQ0KDQpiZWhfbW9kZWxfdmFyIDwtIHJtYSh5aSA9IHNpZ190aW1lLA0KICAgICAgICAgICAgICBzZWkgPSBzaWdfdGltZV9zZCwNCiAgICAgICAgICAgICAgZGF0YSA9IGJlaGF2aW9yYWwsDQogICAgICAgICAgICAgIG1ldGhvZCA9ICJSRU1MIiwNCiAgICAgICAgICAgICAgdGVzdCA9ICJrbmhhIikNCg0KY29nbml0aXZlIDwtIHN1YnNldCh0b3RhbF9yZWdfcmVzdWx0cywgYXR0aXR1ZGVfY2F0ID09ICJjb2duaXRpdmUiKQ0KDQpjb2dfbW9kZWxfdmFyIDwtIHJtYSh5aSA9IHNpZ190aW1lLA0KICAgICAgICAgICAgICBzZWkgPSBzaWdfdGltZV9zZCwNCiAgICAgICAgICAgICAgZGF0YSA9IGNvZ25pdGl2ZSwNCiAgICAgICAgICAgICAgbWV0aG9kID0gIlJFTUwiLA0KICAgICAgICAgICAgICB0ZXN0ID0gImtuaGEiKQ0KDQoNCmBgYA0KDQpgYGB7ciwgZWNobz1GQUxTRX0NCg0Ke3BuZyA8LSBmb3Jlc3QobW9kZWxfc3RlcF8xX3ZhciwgYXQ9YygtMC4xLCAwLCAwLjEpLCBhbm5vdGF0ZSA9ICBUUlVFLCBoZWFkZXIgPSAiUG9sYXJpc2F0aWUgaW4gaG91ZGluZ2VuIHRlbiBhYW56aWVuIHZhbiBrbGltYWF0IiwgcGNoID0gMjMsIGZvbnRzID0gIlRpbWVzIiwgeWxpbSA9IGMoLTYsIDApLCBjZXggPSAxLCBhZGRmaXQgPSBGQUxTRSwgd2lkdGggPSA1KQ0KDQphZGRwb2x5LnJtYShtb2RlbF9zdGVwXzFfdmFyLCByb3cgPSAtNiwgbWxhYiA9ICJUb3RhYWwiLCBjb2wgPSAiI0FDQkZENiIpDQphZGRwb2x5LnJtYShhZmZfbW9kZWxfdmFyLCByb3cgPSAtMywgbWxhYiA9ICJBZmZlY3RpZWYiLCBjb2wgPSAiI0NDNTI3OSIpDQphZGRwb2x5LnJtYShiZWhfbW9kZWxfdmFyLCByb3cgPSAtNCwgbWxhYiA9ICJHZWRyYWdzbWF0aWciLCBjb2wgPSAiI0IwQ0M1MiIpDQphZGRwb2x5LnJtYShjb2dfbW9kZWxfdmFyLCByb3cgPSAtNSwgbWxhYiA9ICJDb2duaXRpZWYiLCBjb2wgPSAiIzI5ODBCOSIpDQp9DQoNCiMgVW5mb3J0dW5hdGVseSwgSSBkbyBub3QgbWFuYWdlIHRvIGRlbGV0ZSB0aGUgIk9ic2VydmVkIG91dGNvbWUiIGluIEVuZ2xpc2ggZnJvbSB1bmRlcm5lYXRoIHRoZSBwbG90LCBvciBjaGFuZ2UgQ0kgaW4gQkkuIA0KYGBgDQoNCioqKkludmxvZWQgdmFuIG1lZGlhKioqDQoNCk1hYXIgaG9lIGtvbXQgaGV0IGRhbiBkYXQgcG9sYXJpc2F0aWUgbmlldCBpcyB0b2VnZW5vbWVuLCBtYWFyIGRpdCB3ZWwNCmhldCBhbGdlbWVuZSBnZXZvZWwgaXMgaW4gZGUgTmVkZXJsYW5kc2Ugc2FtZW5sZXZpbmc/IEVlbiByZWNlbnQgcmFwcG9ydA0KdmFuIGhldCBTQ1AgKE1pbHRlbmJ1cmcgZXQgYWwuLCAyMDIyKSBsYWF0IHppZW4gZGF0IGRyaWVrd2FydCB2YW4gZGUNCk5lZGVybGFuZHNlIGJ1cmdlcnMgZGVua3QgZGF0IG1lbmluZ3N2ZXJzY2hpbGxlbiBvdmVyIG1hYXRzY2hhcHBlbGlqa2UNCnByb2JsZW1lbiB0b2VuZW1lbi4gRGl0IHRlcndpamwsIHpvYWxzIG9vayBkZSBhdXRldXJzIHZhbiBkaXQgcmFwcG9ydA0KYWFuZ2V2ZW4sIGVyIGdlZW4gd2V0ZW5zY2hhcHBlbGlqayBiZXdpanMgaXMgdm9vciBlZW4gdG9lbmFtZSBpbg0KcG9sYXJpc2F0aWUuIE1lbnNlbiBlcnZhcmVuIGVlbiB2ZXJoYXJkZSB0b29uIGluIGRlIHBvbGl0aWVrIGVuIG9wDQpzb2NpYWxlIG1lZGlhLCBlbiB2aW5kZW4gZGF0IG1lbiB2YWFrIG5pZXQgbWVlciBpbiBkZWJhdCBnYWF0LCBtYWFyDQplbmtlbCBoZXQgZWlnZW4gZ2VsaWprIHdpbCBoYWxlbi4gRGUgdm9vcmJlZWxkZW4gZGllIHdlIGFhbmhhYWxkZW4gaW4NCm9uemUgaW50cm9kdWN0aWUsIHN1Z2dlcmVyZW4gZWVuIGdyb3RlIHJvbCB2YW4gZGUgKHNvY2lhbGUpIG1lZGlhLg0KDQoqKipWZXJzY2hpbGxlbiB0dXNzZW4gZ3JvZXBlbiBpbiBOZWRlcmxhbmQqKioNCg0KSGV0IGZlaXQgZGF0IGRlIHBvbGFyaXNhdGllIG5pZXQgaXMgdG9lZ2Vub21lbiwgYmV0ZWtlbnQgbmF0dXVybGlqayBuaWV0DQpkYXQgYWxsZSBOZWRlcmxhbmRlcnMgZXIgaGV0emVsZmRlIG92ZXIgZGVua2VuLiBWZXJzY2hpbGxlbiB0dXNzZW4NCmdyb2VwZW4gaW4gZGUgTmVkZXJsYW5kc2Ugc2FtZW5sZXZpbmcgemlqbiBlciB6ZWtlciB3ZWwuIFpvIHN0YWFuDQp2cm91d2VuIHBvc2l0aWV2ZXIgdGVnZW5vdmVyIGhldCBrbGltYWF0IGRhbiBtYW5uZW4uIFRlZ2VuIGJld2VyaW5nZW4NCnZhbiBqb25nZXJlbiBuYWFyICJib29tZXJzIiBpbiwgdm9uZGVuIHdlIGRhdCBrbGltYWF0aG91ZGluZ2VuDQpwb3NpdGlldmVyIHdvcmRlbiBtZXQgbGVlZnRpamQuIE91ZGVyZW4gaGViYmVuIGR1cyBwb3NpdGlldmVyZQ0Kb3B2YXR0aW5nZW4gb3ZlciBoZXQga2xpbWFhdCBkYW4gam9uZ2VyZW4uIFRlbnNsb3R0ZSB6aWpuIGVyIG9vaw0KdmVyc2NoaWxsZW4gdHVzc2VuIG9wbGVpZGluZ3Nncm9lcGVuLiBIb2dlcmUgb3BsZWlkaW5nc2dyb2VwZW4gaGViYmVuDQpwb3NpdGlldmVyZSBob3VkaW5nZW4gZGFuIGRlIGxhYWdzdGUgb3BsZWlkaW5nc2dyb2VwLiBCZXN0YWFuZGUNCnZlcnNjaGlsbGVuIHppam4gZWNodGVyIG5pZXQgZ3JvdGVyIHdvcmRlbi4NCg0KKioqR29lZCBuaWV1d3MqKioNCg0KVWl0IG9ucyBvbmRlcnpvZWsga3VubmVuIHdlIGVlbiBiZWxhbmdyaWprZSBjb25jbHVzaWUgdHJla2tlbi4gQWwNCnNjaGV0c2VuIGRlIG1lZGlhIGVlbiBhbmRlciBiZWVsZCwgcG9sYXJpc2F0aWUgaW4ga2xpbWFhdGhvdWRpbmdlbiBpcw0KYWZnZW5vbWVuLiBEaXQgYmV0ZWtlbnQgZGF0IGVyIG5vZyBzdGVlZHMgZWVuIG1vZ2VsaWpraGVpZCBpcyBvbSBpZGVlw6tuDQp2YW4gTmVkZXJsYW5kc2UgYnVyZ2VycyB0ZSB2ZXJ6b2VuZW4gZW4gZ2V6YW1lbmxpamsgdGUgc3RyaWpkZW4gdGVnZW4NCmtsaW1hYXR2ZXJhbmRlcmluZy4gSGV0IHpvdSBoZWxwZW4gYWxzIGRlIFNJUkUtY2FtcGFnbmUgaGllcmJpaiBuaWV0DQphbGxlZW4gd2FhcnNjaHV3dCB2b29yIGRlIGdldm9sZ2VuIHZhbiBwb2xhcmlzYXRpZSwgbWFhciBvb2sgdm9vciBoZXQNCnZlcmtlZXJkZSBiZWVsZCBkYXQgZGUgbWVkaWEgc2NoZXRzZW4gb3ZlciBkZXplIHBvbGFyaXNhdGllLg0KDQoqKipSZWZlcmVudGllcyoqKg0KDQpNaWx0ZW5idXJnLCBFLiwgR2V1cmtpbmssIEIuLCBUdW5kZXJtYW4sIFMuLCBCZWVrZXJzLCBELiwgJiBSaWRkZXIsIEouDQpkZW4uICgyMDIyKS4gQnVyZ2VycGVyc3BlY3RpZXZlbiAyMDIyIFx8IGJlcmljaHQgMi4gU29jaWFhbCBDdWx0dXJlZWwNClBsYW5idXJlYXUuDQo=</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("blog.rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

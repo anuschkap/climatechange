@@ -322,7 +322,7 @@ mot2019 <- mot2019 %>% select(surveyyear, sex, marstat, educ, isced, isced_cat, 
 mot2021 <- mot2021 %>% select(surveyyear, sex, marstat, educ, isced, isced_cat, urban, age, cchange_mot, worried_mot, futuregen, nowor, ontime, gov, resp_gov, resp_comp, resp_mkb, resp_citiz_mot, resp_you, pers_resp_mot, sust_choice, contr, energy, noidea, motiv, age_cat, weightvec)
 
 mottotal <- dplyr::bind_rows(mot2019, mot2021)
-utils::View(mottotal)
+mottotal$sex <- mottotal$sex - 1
 
 save(mottotal, file="./data/final_data/mottotal.Rdata")
 
@@ -575,7 +575,8 @@ liss2020b <- liss2020b %>% select(surveyyear, sex, marstat, educ, isced, isced_c
 liss2021 <- liss2021 %>% select(surveyyear, sex, marstat, educ, isced, isced_cat, age, urban,  lifestyle, age_cat, weightvec)
 
 lisstotal <- dplyr::bind_rows(liss2019, liss2020a, liss2020b, liss2021)
-utils::View(lisstotal)
+
+lisstotal$sex <- lisstotal$sex - 1
 
 save(lisstotal, file="./data/final_data/lisstotal.Rdata")
 
@@ -759,7 +760,7 @@ socon2021$age_cat[socon2021$age >=46 & socon2021$age <= 60] <- 3
 socon2021$age_cat[socon2021$age >=61] <- 4
 
 socontotal <- dplyr::bind_rows(socon2020, socon2021, socon2022)
-utils::View(socontotal)
+socontotal$sex <- socontotal$sex - 1
 
 save(socontotal, file="./data/final_data/socontotal.Rdata")
 ```

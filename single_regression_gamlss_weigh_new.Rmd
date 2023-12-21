@@ -16,20 +16,16 @@ In this script I use loops to perform gamlss regressions for all 52 attitudes. T
 
 ```{r}
 rm(list = ls())
-#install.packages("gamlss")
 library(gamlss)
 library(tidyverse)
 library(dplyr)
 library(fastDummies)
-#library(here)
-#here()
-#here::i_am("scripts/analysis/single_regression.Rmd")
 ```
 
 ## ESS {-}
 
 ```{r}
-load(here("./data/final_data", "esstotal.RData"))
+load("./data/final_data/esstotal.RData")
 
 # Gamlss cannot handle NAs, so I have to listwise delete all of them
 ess_complete <- esstotal %>% drop_na()
@@ -46,7 +42,7 @@ ess_list_empty <- list()
   # Specify the sigma formula
   sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
   # Perform the linear regression. The sigma formula pastes every variable one by one and calculates variance, the other formula shows the mean attitudes effects
-  ess_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), family=NO(mu.link = "identity", sigma.link = "identity"), data = ess_complete, weights = weightvec)
+  ess_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula,  family=NO(mu.link = "identity", sigma.link = "identity"), data = ess_complete, weights = weightvec)
   
   ess_list_empty[[i]] <- ess_fit
 } 
@@ -57,7 +53,7 @@ summary(ess_list_empty[[2]]) # Sig neg effect on intercept, sig pos effect on va
 summary(ess_list_empty[[3]]) # Sig pos effect on intercept, sig neg effect on variance (pers_resp)
 
  
-save(ess_list_empty, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_empty_w.RData")
+save(ess_list_empty, file="./data/final_data/regression_outputs/ess_list_empty_w.RData")
 
 #Estimate a second model with the indicators + time
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -77,7 +73,7 @@ ess_list_preds <- list()
 
 summary(ess_list_preds[[1]]) 
 
-save(ess_list_preds, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_preds_w_new.RData")
+save(ess_list_preds, file="./data/final_data/regression_outputs/ess_list_preds_w_new.RData")
 
 #Now the last model with interaction of time on predictor variables
 ess_complete$age_time <- ess_complete$age * ess_complete$time
@@ -105,14 +101,14 @@ summary(ess_list_interactions[[1]])
 summary(ess_list_interactions[[2]]) 
 summary(ess_list_interactions[[3]])
 
-save(ess_list_interactions, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_interactions_w_new.RData")
+save(ess_list_interactions, file="./data/final_data/regression_outputs/ess_list_interactions_w_new.RData")
 ```
 
 ## EVS {-}
 
 ```{r}
 # Perform the same procedure for the EVS
-load(here("./data/final_data", "evssel.RData"))
+load("./data/final_data/evssel.RData")
 
 evs_complete <- evssel %>% dplyr::select(surveyyear:marstat, weightvec, isced_cat)
 evs_complete <- evs_complete %>% drop_na()
@@ -136,9 +132,8 @@ evs_list_empty <- list()
 summary(evs_list_empty[[1]]) #Sig pos effect of time on intercept
 
 model1 <- evs_list_empty[[1]]
-plot(model1, ts = "true")
 
-save(evs_list_empty, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/evs_list_empty_w.RData")
+save(evs_list_empty, file="./data/final_data/regression_outputs/evs_list_empty_w.RData")
 
 # Predictor model
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -158,7 +153,7 @@ evs_list_preds <- list()
 
 summary(evs_list_preds[[1]]) 
 
-save(evs_list_preds, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/evs_list_preds_w_new.RData")
+save(evs_list_preds, file="./data/final_data/regression_outputs/evs_list_preds_w_new.RData")
 
 #Now the last model with interaction of time on predictor variables
 evs_complete$age_time <- evs_complete$age * evs_complete$time
@@ -183,14 +178,14 @@ evs_list_interactions <- list()
 
 summary(evs_list_interactions[[1]]) 
 
-save(evs_list_interactions, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/evs_list_interactions_w_new.RData")
+save(evs_list_interactions, file="./data/final_data/regression_outputs/evs_list_interactions_w_new.RData")
 
 ```
 
 ## I&O {-}
 
 ```{r}
-load(here("./data/final_data", "io_total.RData"))
+load("./data/final_data/io_total.RData")
 io_complete <- io_total %>% dplyr::select(worried:surveyyear, weightvec, isced_cat)
 #Urban, IOINKOMEN, IOPOL has to go away
 io_complete = subset(io_complete, select = -c(urban,IOINKOMEN, IOPOL2017) )
@@ -219,7 +214,7 @@ summary(io_list_empty[[2]])
 model1 <- io_list_empty[[1]]
 plot(model1, ts = "true")
 
-save(io_list_empty, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/io_list_empty_w.RData")
+save(io_list_empty, file="./data/final_data/regression_outputs/io_list_empty_w.RData")
 
 # Predictor model
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -239,7 +234,7 @@ io_list_preds <- list()
 
 summary(io_list_preds[[1]]) 
 
-save(io_list_preds, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/io_list_preds_w_new.RData")
+save(io_list_preds, file="./data/final_data/regression_outputs/io_list_preds_w_new.RData")
 
 #Now the last model with interaction of time on predictor variables
 io_complete$age_time <- io_complete$age * io_complete$time
@@ -265,14 +260,14 @@ io_list_interactions <- list()
 
 summary(io_list_interactions[[1]]) 
 
-save(io_list_interactions, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/io_list_interactions_w_new.RData")
+save(io_list_interactions, file="./data/final_data/regression_outputs/io_list_interactions_w_new.RData")
 
 ```
 
 ## ISSP {-}
 
 ```{r}
-load(here("./data/final_data", "issptotal.Rdata"))
+load("./data/final_data/issptotal.Rdata")
 issptotal$surveyyear[is.na(issptotal$surveyyear)] <- "2010"
 issptotal$surveyyear <- as.numeric(issptotal$surveyyear)
 
@@ -302,7 +297,7 @@ summary(issp_list_empty[[1]])
 summary(issp_list_empty[[2]]) 
 summary(issp_list_empty[[3]]) 
  
-save(issp_list_empty, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_empty_w.RData")
+save(issp_list_empty, file="./data/final_data/regression_outputs/issp_list_empty_w.RData")
 
 # Now with predictors
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -323,7 +318,7 @@ issp_list_preds <- list()
 
 summary(issp_list_preds[[9]]) 
 
-save(issp_list_preds, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_preds_w_new.RData")
+save(issp_list_preds, file="./data/final_data/regression_outputs/issp_list_preds_w_new.RData")
 
 # And now interactions
 issp_complete$age_time <- issp_complete$age * issp_complete$time
@@ -348,7 +343,7 @@ issp_list_interactions <- list()
 
 summary(issp_list_interactions[[1]]) 
 
-save(issp_list_interactions, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_interactions_w_new.RData")
+save(issp_list_interactions, file="./data/final_data/regression_outputs/issp_list_interactions_w_new.RData")
 
 # Now the variables that are only asked twice
 issp_complete <- issptotal %>% dplyr::select(surveyyear, isced:growharm, weightvec, isced_cat)
@@ -375,7 +370,7 @@ summary(issp_list_empty_2_waves[[1]])
 summary(issp_list_empty_2_waves[[2]])
 summary(issp_list_empty_2_waves[[3]]) 
 
-save(issp_list_empty_2_waves, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_empty_2_waves_w.RData")
+save(issp_list_empty_2_waves, file="./data/final_data/regression_outputs/issp_list_empty_2_waves_w.RData")
 
 # And the model with the predictors
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -395,7 +390,7 @@ issp_list_preds_2_waves <- list()
 
 summary(issp_list_preds_2_waves[[1]]) 
 
-save(issp_list_preds_2_waves, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_preds_2_waves_w_new.RData")
+save(issp_list_preds_2_waves, file="./data/final_data/regression_outputs/issp_list_preds_2_waves_w_new.RData")
 
 # And lastly, again the interactions
 issp_complete$age_time <- issp_complete$age * issp_complete$time
@@ -420,14 +415,14 @@ issp_list_interactions_2_waves <- list()
 
 summary(issp_list_interactions_2_waves[[1]]) 
 
-save(issp_list_interactions_2_waves, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_interactions_2_waves_w_new.RData")
+save(issp_list_interactions_2_waves, file="./data/final_data/regression_outputs/issp_list_interactions_2_waves_w_new.RData")
 ```
 
 ## EB {-}
 
 ```{r}
 # Now the most difficult one: Eurobarometer. No items are asked steadily throughout time, so have to work with a lot of subsets. 
-load(here("./data/final_data", "eb_tot.Rdata"))
+load("./data/final_data/eb_tot.Rdata")
 
 # first 1986 - 1995
 eb_complete <- eb_tot %>% dplyr::select(surveyyear, env_ec_stat, env_prsimp, sex, isced: urban, weightvec, isced_cat)
@@ -455,7 +450,7 @@ eb_list_empty_1986 <- list()
 summary(eb_list_empty_1986[[1]]) 
 summary(eb_list_empty_1986[[2]])
 
-save(eb_list_empty_1986, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_1986_w.RData")
+save(eb_list_empty_1986, file="./data/final_data/regression_outputs/eb_list_empty_1986_w.RData")
 
 # Model with predictors
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -477,7 +472,7 @@ eb_list_preds_1986 <- list()
 summary(eb_list_preds_1986[[1]]) 
 summary(eb_list_preds_1986[[2]])
 
-save(eb_list_preds_1986, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_1986_w_new.RData")
+save(eb_list_preds_1986, file="./data/final_data/regression_outputs/eb_list_preds_1986_w_new.RData")
 
 # And the model with interactions
 eb_complete$age_time <- eb_complete$age * eb_complete$time
@@ -503,7 +498,7 @@ eb_list_interactions_1986 <- list()
 summary(eb_list_interactions_1986[[1]]) 
 summary(eb_list_interactions_1986[[2]])
 
-save(eb_list_interactions_1986, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_1986_w_new.RData")
+save(eb_list_interactions_1986, file="./data/final_data/regression_outputs/eb_list_interactions_1986_w_new.RData")
 ```
 
 ```{r}
@@ -531,7 +526,7 @@ eb_list_empty_quallife <- list()
 
 summary(eb_list_empty_quallife[[1]]) 
 
-save(eb_list_empty_quallife, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_quallife_w.RData")
+save(eb_list_empty_quallife, file="./data/final_data/regression_outputs/eb_list_empty_quallife_w.RData")
 
 # Model with predictors
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -552,7 +547,7 @@ eb_list_preds_quallife <- list()
 
 summary(eb_list_preds_quallife[[1]]) 
 
-save(eb_list_preds_quallife, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_quallife_w_new.RData")
+save(eb_list_preds_quallife, file="./data/final_data/regression_outputs/eb_list_preds_quallife_w_new.RData")
 
 # And the model with interactions
 eb_complete$age_time <- eb_complete$age * eb_complete$time
@@ -577,7 +572,7 @@ eb_list_interactions_quallife <- list()
 
 summary(eb_list_interactions_quallife[[1]]) 
 
-save(eb_list_interactions_quallife, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_quallife_w_new.RData")
+save(eb_list_interactions_quallife, file="./data/final_data/regression_outputs/eb_list_interactions_quallife_w_new.RData")
 ```
 
 ```{r}
@@ -605,7 +600,7 @@ eb_list_empty_2007 <- list()
 
 summary(eb_list_empty_2007[[2]]) 
 
-save(eb_list_empty_2007, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2007_w.RData")
+save(eb_list_empty_2007, file="./data/final_data/regression_outputs/eb_list_empty_2007_w.RData")
 
 # Model with predictors
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -625,7 +620,7 @@ eb_list_preds_2007 <- list()
 
 summary(eb_list_preds_2007[[1]]) 
 
-save(eb_list_preds_2007, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2007_w_new.RData")
+save(eb_list_preds_2007, file="./data/final_data/regression_outputs/eb_list_preds_2007_w_new.RData")
 
 # And the model with interactions
 eb_complete$age_time <- eb_complete$age * eb_complete$time
@@ -650,7 +645,7 @@ eb_list_interactions_2007 <- list()
 
 summary(eb_list_interactions_2007[[1]]) 
 
-save(eb_list_interactions_2007, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2007_w_new.RData")
+save(eb_list_interactions_2007, file="./data/final_data/regression_outputs/eb_list_interactions_2007_w_new.RData")
 ```
 
 ```{r}
@@ -677,7 +672,7 @@ eb_list_empty_buyprod <- list()
 
 summary(eb_list_empty_buyprod[[1]]) 
 
-save(eb_list_empty_buyprod, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_buyprod_w.RData")
+save(eb_list_empty_buyprod, file="./data/final_data/regression_outputs/eb_list_empty_buyprod_w.RData")
 
 # Model with predictors
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -697,7 +692,7 @@ eb_list_preds_buyprod <- list()
 
 summary(eb_list_preds_buyprod[[1]]) 
 
-save(eb_list_preds_buyprod, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_buyprod_w_new.RData")
+save(eb_list_preds_buyprod, file="./data/final_data/regression_outputs/eb_list_preds_buyprod_w_new.RData")
 
 # And the model with interactions
 eb_complete$age_time <- eb_complete$age * eb_complete$time
@@ -722,7 +717,7 @@ eb_list_interactions_buyprod <- list()
 
 summary(eb_list_interactions_buyprod[[1]]) 
 
-save(eb_list_interactions_buyprod, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_buyprod_w_new.RData")
+save(eb_list_interactions_buyprod, file="./data/final_data/regression_outputs/eb_list_interactions_buyprod_w_new.RData")
 ```
 
 ```{r}
@@ -749,7 +744,7 @@ eb_list_empty_eff_daily <- list()
 
 summary(eb_list_empty_eff_daily[[1]]) 
 
-save(eb_list_empty_eff_daily, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_eff_daily_w.RData")
+save(eb_list_empty_eff_daily, file="./data/final_data/regression_outputs/eb_list_empty_eff_daily_w.RData")
 
 # Model with predictors
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -769,7 +764,7 @@ eb_list_preds_eff_daily <- list()
 
 summary(eb_list_preds_eff_daily[[1]]) 
 
-save(eb_list_preds_eff_daily, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_eff_daily_w_new.RData")
+save(eb_list_preds_eff_daily, file="./data/final_data/regression_outputs/eb_list_preds_eff_daily_w_new.RData")
 
 # And the model with interactions
 eb_complete$age_time <- eb_complete$age * eb_complete$time
@@ -794,7 +789,7 @@ eb_list_interactions_eff_daily <- list()
 
 summary(eb_list_interactions_eff_daily[[1]]) 
 
-save(eb_list_interactions_eff_daily, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_eff_daily_w_new.RData")
+save(eb_list_interactions_eff_daily, file="./data/final_data/regression_outputs/eb_list_interactions_eff_daily_w_new.RData")
 ```
 
 ```{r}
@@ -821,7 +816,7 @@ eb_list_empty_2008 <- list()
 
 summary(eb_list_empty_2008[[1]]) 
 
-save(eb_list_empty_2008, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2008_w.RData")
+save(eb_list_empty_2008, file="./data/final_data/regression_outputs/eb_list_empty_2008_w.RData")
 
 # Model with predictors
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -841,7 +836,7 @@ eb_list_preds_2008 <- list()
 
 summary(eb_list_preds_2008[[1]]) 
 
-save(eb_list_preds_2008, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2008_w_new.RData")
+save(eb_list_preds_2008, file="./data/final_data/regression_outputs/eb_list_preds_2008_w_new.RData")
 
 # And the model with interactions
 eb_complete$age_time <- eb_complete$age * eb_complete$time
@@ -866,7 +861,7 @@ eb_list_interactions_2008 <- list()
 
 summary(eb_list_interactions_2008[[1]]) 
 
-save(eb_list_interactions_2008, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2008_w_new.RData")
+save(eb_list_interactions_2008, file="./data/final_data/regression_outputs/eb_list_interactions_2008_w_new.RData")
 ```
 
 
@@ -894,7 +889,7 @@ eb_list_empty_2009 <- list()
 
 summary(eb_list_empty_2009[[1]]) 
 
-save(eb_list_empty_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2009_w.RData")
+save(eb_list_empty_2009, file="./data/final_data/regression_outputs/eb_list_empty_2009_w.RData")
 
 # Model with predictors
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -914,7 +909,7 @@ eb_list_preds_2009 <- list()
 
 summary(eb_list_preds_2009[[1]]) 
 
-save(eb_list_preds_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2009_w_new.RData")
+save(eb_list_preds_2009, file="./data/final_data/regression_outputs/eb_list_preds_2009_w_new.RData")
 
 # And the model with interactions
 eb_complete$age_time <- eb_complete$age * eb_complete$time
@@ -939,7 +934,7 @@ eb_list_interactions_2009 <- list()
 
 summary(eb_list_interactions_2009[[1]]) 
 
-save(eb_list_interactions_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2009_w_new.RData")
+save(eb_list_interactions_2009, file="./data/final_data/regression_outputs/eb_list_interactions_2009_w_new.RData")
 ```
 
 ```{r}
@@ -966,7 +961,7 @@ eb_list_empty_pers_imp <- list()
 
 summary(eb_list_empty_pers_imp[[1]]) 
 
-save(eb_list_empty_pers_imp, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_pers_imp_w.RData")
+save(eb_list_empty_pers_imp, file="./data/final_data/regression_outputs/eb_list_empty_pers_imp_w.RData")
 
 # Model with predictors
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -987,7 +982,7 @@ eb_list_preds_pers_imp <- list()
 
 summary(eb_list_preds_pers_imp[[1]]) 
 
-save(eb_list_preds_pers_imp, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_pers_imp_w_new.RData")
+save(eb_list_preds_pers_imp, file="./data/final_data/regression_outputs/eb_list_preds_pers_imp_w_new.RData")
 
 # And the model with interactions
 eb_complete$age_time <- eb_complete$age * eb_complete$time
@@ -1012,7 +1007,7 @@ eb_list_interactions_pers_imp <- list()
 
 summary(eb_list_interactions_pers_imp[[1]]) 
 
-save(eb_list_interactions_pers_imp, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_pers_imp_w_new.RData")
+save(eb_list_interactions_pers_imp, file="./data/final_data/regression_outputs/eb_list_interactions_pers_imp_w_new.RData")
 ```
 
 ```{r}
@@ -1039,7 +1034,7 @@ eb_list_empty_doprot <- list()
 
 summary(eb_list_empty_doprot[[1]]) 
 
-save(eb_list_empty_doprot, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_doprot_w.RData")
+save(eb_list_empty_doprot, file="./data/final_data/regression_outputs/eb_list_empty_doprot_w.RData")
 
 # Model with predictors
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -1059,7 +1054,7 @@ eb_list_preds_doprot <- list()
 
 summary(eb_list_preds_doprot[[1]]) 
 
-save(eb_list_preds_doprot, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_doprot_w_new.RData")
+save(eb_list_preds_doprot, file="./data/final_data/regression_outputs/eb_list_preds_doprot_w_new.RData")
 
 # And the model with interactions
 eb_complete$age_time <- eb_complete$age * eb_complete$time
@@ -1084,7 +1079,7 @@ eb_list_interactions_doprot <- list()
 
 summary(eb_list_interactions_doprot[[1]]) 
 
-save(eb_list_interactions_doprot, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_doprot_w_new.RData")
+save(eb_list_interactions_doprot, file="./data/final_data/regression_outputs/eb_list_interactions_doprot_w_new.RData")
 ```
 
 ```{r}
@@ -1111,7 +1106,7 @@ eb_list_empty_2011 <- list()
 
 summary(eb_list_empty_2011[[1]]) 
 
-save(eb_list_empty_2011, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_2011_w.RData")
+save(eb_list_empty_2011, file="./data/final_data/regression_outputs/eb_list_empty_2011_w.RData")
 
 # Model with predictors
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -1131,7 +1126,7 @@ eb_list_preds_2011 <- list()
 
 summary(eb_list_preds_2011[[1]]) 
 
-save(eb_list_preds_2011, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2011_w_new.RData")
+save(eb_list_preds_2011, file="./data/final_data/regression_outputs/eb_list_preds_2011_w_new.RData")
 
 # And the model with interactions
 eb_complete$age_time <- eb_complete$age * eb_complete$time
@@ -1156,7 +1151,7 @@ eb_list_interactions_2011 <- list()
 
 summary(eb_list_interactions_2011[[1]]) 
 
-save(eb_list_interactions_2011, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_2011_w_new.RData")
+save(eb_list_interactions_2011, file="./data/final_data/regression_outputs/eb_list_interactions_2011_w_new.RData")
 ```
 
 ```{r}
@@ -1183,7 +1178,7 @@ eb_list_empty_cchange2 <- list()
 
 summary(eb_list_empty_cchange2[[1]]) 
 
-save(eb_list_empty_cchange2, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_cchange2_w.RData")
+save(eb_list_empty_cchange2, file="./data/final_data/regression_outputs/eb_list_empty_cchange2_w.RData")
 
 # Model with predictors
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -1204,7 +1199,7 @@ eb_list_preds_cchange2 <- list()
 
 summary(eb_list_preds_cchange2[[1]]) 
 
-save(eb_list_preds_cchange2, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_cchange2_w_new.RData")
+save(eb_list_preds_cchange2, file="./data/final_data/regression_outputs/eb_list_preds_cchange2_w_new.RData")
 
 # And the model with interactions
 eb_complete$age_time <- eb_complete$age * eb_complete$time
@@ -1229,7 +1224,7 @@ eb_list_interactions_cchange2 <- list()
 
 summary(eb_list_interactions_cchange2[[1]]) 
 
-save(eb_list_interactions_cchange2, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_cchange2_w_new.RData")
+save(eb_list_interactions_cchange2, file="./data/final_data/regression_outputs/eb_list_interactions_cchange2_w_new.RData")
 ```
 
 ```{r}
@@ -1256,7 +1251,7 @@ eb_list_empty_prsaction <- list()
 
 summary(eb_list_empty_prsaction[[1]]) 
 
-save(eb_list_empty_prsaction, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_prsaction_w.RData")
+save(eb_list_empty_prsaction, file="./data/final_data/regression_outputs/eb_list_empty_prsaction_w.RData")
 
 # Model with predictors
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -1276,7 +1271,7 @@ eb_list_preds_prsaction <- list()
 
 summary(eb_list_preds_prsaction[[1]]) 
 
-save(eb_list_preds_prsaction, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_prsaction_w_new.RData")
+save(eb_list_preds_prsaction, file="./data/final_data/regression_outputs/eb_list_preds_prsaction_w_new.RData")
 
 # And the model with interactions
 eb_complete$age_time <- eb_complete$age * eb_complete$time
@@ -1301,7 +1296,7 @@ eb_list_interactions_prsaction <- list()
 
 summary(eb_list_interactions_prsaction[[1]]) 
 
-save(eb_list_interactions_prsaction, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_prsaction_w_new.RData")
+save(eb_list_interactions_prsaction, file="./data/final_data/regression_outputs/eb_list_interactions_prsaction_w_new.RData")
 ```
 
 ```{r}
@@ -1328,7 +1323,7 @@ eb_list_empty_doprot_city <- list()
 
 summary(eb_list_empty_doprot_city[[1]]) 
 
-save(eb_list_empty_doprot_city, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_empty_doprot_city_w.RData")
+save(eb_list_empty_doprot_city, file="./data/final_data/regression_outputs/eb_list_empty_doprot_city_w.RData")
 
 # Model with predictors
 predictors <- c("time", "sex", "isced_cat", "age")
@@ -1348,7 +1343,7 @@ eb_list_preds_doprot_city <- list()
 
 summary(eb_list_preds_doprot_city[[1]]) 
 
-save(eb_list_preds_doprot_city, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_doprot_city_w_new.RData")
+save(eb_list_preds_doprot_city, file="./data/final_data/regression_outputs/eb_list_preds_doprot_city_w_new.RData")
 
 # And the model with interactions
 eb_complete$age_time <- eb_complete$age * eb_complete$time
@@ -1373,7 +1368,7 @@ eb_list_interactions_doprot_city <- list()
 
 summary(eb_list_interactions_doprot_city[[1]]) 
 
-save(eb_list_interactions_doprot_city, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_interactions_doprot_city_w_new.RData")
+save(eb_list_interactions_doprot_city, file="./data/final_data/regression_outputs/eb_list_interactions_doprot_city_w_new.RData")
 ```
 
 
@@ -1385,7 +1380,6 @@ load("./data/final_data/mottotal.RData")
 mot_complete <- mottotal %>% drop_na()
 mot_complete$time <- mot_complete$surveyyear - min(mot_complete$surveyyear)
 
-utils::View(mot_complete)
 # I want to build models. In the empty model, I only want to include time. 
 predictors <- c("time")
 deps <- c("cchange_mot", "worried_mot", "futuregen", "nowor", "ontime", "gov", "resp_gov", "resp_comp", "resp_mkb", "resp_citiz_mot", "resp_you", "pers_resp_mot", "sust_choice", "contr", "energy", "noidea", "motiv")
@@ -1464,7 +1458,6 @@ load("./data/final_data/lisstotal.RData")
 liss_complete <- lisstotal %>% drop_na()
 liss_complete$time <- liss_complete$surveyyear - min(liss_complete$surveyyear)
 
-utils::View(liss_complete)
 # I want to build models. In the empty model, I only want to include time. 
 predictors <- c("time")
 deps <- c("lifestyle")
@@ -1547,7 +1540,6 @@ load("./data/final_data/socontotal.RData")
 socon_complete <- socontotal %>% drop_na()
 socon_complete$time <- socon_complete$surveyyear - min(socon_complete$surveyyear)
 
-utils::View(socon_complete)
 # I want to build models. In the empty model, I only want to include time. 
 predictors <- c("time")
 deps <- c("fut_gen_socon")

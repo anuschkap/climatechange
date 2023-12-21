@@ -1,0 +1,516 @@
+---
+title: "Meta-regression weighted gamlss models"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r, echo=FALSE}
+#knitr::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(number_sections = FALSE)
+options(width = 100)
+colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
+```
+
+In this script, I perform meta-analyses for the models and test the hypotheses
+
+```{r, results = 'hide', warning=FALSE, message=FALSE}
+rm(list=ls())
+library(meta)
+library(metafor)
+library(dplyr)
+library(kableExtra)
+library(fastDummies)
+
+set.seed(1)
+
+```
+
+## Forest plots {-}
+
+```{r, results='hide', warning=FALSE}
+# With the final data
+load("./data/meta_analysis/total_reg_results_gam_w_new.RData")
+
+# Step 1. Estimate the empty model without moderators to make the forest plots. 
+model_step_1_att <- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_reg_results,
+              method = "ML",
+              test = "knha")
+
+model_step_1_att
+
+# I want to assign different colors to the different types of dependent variables, so that one can easily distinguish 
+# the types of attitudes by colors in the forest plot
+total_reg_results$colour <- NA
+total_reg_results$colour[total_reg_results$attitude_cat=="cognitive"] <- "#2980B9" # blue
+total_reg_results$colour[total_reg_results$attitude_cat=="affective"] <- "#CC5279" # pink
+total_reg_results$colour[total_reg_results$attitude_cat=="behavioral"] <- "#B0CC52" # green
+
+colour.palette <- as.vector(total_reg_results$colour)
+
+# Make a forest plot (has to be done outside codechunk, otherwise it doesn't save)
+```
+
+
+```{r, warning=FALSE}
+# Now plot the model with the 4 pooled effects
+# The argument order = "yi" puts the effects in order from negative to positive
+# If I don't use the brackets, Rmarkdown doesn't recognize the plot
+# I would like to change the names of the variables so that they are a bit more descriptive and look better
+total_reg_results$dep_var_name[total_reg_results$dep_var == "dodiff"] <- "Do things differently" 
+total_reg_results$dep_var_name[total_reg_results$dep_var == "frontrunner"] <- "NL frontrunner"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "min_contr"] <- "Minimal contribution"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "people_decide"] <- "Let people decide"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "econprotect"] <- "Need economic growth"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "growharm"] <- "Growth harms env"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "bus_decide"] <- "Let business decide"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "othersame"] <- "Others do same"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_citiz"] <- "Responsibility citizen"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "dk_start"] <- "Don't know where start"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "buss_help"] <- "Large companies reduce"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "envp_eg"] <- "Protection boosts growth"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "effr_eg"] <- "Use natural resources"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "env_quallife"] <- "Env affects quality life"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cc_unstop"] <- "Climate change unstoppable"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cc_poseu"] <- "Fighting cc pos impact EU"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "big_pol"] <- "Big polluters responsible"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "pers_resp"] <- "Personal responsiblity" 
+total_reg_results$dep_var_name[total_reg_results$dep_var == "worry"] <- "Worried climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "worried"] <- "Worry CO2 and climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "worry_future"] <- "Bleak future generations"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "willing_price"] <- "Willing pay higher prices"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "willing_tax"] <- "Willing pay higher taxes"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "willing_living"] <- "Willing cut std of living"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "do_right"] <- "Do what is right"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "climate5"] <- "Would give part income" 
+total_reg_results$dep_var_name[total_reg_results$dep_var == "prsaction"] <- "Taken personal action"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cc_prsact"] <- "Taken personal action"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "buyprod"] <- "Buy environmental products"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "worry_issp"] <- "Worry too much about future"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "lifeharm"] <- "Everything we do harms env"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "progharm"] <- "Worry too much about harm"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "moreimp"] <- "Other things more important"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "exag"] <- "Claims exaggerated" 
+total_reg_results$dep_var_name[total_reg_results$dep_var == "country_effort"] <- "Countries doing enough"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cause"] <- "Cause climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "human_resp"] <- "Humans responsible"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "env_ec_stat"] <- "Env vs economy"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "env_prsimp"] <- "Urgent problem"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cchange"] <- "Most important problem"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cchange2"] <- "2nd most important problem"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cchangetot"] <- "Mentioned as important problem"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "ccpercept"] <- "Serious climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "doprot_comp"] <- "Companies do enough" 
+total_reg_results$dep_var_name[total_reg_results$dep_var == "doprot_citiz"] <- "Citizens do enough"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "doprot_region"] <- "Region does enough"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "do_gov"] <- "Government does enough"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "doprot_natgov"] <- "Government does enough"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "doprot_eu"] <- "EU does enough"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "doprot_city"] <- "City does enough"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cc_exag"] <- "Seriousness exaggerated"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "role_ind"] <- "Individuals can play role"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "eff_daily"] <- "Env issues affect daily life"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "pers_imp"] <- "Personal importance"
+
+# And the national datasets added
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cchange_mot"] <- "Think about climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "worried_mot"] <- "Worry status climate"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "futuregen"] <- "Worry future generations"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "nowor"] <- "Don't worry global warming"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "ontime"] <- "Still on time to do sth"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "gov"] <- "Evaluation government action"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_gov"] <- "Responsibility gov"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_comp"] <- "Responsibility big comp"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_mkb"] <- "Responsibility SME"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_citiz_mot"] <- "Responsibility citizen"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_you"] <- "Your responsibility"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "pers_resp_mot"] <- "Your responsibility CO2"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "sust_choice"] <- "Sustainability important"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "contr"] <- "Contribute to sustainable society"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "energy"] <- "Energy choices fight climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "noidea"] <- "No idea what to do"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "motiv"] <- "Motivated to fight climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "fut_gen_socon"] <- "Worry future generations"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "lifestyle"] <- "Importance changing lifestyle"
+
+
+par(mar = c(5, 5, 2, 2))
+
+{png <- forest(model_step_1_att, , at=c(-0.4, 0, 0.4), colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var_name, pch = 23,fonts = "Times New Roman", ylim = c(-4.5, 75), cex = 0.25, mlab = "Pooled estimate total", order = "yi", ilab = mean_year, ilab.xpos = -4, xlim = c(-2, 2), width = 0.0001)
+}
+
+
+# The plot can only be saved outside of the codechunk, hence the code underneath
+```
+
+#Mean attitudes 
+png(file = "./output/forestplot_neg_to_pos_weight_NEW_DECEMBER.png", width = 2800, height = 2400, res = 300)
+
+{png <- forest(model_step_1_att, , at=c(-1, 0, 1), colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect attitudes", slab = total_reg_results$dep_var_name, pch = 23,fonts = "Times", ylim = c(-4.5, 75), cex = 0.5, mlab = "Pooled estimate total", order = "yi", ilab = mean_year, ilab.xpos = -4, xlim = c(-2, 2))
+
+}
+
+dev.off()
+
+```{r, warning=FALSE}
+# Repeat step 1, but then for the polarization (variance)
+model_step_1_var <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_reg_results,
+              method = "ML",
+              test = "knha")
+
+model_step_1_var
+
+{png <- forest(model_step_1_var, at=c(-1, 0, 1), colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect polarization", slab = total_reg_results$dep_var_name, pch = 23,fonts = "Times", cex = 0.25, ylim = c(-4.5, 75), mlab = "Pooled estimate total", order = "yi", ilab = mean_year, ilab.xpos = -4, xlim = c(-2, 2), width = 0.0001)
+}
+
+# And also make the forest plot for the variance
+```
+
+#Polarization attitudes
+png(file = "./output/forestplot_variance_NEW_DECEMBER.png", width = 2800, height = 2400, res = 300)
+
+{png <- forest(model_step_1_var, at=c(-0.3, 0, 0.3), colout = colour.palette, col = "#ACBFD6", annotate = TRUE, header = "Forest plot time effect polarization", slab = total_reg_results$dep_var_name, pch = 23,fonts = "Times", cex = 0.5, ylim = c(-4.5, 75), mlab = "Pooled estimate total", order = "yi", ilab = mean_year, ilab.xpos = -4, xlim = c(-2, 2))
+}
+
+dev.off()
+
+## Step 2 until 4 meta-regression {-}
+
+```{r, results='hide', warning=FALSE}
+#Step 2. Empty model with meta-level indicators, first only with mean year. 
+# First I have to give mean_year a meaning
+table(total_reg_results$mean_year)
+total_reg_results$mean_year_centered <- total_reg_results$mean_year - mean(total_reg_results$mean_year)
+
+#From the plot we saw that behavioral shows something else than the other 2, so set that as the reference category.
+table(total_reg_results$attitude_cat)
+total_reg_results$attitude_cat <- factor(total_reg_results$attitude_cat)
+total_reg_results$attitude_cat <- relevel(total_reg_results$attitude_cat, ref = "behavioral") # Other ref cats also insig for mean, for variance beh as ref cat sig
+ 
+model_step_2_att <- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_reg_results,
+              mods = ~ attitude_cat,
+              method = "ML",
+              test = "knha")
+
+summary(model_step_2_att)
+
+# Save dataset with new variables
+
+save(total_reg_results, file= "./data/meta_analysis/total_reg_results_gam_w_new.RData" )
+
+```
+
+
+```{r, results='hide', warning=FALSE}
+# Step 2 variance
+#Step 2. Empty model with meta-level indicators
+model_step_2_var <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_reg_results,
+              mods = ~ attitude_cat, # cogn as ref cat, sig
+              method = "ML",
+              test = "knha")
+
+model_step_2_var
+
+```
+
+```{r, results='hide', warning=FALSE}
+# Step 3. Model with 2 meta-level vars variables
+model_step_3_att <- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_reg_results,
+              mods = ~ attitude_cat + mean_year_centered,
+              method = "ML",
+              test = "knha")
+
+model_step_3_att
+
+# Step 4. Model with all metalevel variables
+# First check the correlation between the numeric vars
+total_reg_results[,c("pec_miss", "or_scale", "national", "mean_year_centered")] %>% cor() # low correlations
+
+model_step_4_att <- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_reg_results,
+              mods = ~ attitude_cat + mean_year_centered + ambiguous + national + or_scale + pec_miss + data + nr_waves,
+              method = "ML",
+              test = "knha")
+
+model_step_4_att
+```
+
+```{r, results='hide', warning=FALSE}
+# Step 3. Variance
+model_step_3_var <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_reg_results,
+              mods = ~  attitude_cat + mean_year_centered,
+              method = "ML",
+              test = "knha")
+
+model_step_3_var
+
+# Step 4. Variance
+model_step_4_var <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_reg_results,
+              mods = ~  attitude_cat +  mean_year_centered + ambiguous + national + or_scale + pec_miss + data + nr_waves,
+              method = "ML",
+              test = "knha")
+
+model_step_4_var
+```
+## Fixed effects {-}
+```{r}
+# Mean attitudes
+# Step 1
+model_step_1_att_f <- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_reg_results,
+              method = "FE",
+              test = "z")
+
+model_step_1_att_f
+
+model_step_2_att_f <- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_reg_results,
+              mods = ~ attitude_cat,
+              method = "FE",
+              test = "z")
+
+summary(model_step_2_att_f)
+
+model_step_3_att_f <- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_reg_results,
+              mods = ~ attitude_cat + mean_year_centered,
+              method = "FE",
+              test = "z")
+
+model_step_3_att_f
+
+model_step_4_att_f <- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_reg_results,
+              mods = ~ attitude_cat + mean_year_centered + ambiguous + national + or_scale + pec_miss + data + nr_waves,
+              method = "FE",
+              test = "z")
+
+model_step_4_att_f
+
+```
+
+```{r}
+# Fixed effects variance
+model_step_1_var_f <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_reg_results,
+              method = "FE",
+              test = "z")
+
+model_step_1_var_f
+
+model_step_2_var_f <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_reg_results,
+              mods = ~ attitude_cat, # cogn as ref cat, sig
+              method = "FE",
+              test = "z")
+
+model_step_2_var_f
+
+model_step_3_var_f <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_reg_results,
+              mods = ~  attitude_cat + mean_year_centered,
+              method = "FE",
+              test = "z")
+
+model_step_3_var_f
+
+# Step 4. Variance
+model_step_4_var_f <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_reg_results,
+              mods = ~  attitude_cat +  mean_year_centered + ambiguous + national + or_scale + pec_miss + data + nr_waves,
+              method = "FE",
+              test = "z")
+
+model_step_4_var_f
+```
+
+
+```{r}
+# Random model for independent variables
+
+model_step_1_att_p <- rma(yi = mu_time_pred,
+              sei = mu_time_sd_pred,
+              data = total_reg_results,
+              method = "ML",
+              test = "knha")
+
+model_step_1_att_p
+
+model_step_2_att_p <- rma(yi = mu_time_pred,
+              sei = mu_time_sd_pred,
+              data = total_reg_results,
+              mods = ~ attitude_cat,
+              method = "ML",
+              test = "knha")
+
+summary(model_step_2_att_p)
+
+model_step_3_att_p <- rma(yi = mu_time_pred,
+              sei = mu_time_sd_pred,
+              data = total_reg_results,
+              mods = ~ attitude_cat + mean_year_centered,
+              method = "ML",
+              test = "knha")
+
+model_step_3_att_p
+
+model_step_4_att_p <- rma(yi = mu_time_pred,
+              sei = mu_time_sd_pred,
+              data = total_reg_results,
+              mods = ~ attitude_cat + mean_year_centered + ambiguous + national + or_scale + pec_miss + data + nr_waves,
+              method = "ML",
+              test = "knha")
+
+model_step_4_att_p
+
+
+
+model_step_1_var_p <- rma(yi = sig_time_pred,
+              sei = sig_time_sd_pred,
+              data = total_reg_results,
+              method = "ML",
+              test = "knha")
+
+model_step_1_var_p
+
+model_step_2_var_p <- rma(yi = sig_time_pred,
+              sei = sig_time_sd_pred,
+              data = total_reg_results,
+              mods = ~ attitude_cat, # cogn as ref cat, sig
+              method = "ML",
+              test = "knha")
+
+model_step_2_var_p
+
+model_step_3_var_p <- rma(yi = sig_time_pred,
+              sei = sig_time_sd_pred,
+              data = total_reg_results,
+              mods = ~  attitude_cat + mean_year_centered,
+              method = "ML",
+              test = "knha")
+
+model_step_3_var_p
+
+# Step 4. Variance
+model_step_4_var_p <- rma(yi = sig_time_pred,
+              sei = sig_time_sd_pred,
+              data = total_reg_results,
+              mods = ~  attitude_cat +  mean_year_centered + ambiguous + national + or_scale + pec_miss + data + nr_waves,
+              method = "ML",
+              test = "knha")
+
+model_step_4_var_p
+```
+
+
+```{r}
+# Fixed model for independent variables
+
+model_step_1_att_fp <- rma(yi = mu_time_pred,
+              sei = mu_time_sd_pred,
+              data = total_reg_results,
+              method = "FE",
+              test = "z")
+
+model_step_1_att_fp
+
+model_step_2_att_fp <- rma(yi = mu_time_pred,
+              sei = mu_time_sd_pred,
+              data = total_reg_results,
+              mods = ~ attitude_cat,
+              method = "FE",
+              test = "z")
+
+summary(model_step_2_att_fp)
+
+model_step_3_att_fp <- rma(yi = mu_time_pred,
+              sei = mu_time_sd_pred,
+              data = total_reg_results,
+              mods = ~ attitude_cat + mean_year_centered,
+              method = "FE",
+              test = "z")
+
+model_step_3_att_fp
+
+model_step_4_att_fp <- rma(yi = mu_time_pred,
+              sei = mu_time_sd_pred,
+              data = total_reg_results,
+              mods = ~ attitude_cat + mean_year_centered + ambiguous + national + or_scale + pec_miss + data + nr_waves,
+              method = "FE",
+              test = "z")
+
+model_step_4_att_fp
+
+
+
+model_step_1_var_fp <- rma(yi = sig_time_pred,
+              sei = sig_time_sd_pred,
+              data = total_reg_results,
+              method = "FE",
+              test = "z")
+
+model_step_1_var_fp
+
+model_step_2_var_fp <- rma(yi = sig_time_pred,
+              sei = sig_time_sd_pred,
+              data = total_reg_results,
+              mods = ~ attitude_cat, # cogn as ref cat, sig
+              method = "FE",
+              test = "z")
+
+model_step_2_var_fp
+
+model_step_3_var_fp <- rma(yi = sig_time_pred,
+              sei = sig_time_sd_pred,
+              data = total_reg_results,
+              mods = ~  attitude_cat + mean_year_centered,
+              method = "FE",
+              test = "z")
+
+model_step_3_var_fp
+
+# Step 4. Variance
+model_step_4_var_fp <- rma(yi = sig_time_pred,
+              sei = sig_time_sd_pred,
+              data = total_reg_results,
+              mods = ~  attitude_cat +  mean_year_centered + ambiguous + national + or_scale + pec_miss + data + nr_waves,
+              method = "FE",
+              test = "z")
+
+model_step_4_var_fp
+```
+
+
+
+
+## Put the results in kable table {-}
+
+```{r}
+options(knitr.kable.NA = '')
+```
+
+
+

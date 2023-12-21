@@ -19,21 +19,21 @@ rm(list=ls())
 library(tidyverse)
 library(dplyr)
 library(gamlss)
-library(here)
-here()
-here::i_am("scripts/analysis/regression_to_meta_analysis_weight_gamlss_new.Rmd")
 ```
 
 ## ESS {-}
 
 ```{r}
 # First load the empty lists
-load(here("./data/final_data/regression_outputs", "ess_list_empty_w.RData"))
+load("./data/final_data/regression_outputs/ess_list_empty_w.RData")
+
+summary(ess_list_empty[[1]])
 
 # Store the results in a new dataframe
 ess_empty_df <- data.frame(dep_var = character())
 
-# Loop over the list of models
+
+        # Loop over the list of models
 for (i in seq_along(ess_list_empty)) {
 
   # Extract the dependent variable so that we know for which dep var the effects are
@@ -57,7 +57,7 @@ for (i in seq_along(ess_list_empty)) {
 }
 
 # Of course this also has to be done for the other lists of the other models
-load(here("./data/final_data/regression_outputs", "ess_list_preds_w_new.RData"))
+load("./data/final_data/regression_outputs/ess_list_preds_w_new.RData")
 
 # This does mean that the estimates of the sigma are in a different place
 sum <- summary(ess_list_preds[[1]])
@@ -89,7 +89,7 @@ for (i in seq_along(ess_list_preds)) {
 }
 
 # And then for the interaction model
-load(here("./data/final_data/regression_outputs", "ess_list_interactions_w_new.RData"))
+load("./data/final_data/regression_outputs/ess_list_interactions_w_new.RData")
 
 # Store the results in a new dataframe
 ess_interactions_df <- data.frame(dep_var = character())
@@ -123,14 +123,15 @@ ess_results_df$first_year <- 2016
 ess_results_df$mean_year <- 2018
 ess_results_df$data <- "ESS"
 
-save(ess_results_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_results_df_w_new.RData")
+save(ess_results_df, file="./data/final_data/regression_outputs/ess_results_df_w_new.RData")
 ```
 
 ## EVS {-}
 
 ```{r}
 # Now the same for the EVS
-load(here("./data/final_data/regression_outputs", "evs_list_empty_w.RData"))
+rm(list=ls())
+load("./data/final_data/regression_outputs/evs_list_empty_w.RData")
 
 # Store the results in a new dataframe
 evs_empty_df <- data.frame(dep_var = character())
@@ -159,7 +160,7 @@ for (i in seq_along(evs_list_empty)) {
 }
 
 # And the predictor model
-load(here("./data/final_data/regression_outputs", "evs_list_preds_w_new.RData"))
+load("./data/final_data/regression_outputs/evs_list_preds_w_new.RData")
 
 # Store the results in a new dataframe
 evs_preds_df <- data.frame(dep_var = character())
@@ -188,7 +189,7 @@ for (i in seq_along(evs_list_preds)) {
 }
 
 # And lastly the interaction model
-load(here("./data/final_data/regression_outputs", "evs_list_interactions_w_new.RData"))
+load("./data/final_data/regression_outputs/evs_list_interactions_w_new.RData")
 
 # Store the results in a new dataframe
 evs_interactions_df <- data.frame(dep_var = character())
@@ -223,14 +224,14 @@ evs_results_df$first_year <- 1990
 evs_results_df$mean_year <- 1999
 evs_results_df$data <- "EVS"
 
-save(evs_results_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/evs_results_df_w_new.RData")
+save(evs_results_df, file="./data/final_data/regression_outputs/evs_results_df_w_new.RData")
 ```
 
 ## I&O Research {-}
 
 ```{r}
 # Now for I&O research
-load(here("./data/final_data/regression_outputs", "io_list_empty_w.RData"))
+load("./data/final_data/regression_outputs/io_list_empty_w.RData")
 
 # Store the results in a new dataframe
 io_empty_df <- data.frame(dep_var = character())
@@ -258,7 +259,7 @@ for (i in seq_along(io_list_empty)) {
 }
 
 # Predictor model
-load(here("./data/final_data/regression_outputs", "io_list_preds_w_new.RData"))
+load("./data/final_data/regression_outputs/io_list_preds_w_new.RData")
 
 # Store the results in a new dataframe
 io_preds_df <- data.frame(dep_var = character())
@@ -287,7 +288,7 @@ for (i in seq_along(io_list_preds)) {
 }
 
 # Interaction model
-load(here("./data/final_data/regression_outputs", "io_list_interactions_w_new.RData"))
+load("./data/final_data/regression_outputs/io_list_interactions_w_new.RData")
 
 # Store the results in a new dataframe
 io_interactions_df <- data.frame(dep_var = character())
@@ -322,14 +323,14 @@ io_results_df$first_year <- 2019
 io_results_df$mean_year <- 2021
 io_results_df$data <- "IO"
 
-save(io_results_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/io_results_df_w_new.RData")
+save(io_results_df, file="./data/final_data/regression_outputs/io_results_df_w_new.RData")
 ```
 
 ## ISSP {-}
 
 ```{r}
 # Now for ISSP, which has to happen twice (bc 2 substs based on dependent vars)
-load(here("./data/final_data/regression_outputs", "issp_list_empty_w.RData"))
+load("./data/final_data/regression_outputs/issp_list_empty_w.RData")
 
 # Store the results in a new dataframe
 issp_empty_df <- data.frame(dep_var = character())
@@ -358,7 +359,7 @@ for (i in seq_along(issp_list_empty)) {
 }
 
 # Predictor model 
-load(here("./data/final_data/regression_outputs", "issp_list_preds_w_new.RData"))
+load("./data/final_data/regression_outputs/issp_list_preds_w_new.RData")
 
 # Store the results in a new dataframe
 issp_preds_df <- data.frame(dep_var = character())
@@ -387,7 +388,7 @@ for (i in seq_along(issp_list_preds)) {
 }
 
 # Interaction model 
-load(here("./data/final_data/regression_outputs", "issp_list_interactions_w_new.RData"))
+load("./data/final_data/regression_outputs/issp_list_interactions_w_new.RData")
 
 # Store the results in a new dataframe
 issp_interactions_df <- data.frame(dep_var = character())
@@ -422,13 +423,13 @@ issp_results_df$first_year <- 1993
 issp_results_df$mean_year <- 2002
 issp_results_df$data <- "ISSP"
 
-save(issp_results_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_results_df_w_new.RData")
+save(issp_results_df, file="./data/final_data/regression_outputs/issp_results_df_w_new.RData")
 ```
 
 
 ```{r}
 # And with the second model
-load(here("./data/final_data/regression_outputs", "issp_list_empty_2_waves_w.RData"))
+load("./data/final_data/regression_outputs/issp_list_empty_2_waves_w.RData")
 
 # Store the results in a new dataframe
 issp_empty_2_df <- data.frame(dep_var = character())
@@ -457,7 +458,7 @@ for (i in seq_along(issp_list_empty_2_waves)) {
 }
 
 # Predictor model 
-load(here("./data/final_data/regression_outputs", "issp_list_preds_2_waves_w_new.RData"))
+load("./data/final_data/regression_outputs/issp_list_preds_2_waves_w_new.RData")
 
 # Store the results in a new dataframe
 issp_preds_2_df <- data.frame(dep_var = character())
@@ -486,7 +487,7 @@ for (i in seq_along(issp_list_preds_2_waves)) {
 }
 
 # Interaction model 
-load(here("./data/final_data/regression_outputs", "issp_list_interactions_2_waves_w.RData"))
+load("./data/final_data/regression_outputs/issp_list_interactions_2_waves_w.RData")
 
 # Store the results in a new dataframe
 issp_interactions_2_df <- data.frame(dep_var = character())
@@ -521,7 +522,7 @@ issp_results_2_df$first_year <- 2000
 issp_results_2_df$mean_year <- 2005
 issp_results_2_df$data <- "ISSP"
 
-save(issp_results_2_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_results_2_df_new.RData")
+save(issp_results_2_df, file="./data/final_data/regression_outputs/issp_results_2_df_new.RData")
 ```
 
 ## EB {-}
@@ -531,20 +532,21 @@ save(issp_results_2_df, file="/Users/anuschka/Documents/climatechange/climatecha
 
 # First load all the eurobarometer lists with empty models in my environment
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "issp_list_interactions_2_waves_w.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_empty_1986_w.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_empty_2007_w.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_empty_2008_w.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_empty_2009_w.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_empty_2011_w.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_empty_buyprod_w.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_empty_cchange2_w.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_empty_doprot_w.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_empty_eff_daily_w.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_empty_pers_imp_w.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_empty_prsaction_w.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_empty_quallife_w.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_empty_doprot_city_w.RData"))
+load("./data/final_data/regression_outputs/issp_list_interactions_2_waves_w.RData")
+load("./data/final_data/regression_outputs/eb_list_empty_1986_w.RData")
+load("./data/final_data/regression_outputs/eb_list_empty_2007_w.RData")
+load("./data/final_data/regression_outputs/eb_list_empty_2008_w.RData")
+load("./data/final_data/regression_outputs/eb_list_empty_2009_w.RData")
+load("./data/final_data/regression_outputs/eb_list_empty_2011_w.RData")
+load("./data/final_data/regression_outputs/eb_list_empty_buyprod_w.RData")
+load("./data/final_data/regression_outputs/eb_list_empty_cchange2_w.RData")
+load("./data/final_data/regression_outputs/eb_list_empty_doprot_w.RData")
+load("./data/final_data/regression_outputs/eb_list_empty_eff_daily_w.RData")
+load("./data/final_data/regression_outputs/eb_list_empty_pers_imp_w.RData")
+load("./data/final_data/regression_outputs/eb_list_empty_prsaction_w.RData")
+load("./data/final_data/regression_outputs/eb_list_empty_quallife_w.RData")
+load("./data/final_data/regression_outputs/eb_list_empty_doprot_city_w.RData")
+
 
 # Store the results in a new dataframe
 eb_results_df <- data.frame(dep_var = character())
@@ -585,7 +587,7 @@ for (i in seq_along(my_list)) {
 eb_results_empty_df <- eb_results_df
 
 # let's save it 
-save(eb_results_empty_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_results_empty_df_w_new.RData" )
+save(eb_results_empty_df, file= "./data/final_data/regression_outputs/eb_results_empty_df_w_new.RData" )
 
 # And the numbers are indeed extracted correctly if i check this randomly
 sum <- summary(eb_list_empty_quallife[[1]])
@@ -596,18 +598,19 @@ sum <- summary(eb_list_empty_quallife[[1]])
 # Now i want the same for the models with the predictors
 # First clear the environment because I don't want the empty lists iterated in the predictor loop
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "eb_list_preds_1986_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_2007_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_2008_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_2009_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_2011_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_buyprod_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_cchange2_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_doprot_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_eff_daily_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_pers_imp_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_prsaction_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_preds_doprot_city_w_new.RData"))
+load("./data/final_data/regression_outputs/eb_list_preds_1986_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_2007_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_2008_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_2009_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_2011_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_buyprod_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_cchange2_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_doprot_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_eff_daily_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_pers_imp_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_prsaction_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_preds_doprot_city_w_new.RData")
+
 
 # Store the results in a new dataframe
 eb_results_preds_df <- data.frame(dep_var = character())
@@ -645,26 +648,27 @@ for (i in seq_along(my_list)) {
 } 
 
 # Again, an error, but the output is correct
-save(eb_results_preds_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_results_preds_df_w_new.RData" )
+save(eb_results_preds_df, file= "./data/final_data/regression_outputs/eb_results_preds_df_w_new.RData" )
 ```
 
 
 ```{r}
 # Lastly for the interaction models
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_1986_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_2007_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_2008_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_2009_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_2011_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_buyprod_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_cchange2_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_doprot_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_eff_daily_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_pers_imp_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_prsaction_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_quallife_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_doprot_city_w_new.RData"))
+load("./data/final_data/regression_outputs/eb_list_interactions_1986_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_2007_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_2008_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_2009_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_2011_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_buyprod_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_cchange2_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_doprot_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_eff_daily_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_pers_imp_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_prsaction_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_quallife_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_doprot_city_w_new.RData")
+
 
 # Store the results in a new dataframe
 eb_results_interactions_df <- data.frame(dep_var = character())
@@ -702,14 +706,14 @@ for (i in seq_along(my_list)) {
 } 
 
 
-save(eb_results_interactions_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_results_interactions_df_w_new.RData" )
+save(eb_results_interactions_df, file= "./data/final_data/regression_outputs/eb_results_interactions_df_w_new.RData" )
 ```
 
 
 ```{r}
 # Make one dataframe of the three loops
-load(here("./data/final_data/regression_outputs", "eb_results_empty_df_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_results_preds_df_w_new.RData"))
+load("./data/final_data/regression_outputs/eb_results_empty_df_w_new.RData")
+load("./data/final_data/regression_outputs/eb_results_preds_df_w_new.RData")
 
 # Merge the results
 eb_results_df <- left_join(eb_results_empty_df, eb_results_preds_df)
@@ -772,12 +776,13 @@ eb_results_df$mean_year[eb_results_df$dep_var == "env_ec_stat"] <- 1991
 eb_results_df$mean_year[eb_results_df$dep_var == "env_prsimp"] <- 1991
 eb_results_df$mean_year[eb_results_df$dep_var == "prsaction"] <- 2014
 
-save(eb_results_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_results_df_w_new.RData" )
+save(eb_results_df, file= "./data/final_data/regression_outputs/eb_results_df_w_new.RData" )
 ```
 
 ## Motivaction {-}
 
 ```{r}
+rm(list=ls())
 load("./data/final_data/regression_outputs/mot_list_empty_w.RData")
 
 mot_empty_df <- data.frame(dep_var = character())
@@ -805,8 +810,6 @@ for (i in seq_along(mot_list_empty)) {
   # Put the results 
   mot_empty_df <- rbind(mot_empty_df, data.frame(dep_var = dep_var, mu_intercept = mu_int, mu_sd = mu_sd, sigma_intercept = sigma_int, sigma_sd = sigma_sd, mu_time = mu_time, mu_time_sd = mu_time_sd, sig_time = sig_time, sig_time_sd = sig_time_sd))
 }
-
-utils::View(mot_empty_df)
 
 load("./data/final_data/regression_outputs/mot_list_preds_w_new.RData")
 
@@ -876,8 +879,6 @@ for (i in seq_along(mot_list_interactions)) {
 
 mot_results_df <- merge(mot_empty_df, mot_preds_df)
 mot_results_df <- merge(mot_results_df, mot_interactions_df)
-utils::View(mot_results_df)
-
 mot_results_df$first_year <- 2019
 mot_results_df$mean_year <- 2020
 mot_results_df$data <- "MOT"
@@ -986,7 +987,6 @@ for (i in seq_along(liss_list_interactions)) {
 
 liss_results_df <- merge(liss_empty_df, liss_preds_df)
 liss_results_df <- merge(liss_results_df, liss_interactions_df)
-utils::View(liss_results_df)
 
 liss_results_df$first_year <- 2019
 liss_results_df$mean_year <- 2020
@@ -1146,7 +1146,7 @@ total_reg_results$attitude_cat[total_reg_results$dep_var == "dodiff"
                                | total_reg_results$dep_var == "worried_mot"
                                | total_reg_results$dep_var == "futuregen"
                                | total_reg_results$dep_var == "nowor"
-                               | total_reg_results$dep_var == "motivr"
+                               | total_reg_results$dep_var == "motiv"
                                | total_reg_results$dep_var == "fut_gen_socon"
                                | total_reg_results$dep_var == "pers_resp_mot"] <- "affective"
 
@@ -1253,6 +1253,22 @@ total_reg_results$ambiguous[total_reg_results$dep_var == "dodiff"
 
 table(total_reg_results$ambiguous, useNA = "always")
 
+# I also want an indicator for whether it is a national or international dataset. 
+total_reg_results$national[total_reg_results$data == "IO"|
+                             total_reg_results$data == "MOT" |
+                             total_reg_results$data == "LISS" |
+                             total_reg_results$data == "SOCON"] <- 1
+total_reg_results$national[total_reg_results$data == "EB"|
+                             total_reg_results$data == "ESS" |
+                             total_reg_results$data == "EVS" |
+                             total_reg_results$data == "ISSP"] <- 0
+
+# I also calculated the percentage of missings per variable, in how many waves it was asked and how many categories the original scale had. I collected these data in Excel.
+metavar <- readxl::read_excel("./data/meta_var.xlsx")
+total_reg_results <- merge(total_reg_results, metavar)
+
+
+table(total_reg_results$data)
 save(total_reg_results, file= "./data/meta_analysis/total_reg_results_gam_w_new.RData" )
 ```
 

@@ -16,7 +16,6 @@ In this script I use loops to perform gamlss regressions for all 52 attitudes. T
 
 ```{r}
 rm(list = ls())
-#install.packages("gamlss")
 library(gamlss)
 library(tidyverse)
 library(dplyr)
@@ -26,7 +25,7 @@ library(fastDummies)
 ## ESS {-}
 
 ```{r}
-load(here("./data/final_data", "esstotal.RData"))
+load("./data/final_data/esstotal.RData")
 
 # Gamlss cannot handle NAs, so I have to listwise delete all of them
 ess_complete <- esstotal %>% drop_na()
@@ -50,7 +49,7 @@ ess_list_preds <- list()
 
 summary(ess_list_preds[[1]]) 
 
-save(ess_list_preds, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/ess_list_preds_w_new_age.RData")
+save(ess_list_preds, file="./data/final_data/regression_outputs/ess_list_preds_w_new_age.RData")
 ```
 
 ## EVS {-}
@@ -58,7 +57,7 @@ save(ess_list_preds, file="/Users/anuschka/Documents/climatechange/climatechange
 ```{r}
 rm(list=ls())
 # Perform the same procedure for the EVS
-load(here("./data/final_data", "evssel.RData"))
+load("./data/final_data/evssel.RData")
 
 evs_complete <- evssel %>% dplyr::select(surveyyear:marstat, weightvec, isced_cat)
 evs_complete <- evs_complete %>% drop_na()
@@ -80,14 +79,14 @@ evs_list_preds <- list()
   evs_list_preds[[i]] <- evs_fit
 } 
 
-save(evs_list_preds, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/evs_list_preds_w_new_age.RData")
+save(evs_list_preds, file="./data/final_data/regression_outputs/evs_list_preds_w_new_age.RData")
 ```
 
 ## I&O {-}
 
 ```{r}
 rm(list = ls())
-load(here("./data/final_data", "io_total.RData"))
+load("./data/final_data/io_total.RData")
 io_complete <- io_total %>% dplyr::select(worried:surveyyear, weightvec, isced_cat)
 #Urban, IOINKOMEN, IOPOL has to go away
 io_complete = subset(io_complete, select = -c(urban,IOINKOMEN, IOPOL2017) )
@@ -113,14 +112,14 @@ io_list_preds <- list()
 
 summary(io_list_preds[[1]]) 
 
-save(io_list_preds, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/io_list_preds_w_new_age.RData")
+save(io_list_preds, file="./data/final_data/regression_outputs/io_list_preds_w_new_age.RData")
 ```
 
 ## ISSP {-}
 
 ```{r}
 rm(list=ls())
-load(here("./data/final_data", "issptotal.Rdata"))
+load("./data/final_data/issptotal.Rdata")
 issptotal$surveyyear[is.na(issptotal$surveyyear)] <- "2010"
 issptotal$surveyyear <- as.numeric(issptotal$surveyyear)
 
@@ -146,7 +145,7 @@ issp_list_preds <- list()
   issp_list_preds[[i]] <- issp_fit
 } 
 
-save(issp_list_preds, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_preds_w_new_age.RData")
+save(issp_list_preds, file="./data/final_data/regression_outputs/issp_list_preds_w_new_age.RData")
 
 # Now the variables that are only asked twice
 issp_complete <- issptotal %>% dplyr::select(surveyyear, isced:growharm, weightvec, isced_cat)
@@ -169,7 +168,7 @@ issp_list_preds_2_waves <- list()
   issp_list_preds_2_waves[[i]] <- issp_fit
 } 
 
-save(issp_list_preds_2_waves, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/issp_list_preds_2_waves_w_new_age.RData")
+save(issp_list_preds_2_waves, file="./data/final_data/regression_outputs/issp_list_preds_2_waves_w_new_age.RData")
 ```
 
 ## EB {-}
@@ -177,7 +176,7 @@ save(issp_list_preds_2_waves, file="/Users/anuschka/Documents/climatechange/clim
 ```{r}
 # Now the most difficult one: Eurobarometer. No items are asked steadily throughout time, so have to work with a lot of subsets. 
 rm(list=ls())
-load(here("./data/final_data", "eb_tot.Rdata"))
+load("./data/final_data/eb_tot.Rdata")
 
 # first 1986 - 1995
 eb_complete <- eb_tot %>% dplyr::select(surveyyear, env_ec_stat, env_prsimp, sex, isced: urban, weightvec, isced_cat)
@@ -202,7 +201,7 @@ eb_list_preds_1986 <- list()
   eb_list_preds_1986[[i]] <- eb_fit
 } 
 
-save(eb_list_preds_1986, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_1986_w_new_age.RData")
+save(eb_list_preds_1986, file="./data/final_data/regression_outputs/eb_list_preds_1986_w_new_age.RData")
 ```
 
 ```{r}
@@ -229,7 +228,7 @@ eb_list_preds_quallife <- list()
   eb_list_preds_quallife[[i]] <- eb_fit
 } 
 
-save(eb_list_preds_quallife, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_quallife_w_new_age.RData")
+save(eb_list_preds_quallife, file="./data/final_data/regression_outputs/eb_list_preds_quallife_w_new_age.RData")
 ```
 
 ```{r}
@@ -255,7 +254,7 @@ eb_list_preds_2007 <- list()
   eb_list_preds_2007[[i]] <- eb_fit
 } 
 
-save(eb_list_preds_2007, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2007_w_new_age.RData")
+save(eb_list_preds_2007, file="./data/final_data/regression_outputs/eb_list_preds_2007_w_new_age.RData")
 ```
 
 ```{r}
@@ -280,7 +279,7 @@ eb_list_preds_buyprod <- list()
   eb_list_preds_buyprod[[i]] <- eb_fit
 } 
 
-save(eb_list_preds_buyprod, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_buyprod_w_new_age.RData")
+save(eb_list_preds_buyprod, file="./data/final_data/regression_outputs/eb_list_preds_buyprod_w_new_age.RData")
 ```
 
 ```{r}
@@ -305,7 +304,7 @@ eb_list_preds_eff_daily <- list()
   eb_list_preds_eff_daily[[i]] <- eb_fit
 } 
 
-save(eb_list_preds_eff_daily, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_eff_daily_w_new_age.RData")
+save(eb_list_preds_eff_daily, file="./data/final_data/regression_outputs/eb_list_preds_eff_daily_w_new_age.RData")
 ```
 
 ```{r}
@@ -330,7 +329,7 @@ eb_list_preds_2008 <- list()
   eb_list_preds_2008[[i]] <- eb_fit
 } 
 
-save(eb_list_preds_2008, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2008_w_new_age.RData")
+save(eb_list_preds_2008, file="./data/final_data/regression_outputs/eb_list_preds_2008_w_new_age.RData")
 ```
 
 
@@ -356,7 +355,7 @@ eb_list_preds_2009 <- list()
   eb_list_preds_2009[[i]] <- eb_fit
 } 
 
-save(eb_list_preds_2009, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2009_w_new_age.RData")
+save(eb_list_preds_2009, file="./data/final_data/regression_outputs/eb_list_preds_2009_w_new_age.RData")
 ```
 
 ```{r}
@@ -382,7 +381,7 @@ eb_list_preds_pers_imp <- list()
   eb_list_preds_pers_imp[[i]] <- eb_fit
 } 
 
-save(eb_list_preds_pers_imp, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_pers_imp_w_new_age.RData")
+save(eb_list_preds_pers_imp, file="./data/final_data/regression_outputs/eb_list_preds_pers_imp_w_new_age.RData")
 ```
 
 ```{r}
@@ -407,7 +406,7 @@ eb_list_preds_doprot <- list()
   eb_list_preds_doprot[[i]] <- eb_fit
 } 
 
-save(eb_list_preds_doprot, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_doprot_w_new_age.RData")
+save(eb_list_preds_doprot, file="./data/final_data/regression_outputs/eb_list_preds_doprot_w_new_age.RData")
 ```
 
 ```{r}
@@ -432,7 +431,7 @@ eb_list_preds_2011 <- list()
   eb_list_preds_2011[[i]] <- eb_fit
 } 
 
-save(eb_list_preds_2011, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_2011_w_new_age.RData")
+save(eb_list_preds_2011, file="./data/final_data/regression_outputs/eb_list_preds_2011_w_new_age.RData")
 ```
 
 ```{r}
@@ -458,7 +457,7 @@ eb_list_preds_cchange2 <- list()
   eb_list_preds_cchange2[[i]] <- eb_fit
 } 
 
-save(eb_list_preds_cchange2, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_cchange2_w_new_age.RData")
+save(eb_list_preds_cchange2, file="./data/final_data/regression_outputs/eb_list_preds_cchange2_w_new_age.RData")
 ```
 
 ```{r}
@@ -483,7 +482,7 @@ eb_list_preds_prsaction <- list()
   eb_list_preds_prsaction[[i]] <- eb_fit
 } 
 
-save(eb_list_preds_prsaction, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_prsaction_w_new_age.RData")
+save(eb_list_preds_prsaction, file="./data/final_data/regression_outputs/eb_list_preds_prsaction_w_new_age.RData")
 ```
 
 ```{r}
@@ -508,7 +507,7 @@ eb_list_preds_doprot_city <- list()
   eb_list_preds_doprot_city[[i]] <- eb_fit
 } 
 
-save(eb_list_preds_doprot_city, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/regression_outputs/eb_list_preds_doprot_city_w_new_age.RData")
+save(eb_list_preds_doprot_city, file="./data/final_data/regression_outputs/eb_list_preds_doprot_city_w_new_age.RData")
 ```
 
 ## Motivaction {-}
@@ -543,6 +542,7 @@ save(mot_list_preds, file="./data/final_data/regression_outputs/mot_list_preds_w
 
 ```
 
+## LISS {-}
 
 ```{r}
 rm(list=ls())
@@ -573,6 +573,8 @@ summary(liss_list_preds[[1]])
 save(liss_list_preds, file="./data/final_data/regression_outputs/liss_list_preds_w_new_age.RData")
 
 ```
+
+## SOCON {-}
 
 ```{r}
 rm(list=ls())

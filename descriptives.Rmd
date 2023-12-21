@@ -24,6 +24,7 @@ library(readxl)
 library(gamlss)
 library(metafor)
 library(meta)
+library(ggrepel)
 rm(list=ls())
 ```
 
@@ -35,7 +36,7 @@ datayear <- as.data.frame(datayear)
 ```
 
 ```{r, warning=FALSE, fig.show='asis'}
-color_scale <- c ("#E02023", "#1676E3", "#0AC760", "#1ABC9C", "#85C1E9" , "#EB984E", "#AF7AC5" , "#F1C40F")
+color_scale <- c ("#E02023", "#1676E3", "#20C66B", "#1ABC9C", "#85C1E9" , "#EB984E", "#AF7AC5" , "#F1C40F")
 datayear$dataset <- factor(datayear$dataset, levels = c("MOT", "SOCON", "LISS", "I&O", "ESS", "ISSP", "EVS", "EB"))
 datayear$color[datayear$dataset == "I&O"] <- "#1ABC9C"
 datayear$color[datayear$dataset == "ESS"] <- "#85C1E9"
@@ -44,7 +45,7 @@ datayear$color[datayear$dataset == "EVS"] <- "#AF7AC5"
 datayear$color[datayear$dataset == "EB"] <- "#F1C40F"
 datayear$color[datayear$dataset == "MOT"] <- "#E02023"
 datayear$color[datayear$dataset == "SOCON"] <- "#1676E3"
-datayear$color[datayear$dataset == "LISS"] <- "#0AC760"
+datayear$color[datayear$dataset == "LISS"] <- "#20C66B"
 
 first_last_year <- datayear %>%
   group_by(dataset) %>%
@@ -52,24 +53,21 @@ first_last_year <- datayear %>%
             last_year = max(year))
 
 yearplot <- ggplot(data = datayear, aes(x = year, y = dataset, color = color)) +
-  geom_line(size = 1) +
+  geom_point(size = 2) +
+  geom_line(aes(group = dataset), size = 1) +
+  geom_text(data = first_last_year, aes(x = first_year, y = dataset, label = as.character(first_year)),
+            vjust = -1, color = "darkgrey", size = 3, show.legend = FALSE) + 
+    geom_text(data = first_last_year, aes(x = last_year, y = dataset, label = as.character(last_year)),
+            vjust = -1, color = "darkgrey", size = 3, show.legend = FALSE) +
   scale_color_manual(values = color_scale) +
-  labs(x = "Year",
-       y = "Dataset") +
-  geom_point(data = datayear, aes(x = year, y = dataset), color = datayear$color, size = 2) +
-  geom_point(data = first_last_year, x = first_last_year$first_year, y = datayear$dataset) + 
-  geom_point(data = first_last_year, x = first_last_year$last_year, y = datayear$dataset) + 
-  geom_text(data = first_last_year, x = first_last_year$first_year, label = first_last_year$first_year, vjust = -1) +
-  geom_text(data = first_last_year, x = first_last_year$last_year, label = first_last_year$last_year, vjust = -1) + 
-  theme_classic() +
-  guides(color = FALSE)
+  labs(x = "Year", y = "Dataset") +
+  theme_classic() + 
+  theme(legend.position = "none")
+print(yearplot)
+
+ggsave("yearplot.png", width = 7, height = 5, path = "./output/yearplot_DEC.png")
 
 
-yearplot 
-
-
-
-#ggsave("yearplot.png", width = 7, height = 5, path = "/Users/anuschka/Documents/climatechange/climatechange/output/yearplot.png")
 ```
 
 ## Table of the GAMLSS regression output {-}
@@ -126,12 +124,12 @@ model_total[is.na(model_total)] <- ""
 
 # The dataframe is binded, the order is not totally how i want it. The data are now all centered at the top, but for the 
 # previous models, I need the data to be centered around the mu/intercept and sigma/intercept (with a lot of blank spaces). # Furthermore, some variables have a name that has special signs in them, which causes R not to recognize them. To make it #easy, I quickly fix these things in Excel. I don't make any changes to the data
-write_xlsx(model_total, here("./data/descriptives/", "kable_model_total_gamlss.xlsx" ))
+#write_xlsx(model_total, "./data/descriptives/kable_model_total_gamlss.xlsx" )
 ```
 
 
 ```{r}
-model_new <- read_excel(here("./data/descriptives/", "kable_model_total_gamlss.xlsx" ))
+model_new <- read_excel("./data/descriptives/kable_model_total_gamlss.xlsx" )
 
 # I Want to round the numeric variables to 3 decimals
 model_new <- dplyr::mutate(model_new, across(.cols = c(-mu_sigma, -variables), .fns= as.numeric))
@@ -197,7 +195,7 @@ load("./data/meta_analysis/total_reg_results_gam_w_new.RData")
 model_step_1_att <- rma(yi = mu_time,
               sei = mu_time_sd,
               data = total_reg_results,
-              method = "REML",
+              method = "ML",
               test = "knha")
 
 one <- summary(model_step_1_att)
@@ -214,7 +212,7 @@ one_df$p <- one$pval
 model_step_1_var <- rma(yi = sig_time,
               sei = sig_time_sd,
               data = total_reg_results,
-              method = "REML",
+              method = "ML",
               test = "knha")
 
 two <- summary(model_step_1_var)
@@ -236,7 +234,7 @@ load("./data/meta_analysis/total_indep_var_results_new.RData")
 m2_att <- rma(yi = mu_time_pred,
               sei = mu_time_sd_pred,
               data = total_reg_results,
-              method = "REML",
+              method = "ML",
               test = "knha")
 
 # Gender 
@@ -245,7 +243,7 @@ gender_gen <- metagen(TE = mu_sex_est,
                  data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 # Age 
@@ -254,7 +252,7 @@ age_gen <- metagen(TE = mu_age_est,
                  data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 # Educational level. This is now a dummy
@@ -263,7 +261,7 @@ edu_med_gen <- metagen(TE = mu_isced_med_est,
                  data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 edu_high_gen <- metagen(TE = mu_isced_high_est,
@@ -271,7 +269,7 @@ edu_high_gen <- metagen(TE = mu_isced_high_est,
                  data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 # Extract all the data from the models and put them in a dataframe that will later be the input of the kable table
@@ -287,7 +285,7 @@ three_df$p_1 <- c(m2_att$pval, gender_gen$pval.random, age_gen$pval.random, edu_
 m2_var <- rma(yi = sig_time_pred,
               sei = sig_time_sd_pred,
               data = total_reg_results,
-              method = "REML",
+              method = "ML",
               test = "knha")
 
 # Gender
@@ -296,7 +294,7 @@ gender_var_gen <- metagen(TE = sig_sex_est,
                  data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 # Age
@@ -305,7 +303,7 @@ age_var_gen <- metagen(TE = sig_age_est,
                  data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 # Education
@@ -314,7 +312,7 @@ edu_var_med_gen <- metagen(TE = sig_isced_med_est,
                  data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 edu_var_high_gen <- metagen(TE = sig_isced_high_est,
@@ -322,7 +320,7 @@ edu_var_high_gen <- metagen(TE = sig_isced_high_est,
                  data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 four_df <- data.frame(matrix(ncol = 5, nrow = 5))
@@ -344,7 +342,7 @@ load("./data/meta_analysis/total_inter_results_new.RData")
 m3_att <- rma(yi = mu_time_int,
               sei = mu_time_sd_int,
               data = total_reg_results,
-              method = "REML",
+              method = "ML",
               test = "knha")
 
 # Gender 
@@ -353,7 +351,7 @@ gender_gen_int <- metagen(TE = mu_sex_est,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 # Age 
@@ -362,7 +360,7 @@ age_gen_int <- metagen(TE = mu_age_est,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 # Educational level
@@ -371,7 +369,7 @@ edu_med_gen_int <- metagen(TE = mu_isced_med_est,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 edu_high_gen_int <- metagen(TE = mu_isced_high_est,
@@ -379,7 +377,7 @@ edu_high_gen_int <- metagen(TE = mu_isced_high_est,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 # And the interaction effects 
@@ -389,7 +387,7 @@ gender_int_eff <- metagen(TE = mu_sex_est_inter,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 # Age 
@@ -398,7 +396,7 @@ age_int_eff <- metagen(TE = mu_age_est_inter,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 # Educational level
@@ -407,7 +405,7 @@ edu_med_int_eff <- metagen(TE = mu_isced_med_est_inter,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 edu_high_int_eff <- metagen(TE = mu_isced_high_est_inter,
@@ -415,7 +413,7 @@ edu_high_int_eff <- metagen(TE = mu_isced_high_est_inter,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 # Now extract the data for a table
@@ -431,7 +429,7 @@ five_df$p_2 <- c(m3_att$pval, gender_gen_int$pval.random, age_gen_int$pval.rando
 m3_var <- rma(yi = sig_time_int,
               sei = sig_time_sd_int,
               data = total_reg_results,
-              method = "REML",
+              method = "ML",
               test = "knha")
 
 # Gender 
@@ -440,7 +438,7 @@ gender_gen_int_var <- metagen(TE = sig_sex_est,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 # Age 
@@ -449,7 +447,7 @@ age_gen_int_var <- metagen(TE = sig_age_est,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 # Educational level
@@ -458,7 +456,7 @@ edu_med_gen_int_var <- metagen(TE = sig_isced_med_est,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 edu_high_gen_int_var <- metagen(TE = sig_isced_high_est,
@@ -466,7 +464,7 @@ edu_high_gen_int_var <- metagen(TE = sig_isced_high_est,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 # And the interaction effects 
@@ -476,7 +474,7 @@ gender_int_eff_var <- metagen(TE = sig_sex_est_inter,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 # Age 
@@ -485,7 +483,7 @@ age_int_eff_var <- metagen(TE = sig_age_est_inter,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 # Educational level
@@ -494,7 +492,7 @@ edu_med_int_eff_var <- metagen(TE = sig_isced_med_est_inter,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 edu_high_int_eff_var <- metagen(TE = sig_isced_high_est_inter,
@@ -502,7 +500,7 @@ edu_high_int_eff_var <- metagen(TE = sig_isced_high_est_inter,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
-                 method.tau = "REML",
+                 method.tau = "ML",
                  hakn = TRUE)
 
 six_df <- data.frame(matrix(ncol = 5, nrow = 9))
@@ -584,7 +582,7 @@ kable(model_new, digits = 3, caption = "Table 3. All pooled effects mean attitud
     threeparttable = TRUE,
     footnote_as_chunk = TRUE
     ) %>%
-    save_kable("./output/pooled_effects_table_NOVEMBER.html")
+    save_kable("./output/pooled_effects_table_DECEMBER.html")
 ```
 
 ## Appendix D. Pooled effects age-only vs gender and education-only model {-}
@@ -769,7 +767,7 @@ kable(total_df, digits = 3, caption = "Appendix D. Pooled effects mean attitudes
     threeparttable = TRUE,
     footnote_as_chunk = TRUE
     )%>%
- save_kable("./output/appendix/pooled_effects_edugenage_NOVEMBER.html")
+ save_kable("./output/appendix/pooled_effects_edugenage_DECEMBER.html")
 
 
 ```

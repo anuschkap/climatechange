@@ -24,7 +24,7 @@ library(gamlss)
 # ESS {-}
 
 ```{r}
-load(here("./data/final_data/regression_outputs", "ess_list_interactions_w_new.RData"))
+load("./data/final_data/regression_outputs/ess_list_interactions_w_new.RData")
 
 # Store the results in a new dataframe
 ess_inter_preds_df <- data.frame(dep_var = character())
@@ -80,7 +80,7 @@ for (i in seq_along(ess_list_interactions)) {
   ess_inter_preds_df <- rbind(ess_inter_preds_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
 }
 
-save(ess_inter_preds_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/ess_inter_var_new.RData")
+save(ess_inter_preds_df, file="./data/final_data/indep_var/ess_inter_var_new.RData")
 
 ```
 
@@ -89,7 +89,7 @@ save(ess_inter_preds_df, file="/Users/anuschka/Documents/climatechange/climatech
 ```{r}
 # Now the same for the EVS
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "evs_list_interactions_w_new.RData"))
+load("./data/final_data/regression_outputs/evs_list_interactions_w_new.RData")
 
 # Store the results in a new dataframe
 evs_indep_interactions_df <- data.frame(dep_var = character())
@@ -145,7 +145,7 @@ for (i in seq_along(evs_list_interactions)) {
   evs_indep_interactions_df <- rbind(evs_indep_interactions_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
 }
 
-save(evs_indep_interactions_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/evs_inter_var_new.RData")
+save(evs_indep_interactions_df, file="./data/final_data/indep_var/evs_inter_var_new.RData")
 ```
 
 ## I&O Research {-}
@@ -153,7 +153,7 @@ save(evs_indep_interactions_df, file="/Users/anuschka/Documents/climatechange/cl
 ```{r}
 # Now for I&O research
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "io_list_interactions_w_new.RData"))
+load("./data/final_data/regression_outputs/io_list_interactions_w_new.RData")
 
 # Store the results in a new dataframe
 io_indep_interactions_df <- data.frame(dep_var = character())
@@ -209,7 +209,7 @@ for (i in seq_along(io_list_interactions)) {
   io_indep_interactions_df <- rbind(io_indep_interactions_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
 }
 
-save(io_indep_interactions_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/io_inter_var_new.RData")
+save(io_indep_interactions_df, file="./data/final_data/indep_var/io_inter_var_new.RData")
 
 ```
 
@@ -218,7 +218,7 @@ save(io_indep_interactions_df, file="/Users/anuschka/Documents/climatechange/cli
 ```{r}
 # Now for ISSP, which has to happen twice (bc 2 subsets based on dependent vars)
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "issp_list_interactions_w_new.RData"))
+load("./data/final_data/regression_outputs/issp_list_interactions_w_new.RData")
 
 # Store the results in a new dataframe
 issp_indep_interactions_df <- data.frame(dep_var = character())
@@ -275,11 +275,11 @@ for (i in seq_along(issp_list_interactions)) {
   issp_indep_interactions_df <- rbind(issp_indep_interactions_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
 }
 
-save(issp_indep_interactions_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/issp_inter_var_new.RData")
+save(issp_indep_interactions_df, file="./data/final_data/indep_var/issp_inter_var_new.RData")
 
 # For the other indep vars as well
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "issp_list_interactions_2_waves_w_new.RData"))
+load("./data/final_data/regression_outputs/issp_list_interactions_2_waves_w_new.RData")
 
 # Store the results in a new dataframe
 issp_2_indep_interactions_df <- data.frame(dep_var = character())
@@ -336,7 +336,7 @@ for (i in seq_along(issp_list_interactions_2_waves)) {
   issp_2_indep_interactions_df <- rbind(issp_2_indep_interactions_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
 }
 
-save(issp_2_indep_interactions_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/issp_2_inter_var_new.RData")
+save(issp_2_indep_interactions_df, file="./data/final_data/indep_var/issp_2_inter_var_new.RData")
 ```
 
 ## EB {-}
@@ -344,7 +344,7 @@ save(issp_2_indep_interactions_df, file="/Users/anuschka/Documents/climatechange
 ```{r}
 # Unfortunately, the loop I used in the other scripts does not seem to work for the interaction effects, so I need to do them one by one
 rm(list=ls())
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_1986_w_new.RData"))
+load("./data/final_data/regression_outputs/eb_list_interactions_1986_w_new.RData")
 
 # Store the results in a new dataframe
 eb_interactions_1986_df <- data.frame(dep_var = character())
@@ -401,24 +401,26 @@ for (i in seq_along(eb_list_interactions_1986)) {
   eb_interactions_1986_df <- rbind(eb_interactions_1986_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
 }
 
-save(eb_interactions_1986_df, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/eb_1986_inter_var_new.RData")
+save(eb_interactions_1986_df, file="./data/final_data/indep_var/eb_1986_inter_var_new.RData")
 
 ```
 
 ```{r}
 # Extract the indep vars from the regressions Eurobarometer one by one
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_2007_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_2008_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_2009_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_2011_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_buyprod_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_cchange2_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_doprot_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_eff_daily_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_pers_imp_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_prsaction_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_quallife_w_new.RData"))
-load(here("./data/final_data/regression_outputs", "eb_list_interactions_doprot_city_w_new.RData"))
+rm(list=ls())
+load("./data/final_data/regression_outputs/eb_list_interactions_2007_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_2008_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_2009_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_2011_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_buyprod_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_cchange2_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_doprot_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_eff_daily_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_pers_imp_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_prsaction_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_quallife_w_new.RData")
+load("./data/final_data/regression_outputs/eb_list_interactions_doprot_city_w_new.RData")
+
 
   # Store the results in a new dataframe
 eb_indep_interactions_2007_df <- data.frame(dep_var = character())
@@ -1103,10 +1105,10 @@ for (i in seq_along(eb_list_interactions_quallife)) {
   eb_indep_interactions_quallife_df <- rbind(eb_indep_interactions_quallife_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
 } 
 
-load(here("./data/final_data/indep_var", "eb_1986_inter_var_new.RData"))
+load("./data/final_data/indep_var/eb_1986_inter_var_new.RData")
 eb_indep_interactions_df <- rbind(eb_interactions_1986_df, eb_indep_interactions_2007_df, eb_indep_interactions_2008_df, eb_indep_interactions_2009_df, eb_indep_interactions_2011_df, eb_indep_interactions_buyprod_df, eb_indep_interactions_cchange2_df, eb_indep_interactions_doprot_city_df, eb_indep_interactions_doprot_df, eb_indep_interactions_eff_daily_df, eb_indep_interactions_pers_imp_df, eb_indep_interactions_prsaction_df, eb_indep_interactions_quallife_df)
 
-save(eb_indep_interactions_df, file= "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/indep_var/eb_inter_var_new.RData" )
+save(eb_indep_interactions_df, file= "./data/final_data/indep_var/eb_inter_var_new.RData" )
 ```
 
 ## Merge everything into one dataset 
@@ -1114,16 +1116,16 @@ save(eb_indep_interactions_df, file= "/Users/anuschka/Documents/climatechange/cl
 ```{r}
 # The final step is to merge all results into one dataframe
 rm(list=ls())
-load(here("./data/final_data/indep_var", "eb_inter_var_new.RData"))
-load(here("./data/final_data/indep_var", "ess_inter_var_new.RData"))
-load(here("./data/final_data/indep_var", "evs_inter_var_new.RData"))
-load(here("./data/final_data/indep_var", "io_inter_var_new.RData"))
-load(here("./data/final_data/indep_var", "issp_2_inter_var_new.RData"))
-load(here("./data/final_data/indep_var", "issp_inter_var_new.RData"))
+load("./data/final_data/indep_var/eb_inter_var_new.RData")
+load("./data/final_data/indep_var/ess_inter_var_new.RData")
+load("./data/final_data/indep_var/evs_inter_var_new.RData")
+load("./data/final_data/indep_var/io_inter_var_new.RData")
+load("./data/final_data/indep_var/issp_2_inter_var_new.RData")
+load("./data/final_data/indep_var/issp_inter_var_new.RData")
 
 
 total_inter_results <- rbind(eb_indep_interactions_df, ess_inter_preds_df, evs_indep_interactions_df, io_indep_interactions_df, issp_indep_interactions_df, issp_2_indep_interactions_df) 
 
-save(total_inter_results, file= "/Users/anuschka/Documents/climatechange/climatechange/data/meta_analysis/total_inter_results_new.RData" )
+save(total_inter_results, file= "./data/meta_analysis/total_inter_results_new.RData" )
 ```
 

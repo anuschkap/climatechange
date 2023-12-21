@@ -5,3 +5,4 @@ descriptives212.Rmd
 *.png
 .Rproj.user
 /data/
+/scripts/

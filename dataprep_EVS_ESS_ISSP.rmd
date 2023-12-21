@@ -96,6 +96,8 @@ evssel <- cbind(evssel, evssel_w1)
 
 
 evssel$sex <- revalue(evssel$X001, c("Male"="1", "Female"="2"))
+evssel$sex <- evssel$sex - 1
+table(evssel$sex)
 table(evssel$E033, useNA = "always")
 evssel$lrscale <- as.numeric(evssel$E033)
 
@@ -137,12 +139,12 @@ for (var in mis_vars) {
 
 
 #Let's first save the prepped data. 
-save(evssel, file="/Users/anuschka/Documents/climatechange/climatechange//data/final_data/evssel.Rdata")
+save(evssel, file="./data/final_data/evssel.Rdata")
 
 evssel <- evssel %>% select(stdyno_w, S001, S002EVS, S006, S017, S018, S020, climate5, sex, X002, age, edu_yrs, isced,  religious, lrplace, income, income_quart, marstat, weightvec, X023, X023R, X047CS, X047_EVS, X047R_EVS) %>% 
         dplyr::rename(surveyyear = S020)
 
-save(evssel, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/evssel.Rdata")
+save(evssel, file="./data/final_data/evssel.Rdata")
 ```
 
 ## European Social Survey {-}
@@ -323,14 +325,13 @@ attributes(ess20sel$worry)
 
 esstotal <- dplyr::bind_rows(ess16sel, ess20sel)
 
-save(esstotal, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/esstotal.Rdata")
-
 esstotal$surveyyear[esstotal$essround==8] <- 2016
 esstotal$surveyyear[esstotal$essround==10] <- 2020
 esstotal$surveyyear <- as.numeric(esstotal$surveyyear)
 table(esstotal$surveyyear, useNA = "always")
-
-save(esstotal, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/esstotal.Rdata")
+esstotal$sex <- esstotal$sex - 1
+table(esstotal$sex)
+save(esstotal, file="./data/final_data/esstotal.Rdata")
 
 # One time it did not correctly apply esstotal
 #esstotal$urban <- as.factor(esstotal$urban)
@@ -621,7 +622,7 @@ save(issp10sel, file="/Users/anuschka/Documents/climatechange/climatechange/data
 ```
 
 ```{r}
-#Now I have to make one long datafile of these three datasets. 
+#Now I have to make one datafile of these three datasets. 
 load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp93sel.Rdata")
 load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp00sel.Rdata")
 load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp10sel.Rdata")
@@ -655,9 +656,8 @@ issptotal <- issptotal %>% select(surveyyear, worry:growharm, income_a, studyno,
 table(issptotal$urban, useNA = "always")
 issptotal$urban <- revalue(issptotal$urban, c("1"= "Low urbanity", "2"="Medium urbanity", "3" = "High urbanity"))
 issptotal$urban <- factor(issptotal$urban, levels=c("Low urbanity", "Medium urbanity", "High urbanity"), ordered=TRUE)
-
-
-save(issptotal, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/issptotal.Rdata")
+issptotal$sex <- issptotal$sex - 1
+save(issptotal, file="./data/final_data/issptotal.Rdata")
 ```
 
 ## Merging all the data into large datasets {-}

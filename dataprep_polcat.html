@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Anuschka Peelen" />
+
+<meta name="date" content="2023-12-21" />
+
+<title>Data preparation left-right placement expert data</title>
+
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="tweaks.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Scripts data preparation
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="dataprep_EB.html">Data preparation Eurobarometer</a>
+    </li>
+    <li>
+      <a href="dataprep_EVS_ESS_ISSP.html">Data preparation EVS, ESS, ISSP</a>
+    </li>
+    <li>
+      <a href="dataprep_I-O.html">Data preparation I&amp;O Research</a>
+    </li>
+    <li>
+      <a href="dataprep_motivaction_LISS_socon.html">Data preparation Motivaction, LISS, Socon</a>
+    </li>
+    <li>
+      <a href="weights.html">Weighing data</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Scripts descriptives and analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="descriptives.html">Descriptives and pooled table</a>
+    </li>
+    <li>
+      <a href="single_regression_gamlss_weigh_new.html">Gamlss regressions weighted</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_weight_gamlss_new.html">Extract coefficients gamlss regressions</a>
+    </li>
+    <li>
+      <a href="regression_to_indep_var_analysis_weight_gamlss_new.html">Extract coefficients independent var model</a>
+    </li>
+    <li>
+      <a href="regression_to_interact_analysis_weight_gamlss_new.html">Extract coefficients interaction model</a>
+    </li>
+    <li>
+      <a href="DEC23_meta_analysis_gamlss_weigh.html">Meta-analysis weighted gamlss</a>
+    </li>
+    <li>
+      <a href="meta_analysis_indep_var.html">Meta-analysis independent variables</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Appendix
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="single_regression_gw_py_new.html">Gamlss regression shorter time spans</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_wg_waves_new.html">Extract coefficients shorter time spans</a>
+    </li>
+    <li>
+      <a href="meta_analysis_gw_waves.html">Meta-analysis shorter time spans</a>
+    </li>
+    <li>
+      <a></a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/apeelen/climatechange">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Data preparation left-right placement
+expert data</h1>
+<h4 class="author">Anuschka Peelen</h4>
+<h4 class="date">2023-12-21</h4>
+
+</div>
+
+
+<p>In this script, I recode expert data of CHES and POPPA to be able to
+use as a substitute for left-right placement of the I&amp;O research
+data. In the end, I have not used this variable in my thesis, but I
+still refer to it in the script for I&amp;O research and it can still be
+used in a later stadium (to include political placement).</p>
+<pre class="r"><code>#Load the data of poppa
+pop &lt;- read_dta(&quot;/Users/anuschka/Documents/gesis_dir/poppa/expert_data_stata.dta&quot;)
+
+#Select only the Netherlands and general left-right placement
+popsel &lt;- pop %&gt;% filter(country_id==19) %&gt;%
+  select(nr_experts, party, lroverall) %&gt;%
+  dplyr::rename(party_name = party) 
+
+popsel$party_name &lt;- revalue(popsel$party_name, c(&quot;50Plus&quot;= &quot;50PLUS&quot;))
+
+#Do the same for the CHES data
+ches &lt;- read_dta(&quot;/Users/anuschka/Documents/gesis_dir/ches/ches2019.dta&quot;)
+dutch &lt;- 1001:1051  #Dutch party ids
+ches &lt;- ches[ches$party_id %in% dutch, ] 
+
+ches &lt;- ches %&gt;% select(party, party_name, lrgen) 
+ches$party_name &lt;- revalue(ches$party_name, c(&quot;PVdD&quot; = &quot;PvdD&quot;))
+
+names(ches) &lt;- names(popsel) #namen gelijk maken
+
+#Combine the two
+expert &lt;- rbind(ches, popsel)
+expert &lt;- na.omit(expert)
+
+# Calculate the mean left-right placement of these columns of experts
+expert2 &lt;- expert %&gt;% #Maar deze wel
+  group_by(party_name) %&gt;%
+  summarise_at(vars(lroverall), list(lroverall_mean = mean), na.rm=T) 
+
+save(expert, file = &quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/expert.RData&quot;)
+
+# Test it on a dataset that later on was no longer part of my thesis
+load(&quot;/Users/anuschka/Documents/climatechange/climatechange/data/final_data/dpes2021sel.RData&quot;)
+
+unique(dpes2021sel$party_name)
+
+dpes2021sel$party_name &lt;- as.character(dpes2021sel$party_name)
+unique(dpes2021sel$party_name2)
+unique(expert2$party_name)
+
+dpes2021sel %&gt;% 
+  left_join(expert2, by=&quot;party_name&quot;) -&gt; dpes2021seltest
+
+save(expert2, file = &quot;/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/expert.RData&quot;)</code></pre>
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRhdGEgcHJlcGFyYXRpb24gbGVmdC1yaWdodCBwbGFjZW1lbnQgZXhwZXJ0IGRhdGEiDQphdXRob3I6ICJBbnVzY2hrYSBQZWVsZW4iDQpkYXRlOiAiYHIgU3lzLkRhdGUoKWAiDQpvdXRwdXQ6IGh0bWxfZG9jdW1lbnQNCi0tLQ0KDQpgYGB7ciwgZWNobz1GQUxTRX0NCmtuaXRyOjpvcHRzX2NodW5rJHNldChldmFsID0gRkFMU0UpDQpvcHRpb25zKHdpZHRoID0gMTAwKQ0KY29sb3JpemUgPC0gZnVuY3Rpb24oeCwgY29sb3IpIHtzcHJpbnRmKCI8c3BhbiBzdHlsZT0nY29sb3I6ICVzOyc+JXM8L3NwYW4+IiwgY29sb3IsIHgpIH0NCmBgYA0KDQpJbiB0aGlzIHNjcmlwdCwgSSByZWNvZGUgZXhwZXJ0IGRhdGEgb2YgQ0hFUyBhbmQgUE9QUEEgdG8gYmUgYWJsZSB0byB1c2UgYXMgYSBzdWJzdGl0dXRlIGZvciBsZWZ0LXJpZ2h0IHBsYWNlbWVudCBvZiB0aGUgSSZPIHJlc2VhcmNoIGRhdGEuIEluIHRoZSBlbmQsIEkgaGF2ZSBub3QgdXNlZCB0aGlzIHZhcmlhYmxlIGluIG15IHRoZXNpcywgYnV0IEkgc3RpbGwgcmVmZXIgdG8gaXQgaW4gdGhlIHNjcmlwdCBmb3IgSSZPIHJlc2VhcmNoIGFuZCBpdCBjYW4gc3RpbGwgYmUgdXNlZCBpbiBhIGxhdGVyIHN0YWRpdW0gKHRvIGluY2x1ZGUgcG9saXRpY2FsIHBsYWNlbWVudCkuDQoNCmBgYHtyfQ0KI0xvYWQgdGhlIGRhdGEgb2YgcG9wcGENCnBvcCA8LSByZWFkX2R0YSgiL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9nZXNpc19kaXIvcG9wcGEvZXhwZXJ0X2RhdGFfc3RhdGEuZHRhIikNCg0KI1NlbGVjdCBvbmx5IHRoZSBOZXRoZXJsYW5kcyBhbmQgZ2VuZXJhbCBsZWZ0LXJpZ2h0IHBsYWNlbWVudA0KcG9wc2VsIDwtIHBvcCAlPiUgZmlsdGVyKGNvdW50cnlfaWQ9PTE5KSAlPiUNCiAgc2VsZWN0KG5yX2V4cGVydHMsIHBhcnR5LCBscm92ZXJhbGwpICU+JQ0KICBkcGx5cjo6cmVuYW1lKHBhcnR5X25hbWUgPSBwYXJ0eSkgDQoNCnBvcHNlbCRwYXJ0eV9uYW1lIDwtIHJldmFsdWUocG9wc2VsJHBhcnR5X25hbWUsIGMoIjUwUGx1cyI9ICI1MFBMVVMiKSkNCg0KI0RvIHRoZSBzYW1lIGZvciB0aGUgQ0hFUyBkYXRhDQpjaGVzIDwtIHJlYWRfZHRhKCIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2dlc2lzX2Rpci9jaGVzL2NoZXMyMDE5LmR0YSIpDQpkdXRjaCA8LSAxMDAxOjEwNTEgICNEdXRjaCBwYXJ0eSBpZHMNCmNoZXMgPC0gY2hlc1tjaGVzJHBhcnR5X2lkICVpbiUgZHV0Y2gsIF0gDQoNCmNoZXMgPC0gY2hlcyAlPiUgc2VsZWN0KHBhcnR5LCBwYXJ0eV9uYW1lLCBscmdlbikgDQpjaGVzJHBhcnR5X25hbWUgPC0gcmV2YWx1ZShjaGVzJHBhcnR5X25hbWUsIGMoIlBWZEQiID0gIlB2ZEQiKSkNCg0KbmFtZXMoY2hlcykgPC0gbmFtZXMocG9wc2VsKSAjbmFtZW4gZ2VsaWprIG1ha2VuDQoNCiNDb21iaW5lIHRoZSB0d28NCmV4cGVydCA8LSByYmluZChjaGVzLCBwb3BzZWwpDQpleHBlcnQgPC0gbmEub21pdChleHBlcnQpDQoNCiMgQ2FsY3VsYXRlIHRoZSBtZWFuIGxlZnQtcmlnaHQgcGxhY2VtZW50IG9mIHRoZXNlIGNvbHVtbnMgb2YgZXhwZXJ0cw0KZXhwZXJ0MiA8LSBleHBlcnQgJT4lICNNYWFyIGRlemUgd2VsDQogIGdyb3VwX2J5KHBhcnR5X25hbWUpICU+JQ0KICBzdW1tYXJpc2VfYXQodmFycyhscm92ZXJhbGwpLCBsaXN0KGxyb3ZlcmFsbF9tZWFuID0gbWVhbiksIG5hLnJtPVQpIA0KDQpzYXZlKGV4cGVydCwgZmlsZSA9ICIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9kYXRhL2FsbF93YXZlcy9leHBlcnQuUkRhdGEiKQ0KDQojIFRlc3QgaXQgb24gYSBkYXRhc2V0IHRoYXQgbGF0ZXIgb24gd2FzIG5vIGxvbmdlciBwYXJ0IG9mIG15IHRoZXNpcw0KbG9hZCgiL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9maW5hbF9kYXRhL2RwZXMyMDIxc2VsLlJEYXRhIikNCg0KdW5pcXVlKGRwZXMyMDIxc2VsJHBhcnR5X25hbWUpDQoNCmRwZXMyMDIxc2VsJHBhcnR5X25hbWUgPC0gYXMuY2hhcmFjdGVyKGRwZXMyMDIxc2VsJHBhcnR5X25hbWUpDQp1bmlxdWUoZHBlczIwMjFzZWwkcGFydHlfbmFtZTIpDQp1bmlxdWUoZXhwZXJ0MiRwYXJ0eV9uYW1lKQ0KDQpkcGVzMjAyMXNlbCAlPiUgDQogIGxlZnRfam9pbihleHBlcnQyLCBieT0icGFydHlfbmFtZSIpIC0+IGRwZXMyMDIxc2VsdGVzdA0KDQpzYXZlKGV4cGVydDIsIGZpbGUgPSAiL1VzZXJzL2FudXNjaGthL0RvY3VtZW50cy9jbGltYXRlY2hhbmdlL2NsaW1hdGVjaGFuZ2UvZGF0YS9hbGxfd2F2ZXMvZXhwZXJ0LlJEYXRhIikNCmBgYA0KDQo=</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("dataprep_polcat.Rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
