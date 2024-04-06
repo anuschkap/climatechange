@@ -1,0 +1,258 @@
+---
+title: "Untitled"
+output: html_document
+date: "2023-12-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+```{r}
+rm(list=ls())
+load("./data/final_data/eb_tot.Rdata")
+
+table <- table(eb_tot$env_ec_stat, eb_tot$surveyyear, useNA = "always")
+prop_table <- prop.table(table, margin = 1)
+(0.005 + 0.002 + 0.001)/3 = 0.003 # percentage missings, # 3 waves
+
+table <- table(eb_tot$env_prsimp, eb_tot$surveyyear, useNA = "always")
+prop_table <- prop.table(table, margin = 1)
+(0.001 + 0.001 + 0.001) / 3 = 0.001 # perc miss, 3 waves
+
+table <- table(eb_tot$envp_eg, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.07 + 0.006)/2 = 0.038 # perc missings, 2 waves
+
+table <- table(eb_tot$effr_eg, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.07 + 0.004)/2 = 0.037 # perc missings, 2 waves
+
+table <- table(eb_tot$cchange, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1) # too small, 5 waves
+# also applies to the other cchange vars
+
+table <- table(eb_tot$ccpercept, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.003 + 0.11 + 0.001 + 0.001 + 0.11 + 0)/6 = 0.038 # perc missings, 6 waves
+
+table <- table(eb_tot$prsaction, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.09 + 0.001 + 0 + 0.08) / 4 = 0.04
+
+table <- table(eb_tot$env_quallife, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.001 + 0.001 + 0.08 + 0.001) / 4 = 0.02
+
+table <- table(eb_tot$doprot_region, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.02 + 0.08)/2 = 0.05
+
+table <- table(eb_tot$doprot_city, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.01 + 0.07)/2 = 0.04
+
+table <- table(eb_tot$doprot_citiz, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.08 + 0.004 + 0.078)/3 = 0.054
+
+table <- table(eb_tot$doprot_comp, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.08 + 0.007 + 0.08)/3 = 0.056
+
+table <- table(eb_tot$doprot_natgov, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.08 + 0.006 + 0.079)/3 = 0.055
+
+table <- table(eb_tot$doprot_eu, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.08 + 0.02 + 0.08)/3 = 0.06
+
+table <- table(eb_tot$cc_unstop, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.002 + 0.004)/2 = 0.003
+
+table <- table(eb_tot$cc_exag, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.002 + 0.003)/2 = 0.003 
+
+table <- table(eb_tot$cc_poseu, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.011 + 0.02)/2 = 0.02
+
+table <- table(eb_tot$cc_prsact, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.002 + 0.003)/2 = 0.003
+
+table <- table(eb_tot$role_ind, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.0004 + 0.08 + 0.0002 + 0.08)/4 = 0.04
+
+table <- table(eb_tot$big_pol, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.002 + 0.08 + 0.0008 + 0.08)/4 = 0.04
+
+table <- table(eb_tot$eff_daily, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.001 + 0.083 + 0.003 + 0.084)/4 = 0.04
+
+table <- table(eb_tot$pers_imp, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.08 + 0)/2 = 0.04
+
+table <- table(eb_tot$buyprod, eb_tot$surveyyear, useNA = "always")
+prop.table(table, margin = 1)
+(0.001 + 0.076 + 0.0004)/3 = 0.026
+```
+
+
+```{r}
+load("./data/final_data/esstotal.Rdata")
+table(esstotal$cause, esstotal$surveyyear, useNA = "always")
+table(esstotal$cause, useNA = "always")
+((37+12)/2)/3151 = 0.008
+
+table(esstotal$pers_resp, esstotal$surveyyear, useNA = "always")
+((29 + 2)/2)/3151 = 0.0049
+
+table(esstotal$worry, esstotal$surveyyear, useNA = "always")
+((22 + 6)/2)/3151
+
+```
+
+```{r}
+load("./data/final_data/evssel.Rdata")
+table(evssel$climate5, evssel$surveyyear,  useNA = "always")
+(8 + 4 + 19)/3/3574 =0.003
+```
+
+```{r}
+load("./data/final_data/io_total.Rdata")
+table(io_total$worried, io_total$surveyyear, useNA = "always")
+(27 + 6 + 6)/3/6761 =0.002
+table(io_total$frontrunner, io_total$surveyyear, useNA = "always")
+(68 + 56 + 63)/3/6761 =0.009
+table(io_total$worry_future, io_total$surveyyear, useNA = "always")
+(83 + 81 + 57)/3/6761 =0.011
+table(io_total$resp_citiz, io_total$surveyyear, useNA = "always")
+(119 + 97 + 98)/3/6761 =0.015
+table(io_total$dk_start, io_total$surveyyear, useNA = "always")
+(122 + 103 + 92)/3/6761 =0.016
+table(io_total$do_gov, io_total$surveyyear, useNA = "always")
+(565 + 115 + 120)/3/6761 =0.039
+table(io_total$buss_help, io_total$surveyyear, useNA = "always")
+(48 + 48 + 35)/3/6761 = 0.006
+table(io_total$min_contr, io_total$surveyyear, useNA = "always")
+(80 + 67 + 55)/3/6761 = 0.01
+table(io_total$human_resp, io_total$surveyyear, useNA = "always")
+(86 + 63 + 48)/3/6761 =0.01
+
+
+```
+
+```{r}
+load("./data/final_data/issptotal.Rdata")
+table(issptotal$worry, issptotal$surveyyear, useNA = "always")
+(71 + 40 + 66)/3/4933 = 0.012
+table(issptotal$lifeharm, issptotal$surveyyear, useNA = "always")
+(66 + 49 + 77)/3/4933 = 0.013
+table(issptotal$progharm, issptotal$surveyyear, useNA = "always")
+(129 + 60 + 99)/3/4933 = 0.019
+table(issptotal$econprotect, issptotal$surveyyear, useNA = "always")
+(164 + 143 + 170)/3/4933 = 0.032
+table(issptotal$growharm, issptotal$surveyyear, useNA = "always")
+(99 + 139)/2/3081 = 0.039
+table(issptotal$willing_price, issptotal$surveyyear, useNA = "always")
+(50 + 36 + 73)/3/4933 = 0.011
+table(issptotal$willing_tax, issptotal$surveyyear, useNA = "always")
+(50 + 394 + 55)/3/4933 = 0.034
+table(issptotal$willing_living, issptotal$surveyyear, useNA = "always")
+(51 + 54 + 66)/3/4933 = 0.012
+table(issptotal$do_right, issptotal$surveyyear, useNA = "always")
+(46 + 53 + 64)/3/4933 = 0.011
+table(issptotal$people_decide, issptotal$surveyyear, useNA = "always")
+(256 + 233 + 256)/3/4933 = 0.05
+table(issptotal$bus_decide, issptotal$surveyyear, useNA = "always")
+(103 + 106 + 130)/3/4933 = 0.023
+table(issptotal$moreimp, issptotal$surveyyear, useNA = "always")
+(41 + 70)/2/3081 = 0.018
+table(issptotal$othersame, issptotal$surveyyear, useNA = "always")
+(43 + 62)/2/3081 = 0.017
+table(issptotal$exag, issptotal$surveyyear, useNA = "always")
+(78 + 112)/2/3081 = 0.031
+table(issptotal$country_effort, issptotal$surveyyear, useNA = "always")
+(91 + 189)/2/3081 = 0.045
+
+```
+```{r}
+load("./data/final_data/lisstotal.Rdata")
+table(lisstotal$lifestyle, lisstotal$surveyyear, useNA = "always")
+(178+91+111+106)/4/9207 = 0.013
+```
+```{r}
+load("./data/final_data/mottotal.Rdata")
+table(mottotal$cchange_mot, mottotal$surveyyear, useNA = "always")
+# 0 missings, 2 waves
+table(mottotal$worried_mot, mottotal$surveyyear, useNA = "always")
+(27 + 37)/2/2272 = 0.014
+table(mottotal$futuregen, mottotal$surveyyear, useNA = "always")
+(49 + 50)/2/2272 = 0.022
+table(mottotal$nowor, mottotal$surveyyear, useNA = "always")
+(32 + 41)/2/2272 = 0.016
+table(mottotal$ontime, mottotal$surveyyear, useNA = "always")
+(107 + 129)/2/2272 = 0.052
+table(mottotal$gov, mottotal$surveyyear, useNA = "always")
+(64 + 90)/2/2272 = 0.034
+table(mottotal$resp_gov, mottotal$surveyyear, useNA = "always")
+(57 + 75)/2/2272 = 0.029
+table(mottotal$resp_comp, mottotal$surveyyear, useNA = "always")
+(46 + 76)/2/2272 = 0.027
+table(mottotal$resp_mkb, mottotal$surveyyear, useNA = "always")
+(64+88)/2/2272 = 0.033
+table(mottotal$resp_citiz_mot, mottotal$surveyyear, useNA = "always")
+(53 + 79)/2/2272 = 0.029
+table(mottotal$resp_you, mottotal$surveyyear, useNA = "always")
+(51+82)/2/2272 = 0.029
+table(mottotal$pers_resp_mot, mottotal$surveyyear, useNA = "always")
+(50 + 76)/2/2272 = 0.028
+table(mottotal$sust_choice, mottotal$surveyyear, useNA = "always")
+(55 + 60)/2/2272 = 0.03
+table(mottotal$contr, mottotal$surveyyear, useNA = "always")
+(66 + 109)/2/2272 = 0.039
+table(mottotal$energy, mottotal$surveyyear, useNA = "always")
+(68 + 97)/2/2272 = 0.036
+table(mottotal$noidea, mottotal$surveyyear, useNA = "always")
+(81 + 105)/2/2272 = 0.04
+table(mottotal$motiv, mottotal$surveyyear, useNA = "always")
+(64 + 71)/2/2272 = 0.03
+
+```
+
+```{r}
+load("./data/final_data/socontotal.Rdata")
+table(socontotal$fut_gen_socon, socontotal$surveyyear, useNA = "always")
+(113 + 96 + 151)/3/3916
+
+```
+

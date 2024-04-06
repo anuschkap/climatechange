@@ -24,3 +24,5 @@ meta
 fastDummies
 lubridate
 ggrepel
+modelsummary
+broom.mixed

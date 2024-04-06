@@ -12,6 +12,17 @@ options(width = 100)
 colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
 ```
 
+```{css, echo=FALSE}
+pre {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 100px;
+}
+```
+
 In this script I extract the coefficients for gender, age and education and put them in a dataset together, to use them as input for the meta-regression. In this script, I only select the coefficients of gender and education, as I use the models without age as a predictor variable. 
 
 ```{r}

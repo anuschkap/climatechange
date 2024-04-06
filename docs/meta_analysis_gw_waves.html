@@ -11,11 +11,11 @@
 
 <meta name="author" content="Anuschka Peelen" />
 
-<meta name="date" content="2023-09-05" />
+<meta name="date" content="2024-01-12" />
 
 <title>Appendix. Meta-regressions for gamlss with short time spans</title>
 
-<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
@@ -31,7 +31,7 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
-<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
@@ -39,10 +39,8 @@
 <script src="site_libs/navigation-1.1/sourceembed.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
-<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -63,6 +61,7 @@ if (window.hljs) {
   }
 }
 </script>
+
 
 
 
@@ -97,6 +96,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -154,11 +156,15 @@ $(document).ready(function () {
     href = "index.html";
   var menuAnchor = $('a[href="' + href + '"]');
 
-  // mark it active
-  menuAnchor.tab('show');
-
-  // if it's got a parent navbar menu mark it active as well
-  menuAnchor.closest('li.dropdown').addClass('active');
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
 
   // Navbar adjustments
   var navHeight = $(".navbar").first().height() + 15;
@@ -187,8 +193,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -196,16 +202,9 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -325,7 +324,7 @@ div.tocify {
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -340,12 +339,9 @@ div.tocify {
      
   </a>
 </li>
-<li>
-  <a href="blog.html">Blog</a>
-</li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Scripts datapreparation
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Scripts data preparation
      
     <span class="caret"></span>
   </a>
@@ -360,34 +356,28 @@ div.tocify {
       <a href="dataprep_I-O.html">Data preparation I&amp;O Research</a>
     </li>
     <li>
-      <a href="weights.html">Weighing data</a>
+      <a href="dataprep_motivaction_LISS_socon.html">Data preparation Motivaction, LISS, Socon</a>
     </li>
     <li>
-      <a href="dataprep_polcat.html">Left right placement</a>
+      <a href="weights.html">Weighing data</a>
     </li>
   </ul>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Scripts descriptives and analysis
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="descriptives.html">Descriptives</a>
+      <a href="descriptives.html">Descriptives and pooled table</a>
     </li>
     <li>
       <a href="single_regression_gamlss_weigh_new.html">Gamlss regressions weighted</a>
     </li>
     <li>
-      <a href="single_regression_gw_py_new.html">Gamlss regression shorter time spans</a>
-    </li>
-    <li>
       <a href="regression_to_meta_analysis_weight_gamlss_new.html">Extract coefficients gamlss regressions</a>
-    </li>
-    <li>
-      <a href="regression_to_meta_analysis_wg_waves_new.html">Extract coefficients shorter time spans</a>
     </li>
     <li>
       <a href="regression_to_indep_var_analysis_weight_gamlss_new.html">Extract coefficients independent var model</a>
@@ -396,10 +386,25 @@ div.tocify {
       <a href="regression_to_interact_analysis_weight_gamlss_new.html">Extract coefficients interaction model</a>
     </li>
     <li>
-      <a href="meta_analysis_gamlss_weigh.html">Meta-analysis weighted gamlss</a>
+      <a href="DEC23_meta_analysis_gamlss_weigh.html">Meta-analysis weighted gamlss</a>
     </li>
     <li>
       <a href="meta_analysis_indep_var.html">Meta-analysis independent variables</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Appendix
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="single_regression_gw_py_new.html">Gamlss regression shorter time spans</a>
+    </li>
+    <li>
+      <a href="regression_to_meta_analysis_wg_waves_new.html">Extract coefficients shorter time spans</a>
     </li>
     <li>
       <a href="meta_analysis_gw_waves.html">Meta-analysis shorter time spans</a>
@@ -425,7 +430,7 @@ div.tocify {
 <div id="header">
 
 <div class="btn-group pull-right float-right">
-<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
 <ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
 <li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
 <li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
@@ -439,943 +444,314 @@ div.tocify {
 <h1 class="title toc-ignore">Appendix. Meta-regressions for gamlss with
 short time spans</h1>
 <h4 class="author">Anuschka Peelen</h4>
-<h4 class="date">2023-09-05</h4>
+<h4 class="date">2024-01-12</h4>
 
 </div>
 
 
+<style type="text/css">
+pre {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 100px;
+}
+</style>
 <p>In this script, I perform meta-analyses for the models with smaller
 time-spans, to put in the Appendix</p>
 <pre class="r"><code>rm(list=ls())
 library(meta)
 library(metafor)
 library(dplyr)
-library(here)
 library(kableExtra)
-set.seed(1)
-here()
-here::i_am(&quot;scripts/analysis/meta_analysis_gw_waves.Rmd&quot;)</code></pre>
+library(modelsummary)
+set.seed(1)</code></pre>
 <pre class="r"><code># With the final data
-load(here(&quot;./data/meta_analysis&quot;, &quot;total_results_waves_new.RData&quot;))
+load(&quot;./data/meta_analysis/total_results_waves_new.RData&quot;)
+
+#Somehow some missings on first and mean year 
+total_results_waves$first_year[total_results_waves$dep_var == &quot;env_ec_stat&quot;] &lt;- 1986
+total_results_waves$first_year[total_results_waves$dep_var == &quot;env_prsimp&quot;] &lt;- 1986
+total_results_waves$mean_year[total_results_waves$dep_var == &quot;env_ec_stat&quot;] &lt;- 1991
+total_results_waves$mean_year[total_results_waves$dep_var == &quot;env_prsimp&quot;] &lt;- 1991
+
+total_results_waves$mean_year_centered &lt;- total_results_waves$mean_year - mean(total_results_waves$mean_year, na.rm = TRUE)
+
+total_results_waves$attitude_cat &lt;- factor(total_results_waves$attitude_cat)
+total_results_waves$attitude_cat &lt;- relevel(total_results_waves$attitude_cat, ref = &quot;behavioral&quot;)
+
 
 # Start with step 2 here, as I don&#39;t make forest plots for these models
 #Step 2. Empty model with meta-level indicators
+model_step_1_att &lt;- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_results_waves,
+              method = &quot;ML&quot;,
+              test = &quot;knha&quot;)
+
+model_step_1_att</code></pre>
+<pre class="r"><code># Variance
+model_step_1_var &lt;- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_results_waves,
+              method = &quot;ML&quot;,
+              test = &quot;knha&quot;)
+
+model_step_1_var</code></pre>
+<pre class="r"><code># Center mean year
+table(total_results_waves$mean_year)</code></pre>
+<pre><code>## 
+## 1991 1995 1997 2004 2005 2009 2010 2012 2013 2014 2015 2018 2020 2021 
+##    4    1    9    1   14    5    2    9   12    8   14    3   28   12</code></pre>
+<pre class="r"><code>total_results_waves$mean_year_centered &lt;- total_results_waves$mean_year - mean(total_results_waves$mean_year)
+
+total_results_waves$attitude_cat &lt;- factor(total_results_waves$attitude_cat)
+total_results_waves$attitude_cat &lt;- relevel(total_results_waves$attitude_cat, ref = &quot;behavioral&quot;)
+
 model_step_2_att &lt;- rma(yi = mu_time,
               sei = mu_time_sd,
               data = total_results_waves,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
-              method = &quot;REML&quot;,
+              mods = ~ attitude_cat,
+              method = &quot;ML&quot;,
               test = &quot;knha&quot;)
 
 model_step_2_att</code></pre>
-<pre class="r"><code># Step 2 variance
-#Step 2. Empty model with meta-level indicators
-model_step_2_var &lt;- rma(yi = sig_time,
+<pre><code>## 
+## Mixed-Effects Model (k = 122; tau^2 estimator: ML)
+## 
+## tau^2 (estimated amount of residual heterogeneity):     0.0303 (SE = 0.0040)
+## tau (square root of estimated tau^2 value):             0.1742
+## I^2 (residual heterogeneity / unaccounted variability): 99.70%
+## H^2 (unaccounted variability / sampling variability):   335.13
+## R^2 (amount of heterogeneity accounted for):            0.58%
+## 
+## Test for Residual Heterogeneity:
+## QE(df = 119) = 6663.0912, p-val &lt; .0001
+## 
+## Test of Moderators (coefficients 2:3):
+## F(df1 = 2, df2 = 119) = 0.3116, p-val = 0.7329
+## 
+## Model Results:
+## 
+##                        estimate      se     tval   df    pval    ci.lb   ci.ub    
+## intrcpt                 -0.0057  0.0386  -0.1489  119  0.8819  -0.0821  0.0706    
+## attitude_cataffective    0.0456  0.0582   0.7839  119  0.4347  -0.0696  0.1609    
+## attitude_catcognitive    0.0233  0.0433   0.5385  119  0.5912  -0.0624  0.1090    
+## 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>model_step_2_var &lt;- rma(yi = sig_time,
               sei = sig_time_sd,
               data = total_results_waves,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
-              method = &quot;REML&quot;,
+              mods = ~ attitude_cat, 
+              method = &quot;ML&quot;,
               test = &quot;knha&quot;)
 
 model_step_2_var</code></pre>
-<pre class="r"><code># Step 3. Model with independent variables
-model_step_3_att &lt;- rma(yi = mu_time_pred,
-              sei = mu_time_sd_pred,
+<pre><code>## 
+## Mixed-Effects Model (k = 122; tau^2 estimator: ML)
+## 
+## tau^2 (estimated amount of residual heterogeneity):     0.0028 (SE = 0.0004)
+## tau (square root of estimated tau^2 value):             0.0533
+## I^2 (residual heterogeneity / unaccounted variability): 98.43%
+## H^2 (unaccounted variability / sampling variability):   63.55
+## R^2 (amount of heterogeneity accounted for):            3.12%
+## 
+## Test for Residual Heterogeneity:
+## QE(df = 119) = 1106.3330, p-val &lt; .0001
+## 
+## Test of Moderators (coefficients 2:3):
+## F(df1 = 2, df2 = 119) = 1.3182, p-val = 0.2715
+## 
+## Model Results:
+## 
+##                        estimate      se     tval   df    pval    ci.lb   ci.ub    
+## intrcpt                  0.0087  0.0133   0.6526  119  0.5153  -0.0177  0.0351    
+## attitude_cataffective   -0.0122  0.0203  -0.5982  119  0.5509  -0.0524  0.0281    
+## attitude_catcognitive   -0.0235  0.0149  -1.5738  119  0.1182  -0.0530  0.0061    
+## 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>model_step_3_att &lt;- rma(yi = mu_time,
+              sei = mu_time_sd,
               data = total_results_waves,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
-              method = &quot;REML&quot;,
+              mods = ~ attitude_cat + mean_year_centered,
+              method = &quot;ML&quot;,
               test = &quot;knha&quot;)
 
 model_step_3_att</code></pre>
-<pre class="r"><code># Step 3. Variance
-model_step_3_var &lt;- rma(yi = sig_time_pred,
-              sei = sig_time_sd_pred,
+<pre><code>## 
+## Mixed-Effects Model (k = 122; tau^2 estimator: ML)
+## 
+## tau^2 (estimated amount of residual heterogeneity):     0.0303 (SE = 0.0040)
+## tau (square root of estimated tau^2 value):             0.1742
+## I^2 (residual heterogeneity / unaccounted variability): 99.70%
+## H^2 (unaccounted variability / sampling variability):   333.98
+## R^2 (amount of heterogeneity accounted for):            0.58%
+## 
+## Test for Residual Heterogeneity:
+## QE(df = 118) = 6606.7602, p-val &lt; .0001
+## 
+## Test of Moderators (coefficients 2:4):
+## F(df1 = 3, df2 = 118) = 0.2070, p-val = 0.8914
+## 
+## Model Results:
+## 
+##                        estimate      se     tval   df    pval    ci.lb   ci.ub    
+## intrcpt                 -0.0051  0.0405  -0.1256  118  0.9002  -0.0852  0.0751    
+## attitude_cataffective    0.0440  0.0652   0.6749  118  0.5011  -0.0851  0.1731    
+## attitude_catcognitive    0.0227  0.0448   0.5068  118  0.6133  -0.0660  0.1113    
+## mean_year_centered       0.0001  0.0023   0.0565  118  0.9551  -0.0043  0.0046    
+## 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>model_step_4_att &lt;- rma(yi = mu_time,
+              sei = mu_time_sd,
               data = total_results_waves,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
-              method = &quot;REML&quot;,
+              mods = ~ attitude_cat + mean_year_centered + ambiguous + national + or_scale + pec_miss + data + nr_waves,
+              method = &quot;ML&quot;,
+              test = &quot;knha&quot;)</code></pre>
+<pre><code>## Warning: Redundant predictors dropped from the model.</code></pre>
+<pre class="r"><code>model_step_4_att</code></pre>
+<pre><code>## 
+## Mixed-Effects Model (k = 122; tau^2 estimator: ML)
+## 
+## tau^2 (estimated amount of residual heterogeneity):     0.0278 (SE = 0.0036)
+## tau (square root of estimated tau^2 value):             0.1666
+## I^2 (residual heterogeneity / unaccounted variability): 99.64%
+## H^2 (unaccounted variability / sampling variability):   276.70
+## R^2 (amount of heterogeneity accounted for):            8.99%
+## 
+## Test for Residual Heterogeneity:
+## QE(df = 107) = 6291.6591, p-val &lt; .0001
+## 
+## Test of Moderators (coefficients 2:15):
+## F(df1 = 14, df2 = 107) = 0.7334, p-val = 0.7366
+## 
+## Model Results:
+## 
+##                        estimate      se     tval   df    pval    ci.lb    ci.ub    
+## intrcpt                  0.1708  0.1351   1.2644  107  0.2088  -0.0970   0.4387    
+## attitude_cataffective    0.0211  0.0820   0.2572  107  0.7975  -0.1415   0.1837    
+## attitude_catcognitive    0.0116  0.0533   0.2184  107  0.8275  -0.0940   0.1173    
+## mean_year_centered       0.0016  0.0042   0.3693  107  0.7126  -0.0068   0.0100    
+## ambiguousYes            -0.0198  0.0449  -0.4403  107  0.6606  -0.1088   0.0692    
+## national                -0.0597  0.1555  -0.3837  107  0.7019  -0.3680   0.2487    
+## or_scale                 0.0243  0.0123   1.9752  107  0.0508  -0.0001   0.0487  . 
+## pec_miss                -0.2178  1.3344  -0.1632  107  0.8707  -2.8631   2.4276    
+## dataESS                 -0.1726  0.1552  -1.1123  107  0.2685  -0.4802   0.1350    
+## dataEVS                 -0.1015  0.1485  -0.6833  107  0.4959  -0.3958   0.1929    
+## dataIO                  -0.0530  0.1462  -0.3623  107  0.7179  -0.3429   0.2369    
+## dataISSP                -0.0995  0.0653  -1.5237  107  0.1305  -0.2291   0.0300    
+## dataLISS                -0.0496  0.2104  -0.2358  107  0.8141  -0.4667   0.3675    
+## dataMOT                 -0.0904  0.1479  -0.6115  107  0.5421  -0.3835   0.2027    
+## nr_waves                -0.0609  0.0279  -2.1831  107  0.0312  -0.1163  -0.0056  * 
+## 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code># Step 3. Variance
+model_step_3_var &lt;- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_results_waves,
+              mods = ~  attitude_cat + mean_year_centered,
+              method = &quot;ML&quot;,
               test = &quot;knha&quot;)
 
 model_step_3_var</code></pre>
-<pre class="r"><code># Step 4. Model with interactions
-model_step_4_att &lt;- rma(yi = mu_time_int,
-              sei = mu_time_sd_int,
+<pre><code>## 
+## Mixed-Effects Model (k = 122; tau^2 estimator: ML)
+## 
+## tau^2 (estimated amount of residual heterogeneity):     0.0028 (SE = 0.0004)
+## tau (square root of estimated tau^2 value):             0.0531
+## I^2 (residual heterogeneity / unaccounted variability): 98.41%
+## H^2 (unaccounted variability / sampling variability):   62.93
+## R^2 (amount of heterogeneity accounted for):            3.76%
+## 
+## Test for Residual Heterogeneity:
+## QE(df = 118) = 1106.3252, p-val &lt; .0001
+## 
+## Test of Moderators (coefficients 2:4):
+## F(df1 = 3, df2 = 118) = 1.0303, p-val = 0.3819
+## 
+## Model Results:
+## 
+##                        estimate      se     tval   df    pval    ci.lb   ci.ub    
+## intrcpt                  0.0055  0.0141   0.3914  118  0.6962  -0.0224  0.0335    
+## attitude_cataffective   -0.0050  0.0229  -0.2179  118  0.8279  -0.0503  0.0403    
+## attitude_catcognitive   -0.0206  0.0155  -1.3325  118  0.1853  -0.0513  0.0100    
+## mean_year_centered      -0.0005  0.0008  -0.6835  118  0.4956  -0.0021  0.0010    
+## 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>model_step_4_var &lt;- rma(yi = sig_time,
+              sei = sig_time_sd,
               data = total_results_waves,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
-              method = &quot;REML&quot;,
-              test = &quot;knha&quot;)
+              mods = ~  attitude_cat +  mean_year_centered + ambiguous + national + or_scale + pec_miss + data + nr_waves,
+              method = &quot;ML&quot;,
+              test = &quot;knha&quot;)</code></pre>
+<pre><code>## Warning: Redundant predictors dropped from the model.</code></pre>
+<pre class="r"><code>model_step_4_var</code></pre>
+<pre><code>## 
+## Mixed-Effects Model (k = 122; tau^2 estimator: ML)
+## 
+## tau^2 (estimated amount of residual heterogeneity):     0.0026 (SE = 0.0004)
+## tau (square root of estimated tau^2 value):             0.0513
+## I^2 (residual heterogeneity / unaccounted variability): 98.12%
+## H^2 (unaccounted variability / sampling variability):   53.22
+## R^2 (amount of heterogeneity accounted for):            10.28%
+## 
+## Test for Residual Heterogeneity:
+## QE(df = 107) = 953.6440, p-val &lt; .0001
+## 
+## Test of Moderators (coefficients 2:15):
+## F(df1 = 14, df2 = 107) = 0.6901, p-val = 0.7796
+## 
+## Model Results:
+## 
+##                        estimate      se     tval   df    pval    ci.lb   ci.ub    
+## intrcpt                  0.0095  0.0459   0.2059  107  0.8373  -0.0815  0.1005    
+## attitude_cataffective    0.0063  0.0285   0.2197  107  0.8265  -0.0502  0.0627    
+## attitude_catcognitive   -0.0200  0.0183  -1.0934  107  0.2767  -0.0562  0.0162    
+## mean_year_centered       0.0007  0.0014   0.4748  107  0.6359  -0.0022  0.0035    
+## ambiguousYes             0.0190  0.0154   1.2345  107  0.2197  -0.0115  0.0495    
+## national                -0.0754  0.0566  -1.3315  107  0.1858  -0.1877  0.0369    
+## or_scale                 0.0032  0.0042   0.7501  107  0.4548  -0.0052  0.0115    
+## pec_miss                -0.5584  0.4583  -1.2184  107  0.2258  -1.4668  0.3501    
+## dataESS                 -0.0361  0.0524  -0.6888  107  0.4925  -0.1400  0.0678    
+## dataEVS                 -0.0104  0.0497  -0.2087  107  0.8350  -0.1089  0.0882    
+## dataIO                   0.0313  0.0538   0.5822  107  0.5616  -0.0753  0.1380    
+## dataISSP                 0.0076  0.0220   0.3440  107  0.7315  -0.0361  0.0512    
+## dataLISS                 0.0671  0.0796   0.8439  107  0.4006  -0.0906  0.2249    
+## dataMOT                  0.0636  0.0542   1.1725  107  0.2436  -0.0439  0.1710    
+## nr_waves                -0.0003  0.0095  -0.0306  107  0.9756  -0.0191  0.0186    
+## 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>models &lt;- list(&quot;M1&quot; = model_step_1_att, &quot;M2&quot; = model_step_2_att, &quot;M3&quot; = model_step_3_att, &quot;M4&quot; = model_step_4_att, &quot;M1&quot; =  model_step_1_var, &quot;M2&quot;= model_step_2_var, &quot;M3&quot;=  model_step_3_var, &quot;M4&quot; = model_step_4_var)
 
-model_step_4_att</code></pre>
-<pre class="r"><code># Step 4. Variance
-model_step_4_var &lt;- rma(yi = sig_time_int,
-              sei = sig_time_sd_int,
-              data = total_results_waves,
-              mods = ~ mean_year + attitude_cat + ambiguous + fin_crisis + covid,
-              method = &quot;REML&quot;,
-              test = &quot;knha&quot;)
-
-model_step_4_var</code></pre>
-<pre class="r"><code>options(knitr.kable.NA = &#39;&#39;)</code></pre>
-<pre class="r"><code># Make a kable table of all the models 
-# First the mean attitudes, that i want in the table next to each other
-# Time effect only model
-model_1_mean_df &lt;- data.frame(matrix(ncol = 5, nrow = 7))
-colnames(model_1_mean_df) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;)
-model_1_mean_df$Variable &lt;- c(&quot;Intercept&quot;, &quot;Mean year&quot;, &quot;Attitude behavioral (ref = aff)&quot;, &quot;Attitude cognitive&quot;, &quot;Ambigious (ref = no)&quot;, &quot;Financial crisis&quot;, &quot;Covid-19&quot;)
-model_1_mean_df$`Mu/Sigma` &lt;- c(&quot;Mean attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
-
-model_1_mean_df$Estimate &lt;- as.numeric(model_step_2_att$beta) #estimate
-model_1_mean_df$SE &lt;- model_step_2_att$se #se indeed but as a row
-model_1_mean_df$p &lt;- model_step_2_att$pval # same as for SE
-
-
-model_1_mean_df$p_text &lt;- case_when(
-model_1_mean_df$p &gt;= 0.05 ~ &quot;&quot;,
-model_1_mean_df$p &lt; 0.001 ~ &quot;***&quot;,
-model_1_mean_df$p &lt; 0.01 ~ &quot;**&quot;,
-model_1_mean_df$p &lt; 0.05 ~ &quot;*&quot;
-)
-
-# I also want the R2, I2 and QE in the table
-model_1_fit  &lt;- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_1_fit) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;, &quot;p_text&quot;)
-model_1_fit$Variable &lt;- c(&quot;R2&quot;, &quot;I2&quot;, &quot;QE&quot;)
-model_1_fit$Estimate &lt;- c(model_step_2_att$R2, model_step_2_att$I2, model_step_2_att$QE)
-
-model_1_mean_df &lt;- rbind(model_1_mean_df, model_1_fit)
-
-
-# Independent variable model 
-model_2_mean_df &lt;- data.frame(matrix(ncol = 5, nrow = 7))
-colnames(model_2_mean_df) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;)
-model_2_mean_df$Variable &lt;- c(&quot;Intercept&quot;, &quot;Mean year&quot;, &quot;Attitude behavioral (ref = aff)&quot;, &quot;Attitude cognitive&quot;, &quot;Ambigious (ref = no)&quot;, &quot;Financial crisis&quot;, &quot;Covid-19&quot;)
-model_2_mean_df$`Mu/Sigma` &lt;- c(&quot;Mean attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
-
-model_2_mean_df$Estimate &lt;- as.numeric(model_step_3_att$beta) #estimate
-model_2_mean_df$SE &lt;- model_step_3_att$se #se indeed but as a row
-model_2_mean_df$p &lt;- model_step_3_att$pval # same as for SE
-
-
-model_2_mean_df$p_text &lt;- case_when(
-model_2_mean_df$p &gt;= 0.05 ~ &quot;&quot;,
-model_2_mean_df$p &lt; 0.001 ~ &quot;***&quot;,
-model_2_mean_df$p &lt; 0.01 ~ &quot;**&quot;,
-model_2_mean_df$p &lt; 0.05 ~ &quot;*&quot;
-)
-
-# I also want the R2, I2 and QE in the table
-model_2_fit  &lt;- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_2_fit) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;, &quot;p_text&quot;)
-model_2_fit$Variable &lt;- c(&quot;R2&quot;, &quot;I2&quot;, &quot;QE&quot;)
-model_2_fit$Estimate &lt;- c(model_step_3_att$R2, model_step_3_att$I2, model_step_3_att$QE)
-
-model_2_mean_df &lt;- rbind(model_2_mean_df, model_2_fit)
-
-
-#And the interaction model
-model_3_mean_df &lt;- data.frame(matrix(ncol = 5, nrow = 7))
-colnames(model_3_mean_df) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;)
-model_3_mean_df$Variable &lt;- c(&quot;Intercept&quot;, &quot;Mean year&quot;, &quot;Attitude behavioral (ref = aff)&quot;, &quot;Attitude cognitive&quot;, &quot;Ambigious (ref = no)&quot;, &quot;Financial crisis&quot;, &quot;Covid-19&quot;)
-model_3_mean_df$`Mu/Sigma` &lt;- c(&quot;Mean attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
-
-model_3_mean_df$Estimate &lt;- as.numeric(model_step_4_att$beta) #estimate
-model_3_mean_df$SE &lt;- model_step_4_att$se #se indeed but as a row
-model_3_mean_df$p &lt;- model_step_4_att$pval # same as for SE
-
-
-model_3_mean_df$p_text &lt;- case_when(
-model_3_mean_df$p &gt;= 0.05 ~ &quot;&quot;,
-model_3_mean_df$p &lt; 0.001 ~ &quot;***&quot;,
-model_3_mean_df$p &lt; 0.01 ~ &quot;**&quot;,
-model_3_mean_df$p &lt; 0.05 ~ &quot;*&quot;
-)
-
-# I also want the R2, I2 and QE in the table
-model_3_fit  &lt;- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_3_fit) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;, &quot;p_text&quot;)
-model_3_fit$Variable &lt;- c(&quot;R2&quot;, &quot;I2&quot;, &quot;QE&quot;)
-model_3_fit$Estimate &lt;- c(model_step_4_att$R2, model_step_4_att$I2, model_step_4_att$QE)
-
-model_3_mean_df &lt;- rbind(model_3_mean_df, model_3_fit)
-
-total_mean &lt;- cbind(model_1_mean_df, model_2_mean_df, model_3_mean_df)
-
-# Now for the sigma
-model_1_var_df &lt;- data.frame(matrix(ncol = 5, nrow = 7))
-colnames(model_1_var_df) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;)
-model_1_var_df$Variable &lt;- c(&quot;Intercept&quot;, &quot;Mean year&quot;, &quot;Attitude behavioral (ref = aff)&quot;, &quot;Attitude cognitive&quot;, &quot;Ambigious (ref = no)&quot;, &quot;Financial crisis&quot;, &quot;Covid-19&quot;)
-model_1_var_df$`Mu/Sigma` &lt;- c(&quot;Polarization in attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
-
-model_1_var_df$Estimate &lt;- as.numeric(model_step_2_var$beta) #estimate
-model_1_var_df$SE &lt;- model_step_2_var$se #se indeed but as a row
-model_1_var_df$p &lt;- model_step_2_var$pval # same as for SE
-
-
-model_1_var_df$p_text &lt;- case_when(
-model_1_var_df$p &gt;= 0.05 ~ &quot;&quot;,
-model_1_var_df$p &lt; 0.001 ~ &quot;***&quot;,
-model_1_var_df$p &lt; 0.01 ~ &quot;**&quot;,
-model_1_var_df$p &lt; 0.05 ~ &quot;*&quot;
-)
-
-# I also want the R2, I2 and QE in the table
-model_1_fit  &lt;- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_1_fit) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;, &quot;p_text&quot;)
-model_1_fit$Variable &lt;- c(&quot;R2&quot;, &quot;I2&quot;, &quot;QE&quot;)
-model_1_fit$Estimate &lt;- c(model_step_2_var$R2, model_step_2_var$I2, model_step_2_var$QE)
-
-model_1_var_df &lt;- rbind(model_1_var_df, model_1_fit)
-
-
-# Independent variable model 
-model_2_var_df &lt;- data.frame(matrix(ncol = 5, nrow = 7))
-colnames(model_2_var_df) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;)
-model_2_var_df$Variable &lt;- c(&quot;Intercept&quot;, &quot;Mean year&quot;, &quot;Attitude behavioral (ref = aff)&quot;, &quot;Attitude cognitive&quot;, &quot;Ambigious (ref = no)&quot;, &quot;Financial crisis&quot;, &quot;Covid-19&quot;)
-model_2_var_df$`Mu/Sigma` &lt;- c(&quot;Polarization in attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
-
-model_2_var_df$Estimate &lt;- as.numeric(model_step_3_var$beta) #estimate
-model_2_var_df$SE &lt;- model_step_3_var$se #se indeed but as a row
-model_2_var_df$p &lt;- model_step_3_var$pval # same as for SE
-
-
-model_2_var_df$p_text &lt;- case_when(
-model_2_var_df$p &gt;= 0.05 ~ &quot;&quot;,
-model_2_var_df$p &lt; 0.001 ~ &quot;***&quot;,
-model_2_var_df$p &lt; 0.01 ~ &quot;**&quot;,
-model_2_var_df$p &lt; 0.05 ~ &quot;*&quot;
-)
-
-# I also want the R2, I2 and QE in the table
-model_2_fit  &lt;- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_2_fit) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;, &quot;p_text&quot;)
-model_2_fit$Variable &lt;- c(&quot;R2&quot;, &quot;I2&quot;, &quot;QE&quot;)
-model_2_fit$Estimate &lt;- c(model_step_3_var$R2, model_step_3_var$I2, model_step_3_var$QE)
-
-model_2_var_df &lt;- rbind(model_2_var_df, model_2_fit)
-
-
-#And the interaction model
-model_3_var_df &lt;- data.frame(matrix(ncol = 5, nrow = 7))
-colnames(model_3_var_df) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;)
-model_3_var_df$Variable &lt;- c(&quot;Intercept&quot;, &quot;Mean year&quot;, &quot;Attitude behavioral (ref = aff)&quot;, &quot;Attitude cognitive&quot;, &quot;Ambigious (ref = no)&quot;, &quot;Financial crisis&quot;, &quot;Covid-19&quot;)
-model_3_var_df$`Mu/Sigma` &lt;- c(&quot;Polarization in attitudes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;)
-
-model_3_var_df$Estimate &lt;- as.numeric(model_step_4_var$beta) #estimate
-model_3_var_df$SE &lt;- model_step_4_var$se #se indeed but as a row
-model_3_var_df$p &lt;- model_step_4_var$pval # same as for SE
-
-model_3_var_df$p_text &lt;- case_when(
-model_3_var_df$p &gt;= 0.05 ~ &quot;&quot;,
-model_3_var_df$p &lt; 0.001 ~ &quot;***&quot;,
-model_3_var_df$p &lt; 0.01 ~ &quot;**&quot;,
-model_3_var_df$p &lt; 0.05 ~ &quot;*&quot;
-)
-
-# I also want the R2, I2 and QE in the table
-model_3_fit  &lt;- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_3_fit) &lt;- c(&quot;Mu/Sigma&quot;, &quot;Variable&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;p&quot;, &quot;p_text&quot;)
-model_3_fit$Variable &lt;- c(&quot;R2&quot;, &quot;I2&quot;, &quot;QE&quot;)
-model_3_fit$Estimate &lt;- c(model_step_4_var$R2, model_step_4_var$I2, model_step_4_var$QE)
-
-model_3_var_df &lt;- rbind(model_3_var_df, model_3_fit)
-
-total_var &lt;- cbind(model_1_var_df, model_2_var_df, model_3_var_df)
-
-#Now a total dataframe with both models together, and then make some changes before making the table
-total_meta &lt;- rbind(total_mean, total_var)
-colnames(total_meta) &lt;- c(&quot;mu_sigma&quot;, &quot;variable_empty&quot;, &quot;est_empty&quot;, &quot;se_empty&quot;, &quot;p_empty&quot;, &quot;p_text_empty&quot;, &quot;mu_sigma_indep&quot;, &quot;variable_indep&quot;, &quot;est_indep&quot;, &quot;se_indep&quot;, &quot;p_indep&quot;, &quot;p_text_indep&quot;, &quot;mu_sigma_inter&quot;, &quot;variable_inter&quot;, &quot;est_inter&quot;, &quot;se_inter&quot;, &quot;p_inter&quot;, &quot;p_text_inter&quot; )
-rownames(total_meta) &lt;- NULL
-total_meta &lt;- dplyr::select(total_meta, mu_sigma, variable_empty, est_empty, se_empty, p_text_empty, est_indep, se_indep, p_text_indep, est_inter, se_inter, p_text_inter)
-
-total_meta &lt;- dplyr::mutate(total_meta, across(.cols=c(est_empty, se_empty, est_indep, se_indep, est_inter, se_inter), .fns= as.numeric))
-numeric_cols &lt;- sapply(total_meta, is.numeric)
-total_meta[, numeric_cols] &lt;- round(total_meta[, numeric_cols], digits = 3)
-
-kable(total_meta, digits = 3, caption = &quot;Appendix X. Meta-regression on climate change attitudes and polarization per wave&quot;,
-      col.names = c( &quot;&quot;, &quot;Variables&quot;, &quot;Estimate&quot;, &quot;Std. Error&quot;, &quot;&quot;, &quot;Estimate&quot;, &quot;Std. Error&quot;, &quot;&quot;, &quot;Estimate&quot;, &quot;Std. Error&quot;, &quot;&quot;)) %&gt;%
+modelsummary(models, output = &quot;kableExtra&quot;, statistic = &#39;std.error&#39;, stars = TRUE, shape = term ~ model + statistic, title = &quot;
+Appendix X. Meta-regression on climate change attitudes and polarization per wave.&quot;, fmt = fmt_statistic(estimate = 3, std.error =3), coef_rename = c(&quot;overall&quot; =&quot;Intercept&quot;, 
+           &quot;intercept&quot; = &quot;Intercept&quot;, 
+           &quot;attitude_cataffective&quot; = &quot;Affective attitude (ref = beh)&quot;,
+           &quot;attitude_catcognitive&quot; = &quot;Cognitive attitude&quot;, 
+           &quot;mean_year_centered&quot; =   &quot;Mean year centered&quot;, 
+           &quot;ambiguousYes&quot; = &quot;Ambiguous (ref = no)&quot;,
+           &quot;national&quot; = &quot;National (ref = no)&quot;, 
+           &quot;or_scale&quot; = &quot;Original scale&quot;, 
+            &quot;pec_miss&quot; = &quot;Perc. missings&quot;, 
+           &quot;dataESS&quot;= &quot;ESS (ref = EB)&quot;, 
+           &quot;dataEVS&quot;= &quot;EVS&quot;, 
+           &quot;dataISSP&quot; = &quot;ISSP&quot;, 
+           &quot;dataLISS&quot;= &quot;LISS&quot;, 
+           &quot;dataMOT&quot; = &quot;MOT&quot;, 
+           &quot;nr_waves&quot; = &quot;Nr. of waves&quot;), gof_map = NA) %&gt;%
   kable_classic_2(html_font = &quot;Times&quot;, fixed_thead = T, full_width = F) %&gt;%
-  add_header_above(c(&quot; &quot; = 2, &quot;Time-only model&quot; = 3, &quot;Indepent var model&quot; = 3, &quot;Interaction model&quot; = 3)) %&gt;%
-   footnote(
-    general_title = &quot;Note.&quot;,
-    general = &quot;*** = p &lt; 0.001, ** = p &lt; 0.01, * = p &lt; 0.05&quot;,
-    threeparttable = TRUE,
-    footnote_as_chunk = TRUE
-    )</code></pre>
-<table class=" lightable-classic-2" style="font-family: Times; width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;">
-<caption>
-Appendix X. Meta-regression on climate change attitudes and polarization
-per wave
-</caption>
-<thead>
-<tr>
-<th style="empty-cells: hide;" colspan="2">
-</th>
-<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
-<div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">
-Time-only model
-</div>
-</th>
-<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
-<div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">
-Indepent var model
-</div>
-</th>
-<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
-<div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">
-Interaction model
-</div>
-</th>
-</tr>
-<tr>
-<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
-</th>
-<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
-Variables
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-Estimate
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-Std. Error
-</th>
-<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-Estimate
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-Std. Error
-</th>
-<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-Estimate
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-Std. Error
-</th>
-<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-Mean attitudes
-</td>
-<td style="text-align:left;">
-Intercept
-</td>
-<td style="text-align:right;">
-7.366
-</td>
-<td style="text-align:right;">
-9.416
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-4.211
-</td>
-<td style="text-align:right;">
-10.083
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-8.078
-</td>
-<td style="text-align:right;">
-10.035
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-Mean year
-</td>
-<td style="text-align:right;">
--0.004
-</td>
-<td style="text-align:right;">
-0.005
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
--0.002
-</td>
-<td style="text-align:right;">
-0.005
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
--0.004
-</td>
-<td style="text-align:right;">
-0.005
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-Attitude behavioral (ref = aff)
-</td>
-<td style="text-align:right;">
--0.094
-</td>
-<td style="text-align:right;">
-0.113
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
--0.058
-</td>
-<td style="text-align:right;">
-0.120
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
--0.130
-</td>
-<td style="text-align:right;">
-0.134
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-Attitude cognitive
-</td>
-<td style="text-align:right;">
--0.034
-</td>
-<td style="text-align:right;">
-0.091
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
--0.033
-</td>
-<td style="text-align:right;">
-0.097
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-0.002
-</td>
-<td style="text-align:right;">
-0.112
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-Ambigious (ref = no)
-</td>
-<td style="text-align:right;">
--0.004
-</td>
-<td style="text-align:right;">
-0.052
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
--0.054
-</td>
-<td style="text-align:right;">
-0.055
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
--0.047
-</td>
-<td style="text-align:right;">
-0.057
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-Financial crisis
-</td>
-<td style="text-align:right;">
--0.012
-</td>
-<td style="text-align:right;">
-0.056
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
--0.035
-</td>
-<td style="text-align:right;">
-0.060
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
--0.058
-</td>
-<td style="text-align:right;">
-0.058
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-Covid-19
-</td>
-<td style="text-align:right;">
-0.010
-</td>
-<td style="text-align:right;">
-0.080
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-0.007
-</td>
-<td style="text-align:right;">
-0.085
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
--0.036
-</td>
-<td style="text-align:right;">
-0.094
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-R2
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-I2
-</td>
-<td style="text-align:right;">
-99.819
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-99.843
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-90.625
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-QE
-</td>
-<td style="text-align:right;">
-7727.912
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-6892.289
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-341.895
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Polarization in attitudes
-</td>
-<td style="text-align:left;">
-Intercept
-</td>
-<td style="text-align:right;">
-1.159
-</td>
-<td style="text-align:right;">
-3.248
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-1.487
-</td>
-<td style="text-align:right;">
-3.019
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-4.115
-</td>
-<td style="text-align:right;">
-3.697
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-Mean year
-</td>
-<td style="text-align:right;">
--0.001
-</td>
-<td style="text-align:right;">
-0.002
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
--0.001
-</td>
-<td style="text-align:right;">
-0.002
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
--0.002
-</td>
-<td style="text-align:right;">
-0.002
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-Attitude behavioral (ref = aff)
-</td>
-<td style="text-align:right;">
--0.017
-</td>
-<td style="text-align:right;">
-0.039
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
--0.017
-</td>
-<td style="text-align:right;">
-0.037
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-0.027
-</td>
-<td style="text-align:right;">
-0.054
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-Attitude cognitive
-</td>
-<td style="text-align:right;">
--0.038
-</td>
-<td style="text-align:right;">
-0.032
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
--0.033
-</td>
-<td style="text-align:right;">
-0.030
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-0.020
-</td>
-<td style="text-align:right;">
-0.048
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-Ambigious (ref = no)
-</td>
-<td style="text-align:right;">
-0.020
-</td>
-<td style="text-align:right;">
-0.018
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-0.017
-</td>
-<td style="text-align:right;">
-0.017
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-0.017
-</td>
-<td style="text-align:right;">
-0.022
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-Financial crisis
-</td>
-<td style="text-align:right;">
-0.013
-</td>
-<td style="text-align:right;">
-0.019
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-0.010
-</td>
-<td style="text-align:right;">
-0.018
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-0.003
-</td>
-<td style="text-align:right;">
-0.021
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-Covid-19
-</td>
-<td style="text-align:right;">
--0.013
-</td>
-<td style="text-align:right;">
-0.028
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
--0.013
-</td>
-<td style="text-align:right;">
-0.026
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-0.069
-</td>
-<td style="text-align:right;">
-0.040
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-R2
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-0.284
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-I2
-</td>
-<td style="text-align:right;">
-99.157
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-99.008
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-80.286
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-QE
-</td>
-<td style="text-align:right;">
-1262.460
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-952.840
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-241.261
-</td>
-<td style="text-align:right;">
-</td>
-<td style="text-align:left;">
-</td>
-</tr>
-</tbody>
-<tfoot>
-<tr>
-<td style="padding: 0; " colspan="100%">
-<span style="font-style: italic;">Note.</span> <sup></sup> *** = p &lt;
-0.001, ** = p &lt; 0.01, * = p &lt; 0.05
-</td>
-</tr>
-</tfoot>
-</table>
-<pre class="r"><code>#%&gt;%
- #   save_kable(&quot;/Users/anuschka/Documents/climatechange/climatechange/output/appendix/meta_regression_table_per_wave.html&quot;)</code></pre>
+   add_header_above(c(&quot; &quot; = 1, &quot;Mu&quot; = 8, &quot;Sigma&quot; = 8)) %&gt;%
+    save_kable(&quot;./output/appendix/meta_regression_table_per_wave_JANUARY.html&quot;)</code></pre>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkFwcGVuZGl4LiBNZXRhLXJlZ3Jlc3Npb25zIGZvciBnYW1sc3Mgd2l0aCBzaG9ydCB0aW1lIHNwYW5zIg0KYXV0aG9yOiAiQW51c2Noa2EgUGVlbGVuIg0KZGF0ZTogImByIFN5cy5EYXRlKClgIg0Kb3V0cHV0OiBodG1sX2RvY3VtZW50DQotLS0NCmBgYHtyLCBlY2hvPUZBTFNFfQ0KI2tuaXRyOjpvcHRzX2NodW5rJHNldChldmFsID0gRkFMU0UpDQprbml0cjo6b3B0c19jaHVuayRzZXQobnVtYmVyX3NlY3Rpb25zID0gRkFMU0UpDQpvcHRpb25zKHdpZHRoID0gMTAwKQ0KY29sb3JpemUgPC0gZnVuY3Rpb24oeCwgY29sb3IpIHtzcHJpbnRmKCI8c3BhbiBzdHlsZT0nY29sb3I6ICVzOyc+JXM8L3NwYW4+IiwgY29sb3IsIHgpIH0NCmBgYA0KDQpJbiB0aGlzIHNjcmlwdCwgSSBwZXJmb3JtIG1ldGEtYW5hbHlzZXMgZm9yIHRoZSBtb2RlbHMgd2l0aCBzbWFsbGVyIHRpbWUtc3BhbnMsIHRvIHB1dCBpbiB0aGUgQXBwZW5kaXgNCg0KYGBge3IsIHJlc3VsdHMgPSAnaGlkZScsIHdhcm5pbmc9RkFMU0UsIG1lc3NhZ2U9RkFMU0V9DQpybShsaXN0PWxzKCkpDQpsaWJyYXJ5KG1ldGEpDQpsaWJyYXJ5KG1ldGFmb3IpDQpsaWJyYXJ5KGRwbHlyKQ0KbGlicmFyeShoZXJlKQ0KbGlicmFyeShrYWJsZUV4dHJhKQ0Kc2V0LnNlZWQoMSkNCmhlcmUoKQ0KaGVyZTo6aV9hbSgic2NyaXB0cy9hbmFseXNpcy9tZXRhX2FuYWx5c2lzX2d3X3dhdmVzLlJtZCIpDQpgYGANCg0KYGBge3IsIHJlc3VsdHM9J2hpZGUnLCB3YXJuaW5nPUZBTFNFfQ0KIyBXaXRoIHRoZSBmaW5hbCBkYXRhDQpsb2FkKGhlcmUoIi4vZGF0YS9tZXRhX2FuYWx5c2lzIiwgInRvdGFsX3Jlc3VsdHNfd2F2ZXNfbmV3LlJEYXRhIikpDQoNCiMgU3RhcnQgd2l0aCBzdGVwIDIgaGVyZSwgYXMgSSBkb24ndCBtYWtlIGZvcmVzdCBwbG90cyBmb3IgdGhlc2UgbW9kZWxzDQojU3RlcCAyLiBFbXB0eSBtb2RlbCB3aXRoIG1ldGEtbGV2ZWwgaW5kaWNhdG9ycw0KbW9kZWxfc3RlcF8yX2F0dCA8LSBybWEoeWkgPSBtdV90aW1lLA0KICAgICAgICAgICAgICBzZWkgPSBtdV90aW1lX3NkLA0KICAgICAgICAgICAgICBkYXRhID0gdG90YWxfcmVzdWx0c193YXZlcywNCiAgICAgICAgICAgICAgbW9kcyA9IH4gbWVhbl95ZWFyICsgYXR0aXR1ZGVfY2F0ICsgYW1iaWd1b3VzICsgZmluX2NyaXNpcyArIGNvdmlkLA0KICAgICAgICAgICAgICBtZXRob2QgPSAiUkVNTCIsDQogICAgICAgICAgICAgIHRlc3QgPSAia25oYSIpDQoNCm1vZGVsX3N0ZXBfMl9hdHQNCmBgYA0KYGBge3IsIHJlc3VsdHM9J2hpZGUnLCB3YXJuaW5nPUZBTFNFfQ0KIyBTdGVwIDIgdmFyaWFuY2UNCiNTdGVwIDIuIEVtcHR5IG1vZGVsIHdpdGggbWV0YS1sZXZlbCBpbmRpY2F0b3JzDQptb2RlbF9zdGVwXzJfdmFyIDwtIHJtYSh5aSA9IHNpZ190aW1lLA0KICAgICAgICAgICAgICBzZWkgPSBzaWdfdGltZV9zZCwNCiAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX3Jlc3VsdHNfd2F2ZXMsDQogICAgICAgICAgICAgIG1vZHMgPSB+IG1lYW5feWVhciArIGF0dGl0dWRlX2NhdCArIGFtYmlndW91cyArIGZpbl9jcmlzaXMgKyBjb3ZpZCwNCiAgICAgICAgICAgICAgbWV0aG9kID0gIlJFTUwiLA0KICAgICAgICAgICAgICB0ZXN0ID0gImtuaGEiKQ0KDQptb2RlbF9zdGVwXzJfdmFyDQpgYGANCg0KYGBge3IsIHJlc3VsdHM9J2hpZGUnLCB3YXJuaW5nPUZBTFNFfQ0KIyBTdGVwIDMuIE1vZGVsIHdpdGggaW5kZXBlbmRlbnQgdmFyaWFibGVzDQptb2RlbF9zdGVwXzNfYXR0IDwtIHJtYSh5aSA9IG11X3RpbWVfcHJlZCwNCiAgICAgICAgICAgICAgc2VpID0gbXVfdGltZV9zZF9wcmVkLA0KICAgICAgICAgICAgICBkYXRhID0gdG90YWxfcmVzdWx0c193YXZlcywNCiAgICAgICAgICAgICAgbW9kcyA9IH4gbWVhbl95ZWFyICsgYXR0aXR1ZGVfY2F0ICsgYW1iaWd1b3VzICsgZmluX2NyaXNpcyArIGNvdmlkLA0KICAgICAgICAgICAgICBtZXRob2QgPSAiUkVNTCIsDQogICAgICAgICAgICAgIHRlc3QgPSAia25oYSIpDQoNCm1vZGVsX3N0ZXBfM19hdHQNCmBgYA0KDQpgYGB7ciwgcmVzdWx0cz0naGlkZScsIHdhcm5pbmc9RkFMU0V9DQojIFN0ZXAgMy4gVmFyaWFuY2UNCm1vZGVsX3N0ZXBfM192YXIgPC0gcm1hKHlpID0gc2lnX3RpbWVfcHJlZCwNCiAgICAgICAgICAgICAgc2VpID0gc2lnX3RpbWVfc2RfcHJlZCwNCiAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX3Jlc3VsdHNfd2F2ZXMsDQogICAgICAgICAgICAgIG1vZHMgPSB+IG1lYW5feWVhciArIGF0dGl0dWRlX2NhdCArIGFtYmlndW91cyArIGZpbl9jcmlzaXMgKyBjb3ZpZCwNCiAgICAgICAgICAgICAgbWV0aG9kID0gIlJFTUwiLA0KICAgICAgICAgICAgICB0ZXN0ID0gImtuaGEiKQ0KDQptb2RlbF9zdGVwXzNfdmFyDQpgYGANCg0KYGBge3IsIHJlc3VsdHM9J2hpZGUnLCB3YXJuaW5nPUZBTFNFfQ0KIyBTdGVwIDQuIE1vZGVsIHdpdGggaW50ZXJhY3Rpb25zDQptb2RlbF9zdGVwXzRfYXR0IDwtIHJtYSh5aSA9IG11X3RpbWVfaW50LA0KICAgICAgICAgICAgICBzZWkgPSBtdV90aW1lX3NkX2ludCwNCiAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX3Jlc3VsdHNfd2F2ZXMsDQogICAgICAgICAgICAgIG1vZHMgPSB+IG1lYW5feWVhciArIGF0dGl0dWRlX2NhdCArIGFtYmlndW91cyArIGZpbl9jcmlzaXMgKyBjb3ZpZCwNCiAgICAgICAgICAgICAgbWV0aG9kID0gIlJFTUwiLA0KICAgICAgICAgICAgICB0ZXN0ID0gImtuaGEiKQ0KDQptb2RlbF9zdGVwXzRfYXR0DQpgYGANCg0KYGBge3IsIHJlc3VsdHM9J2hpZGUnLCB3YXJuaW5nPUZBTFNFfQ0KIyBTdGVwIDQuIFZhcmlhbmNlDQptb2RlbF9zdGVwXzRfdmFyIDwtIHJtYSh5aSA9IHNpZ190aW1lX2ludCwNCiAgICAgICAgICAgICAgc2VpID0gc2lnX3RpbWVfc2RfaW50LA0KICAgICAgICAgICAgICBkYXRhID0gdG90YWxfcmVzdWx0c193YXZlcywNCiAgICAgICAgICAgICAgbW9kcyA9IH4gbWVhbl95ZWFyICsgYXR0aXR1ZGVfY2F0ICsgYW1iaWd1b3VzICsgZmluX2NyaXNpcyArIGNvdmlkLA0KICAgICAgICAgICAgICBtZXRob2QgPSAiUkVNTCIsDQogICAgICAgICAgICAgIHRlc3QgPSAia25oYSIpDQoNCm1vZGVsX3N0ZXBfNF92YXINCmBgYA0KDQpgYGB7cn0NCm9wdGlvbnMoa25pdHIua2FibGUuTkEgPSAnJykNCmBgYA0KDQpgYGB7cn0NCiMgTWFrZSBhIGthYmxlIHRhYmxlIG9mIGFsbCB0aGUgbW9kZWxzIA0KIyBGaXJzdCB0aGUgbWVhbiBhdHRpdHVkZXMsIHRoYXQgaSB3YW50IGluIHRoZSB0YWJsZSBuZXh0IHRvIGVhY2ggb3RoZXINCiMgVGltZSBlZmZlY3Qgb25seSBtb2RlbA0KbW9kZWxfMV9tZWFuX2RmIDwtIGRhdGEuZnJhbWUobWF0cml4KG5jb2wgPSA1LCBucm93ID0gNykpDQpjb2xuYW1lcyhtb2RlbF8xX21lYW5fZGYpIDwtIGMoIk11L1NpZ21hIiwgIlZhcmlhYmxlIiwgIkVzdGltYXRlIiwgIlNFIiwgInAiKQ0KbW9kZWxfMV9tZWFuX2RmJFZhcmlhYmxlIDwtIGMoIkludGVyY2VwdCIsICJNZWFuIHllYXIiLCAiQXR0aXR1ZGUgYmVoYXZpb3JhbCAocmVmID0gYWZmKSIsICJBdHRpdHVkZSBjb2duaXRpdmUiLCAiQW1iaWdpb3VzIChyZWYgPSBubykiLCAiRmluYW5jaWFsIGNyaXNpcyIsICJDb3ZpZC0xOSIpDQptb2RlbF8xX21lYW5fZGYkYE11L1NpZ21hYCA8LSBjKCJNZWFuIGF0dGl0dWRlcyIsICIiLCAiIiwgIiIsICIiLCAiIiwgIiIpDQoNCm1vZGVsXzFfbWVhbl9kZiRFc3RpbWF0ZSA8LSBhcy5udW1lcmljKG1vZGVsX3N0ZXBfMl9hdHQkYmV0YSkgI2VzdGltYXRlDQptb2RlbF8xX21lYW5fZGYkU0UgPC0gbW9kZWxfc3RlcF8yX2F0dCRzZSAjc2UgaW5kZWVkIGJ1dCBhcyBhIHJvdw0KbW9kZWxfMV9tZWFuX2RmJHAgPC0gbW9kZWxfc3RlcF8yX2F0dCRwdmFsICMgc2FtZSBhcyBmb3IgU0UNCg0KDQptb2RlbF8xX21lYW5fZGYkcF90ZXh0IDwtIGNhc2Vfd2hlbigNCm1vZGVsXzFfbWVhbl9kZiRwID49IDAuMDUgfiAiIiwNCm1vZGVsXzFfbWVhbl9kZiRwIDwgMC4wMDEgfiAiKioqIiwNCm1vZGVsXzFfbWVhbl9kZiRwIDwgMC4wMSB+ICIqKiIsDQptb2RlbF8xX21lYW5fZGYkcCA8IDAuMDUgfiAiKiINCikNCg0KIyBJIGFsc28gd2FudCB0aGUgUjIsIEkyIGFuZCBRRSBpbiB0aGUgdGFibGUNCm1vZGVsXzFfZml0ICA8LSBkYXRhLmZyYW1lKG1hdHJpeChuY29sID0gNiwgbnJvdyA9IDMpKQ0KY29sbmFtZXMobW9kZWxfMV9maXQpIDwtIGMoIk11L1NpZ21hIiwgIlZhcmlhYmxlIiwgIkVzdGltYXRlIiwgIlNFIiwgInAiLCAicF90ZXh0IikNCm1vZGVsXzFfZml0JFZhcmlhYmxlIDwtIGMoIlIyIiwgIkkyIiwgIlFFIikNCm1vZGVsXzFfZml0JEVzdGltYXRlIDwtIGMobW9kZWxfc3RlcF8yX2F0dCRSMiwgbW9kZWxfc3RlcF8yX2F0dCRJMiwgbW9kZWxfc3RlcF8yX2F0dCRRRSkNCg0KbW9kZWxfMV9tZWFuX2RmIDwtIHJiaW5kKG1vZGVsXzFfbWVhbl9kZiwgbW9kZWxfMV9maXQpDQoNCg0KIyBJbmRlcGVuZGVudCB2YXJpYWJsZSBtb2RlbCANCm1vZGVsXzJfbWVhbl9kZiA8LSBkYXRhLmZyYW1lKG1hdHJpeChuY29sID0gNSwgbnJvdyA9IDcpKQ0KY29sbmFtZXMobW9kZWxfMl9tZWFuX2RmKSA8LSBjKCJNdS9TaWdtYSIsICJWYXJpYWJsZSIsICJFc3RpbWF0ZSIsICJTRSIsICJwIikNCm1vZGVsXzJfbWVhbl9kZiRWYXJpYWJsZSA8LSBjKCJJbnRlcmNlcHQiLCAiTWVhbiB5ZWFyIiwgIkF0dGl0dWRlIGJlaGF2aW9yYWwgKHJlZiA9IGFmZikiLCAiQXR0aXR1ZGUgY29nbml0aXZlIiwgIkFtYmlnaW91cyAocmVmID0gbm8pIiwgIkZpbmFuY2lhbCBjcmlzaXMiLCAiQ292aWQtMTkiKQ0KbW9kZWxfMl9tZWFuX2RmJGBNdS9TaWdtYWAgPC0gYygiTWVhbiBhdHRpdHVkZXMiLCAiIiwgIiIsICIiLCAiIiwgIiIsICIiKQ0KDQptb2RlbF8yX21lYW5fZGYkRXN0aW1hdGUgPC0gYXMubnVtZXJpYyhtb2RlbF9zdGVwXzNfYXR0JGJldGEpICNlc3RpbWF0ZQ0KbW9kZWxfMl9tZWFuX2RmJFNFIDwtIG1vZGVsX3N0ZXBfM19hdHQkc2UgI3NlIGluZGVlZCBidXQgYXMgYSByb3cNCm1vZGVsXzJfbWVhbl9kZiRwIDwtIG1vZGVsX3N0ZXBfM19hdHQkcHZhbCAjIHNhbWUgYXMgZm9yIFNFDQoNCg0KbW9kZWxfMl9tZWFuX2RmJHBfdGV4dCA8LSBjYXNlX3doZW4oDQptb2RlbF8yX21lYW5fZGYkcCA+PSAwLjA1IH4gIiIsDQptb2RlbF8yX21lYW5fZGYkcCA8IDAuMDAxIH4gIioqKiIsDQptb2RlbF8yX21lYW5fZGYkcCA8IDAuMDEgfiAiKioiLA0KbW9kZWxfMl9tZWFuX2RmJHAgPCAwLjA1IH4gIioiDQopDQoNCiMgSSBhbHNvIHdhbnQgdGhlIFIyLCBJMiBhbmQgUUUgaW4gdGhlIHRhYmxlDQptb2RlbF8yX2ZpdCAgPC0gZGF0YS5mcmFtZShtYXRyaXgobmNvbCA9IDYsIG5yb3cgPSAzKSkNCmNvbG5hbWVzKG1vZGVsXzJfZml0KSA8LSBjKCJNdS9TaWdtYSIsICJWYXJpYWJsZSIsICJFc3RpbWF0ZSIsICJTRSIsICJwIiwgInBfdGV4dCIpDQptb2RlbF8yX2ZpdCRWYXJpYWJsZSA8LSBjKCJSMiIsICJJMiIsICJRRSIpDQptb2RlbF8yX2ZpdCRFc3RpbWF0ZSA8LSBjKG1vZGVsX3N0ZXBfM19hdHQkUjIsIG1vZGVsX3N0ZXBfM19hdHQkSTIsIG1vZGVsX3N0ZXBfM19hdHQkUUUpDQoNCm1vZGVsXzJfbWVhbl9kZiA8LSByYmluZChtb2RlbF8yX21lYW5fZGYsIG1vZGVsXzJfZml0KQ0KDQoNCiNBbmQgdGhlIGludGVyYWN0aW9uIG1vZGVsDQptb2RlbF8zX21lYW5fZGYgPC0gZGF0YS5mcmFtZShtYXRyaXgobmNvbCA9IDUsIG5yb3cgPSA3KSkNCmNvbG5hbWVzKG1vZGVsXzNfbWVhbl9kZikgPC0gYygiTXUvU2lnbWEiLCAiVmFyaWFibGUiLCAiRXN0aW1hdGUiLCAiU0UiLCAicCIpDQptb2RlbF8zX21lYW5fZGYkVmFyaWFibGUgPC0gYygiSW50ZXJjZXB0IiwgIk1lYW4geWVhciIsICJBdHRpdHVkZSBiZWhhdmlvcmFsIChyZWYgPSBhZmYpIiwgIkF0dGl0dWRlIGNvZ25pdGl2ZSIsICJBbWJpZ2lvdXMgKHJlZiA9IG5vKSIsICJGaW5hbmNpYWwgY3Jpc2lzIiwgIkNvdmlkLTE5IikNCm1vZGVsXzNfbWVhbl9kZiRgTXUvU2lnbWFgIDwtIGMoIk1lYW4gYXR0aXR1ZGVzIiwgIiIsICIiLCAiIiwgIiIsICIiLCAiIikNCg0KbW9kZWxfM19tZWFuX2RmJEVzdGltYXRlIDwtIGFzLm51bWVyaWMobW9kZWxfc3RlcF80X2F0dCRiZXRhKSAjZXN0aW1hdGUNCm1vZGVsXzNfbWVhbl9kZiRTRSA8LSBtb2RlbF9zdGVwXzRfYXR0JHNlICNzZSBpbmRlZWQgYnV0IGFzIGEgcm93DQptb2RlbF8zX21lYW5fZGYkcCA8LSBtb2RlbF9zdGVwXzRfYXR0JHB2YWwgIyBzYW1lIGFzIGZvciBTRQ0KDQoNCm1vZGVsXzNfbWVhbl9kZiRwX3RleHQgPC0gY2FzZV93aGVuKA0KbW9kZWxfM19tZWFuX2RmJHAgPj0gMC4wNSB+ICIiLA0KbW9kZWxfM19tZWFuX2RmJHAgPCAwLjAwMSB+ICIqKioiLA0KbW9kZWxfM19tZWFuX2RmJHAgPCAwLjAxIH4gIioqIiwNCm1vZGVsXzNfbWVhbl9kZiRwIDwgMC4wNSB+ICIqIg0KKQ0KDQojIEkgYWxzbyB3YW50IHRoZSBSMiwgSTIgYW5kIFFFIGluIHRoZSB0YWJsZQ0KbW9kZWxfM19maXQgIDwtIGRhdGEuZnJhbWUobWF0cml4KG5jb2wgPSA2LCBucm93ID0gMykpDQpjb2xuYW1lcyhtb2RlbF8zX2ZpdCkgPC0gYygiTXUvU2lnbWEiLCAiVmFyaWFibGUiLCAiRXN0aW1hdGUiLCAiU0UiLCAicCIsICJwX3RleHQiKQ0KbW9kZWxfM19maXQkVmFyaWFibGUgPC0gYygiUjIiLCAiSTIiLCAiUUUiKQ0KbW9kZWxfM19maXQkRXN0aW1hdGUgPC0gYyhtb2RlbF9zdGVwXzRfYXR0JFIyLCBtb2RlbF9zdGVwXzRfYXR0JEkyLCBtb2RlbF9zdGVwXzRfYXR0JFFFKQ0KDQptb2RlbF8zX21lYW5fZGYgPC0gcmJpbmQobW9kZWxfM19tZWFuX2RmLCBtb2RlbF8zX2ZpdCkNCg0KdG90YWxfbWVhbiA8LSBjYmluZChtb2RlbF8xX21lYW5fZGYsIG1vZGVsXzJfbWVhbl9kZiwgbW9kZWxfM19tZWFuX2RmKQ0KDQojIE5vdyBmb3IgdGhlIHNpZ21hDQptb2RlbF8xX3Zhcl9kZiA8LSBkYXRhLmZyYW1lKG1hdHJpeChuY29sID0gNSwgbnJvdyA9IDcpKQ0KY29sbmFtZXMobW9kZWxfMV92YXJfZGYpIDwtIGMoIk11L1NpZ21hIiwgIlZhcmlhYmxlIiwgIkVzdGltYXRlIiwgIlNFIiwgInAiKQ0KbW9kZWxfMV92YXJfZGYkVmFyaWFibGUgPC0gYygiSW50ZXJjZXB0IiwgIk1lYW4geWVhciIsICJBdHRpdHVkZSBiZWhhdmlvcmFsIChyZWYgPSBhZmYpIiwgIkF0dGl0dWRlIGNvZ25pdGl2ZSIsICJBbWJpZ2lvdXMgKHJlZiA9IG5vKSIsICJGaW5hbmNpYWwgY3Jpc2lzIiwgIkNvdmlkLTE5IikNCm1vZGVsXzFfdmFyX2RmJGBNdS9TaWdtYWAgPC0gYygiUG9sYXJpemF0aW9uIGluIGF0dGl0dWRlcyIsICIiLCAiIiwgIiIsICIiLCAiIiwgIiIpDQoNCm1vZGVsXzFfdmFyX2RmJEVzdGltYXRlIDwtIGFzLm51bWVyaWMobW9kZWxfc3RlcF8yX3ZhciRiZXRhKSAjZXN0aW1hdGUNCm1vZGVsXzFfdmFyX2RmJFNFIDwtIG1vZGVsX3N0ZXBfMl92YXIkc2UgI3NlIGluZGVlZCBidXQgYXMgYSByb3cNCm1vZGVsXzFfdmFyX2RmJHAgPC0gbW9kZWxfc3RlcF8yX3ZhciRwdmFsICMgc2FtZSBhcyBmb3IgU0UNCg0KDQptb2RlbF8xX3Zhcl9kZiRwX3RleHQgPC0gY2FzZV93aGVuKA0KbW9kZWxfMV92YXJfZGYkcCA+PSAwLjA1IH4gIiIsDQptb2RlbF8xX3Zhcl9kZiRwIDwgMC4wMDEgfiAiKioqIiwNCm1vZGVsXzFfdmFyX2RmJHAgPCAwLjAxIH4gIioqIiwNCm1vZGVsXzFfdmFyX2RmJHAgPCAwLjA1IH4gIioiDQopDQoNCiMgSSBhbHNvIHdhbnQgdGhlIFIyLCBJMiBhbmQgUUUgaW4gdGhlIHRhYmxlDQptb2RlbF8xX2ZpdCAgPC0gZGF0YS5mcmFtZShtYXRyaXgobmNvbCA9IDYsIG5yb3cgPSAzKSkNCmNvbG5hbWVzKG1vZGVsXzFfZml0KSA8LSBjKCJNdS9TaWdtYSIsICJWYXJpYWJsZSIsICJFc3RpbWF0ZSIsICJTRSIsICJwIiwgInBfdGV4dCIpDQptb2RlbF8xX2ZpdCRWYXJpYWJsZSA8LSBjKCJSMiIsICJJMiIsICJRRSIpDQptb2RlbF8xX2ZpdCRFc3RpbWF0ZSA8LSBjKG1vZGVsX3N0ZXBfMl92YXIkUjIsIG1vZGVsX3N0ZXBfMl92YXIkSTIsIG1vZGVsX3N0ZXBfMl92YXIkUUUpDQoNCm1vZGVsXzFfdmFyX2RmIDwtIHJiaW5kKG1vZGVsXzFfdmFyX2RmLCBtb2RlbF8xX2ZpdCkNCg0KDQojIEluZGVwZW5kZW50IHZhcmlhYmxlIG1vZGVsIA0KbW9kZWxfMl92YXJfZGYgPC0gZGF0YS5mcmFtZShtYXRyaXgobmNvbCA9IDUsIG5yb3cgPSA3KSkNCmNvbG5hbWVzKG1vZGVsXzJfdmFyX2RmKSA8LSBjKCJNdS9TaWdtYSIsICJWYXJpYWJsZSIsICJFc3RpbWF0ZSIsICJTRSIsICJwIikNCm1vZGVsXzJfdmFyX2RmJFZhcmlhYmxlIDwtIGMoIkludGVyY2VwdCIsICJNZWFuIHllYXIiLCAiQXR0aXR1ZGUgYmVoYXZpb3JhbCAocmVmID0gYWZmKSIsICJBdHRpdHVkZSBjb2duaXRpdmUiLCAiQW1iaWdpb3VzIChyZWYgPSBubykiLCAiRmluYW5jaWFsIGNyaXNpcyIsICJDb3ZpZC0xOSIpDQptb2RlbF8yX3Zhcl9kZiRgTXUvU2lnbWFgIDwtIGMoIlBvbGFyaXphdGlvbiBpbiBhdHRpdHVkZXMiLCAiIiwgIiIsICIiLCAiIiwgIiIsICIiKQ0KDQptb2RlbF8yX3Zhcl9kZiRFc3RpbWF0ZSA8LSBhcy5udW1lcmljKG1vZGVsX3N0ZXBfM192YXIkYmV0YSkgI2VzdGltYXRlDQptb2RlbF8yX3Zhcl9kZiRTRSA8LSBtb2RlbF9zdGVwXzNfdmFyJHNlICNzZSBpbmRlZWQgYnV0IGFzIGEgcm93DQptb2RlbF8yX3Zhcl9kZiRwIDwtIG1vZGVsX3N0ZXBfM192YXIkcHZhbCAjIHNhbWUgYXMgZm9yIFNFDQoNCg0KbW9kZWxfMl92YXJfZGYkcF90ZXh0IDwtIGNhc2Vfd2hlbigNCm1vZGVsXzJfdmFyX2RmJHAgPj0gMC4wNSB+ICIiLA0KbW9kZWxfMl92YXJfZGYkcCA8IDAuMDAxIH4gIioqKiIsDQptb2RlbF8yX3Zhcl9kZiRwIDwgMC4wMSB+ICIqKiIsDQptb2RlbF8yX3Zhcl9kZiRwIDwgMC4wNSB+ICIqIg0KKQ0KDQojIEkgYWxzbyB3YW50IHRoZSBSMiwgSTIgYW5kIFFFIGluIHRoZSB0YWJsZQ0KbW9kZWxfMl9maXQgIDwtIGRhdGEuZnJhbWUobWF0cml4KG5jb2wgPSA2LCBucm93ID0gMykpDQpjb2xuYW1lcyhtb2RlbF8yX2ZpdCkgPC0gYygiTXUvU2lnbWEiLCAiVmFyaWFibGUiLCAiRXN0aW1hdGUiLCAiU0UiLCAicCIsICJwX3RleHQiKQ0KbW9kZWxfMl9maXQkVmFyaWFibGUgPC0gYygiUjIiLCAiSTIiLCAiUUUiKQ0KbW9kZWxfMl9maXQkRXN0aW1hdGUgPC0gYyhtb2RlbF9zdGVwXzNfdmFyJFIyLCBtb2RlbF9zdGVwXzNfdmFyJEkyLCBtb2RlbF9zdGVwXzNfdmFyJFFFKQ0KDQptb2RlbF8yX3Zhcl9kZiA8LSByYmluZChtb2RlbF8yX3Zhcl9kZiwgbW9kZWxfMl9maXQpDQoNCg0KI0FuZCB0aGUgaW50ZXJhY3Rpb24gbW9kZWwNCm1vZGVsXzNfdmFyX2RmIDwtIGRhdGEuZnJhbWUobWF0cml4KG5jb2wgPSA1LCBucm93ID0gNykpDQpjb2xuYW1lcyhtb2RlbF8zX3Zhcl9kZikgPC0gYygiTXUvU2lnbWEiLCAiVmFyaWFibGUiLCAiRXN0aW1hdGUiLCAiU0UiLCAicCIpDQptb2RlbF8zX3Zhcl9kZiRWYXJpYWJsZSA8LSBjKCJJbnRlcmNlcHQiLCAiTWVhbiB5ZWFyIiwgIkF0dGl0dWRlIGJlaGF2aW9yYWwgKHJlZiA9IGFmZikiLCAiQXR0aXR1ZGUgY29nbml0aXZlIiwgIkFtYmlnaW91cyAocmVmID0gbm8pIiwgIkZpbmFuY2lhbCBjcmlzaXMiLCAiQ292aWQtMTkiKQ0KbW9kZWxfM192YXJfZGYkYE11L1NpZ21hYCA8LSBjKCJQb2xhcml6YXRpb24gaW4gYXR0aXR1ZGVzIiwgIiIsICIiLCAiIiwgIiIsICIiLCAiIikNCg0KbW9kZWxfM192YXJfZGYkRXN0aW1hdGUgPC0gYXMubnVtZXJpYyhtb2RlbF9zdGVwXzRfdmFyJGJldGEpICNlc3RpbWF0ZQ0KbW9kZWxfM192YXJfZGYkU0UgPC0gbW9kZWxfc3RlcF80X3ZhciRzZSAjc2UgaW5kZWVkIGJ1dCBhcyBhIHJvdw0KbW9kZWxfM192YXJfZGYkcCA8LSBtb2RlbF9zdGVwXzRfdmFyJHB2YWwgIyBzYW1lIGFzIGZvciBTRQ0KDQptb2RlbF8zX3Zhcl9kZiRwX3RleHQgPC0gY2FzZV93aGVuKA0KbW9kZWxfM192YXJfZGYkcCA+PSAwLjA1IH4gIiIsDQptb2RlbF8zX3Zhcl9kZiRwIDwgMC4wMDEgfiAiKioqIiwNCm1vZGVsXzNfdmFyX2RmJHAgPCAwLjAxIH4gIioqIiwNCm1vZGVsXzNfdmFyX2RmJHAgPCAwLjA1IH4gIioiDQopDQoNCiMgSSBhbHNvIHdhbnQgdGhlIFIyLCBJMiBhbmQgUUUgaW4gdGhlIHRhYmxlDQptb2RlbF8zX2ZpdCAgPC0gZGF0YS5mcmFtZShtYXRyaXgobmNvbCA9IDYsIG5yb3cgPSAzKSkNCmNvbG5hbWVzKG1vZGVsXzNfZml0KSA8LSBjKCJNdS9TaWdtYSIsICJWYXJpYWJsZSIsICJFc3RpbWF0ZSIsICJTRSIsICJwIiwgInBfdGV4dCIpDQptb2RlbF8zX2ZpdCRWYXJpYWJsZSA8LSBjKCJSMiIsICJJMiIsICJRRSIpDQptb2RlbF8zX2ZpdCRFc3RpbWF0ZSA8LSBjKG1vZGVsX3N0ZXBfNF92YXIkUjIsIG1vZGVsX3N0ZXBfNF92YXIkSTIsIG1vZGVsX3N0ZXBfNF92YXIkUUUpDQoNCm1vZGVsXzNfdmFyX2RmIDwtIHJiaW5kKG1vZGVsXzNfdmFyX2RmLCBtb2RlbF8zX2ZpdCkNCg0KdG90YWxfdmFyIDwtIGNiaW5kKG1vZGVsXzFfdmFyX2RmLCBtb2RlbF8yX3Zhcl9kZiwgbW9kZWxfM192YXJfZGYpDQoNCiNOb3cgYSB0b3RhbCBkYXRhZnJhbWUgd2l0aCBib3RoIG1vZGVscyB0b2dldGhlciwgYW5kIHRoZW4gbWFrZSBzb21lIGNoYW5nZXMgYmVmb3JlIG1ha2luZyB0aGUgdGFibGUNCnRvdGFsX21ldGEgPC0gcmJpbmQodG90YWxfbWVhbiwgdG90YWxfdmFyKQ0KY29sbmFtZXModG90YWxfbWV0YSkgPC0gYygibXVfc2lnbWEiLCAidmFyaWFibGVfZW1wdHkiLCAiZXN0X2VtcHR5IiwgInNlX2VtcHR5IiwgInBfZW1wdHkiLCAicF90ZXh0X2VtcHR5IiwgIm11X3NpZ21hX2luZGVwIiwgInZhcmlhYmxlX2luZGVwIiwgImVzdF9pbmRlcCIsICJzZV9pbmRlcCIsICJwX2luZGVwIiwgInBfdGV4dF9pbmRlcCIsICJtdV9zaWdtYV9pbnRlciIsICJ2YXJpYWJsZV9pbnRlciIsICJlc3RfaW50ZXIiLCAic2VfaW50ZXIiLCAicF9pbnRlciIsICJwX3RleHRfaW50ZXIiICkNCnJvd25hbWVzKHRvdGFsX21ldGEpIDwtIE5VTEwNCnRvdGFsX21ldGEgPC0gZHBseXI6OnNlbGVjdCh0b3RhbF9tZXRhLCBtdV9zaWdtYSwgdmFyaWFibGVfZW1wdHksIGVzdF9lbXB0eSwgc2VfZW1wdHksIHBfdGV4dF9lbXB0eSwgZXN0X2luZGVwLCBzZV9pbmRlcCwgcF90ZXh0X2luZGVwLCBlc3RfaW50ZXIsIHNlX2ludGVyLCBwX3RleHRfaW50ZXIpDQoNCnRvdGFsX21ldGEgPC0gZHBseXI6Om11dGF0ZSh0b3RhbF9tZXRhLCBhY3Jvc3MoLmNvbHM9Yyhlc3RfZW1wdHksIHNlX2VtcHR5LCBlc3RfaW5kZXAsIHNlX2luZGVwLCBlc3RfaW50ZXIsIHNlX2ludGVyKSwgLmZucz0gYXMubnVtZXJpYykpDQpudW1lcmljX2NvbHMgPC0gc2FwcGx5KHRvdGFsX21ldGEsIGlzLm51bWVyaWMpDQp0b3RhbF9tZXRhWywgbnVtZXJpY19jb2xzXSA8LSByb3VuZCh0b3RhbF9tZXRhWywgbnVtZXJpY19jb2xzXSwgZGlnaXRzID0gMykNCg0Ka2FibGUodG90YWxfbWV0YSwgZGlnaXRzID0gMywgY2FwdGlvbiA9ICJBcHBlbmRpeCBYLiBNZXRhLXJlZ3Jlc3Npb24gb24gY2xpbWF0ZSBjaGFuZ2UgYXR0aXR1ZGVzIGFuZCBwb2xhcml6YXRpb24gcGVyIHdhdmUiLA0KICAgICAgY29sLm5hbWVzID0gYyggIiIsICJWYXJpYWJsZXMiLCAiRXN0aW1hdGUiLCAiU3RkLiBFcnJvciIsICIiLCAiRXN0aW1hdGUiLCAiU3RkLiBFcnJvciIsICIiLCAiRXN0aW1hdGUiLCAiU3RkLiBFcnJvciIsICIiKSkgJT4lDQogIGthYmxlX2NsYXNzaWNfMihodG1sX2ZvbnQgPSAiVGltZXMiLCBmaXhlZF90aGVhZCA9IFQsIGZ1bGxfd2lkdGggPSBGKSAlPiUNCiAgYWRkX2hlYWRlcl9hYm92ZShjKCIgIiA9IDIsICJUaW1lLW9ubHkgbW9kZWwiID0gMywgIkluZGVwZW50IHZhciBtb2RlbCIgPSAzLCAiSW50ZXJhY3Rpb24gbW9kZWwiID0gMykpICU+JQ0KICAgZm9vdG5vdGUoDQogICAgZ2VuZXJhbF90aXRsZSA9ICJOb3RlLiIsDQogICAgZ2VuZXJhbCA9ICIqKiogPSBwIDwgMC4wMDEsICoqID0gcCA8IDAuMDEsICogPSBwIDwgMC4wNSIsDQogICAgdGhyZWVwYXJ0dGFibGUgPSBUUlVFLA0KICAgIGZvb3Rub3RlX2FzX2NodW5rID0gVFJVRQ0KICAgICkNCg0KIyU+JQ0KICMgICBzYXZlX2thYmxlKCIvVXNlcnMvYW51c2Noa2EvRG9jdW1lbnRzL2NsaW1hdGVjaGFuZ2UvY2xpbWF0ZWNoYW5nZS9vdXRwdXQvYXBwZW5kaXgvbWV0YV9yZWdyZXNzaW9uX3RhYmxlX3Blcl93YXZlLmh0bWwiKQ0KDQpgYGANCg0KDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkFwcGVuZGl4LiBNZXRhLXJlZ3Jlc3Npb25zIGZvciBnYW1sc3Mgd2l0aCBzaG9ydCB0aW1lIHNwYW5zIg0KYXV0aG9yOiAiQW51c2Noa2EgUGVlbGVuIg0KZGF0ZTogImByIFN5cy5EYXRlKClgIg0Kb3V0cHV0OiBodG1sX2RvY3VtZW50DQotLS0NCmBgYHtyLCBlY2hvPUZBTFNFfQ0KI2tuaXRyOjpvcHRzX2NodW5rJHNldChldmFsID0gRkFMU0UpDQprbml0cjo6b3B0c19jaHVuayRzZXQobnVtYmVyX3NlY3Rpb25zID0gRkFMU0UpDQpvcHRpb25zKHdpZHRoID0gMTAwKQ0KY29sb3JpemUgPC0gZnVuY3Rpb24oeCwgY29sb3IpIHtzcHJpbnRmKCI8c3BhbiBzdHlsZT0nY29sb3I6ICVzOyc+JXM8L3NwYW4+IiwgY29sb3IsIHgpIH0NCmBgYA0KDQpgYGB7Y3NzLCBlY2hvPUZBTFNFfQ0KcHJlIHsNCiAgbWF4LWhlaWdodDogMzAwcHg7DQogIG92ZXJmbG93LXk6IGF1dG87DQp9DQoNCnByZVtjbGFzc10gew0KICBtYXgtaGVpZ2h0OiAxMDBweDsNCn0NCmBgYA0KDQpJbiB0aGlzIHNjcmlwdCwgSSBwZXJmb3JtIG1ldGEtYW5hbHlzZXMgZm9yIHRoZSBtb2RlbHMgd2l0aCBzbWFsbGVyIHRpbWUtc3BhbnMsIHRvIHB1dCBpbiB0aGUgQXBwZW5kaXgNCg0KYGBge3IsIHJlc3VsdHMgPSAnaGlkZScsIHdhcm5pbmc9RkFMU0UsIG1lc3NhZ2U9RkFMU0V9DQpybShsaXN0PWxzKCkpDQpsaWJyYXJ5KG1ldGEpDQpsaWJyYXJ5KG1ldGFmb3IpDQpsaWJyYXJ5KGRwbHlyKQ0KbGlicmFyeShrYWJsZUV4dHJhKQ0KbGlicmFyeShtb2RlbHN1bW1hcnkpDQpzZXQuc2VlZCgxKQ0KYGBgDQoNCmBgYHtyLCByZXN1bHRzPSdoaWRlJywgd2FybmluZz1GQUxTRX0NCiMgV2l0aCB0aGUgZmluYWwgZGF0YQ0KbG9hZCgiLi9kYXRhL21ldGFfYW5hbHlzaXMvdG90YWxfcmVzdWx0c193YXZlc19uZXcuUkRhdGEiKQ0KDQojU29tZWhvdyBzb21lIG1pc3NpbmdzIG9uIGZpcnN0IGFuZCBtZWFuIHllYXIgDQp0b3RhbF9yZXN1bHRzX3dhdmVzJGZpcnN0X3llYXJbdG90YWxfcmVzdWx0c193YXZlcyRkZXBfdmFyID09ICJlbnZfZWNfc3RhdCJdIDwtIDE5ODYNCnRvdGFsX3Jlc3VsdHNfd2F2ZXMkZmlyc3RfeWVhclt0b3RhbF9yZXN1bHRzX3dhdmVzJGRlcF92YXIgPT0gImVudl9wcnNpbXAiXSA8LSAxOTg2DQp0b3RhbF9yZXN1bHRzX3dhdmVzJG1lYW5feWVhclt0b3RhbF9yZXN1bHRzX3dhdmVzJGRlcF92YXIgPT0gImVudl9lY19zdGF0Il0gPC0gMTk5MQ0KdG90YWxfcmVzdWx0c193YXZlcyRtZWFuX3llYXJbdG90YWxfcmVzdWx0c193YXZlcyRkZXBfdmFyID09ICJlbnZfcHJzaW1wIl0gPC0gMTk5MQ0KDQp0b3RhbF9yZXN1bHRzX3dhdmVzJG1lYW5feWVhcl9jZW50ZXJlZCA8LSB0b3RhbF9yZXN1bHRzX3dhdmVzJG1lYW5feWVhciAtIG1lYW4odG90YWxfcmVzdWx0c193YXZlcyRtZWFuX3llYXIsIG5hLnJtID0gVFJVRSkNCg0KdG90YWxfcmVzdWx0c193YXZlcyRhdHRpdHVkZV9jYXQgPC0gZmFjdG9yKHRvdGFsX3Jlc3VsdHNfd2F2ZXMkYXR0aXR1ZGVfY2F0KQ0KdG90YWxfcmVzdWx0c193YXZlcyRhdHRpdHVkZV9jYXQgPC0gcmVsZXZlbCh0b3RhbF9yZXN1bHRzX3dhdmVzJGF0dGl0dWRlX2NhdCwgcmVmID0gImJlaGF2aW9yYWwiKQ0KDQoNCiMgU3RhcnQgd2l0aCBzdGVwIDIgaGVyZSwgYXMgSSBkb24ndCBtYWtlIGZvcmVzdCBwbG90cyBmb3IgdGhlc2UgbW9kZWxzDQojU3RlcCAyLiBFbXB0eSBtb2RlbCB3aXRoIG1ldGEtbGV2ZWwgaW5kaWNhdG9ycw0KbW9kZWxfc3RlcF8xX2F0dCA8LSBybWEoeWkgPSBtdV90aW1lLA0KICAgICAgICAgICAgICBzZWkgPSBtdV90aW1lX3NkLA0KICAgICAgICAgICAgICBkYXRhID0gdG90YWxfcmVzdWx0c193YXZlcywNCiAgICAgICAgICAgICAgbWV0aG9kID0gIk1MIiwNCiAgICAgICAgICAgICAgdGVzdCA9ICJrbmhhIikNCg0KbW9kZWxfc3RlcF8xX2F0dA0KDQpgYGANCg0KYGBge3IsIHJlc3VsdHM9J2hpZGUnLCB3YXJuaW5nPUZBTFNFfQ0KIyBWYXJpYW5jZQ0KbW9kZWxfc3RlcF8xX3ZhciA8LSBybWEoeWkgPSBzaWdfdGltZSwNCiAgICAgICAgICAgICAgc2VpID0gc2lnX3RpbWVfc2QsDQogICAgICAgICAgICAgIGRhdGEgPSB0b3RhbF9yZXN1bHRzX3dhdmVzLA0KICAgICAgICAgICAgICBtZXRob2QgPSAiTUwiLA0KICAgICAgICAgICAgICB0ZXN0ID0gImtuaGEiKQ0KDQptb2RlbF9zdGVwXzFfdmFyDQpgYGANCg0KYGBge3J9DQojIENlbnRlciBtZWFuIHllYXINCnRhYmxlKHRvdGFsX3Jlc3VsdHNfd2F2ZXMkbWVhbl95ZWFyKQ0KdG90YWxfcmVzdWx0c193YXZlcyRtZWFuX3llYXJfY2VudGVyZWQgPC0gdG90YWxfcmVzdWx0c193YXZlcyRtZWFuX3llYXIgLSBtZWFuKHRvdGFsX3Jlc3VsdHNfd2F2ZXMkbWVhbl95ZWFyKQ0KDQp0b3RhbF9yZXN1bHRzX3dhdmVzJGF0dGl0dWRlX2NhdCA8LSBmYWN0b3IodG90YWxfcmVzdWx0c193YXZlcyRhdHRpdHVkZV9jYXQpDQp0b3RhbF9yZXN1bHRzX3dhdmVzJGF0dGl0dWRlX2NhdCA8LSByZWxldmVsKHRvdGFsX3Jlc3VsdHNfd2F2ZXMkYXR0aXR1ZGVfY2F0LCByZWYgPSAiYmVoYXZpb3JhbCIpDQoNCm1vZGVsX3N0ZXBfMl9hdHQgPC0gcm1hKHlpID0gbXVfdGltZSwNCiAgICAgICAgICAgICAgc2VpID0gbXVfdGltZV9zZCwNCiAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX3Jlc3VsdHNfd2F2ZXMsDQogICAgICAgICAgICAgIG1vZHMgPSB+IGF0dGl0dWRlX2NhdCwNCiAgICAgICAgICAgICAgbWV0aG9kID0gIk1MIiwNCiAgICAgICAgICAgICAgdGVzdCA9ICJrbmhhIikNCg0KbW9kZWxfc3RlcF8yX2F0dA0KDQptb2RlbF9zdGVwXzJfdmFyIDwtIHJtYSh5aSA9IHNpZ190aW1lLA0KICAgICAgICAgICAgICBzZWkgPSBzaWdfdGltZV9zZCwNCiAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX3Jlc3VsdHNfd2F2ZXMsDQogICAgICAgICAgICAgIG1vZHMgPSB+IGF0dGl0dWRlX2NhdCwgDQogICAgICAgICAgICAgIG1ldGhvZCA9ICJNTCIsDQogICAgICAgICAgICAgIHRlc3QgPSAia25oYSIpDQoNCm1vZGVsX3N0ZXBfMl92YXINCg0KbW9kZWxfc3RlcF8zX2F0dCA8LSBybWEoeWkgPSBtdV90aW1lLA0KICAgICAgICAgICAgICBzZWkgPSBtdV90aW1lX3NkLA0KICAgICAgICAgICAgICBkYXRhID0gdG90YWxfcmVzdWx0c193YXZlcywNCiAgICAgICAgICAgICAgbW9kcyA9IH4gYXR0aXR1ZGVfY2F0ICsgbWVhbl95ZWFyX2NlbnRlcmVkLA0KICAgICAgICAgICAgICBtZXRob2QgPSAiTUwiLA0KICAgICAgICAgICAgICB0ZXN0ID0gImtuaGEiKQ0KDQptb2RlbF9zdGVwXzNfYXR0DQoNCm1vZGVsX3N0ZXBfNF9hdHQgPC0gcm1hKHlpID0gbXVfdGltZSwNCiAgICAgICAgICAgICAgc2VpID0gbXVfdGltZV9zZCwNCiAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX3Jlc3VsdHNfd2F2ZXMsDQogICAgICAgICAgICAgIG1vZHMgPSB+IGF0dGl0dWRlX2NhdCArIG1lYW5feWVhcl9jZW50ZXJlZCArIGFtYmlndW91cyArIG5hdGlvbmFsICsgb3Jfc2NhbGUgKyBwZWNfbWlzcyArIGRhdGEgKyBucl93YXZlcywNCiAgICAgICAgICAgICAgbWV0aG9kID0gIk1MIiwNCiAgICAgICAgICAgICAgdGVzdCA9ICJrbmhhIikNCg0KbW9kZWxfc3RlcF80X2F0dA0KDQojIFN0ZXAgMy4gVmFyaWFuY2UNCm1vZGVsX3N0ZXBfM192YXIgPC0gcm1hKHlpID0gc2lnX3RpbWUsDQogICAgICAgICAgICAgIHNlaSA9IHNpZ190aW1lX3NkLA0KICAgICAgICAgICAgICBkYXRhID0gdG90YWxfcmVzdWx0c193YXZlcywNCiAgICAgICAgICAgICAgbW9kcyA9IH4gIGF0dGl0dWRlX2NhdCArIG1lYW5feWVhcl9jZW50ZXJlZCwNCiAgICAgICAgICAgICAgbWV0aG9kID0gIk1MIiwNCiAgICAgICAgICAgICAgdGVzdCA9ICJrbmhhIikNCg0KbW9kZWxfc3RlcF8zX3Zhcg0KDQptb2RlbF9zdGVwXzRfdmFyIDwtIHJtYSh5aSA9IHNpZ190aW1lLA0KICAgICAgICAgICAgICBzZWkgPSBzaWdfdGltZV9zZCwNCiAgICAgICAgICAgICAgZGF0YSA9IHRvdGFsX3Jlc3VsdHNfd2F2ZXMsDQogICAgICAgICAgICAgIG1vZHMgPSB+ICBhdHRpdHVkZV9jYXQgKyAgbWVhbl95ZWFyX2NlbnRlcmVkICsgYW1iaWd1b3VzICsgbmF0aW9uYWwgKyBvcl9zY2FsZSArIHBlY19taXNzICsgZGF0YSArIG5yX3dhdmVzLA0KICAgICAgICAgICAgICBtZXRob2QgPSAiTUwiLA0KICAgICAgICAgICAgICB0ZXN0ID0gImtuaGEiKQ0KDQptb2RlbF9zdGVwXzRfdmFyDQoNCg0KYGBgDQoNCg0KYGBge3J9DQptb2RlbHMgPC0gbGlzdCgiTTEiID0gbW9kZWxfc3RlcF8xX2F0dCwgIk0yIiA9IG1vZGVsX3N0ZXBfMl9hdHQsICJNMyIgPSBtb2RlbF9zdGVwXzNfYXR0LCAiTTQiID0gbW9kZWxfc3RlcF80X2F0dCwgIk0xIiA9ICBtb2RlbF9zdGVwXzFfdmFyLCAiTTIiPSBtb2RlbF9zdGVwXzJfdmFyLCAiTTMiPSAgbW9kZWxfc3RlcF8zX3ZhciwgIk00IiA9IG1vZGVsX3N0ZXBfNF92YXIpDQoNCm1vZGVsc3VtbWFyeShtb2RlbHMsIG91dHB1dCA9ICJrYWJsZUV4dHJhIiwgc3RhdGlzdGljID0gJ3N0ZC5lcnJvcicsIHN0YXJzID0gVFJVRSwgc2hhcGUgPSB0ZXJtIH4gbW9kZWwgKyBzdGF0aXN0aWMsIHRpdGxlID0gIg0KQXBwZW5kaXggWC4gTWV0YS1yZWdyZXNzaW9uIG9uIGNsaW1hdGUgY2hhbmdlIGF0dGl0dWRlcyBhbmQgcG9sYXJpemF0aW9uIHBlciB3YXZlLiIsIGZtdCA9IGZtdF9zdGF0aXN0aWMoZXN0aW1hdGUgPSAzLCBzdGQuZXJyb3IgPTMpLCBjb2VmX3JlbmFtZSA9IGMoIm92ZXJhbGwiID0iSW50ZXJjZXB0IiwgDQogICAgICAgICAgICJpbnRlcmNlcHQiID0gIkludGVyY2VwdCIsIA0KICAgICAgICAgICAiYXR0aXR1ZGVfY2F0YWZmZWN0aXZlIiA9ICJBZmZlY3RpdmUgYXR0aXR1ZGUgKHJlZiA9IGJlaCkiLA0KICAgICAgICAgICAiYXR0aXR1ZGVfY2F0Y29nbml0aXZlIiA9ICJDb2duaXRpdmUgYXR0aXR1ZGUiLCANCiAgICAgICAgICAgIm1lYW5feWVhcl9jZW50ZXJlZCIgPQkiTWVhbiB5ZWFyIGNlbnRlcmVkIiwgDQogICAgICAgICAgICJhbWJpZ3VvdXNZZXMiID0gIkFtYmlndW91cyAocmVmID0gbm8pIiwNCiAgICAgICAgICAgIm5hdGlvbmFsIiA9ICJOYXRpb25hbCAocmVmID0gbm8pIiwgDQogICAgICAgICAgICJvcl9zY2FsZSIgPSAiT3JpZ2luYWwgc2NhbGUiLCANCiAgICAgICAgICAgICJwZWNfbWlzcyIgPSAiUGVyYy4gbWlzc2luZ3MiLCANCiAgICAgICAgICAgImRhdGFFU1MiPSAiRVNTIChyZWYgPSBFQikiLCANCiAgICAgICAgICAgImRhdGFFVlMiPSAiRVZTIiwgDQogICAgICAgICAgICJkYXRhSVNTUCIgPSAiSVNTUCIsIA0KICAgICAgICAgICAiZGF0YUxJU1MiPSAiTElTUyIsIA0KICAgICAgICAgICAiZGF0YU1PVCIgPSAiTU9UIiwgDQogICAgICAgICAgICJucl93YXZlcyIgPSAiTnIuIG9mIHdhdmVzIiksIGdvZl9tYXAgPSBOQSkgJT4lDQogIGthYmxlX2NsYXNzaWNfMihodG1sX2ZvbnQgPSAiVGltZXMiLCBmaXhlZF90aGVhZCA9IFQsIGZ1bGxfd2lkdGggPSBGKSAlPiUNCiAgIGFkZF9oZWFkZXJfYWJvdmUoYygiICIgPSAxLCAiTXUiID0gOCwgIlNpZ21hIiA9IDgpKSAlPiUNCiAgICBzYXZlX2thYmxlKCIuL291dHB1dC9hcHBlbmRpeC9tZXRhX3JlZ3Jlc3Npb25fdGFibGVfcGVyX3dhdmVfSkFOVUFSWS5odG1sIikNCmBgYA0KDQoNCg0KDQoNCg==</div>
 
 
 </div>

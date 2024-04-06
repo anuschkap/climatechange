@@ -11,6 +11,17 @@ options(width = 100)
 colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
 ```
 
+```{css, echo=FALSE}
+pre {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 100px;
+}
+```
+
 In this script, I select, recode and create variables of motivaction data.
 
 ```{r}

@@ -1,0 +1,141 @@
+---
+title: "DRA"
+output: html_document
+date: "2024-04-03"
+---
+
+```{r}
+rm(list=ls())
+library(tidyverse)
+library(dplyr)
+
+#install.packages("remotes")
+#remotes::install_github("davidaarmstrong/DyadRatios")
+
+```
+
+
+```{r}
+# Prepare two datasets to practice with the DRA
+load("./data/final_data/eb_tot.RData")
+
+# N berekenen
+count_per_year <- eb_tot %>%
+  group_by(surveyyear) %>%
+  summarise(N = n())
+
+index <- eb_tot %>%
+ filter(env_ec_stat != 3) %>%
+  mutate(cat = ifelse(env_ec_stat > 3, 1, 0)) %>%
+  group_by(surveyyear) %>%
+  summarise(Index = sum(cat) / n()) %>%
+  mutate(Varname = "env_ec_stat")
+
+index2 <- eb_tot %>%
+ filter(env_prsimp != 3) %>%
+  mutate(cat = ifelse(env_prsimp > 3, 1, 0)) %>%
+  group_by(surveyyear) %>%
+  summarise(Index = sum(cat) / n()) %>%
+  mutate(Varname = "env_prsimp")
+
+index3 <- eb_tot %>%
+ filter(role_ind != 3) %>%
+  mutate(cat = ifelse(role_ind > 3, 1, 0)) %>%
+  group_by(surveyyear) %>%
+  summarise(Index = sum(cat) / n()) %>%
+  mutate(Varname = "role_ind")
+
+index4 <- eb_tot %>%
+ filter(env_quallife != 3) %>%
+  mutate(cat = ifelse(env_quallife > 3, 1, 0)) %>%
+  group_by(surveyyear) %>%
+  summarise(Index = sum(cat) / n() ) %>%
+  mutate(Varname = "env_quallife")
+
+index5 <- eb_tot %>%
+ filter(pers_effort != 3) %>%
+  mutate(cat = ifelse(pers_effort > 3, 1, 0)) %>%
+  group_by(surveyyear) %>%
+  summarise(Index = sum(cat) / n() ) %>%
+  mutate(Varname = "pers_effort")
+
+index6 <- eb_tot %>%
+ filter(env_vs_ec != 3) %>%
+  mutate(cat = ifelse(env_vs_ec > 3, 1, 0)) %>%
+  group_by(surveyyear) %>%
+  summarise(Index = sum(cat) / n()) %>%
+  mutate(Varname = "env_vs_ec")
+
+index7 <- eb_tot %>%
+ filter(eff_daily != 3) %>%
+  mutate(cat = ifelse(eff_daily > 3, 1, 0)) %>%
+  group_by(surveyyear) %>%
+  summarise(Index = sum(cat) / n()) %>%
+  mutate(Varname = "eff_daily")
+
+index8 <- eb_tot %>%
+ filter(big_pol != 3) %>%
+  mutate(cat = ifelse(big_pol > 3, 1, 0)) %>%
+  group_by(surveyyear) %>%
+  summarise(Index = sum(cat) / n()) %>%
+  mutate(Varname = "big_pol")
+
+index9 <- eb_tot %>%
+ filter(buyprod != 3) %>%
+  mutate(cat = ifelse(buyprod > 3, 1, 0)) %>%
+  group_by(surveyyear) %>%
+  summarise(Index = sum(cat) / n() ) %>%
+  mutate(Varname = "buyprod")
+
+index10 <- eb_tot %>%
+ filter(cc_unstop != 3) %>%
+  mutate(cat = ifelse(cc_unstop > 3, 1, 0)) %>%
+  group_by(surveyyear) %>%
+  summarise(Index = sum(cat) / n()) %>%
+  mutate(Varname = "cc_unstop")
+
+
+dra_df <- bind_rows(index, index2, index3, index4, index5, index6, index7, index8, index9, index10)
+
+dra_df <- merge(dra_df, count_per_year)
+
+dra_df$Date <- ISOdate(dra_df$surveyyear, 1, 1)
+dra_df$Date <- as.Date(dra_df$Date)
+dra_df$Ncases <- dra_df$N
+
+
+output <- DyadRatios::extract(dra_df$Varname, dra_df$Date, dra_df$Index, dra_df$Ncases, mult=1,begindt=NA,enddt=NA,npass=1,smoothing=TRUE,endmonth=12)
+
+DyadRatios::summary.extract(output)
+DyadRatios::plot.extract(output)
+
+# Loop lukt niet 
+
+
+dra_df2 <- data.frame(Varname = character(),
+                         year = numeric(),
+                         Index = numeric(),
+                          cat = numeric(), 
+                         stringsAsFactors = FALSE)
+
+var_list <- c("env_ec_stat", "env_prsimp")  
+
+for (var in var_list) {
+
+  index_data <- eb_tot %>%
+    filter({{ var }} != 3) %>%
+    mutate(cat = ifelse({{ var }} > 3, 1, 0)) %>%
+    group_by(surveyyear) %>%
+    summarise(Index = sum(cat) / n()) %>%
+      mutate(Varname = c({{var}}))
+    
+  
+  dra_df2 <- bind_rows(dra_df2, index_data)
+}
+
+
+```
+
+
+
+

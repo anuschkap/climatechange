@@ -11,6 +11,17 @@ options(width = 100)
 colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
 ```
 
+```{css, echo=FALSE}
+pre {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 100px;
+}
+```
+
 In this script, I select, recode and create variables of the Eurobarometer
 
 ```{r}
@@ -19,7 +30,6 @@ library(plyr)
 library(dplyr)
 library(foreign)
 library(tidyverse)
-library(labelled)
 library(ggplot2)
 library(questionr)
 library(psych)
@@ -1387,4 +1397,5 @@ table(eb_tot$sex)
 save(eb_tot, file="./data/final_data/eb_tot.Rdata")
 
 ```
+
 

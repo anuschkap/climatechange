@@ -11,6 +11,17 @@ options(width = 100)
 colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
 ```
 
+```{css, echo=FALSE}
+pre {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 100px;
+}
+```
+
 In this script, I perform meta-analyses for the models with smaller time-spans, to put in the Appendix
 
 ```{r, results = 'hide', warning=FALSE, message=FALSE}
@@ -19,6 +30,7 @@ library(meta)
 library(metafor)
 library(dplyr)
 library(kableExtra)
+library(modelsummary)
 set.seed(1)
 ```
 
@@ -40,498 +52,119 @@ total_results_waves$attitude_cat <- relevel(total_results_waves$attitude_cat, re
 
 # Start with step 2 here, as I don't make forest plots for these models
 #Step 2. Empty model with meta-level indicators
+model_step_1_att <- rma(yi = mu_time,
+              sei = mu_time_sd,
+              data = total_results_waves,
+              method = "ML",
+              test = "knha")
+
+model_step_1_att
+
+```
+
+```{r, results='hide', warning=FALSE}
+# Variance
+model_step_1_var <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_results_waves,
+              method = "ML",
+              test = "knha")
+
+model_step_1_var
+```
+
+```{r}
+# Center mean year
+table(total_results_waves$mean_year)
+total_results_waves$mean_year_centered <- total_results_waves$mean_year - mean(total_results_waves$mean_year)
+
+total_results_waves$attitude_cat <- factor(total_results_waves$attitude_cat)
+total_results_waves$attitude_cat <- relevel(total_results_waves$attitude_cat, ref = "behavioral")
+
 model_step_2_att <- rma(yi = mu_time,
               sei = mu_time_sd,
               data = total_results_waves,
-              mods = ~ mean_year_centered + attitude_cat + ambiguous + data,
-              method = "REML",
+              mods = ~ attitude_cat,
+              method = "ML",
               test = "knha")
 
 model_step_2_att
 
-
-
-table(total_results_waves$mean_year, useNA = "always")
-
-```
-
-```{r, results='hide', warning=FALSE}
-# Estimate non-linear effects by including time as dummies
-total_results_waves <- fastDummies::dummy_cols(total_results_waves, select_columns = "mean_year")
-
-model_step_2_att_dum <- rma(yi = mu_time,
-              sei = mu_time_sd,
-              data = total_results_waves,
-              mods = ~ mean_year_2021 + attitude_cat + ambiguous + data,
-              method = "REML",
-              test = "knha")
-
-model_step_2_att_dum
-
-
-```
-
-
-
-
-
-```{r, results='hide', warning=FALSE}
-# Step 2 variance
-#Step 2. Empty model with meta-level indicators
 model_step_2_var <- rma(yi = sig_time,
               sei = sig_time_sd,
               data = total_results_waves,
-              mods = ~ mean_year_centered + attitude_cat + ambiguous + data,
-              method = "REML",
+              mods = ~ attitude_cat, 
+              method = "ML",
               test = "knha")
 
 model_step_2_var
-```
 
-```{r}
-# Also non-linear mean year for variance
-model_step_2_var_dum <- rma(yi = sig_time,
-              sei = sig_time_sd,
+model_step_3_att <- rma(yi = mu_time,
+              sei = mu_time_sd,
               data = total_results_waves,
-              mods = ~ mean_year_2021 + attitude_cat + ambiguous + data,
-              method = "REML",
-              test = "knha")
-
-model_step_2_var_dum
-
-```
-
-
-
-
-
-```{r, results='hide', warning=FALSE}
-# Step 3. Model with independent variables
-model_step_3_att <- rma(yi = mu_time_pred,
-              sei = mu_time_sd_pred,
-              data = total_results_waves,
-              mods = ~ mean_year_centered + attitude_cat + ambiguous + data,
-              method = "REML",
+              mods = ~ attitude_cat + mean_year_centered,
+              method = "ML",
               test = "knha")
 
 model_step_3_att
-```
 
-```{r, results='hide', warning=FALSE}
-# Step 3. Variance
-model_step_3_var <- rma(yi = sig_time_pred,
-              sei = sig_time_sd_pred,
+model_step_4_att <- rma(yi = mu_time,
+              sei = mu_time_sd,
               data = total_results_waves,
-              mods = ~ mean_year_centered + attitude_cat + ambiguous + data,
-              method = "REML",
-              test = "knha")
-
-model_step_3_var
-```
-
-```{r, results='hide', warning=FALSE}
-# Step 4. Model with interactions
-model_step_4_att <- rma(yi = mu_time_int,
-              sei = mu_time_sd_int,
-              data = total_results_waves,
-              mods = ~ mean_year_centered + attitude_cat + ambiguous + data,
-              method = "REML",
+              mods = ~ attitude_cat + mean_year_centered + ambiguous + national + or_scale + pec_miss + data + nr_waves,
+              method = "ML",
               test = "knha")
 
 model_step_4_att
-```
 
-```{r, results='hide', warning=FALSE}
-# Step 4. Variance
-model_step_4_var <- rma(yi = sig_time_int,
-              sei = sig_time_sd_int,
+# Step 3. Variance
+model_step_3_var <- rma(yi = sig_time,
+              sei = sig_time_sd,
               data = total_results_waves,
-              mods = ~ mean_year_centered + attitude_cat + ambiguous + data,
-              method = "REML",
+              mods = ~  attitude_cat + mean_year_centered,
+              method = "ML",
+              test = "knha")
+
+model_step_3_var
+
+model_step_4_var <- rma(yi = sig_time,
+              sei = sig_time_sd,
+              data = total_results_waves,
+              mods = ~  attitude_cat +  mean_year_centered + ambiguous + national + or_scale + pec_miss + data + nr_waves,
+              method = "ML",
               test = "knha")
 
 model_step_4_var
+
+
 ```
 
-```{r}
-options(knitr.kable.NA = '')
-```
 
 ```{r}
-# Make a kable table of all the models 
-# First the mean attitudes, that i want in the table next to each other
-# Time effect only model
-model_1_mean_df <- data.frame(matrix(ncol = 5, nrow = 5))
-colnames(model_1_mean_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_1_mean_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)")
-model_1_mean_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "")
+models <- list("M1" = model_step_1_att, "M2" = model_step_2_att, "M3" = model_step_3_att, "M4" = model_step_4_att, "M1" =  model_step_1_var, "M2"= model_step_2_var, "M3"=  model_step_3_var, "M4" = model_step_4_var)
 
-model_1_mean_df$Estimate <- as.numeric(model_step_2_att$beta) #estimate
-model_1_mean_df$SE <- model_step_2_att$se #se indeed but as a row
-model_1_mean_df$p <- model_step_2_att$pval # same as for SE
-
-
-model_1_mean_df$p_text <- case_when(
-model_1_mean_df$p >= 0.05 ~ "",
-model_1_mean_df$p < 0.001 ~ "***",
-model_1_mean_df$p < 0.01 ~ "**",
-model_1_mean_df$p < 0.05 ~ "*"
-)
-
-# I also want the R2, I2 and QE in the table
-model_1_fit  <- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_1_fit) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p", "p_text")
-model_1_fit$Variable <- c("R2", "I2", "QE")
-model_1_fit$Estimate <- c(model_step_2_att$R2, model_step_2_att$I2, model_step_2_att$QE)
-
-model_1_mean_df <- rbind(model_1_mean_df, model_1_fit)
-
-
-# Independent variable model 
-model_2_mean_df <- data.frame(matrix(ncol = 5, nrow = 5))
-colnames(model_2_mean_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_2_mean_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)")
-model_2_mean_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "")
-
-model_2_mean_df$Estimate <- as.numeric(model_step_3_att$beta) #estimate
-model_2_mean_df$SE <- model_step_3_att$se #se indeed but as a row
-model_2_mean_df$p <- model_step_3_att$pval # same as for SE
-
-
-model_2_mean_df$p_text <- case_when(
-model_2_mean_df$p >= 0.05 ~ "",
-model_2_mean_df$p < 0.001 ~ "***",
-model_2_mean_df$p < 0.01 ~ "**",
-model_2_mean_df$p < 0.05 ~ "*"
-)
-
-# I also want the R2, I2 and QE in the table
-model_2_fit  <- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_2_fit) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p", "p_text")
-model_2_fit$Variable <- c("R2", "I2", "QE")
-model_2_fit$Estimate <- c(model_step_3_att$R2, model_step_3_att$I2, model_step_3_att$QE)
-
-model_2_mean_df <- rbind(model_2_mean_df, model_2_fit)
-
-
-#And the interaction model
-model_3_mean_df <- data.frame(matrix(ncol = 5, nrow = 5))
-colnames(model_3_mean_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_3_mean_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)")
-model_3_mean_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "")
-
-model_3_mean_df$Estimate <- as.numeric(model_step_4_att$beta) #estimate
-model_3_mean_df$SE <- model_step_4_att$se #se indeed but as a row
-model_3_mean_df$p <- model_step_4_att$pval # same as for SE
-
-
-model_3_mean_df$p_text <- case_when(
-model_3_mean_df$p >= 0.05 ~ "",
-model_3_mean_df$p < 0.001 ~ "***",
-model_3_mean_df$p < 0.01 ~ "**",
-model_3_mean_df$p < 0.05 ~ "*"
-)
-
-# I also want the R2, I2 and QE in the table
-model_3_fit  <- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_3_fit) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p", "p_text")
-model_3_fit$Variable <- c("R2", "I2", "QE")
-model_3_fit$Estimate <- c(model_step_4_att$R2, model_step_4_att$I2, model_step_4_att$QE)
-
-model_3_mean_df <- rbind(model_3_mean_df, model_3_fit)
-
-total_mean <- cbind(model_1_mean_df, model_2_mean_df, model_3_mean_df)
-
-# Now for the sigma
-model_1_var_df <- data.frame(matrix(ncol = 5, nrow = 5))
-colnames(model_1_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_1_var_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)")
-model_1_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "")
-
-model_1_var_df$Estimate <- as.numeric(model_step_2_var$beta) #estimate
-model_1_var_df$SE <- model_step_2_var$se #se indeed but as a row
-model_1_var_df$p <- model_step_2_var$pval # same as for SE
-
-
-model_1_var_df$p_text <- case_when(
-model_1_var_df$p >= 0.05 ~ "",
-model_1_var_df$p < 0.001 ~ "***",
-model_1_var_df$p < 0.01 ~ "**",
-model_1_var_df$p < 0.05 ~ "*"
-)
-
-# I also want the R2, I2 and QE in the table
-model_1_fit  <- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_1_fit) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p", "p_text")
-model_1_fit$Variable <- c("R2", "I2", "QE")
-model_1_fit$Estimate <- c(model_step_2_var$R2, model_step_2_var$I2, model_step_2_var$QE)
-
-model_1_var_df <- rbind(model_1_var_df, model_1_fit)
-
-
-# Independent variable model 
-model_2_var_df <- data.frame(matrix(ncol = 5, nrow = 5))
-colnames(model_2_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_2_var_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)")
-model_2_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "")
-
-model_2_var_df$Estimate <- as.numeric(model_step_3_var$beta) #estimate
-model_2_var_df$SE <- model_step_3_var$se #se indeed but as a row
-model_2_var_df$p <- model_step_3_var$pval # same as for SE
-
-
-model_2_var_df$p_text <- case_when(
-model_2_var_df$p >= 0.05 ~ "",
-model_2_var_df$p < 0.001 ~ "***",
-model_2_var_df$p < 0.01 ~ "**",
-model_2_var_df$p < 0.05 ~ "*"
-)
-
-# I also want the R2, I2 and QE in the table
-model_2_fit  <- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_2_fit) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p", "p_text")
-model_2_fit$Variable <- c("R2", "I2", "QE")
-model_2_fit$Estimate <- c(model_step_3_var$R2, model_step_3_var$I2, model_step_3_var$QE)
-
-model_2_var_df <- rbind(model_2_var_df, model_2_fit)
-
-
-#And the interaction model
-model_3_var_df <- data.frame(matrix(ncol = 5, nrow = 5))
-colnames(model_3_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_3_var_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)")
-model_3_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "")
-
-model_3_var_df$Estimate <- as.numeric(model_step_4_var$beta) #estimate
-model_3_var_df$SE <- model_step_4_var$se #se indeed but as a row
-model_3_var_df$p <- model_step_4_var$pval # same as for SE
-
-model_3_var_df$p_text <- case_when(
-model_3_var_df$p >= 0.05 ~ "",
-model_3_var_df$p < 0.001 ~ "***",
-model_3_var_df$p < 0.01 ~ "**",
-model_3_var_df$p < 0.05 ~ "*"
-)
-
-# I also want the R2, I2 and QE in the table
-model_3_fit  <- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_3_fit) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p", "p_text")
-model_3_fit$Variable <- c("R2", "I2", "QE")
-model_3_fit$Estimate <- c(model_step_4_var$R2, model_step_4_var$I2, model_step_4_var$QE)
-
-model_3_var_df <- rbind(model_3_var_df, model_3_fit)
-
-total_var <- cbind(model_1_var_df, model_2_var_df, model_3_var_df)
-
-#Now a total dataframe with both models together, and then make some changes before making the table
-total_meta <- rbind(total_mean, total_var)
-colnames(total_meta) <- c("mu_sigma", "variable_empty", "est_empty", "se_empty", "p_empty", "p_text_empty", "mu_sigma_indep", "variable_indep", "est_indep", "se_indep", "p_indep", "p_text_indep", "mu_sigma_inter", "variable_inter", "est_inter", "se_inter", "p_inter", "p_text_inter" )
-rownames(total_meta) <- NULL
-total_meta <- dplyr::select(total_meta, mu_sigma, variable_empty, est_empty, se_empty, p_text_empty, est_indep, se_indep, p_text_indep, est_inter, se_inter, p_text_inter)
-
-total_meta <- dplyr::mutate(total_meta, across(.cols=c(est_empty, se_empty, est_indep, se_indep, est_inter, se_inter), .fns= as.numeric))
-numeric_cols <- sapply(total_meta, is.numeric)
-total_meta[, numeric_cols] <- round(total_meta[, numeric_cols], digits = 3)
-
-kable(total_meta, digits = 3, caption = "Appendix X. Meta-regression on climate change attitudes and polarization per wave",
-      col.names = c( "", "Variables", "Estimate", "Std. Error", "", "Estimate", "Std. Error", "", "Estimate", "Std. Error", "")) %>%
+modelsummary(models, output = "kableExtra", statistic = 'std.error', stars = TRUE, shape = term ~ model + statistic, title = "
+Appendix X. Meta-regression on climate change attitudes and polarization per wave.", fmt = fmt_statistic(estimate = 3, std.error =3), coef_rename = c("overall" ="Intercept", 
+           "intercept" = "Intercept", 
+           "attitude_cataffective" = "Affective attitude (ref = beh)",
+           "attitude_catcognitive" = "Cognitive attitude", 
+           "mean_year_centered" =	"Mean year centered", 
+           "ambiguousYes" = "Ambiguous (ref = no)",
+           "national" = "National (ref = no)", 
+           "or_scale" = "Original scale", 
+            "pec_miss" = "Perc. missings", 
+           "dataESS"= "ESS (ref = EB)", 
+           "dataEVS"= "EVS", 
+           "dataISSP" = "ISSP", 
+           "dataLISS"= "LISS", 
+           "dataMOT" = "MOT", 
+           "nr_waves" = "Nr. of waves"), gof_map = NA) %>%
   kable_classic_2(html_font = "Times", fixed_thead = T, full_width = F) %>%
-  add_header_above(c(" " = 2, "Time-only model" = 3, "Indepent var model" = 3, "Interaction model" = 3)) %>%
-   footnote(
-    general_title = "Note.",
-    general = "*** = p < 0.001, ** = p < 0.01, * = p < 0.05",
-    threeparttable = TRUE,
-    footnote_as_chunk = TRUE
-    )%>%
-    save_kable("./output/appendix/meta_regression_table_per_wave_NOVEMBER.html")
-
+   add_header_above(c(" " = 1, "Mu" = 8, "Sigma" = 8)) %>%
+    save_kable("./output/appendix/meta_regression_table_per_wave_JANUARY.html")
 ```
-```{r}
-# Table with the datasets
-model_1_mean_df <- data.frame(matrix(ncol = 5, nrow = 12))
-colnames(model_1_mean_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_1_mean_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)", "Dataset ESS (ref = EB)", "EVS", "I&O", "ISSP", "LISS", "Motivaction", "SOCON")
-model_1_mean_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "", "", "", "", "", "", "", "")
-
-model_1_mean_df$Estimate <- as.numeric(model_step_2_att$beta) #estimate
-model_1_mean_df$SE <- model_step_2_att$se #se indeed but as a row
-model_1_mean_df$p <- model_step_2_att$pval # same as for SE
 
 
-model_1_mean_df$p_text <- case_when(
-model_1_mean_df$p >= 0.05 ~ "",
-model_1_mean_df$p < 0.001 ~ "***",
-model_1_mean_df$p < 0.01 ~ "**",
-model_1_mean_df$p < 0.05 ~ "*"
-)
 
-# I also want the R2, I2 and QE in the table
-model_1_fit  <- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_1_fit) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p", "p_text")
-model_1_fit$Variable <- c("R2", "I2", "QE")
-model_1_fit$Estimate <- c(model_step_2_att$R2, model_step_2_att$I2, model_step_2_att$QE)
-
-model_1_mean_df <- rbind(model_1_mean_df, model_1_fit)
-
-
-# Independent variable model 
-model_2_mean_df <- data.frame(matrix(ncol = 5, nrow = 12))
-colnames(model_2_mean_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_2_mean_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)", "Dataset ESS (ref = EB)", "EVS", "I&O", "ISSP", "LISS", "Motivaction", "SOCON")
-model_2_mean_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "", "", "", "", "", "", "", "")
-
-model_2_mean_df$Estimate <- as.numeric(model_step_3_att$beta) #estimate
-model_2_mean_df$SE <- model_step_3_att$se #se indeed but as a row
-model_2_mean_df$p <- model_step_3_att$pval # same as for SE
-
-
-model_2_mean_df$p_text <- case_when(
-model_2_mean_df$p >= 0.05 ~ "",
-model_2_mean_df$p < 0.001 ~ "***",
-model_2_mean_df$p < 0.01 ~ "**",
-model_2_mean_df$p < 0.05 ~ "*"
-)
-
-# I also want the R2, I2 and QE in the table
-model_2_fit  <- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_2_fit) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p", "p_text")
-model_2_fit$Variable <- c("R2", "I2", "QE")
-model_2_fit$Estimate <- c(model_step_3_att$R2, model_step_3_att$I2, model_step_3_att$QE)
-
-model_2_mean_df <- rbind(model_2_mean_df, model_2_fit)
-
-
-#And the interaction model
-model_3_mean_df <- data.frame(matrix(ncol = 5, nrow = 12))
-colnames(model_3_mean_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_3_mean_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)", "Dataset ESS (ref = EB)", "EVS", "I&O", "ISSP", "LISS", "Motivaction", "SOCON")
-model_3_mean_df$`Mu/Sigma` <- c("Mean attitudes", "", "", "", "", "", "", "", "", "", "", "")
-
-model_3_mean_df$Estimate <- as.numeric(model_step_4_att$beta) #estimate
-model_3_mean_df$SE <- model_step_4_att$se #se indeed but as a row
-model_3_mean_df$p <- model_step_4_att$pval # same as for SE
-
-
-model_3_mean_df$p_text <- case_when(
-model_3_mean_df$p >= 0.05 ~ "",
-model_3_mean_df$p < 0.001 ~ "***",
-model_3_mean_df$p < 0.01 ~ "**",
-model_3_mean_df$p < 0.05 ~ "*"
-)
-
-# I also want the R2, I2 and QE in the table
-model_3_fit  <- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_3_fit) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p", "p_text")
-model_3_fit$Variable <- c("R2", "I2", "QE")
-model_3_fit$Estimate <- c(model_step_4_att$R2, model_step_4_att$I2, model_step_4_att$QE)
-
-model_3_mean_df <- rbind(model_3_mean_df, model_3_fit)
-
-total_mean <- cbind(model_1_mean_df, model_2_mean_df, model_3_mean_df)
-
-# Now for the sigma
-model_1_var_df <- data.frame(matrix(ncol = 5, nrow = 12))
-colnames(model_1_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_1_var_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)", "Dataset ESS (ref = EB)", "EVS", "I&O", "ISSP", "LISS", "Motivaction", "SOCON")
-model_1_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "", "", "", "", "", "", "", "")
-
-model_1_var_df$Estimate <- as.numeric(model_step_2_var$beta) #estimate
-model_1_var_df$SE <- model_step_2_var$se #se indeed but as a row
-model_1_var_df$p <- model_step_2_var$pval # same as for SE
-
-
-model_1_var_df$p_text <- case_when(
-model_1_var_df$p >= 0.05 ~ "",
-model_1_var_df$p < 0.001 ~ "***",
-model_1_var_df$p < 0.01 ~ "**",
-model_1_var_df$p < 0.05 ~ "*"
-)
-
-# I also want the R2, I2 and QE in the table
-model_1_fit  <- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_1_fit) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p", "p_text")
-model_1_fit$Variable <- c("R2", "I2", "QE")
-model_1_fit$Estimate <- c(model_step_2_var$R2, model_step_2_var$I2, model_step_2_var$QE)
-
-model_1_var_df <- rbind(model_1_var_df, model_1_fit)
-
-
-# Independent variable model 
-model_2_var_df <- data.frame(matrix(ncol = 5, nrow = 12))
-colnames(model_2_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_2_var_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)", "Dataset ESS (ref = EB)", "EVS", "I&O", "ISSP", "LISS", "Motivaction", "SOCON")
-model_2_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "", "", "", "", "", "", "", "")
-
-model_2_var_df$Estimate <- as.numeric(model_step_3_var$beta) #estimate
-model_2_var_df$SE <- model_step_3_var$se #se indeed but as a row
-model_2_var_df$p <- model_step_3_var$pval # same as for SE
-
-
-model_2_var_df$p_text <- case_when(
-model_2_var_df$p >= 0.05 ~ "",
-model_2_var_df$p < 0.001 ~ "***",
-model_2_var_df$p < 0.01 ~ "**",
-model_2_var_df$p < 0.05 ~ "*"
-)
-
-# I also want the R2, I2 and QE in the table
-model_2_fit  <- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_2_fit) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p", "p_text")
-model_2_fit$Variable <- c("R2", "I2", "QE")
-model_2_fit$Estimate <- c(model_step_3_var$R2, model_step_3_var$I2, model_step_3_var$QE)
-
-model_2_var_df <- rbind(model_2_var_df, model_2_fit)
-
-
-#And the interaction model
-model_3_var_df <- data.frame(matrix(ncol = 5, nrow = 12))
-colnames(model_3_var_df) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p")
-model_3_var_df$Variable <- c("Intercept", "Mean year (centered around mean)", "Attitude affective (ref = behavioral)", "Attitude cognitive", "Ambiguous (ref = no)", "Dataset ESS (ref = EB)", "EVS", "I&O", "ISSP", "LISS", "Motivaction", "SOCON")
-model_3_var_df$`Mu/Sigma` <- c("Polarization in attitudes", "", "", "", "", "", "", "", "", "", "", "")
-
-model_3_var_df$Estimate <- as.numeric(model_step_4_var$beta) #estimate
-model_3_var_df$SE <- model_step_4_var$se #se indeed but as a row
-model_3_var_df$p <- model_step_4_var$pval # same as for SE
-
-model_3_var_df$p_text <- case_when(
-model_3_var_df$p >= 0.05 ~ "",
-model_3_var_df$p < 0.001 ~ "***",
-model_3_var_df$p < 0.01 ~ "**",
-model_3_var_df$p < 0.05 ~ "*"
-)
-
-# I also want the R2, I2 and QE in the table
-model_3_fit  <- data.frame(matrix(ncol = 6, nrow = 3))
-colnames(model_3_fit) <- c("Mu/Sigma", "Variable", "Estimate", "SE", "p", "p_text")
-model_3_fit$Variable <- c("R2", "I2", "QE")
-model_3_fit$Estimate <- c(model_step_4_var$R2, model_step_4_var$I2, model_step_4_var$QE)
-
-model_3_var_df <- rbind(model_3_var_df, model_3_fit)
-
-
-total_var <- cbind(model_1_var_df, model_2_var_df, model_3_var_df)
-
-#Now a total dataframe with both models together, and then make some changes before making the table
-total_meta <- rbind(total_mean, total_var)
-colnames(total_meta) <- c("mu_sigma", "variable_empty", "est_empty", "se_empty", "p_empty", "p_text_empty", "mu_sigma_indep", "variable_indep", "est_indep", "se_indep", "p_indep", "p_text_indep", "mu_sigma_inter", "variable_inter", "est_inter", "se_inter", "p_inter", "p_text_inter" )
-rownames(total_meta) <- NULL
-total_meta <- dplyr::select(total_meta, mu_sigma, variable_empty, est_empty, se_empty, p_text_empty, est_indep, se_indep, p_text_indep, est_inter, se_inter, p_text_inter)
-
-total_meta <- dplyr::mutate(total_meta, across(.cols=c(est_empty, se_empty, est_indep, se_indep, est_inter, se_inter), .fns= as.numeric))
-numeric_cols <- sapply(total_meta, is.numeric)
-total_meta[, numeric_cols] <- round(total_meta[, numeric_cols], digits = 3)
-
-kable(total_meta, digits = 3, caption = "Appendix X. Meta-regression on climate change attitudes and polarization per wave",
-      col.names = c( "", "Variables", "Estimate", "Std. Error", "", "Estimate", "Std. Error", "", "Estimate", "Std. Error", "")) %>%
-  kable_classic_2(html_font = "Times", fixed_thead = T, full_width = F) %>%
-  add_header_above(c(" " = 2, "Time-only model" = 3, "Indepent var model" = 3, "Interaction model" = 3)) %>%
-   footnote(
-    general_title = "Note.",
-    general = "*** = p < 0.001, ** = p < 0.01, * = p < 0.05",
-    threeparttable = TRUE,
-    footnote_as_chunk = TRUE
-    )%>%
-    save_kable("./output/appendix/meta_regression_table_per_wave_NOVEMBER_WITH_DATASETS.html")
-```
 
 

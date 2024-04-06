@@ -12,6 +12,17 @@ options(width = 100)
 colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
 ```
 
+```{css, echo=FALSE}
+pre {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 100px;
+}
+```
+
 In this script I use loops to perform gamlss regressions for all 52 attitudes. The lists that I will get as output are saved with all the information, after which - in another script - i will extract the raw effects sizes used as input for the meta-regressions.  
 
 ```{r}
@@ -546,6 +557,7 @@ eb_list_preds_quallife <- list()
 } 
 
 summary(eb_list_preds_quallife[[1]]) 
+eb_list_preds_quallife
 
 save(eb_list_preds_quallife, file="./data/final_data/regression_outputs/eb_list_preds_quallife_w_new.RData")
 

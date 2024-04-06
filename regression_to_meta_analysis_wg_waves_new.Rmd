@@ -12,6 +12,17 @@ options(width = 100)
 colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
 ```
 
+```{css, echo=FALSE}
+pre {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 100px;
+}
+```
+
 In this script I extract the coefficients for the time effects and intercepts and put them in a dataset together, to use them as input for the meta-regression. This script uses the gamlss regressions with the time effects over shorter time spans. 
 
 ```{r}
@@ -2267,7 +2278,19 @@ total_results_waves$ambiguous[total_results_waves$dep_var == "dodiff"
                             | total_results_waves$dep_var == "big_pol"
                             | total_results_waves$dep_var == "noidea"] <- "Yes"
 
+# I also want an indicator for whether it is a national or international dataset. 
+total_results_waves$national[total_results_waves$data == "IO"|
+                             total_results_waves$data == "MOT" |
+                             total_results_waves$data == "LISS" |
+                             total_results_waves$data == "SOCON"] <- 1
+total_results_waves$national[total_results_waves$data == "EB"|
+                             total_results_waves$data == "ESS" |
+                             total_results_waves$data == "EVS" |
+                             total_results_waves$data == "ISSP"] <- 0
 
+# I also calculated the percentage of missings per variable, in how many waves it was asked and how many categories the original scale had. I collected these data in Excel.
+metavar <- readxl::read_excel("./data/meta_var.xlsx")
+total_results_waves <- merge(total_results_waves, metavar)
 
 save(total_results_waves, file= "./data/meta_analysis/total_results_waves_new.RData" )
 ```

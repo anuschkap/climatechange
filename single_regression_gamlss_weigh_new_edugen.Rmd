@@ -12,6 +12,17 @@ options(width = 100)
 colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
 ```
 
+```{css, echo=FALSE}
+pre {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 100px;
+}
+```
+
 In this script I use loops to perform gamlss regressions for all 52 attitudes. The lists that I will get as output are saved with all the information, after which - in another script - i will extract the raw effects sizes used as input for the meta-regressions. In this specific script, I will only include the effects of education and gender to test the idea of opposing effects of gender + education versus age. Furthermore, I will only run the independent variables model, as to test the theoretical idea underlying this test, the interaction model is less important. 
 
 ```{r}

@@ -1,0 +1,423 @@
+---
+title: "Extra check data after 2020"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(number_sections = FALSE)
+options(width = 100)
+colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
+```
+
+```{css, echo=FALSE}
+pre {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 100px;
+}
+```
+
+In this script I use loops to perform gamlss regressions for all 52 attitudes. The lists that I will get as output are saved with all the information, after which - in another script - i will extract the raw effects sizes used as input for the meta-regressions.  
+
+```{r}
+rm(list = ls())
+library(gamlss)
+library(tidyverse)
+library(dplyr)
+library(fastDummies)
+```
+
+## ESS {-}
+
+```{r}
+load("./data/final_data/esstotal.RData")
+
+# Gamlss cannot handle NAs, so I have to listwise delete all of them
+ess_2020 <- esstotal %>%
+  filter(surveyyear >= 2020)
+
+ess_2020 <- ess_2020 %>% drop_na()
+
+#Estimate a model with the indicators
+predictors <- c("sex", "isced_cat", "age")
+deps <- c("worry", "cause", "pers_resp")
+
+ess_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  ess_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = ess_2020, weights = weightvec)
+  
+  ess_list_preds[[i]] <- ess_fit
+} 
+
+summary(ess_list_preds[[1]]) 
+
+save(ess_list_preds, file="./data/final_data/regression_outputs/ess_check_2020.RData")
+```
+
+
+## I&O {-}
+
+```{r}
+rm(list=ls())
+load("./data/final_data/io_total.RData")
+io_2020 <- io_total %>% dplyr::select(worried:surveyyear, weightvec, isced_cat) %>%
+  filter(surveyyear ==2020)
+#Urban, IOINKOMEN, IOPOL has to go away
+io_2020 = subset(io_2020, select = -c(urban) )
+io_2020 <- io_2020 %>% drop_na()
+
+
+# Predictor model
+predictors <- c("sex", "isced_cat", "age")
+deps <- c("worried", "frontrunner", "worry_future", "resp_citiz", "dk_start", "do_gov", "buss_help", "min_contr", "human_resp")
+
+io_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  io_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = io_2020, weights = weightvec)
+  
+  io_list_preds[[i]] <- io_fit
+} 
+
+summary(io_list_preds[[3]]) 
+
+save(io_list_preds, file="./data/final_data/regression_outputs/io_check_2020.RData")
+
+io_2022 <- io_total %>% 
+  filter(surveyyear ==2022)
+#Urban, IOINKOMEN, IOPOL has to go away
+io_2022 = subset(io_2022, select = -c(urban, IOINKOMEN, IOPOL2017) )
+io_2022 <- io_2022 %>% drop_na()
+
+
+# Predictor model
+predictors <- c("sex", "isced_cat", "age")
+deps <- c("worried", "frontrunner", "worry_future", "resp_citiz", "dk_start", "do_gov", "buss_help", "min_contr", "human_resp")
+
+io_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  io_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = io_2022, weights = weightvec)
+  
+  io_list_preds[[i]] <- io_fit
+} 
+
+summary(io_list_preds[[3]]) 
+
+save(io_list_preds, file="./data/final_data/regression_outputs/io_check_2022.RData")
+
+```
+
+
+
+## EB {-}
+
+```{r}
+# Now the most difficult one: Eurobarometer. No items are asked steadily throughout time, so have to work with a lot of subsets. 
+rm(list=ls())
+load("./data/final_data/eb_tot.Rdata")
+
+eb_2021 <- eb_tot %>%
+  filter(surveyyear == 2021) %>%
+  dplyr::select(surveyyear, ccpercept, cchange, cchange2, cchangetot, sex, isced, urban, age, weightvec, isced_cat) ##ccpercept, cchange2, cchangetot
+
+eb_2021 <- eb_2021 %>% drop_na()
+
+predictors <- c("sex", "isced_cat", "age")
+deps <- c("ccpercept", "cchange", "cchange2", "cchangetot")
+
+eb_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  eb_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = eb_2021, weights = weightvec)
+  
+  eb_list_preds[[i]] <- eb_fit
+} 
+
+summary(eb_list_preds[[1]]) 
+
+save(eb_list_preds, file="./data/final_data/regression_outputs/eb_check_2021.RData")
+
+```
+
+## Motivaction {-}
+```{r}
+rm(list=ls())
+load("./data/final_data/mottotal.RData")
+
+# Gamlss cannot handle NAs, so I have to listwise delete all of them
+mot_2021 <- mottotal %>%
+  filter(surveyyear == 2021) %>%
+  drop_na()
+
+
+predictors <- c("sex", "isced_cat", "age")
+deps <- c("cchange_mot", "worried_mot", "futuregen", "nowor", "ontime", "gov", "resp_gov", "resp_comp", "resp_mkb", "resp_citiz_mot", "resp_you", "pers_resp_mot", "sust_choice", "contr", "energy", "noidea", "motiv")
+
+mot_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regrmotion
+  mot_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = mot_2021, weights = weightvec)
+  
+  mot_list_preds[[i]] <- mot_fit
+} 
+
+summary(mot_list_preds[[1]]) 
+
+save(mot_list_preds, file="./data/final_data/regression_outputs/mot_check_2021.RData")
+```
+
+## LISS {-}
+```{r}
+rm(list=ls())
+load("./data/final_data/lisstotal.RData")
+
+# Gamlss cannot handle NAs, so I have to listwise delete all of them
+liss_2020_1 <- lisstotal %>% 
+  filter(surveyyear == 2020.58) %>%
+  drop_na()
+
+#Estimate a second model with the indicators + time
+predictors <- c("sex", "isced_cat", "age")
+deps <- c("lifestyle")
+
+liss_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regrlission
+  liss_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = liss_2020_1, weights = weightvec)
+  
+  liss_list_preds[[i]] <- liss_fit
+} 
+
+summary(liss_list_preds[[1]]) 
+
+save(liss_list_preds, file="./data/final_data/regression_outputs/liss_check_2020_1.RData")
+
+
+# Gamlss cannot handle NAs, so I have to listwise delete all of them
+liss_2020_2 <- lisstotal %>% 
+  filter(surveyyear == 2020.83) %>%
+  drop_na()
+
+#Estimate a second model with the indicators + time
+predictors <- c("sex", "isced_cat", "age")
+deps <- c("lifestyle")
+
+liss_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regrlission
+  liss_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = liss_2020_2, weights = weightvec)
+  
+  liss_list_preds[[i]] <- liss_fit
+} 
+
+summary(liss_list_preds[[1]]) 
+
+save(liss_list_preds, file="./data/final_data/regression_outputs/liss_check_2020_2.RData")
+
+
+# Gamlss cannot handle NAs, so I have to listwise delete all of them
+liss_2021 <- lisstotal %>% 
+  filter(surveyyear == 2021) %>%
+  drop_na()
+
+#Estimate a second model with the indicators + time
+predictors <- c("sex", "isced_cat", "age")
+deps <- c("lifestyle")
+
+liss_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  liss_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = liss_2021, weights = weightvec)
+  
+  liss_list_preds[[i]] <- liss_fit
+} 
+
+summary(liss_list_preds[[1]]) 
+
+save(liss_list_preds, file="./data/final_data/regression_outputs/liss_check_2021.RData")
+
+
+
+```
+
+## SOCON {-}
+```{r}
+rm(list=ls())
+load("./data/final_data/socontotal.RData")
+
+# Gamlss cannot handle NAs, so I have to listwise delete all of them
+socon_2020 <- socontotal %>% 
+  filter(surveyyear == 2020) %>%
+  drop_na()
+
+#Estimate a second model with the indicators + time
+predictors <- c("sex", "isced_cat", "age")
+deps <- c("fut_gen_socon")
+
+
+socon_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  socon_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = socon_2020, weights = weightvec)
+  
+  socon_list_preds[[i]] <- socon_fit
+} 
+
+summary(socon_list_preds[[1]]) 
+
+save(socon_list_preds, file="./data/final_data/regression_outputs/socon_check_2020.RData")
+
+# Gamlss cannot handle NAs, so I have to listwise delete all of them
+socon_2021 <- socontotal %>% 
+  filter(surveyyear == 2021) %>%
+  drop_na()
+
+#Estimate a second model with the indicators + time
+predictors <- c("sex", "isced_cat", "age")
+deps <- c("fut_gen_socon")
+
+
+socon_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  socon_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = socon_2021, weights = weightvec)
+  
+  socon_list_preds[[i]] <- socon_fit
+} 
+
+summary(socon_list_preds[[1]]) 
+
+save(socon_list_preds, file="./data/final_data/regression_outputs/socon_check_2021.RData")
+
+socon_2022 <- socontotal %>% 
+  filter(surveyyear == 2022) %>%
+  drop_na()
+
+#Estimate a second model with the indicators + time
+predictors <- c("sex", "isced_cat", "age")
+deps <- c("fut_gen_socon")
+
+
+socon_list_preds <- list()
+
+# Loop through each dependent variable
+  for (i in 1:length(deps)) {
+  # Specify the sigma formula
+  sigma.formula <- as.formula(paste("~", paste(predictors, collapse = " + ")))
+  # Perform the linear regression
+  socon_fit <- gamlss(as.formula(paste(deps[i], "~", paste(predictors, collapse = " + "))), sigma.formula = sigma.formula, family=NO(mu.link = "identity", sigma.link = "identity"), data = socon_2022, weights = weightvec)
+  
+  socon_list_preds[[i]] <- socon_fit
+} 
+
+summary(socon_list_preds[[1]]) 
+
+save(socon_list_preds, file="./data/final_data/regression_outputs/socon_check_2022.RData")
+
+```
+
+
+## Extraction of effects {-}
+
+```{r}
+rm(list=ls())
+load("./data/final_data/regression_outputs/eb_check_2021.RData")
+
+eb_preds_df <- data.frame(dep_var = character())
+
+summary(eb_list_preds[[1]])
+
+# Loop over the list 
+for (i in seq_along(eb_list_preds)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(eb_list_preds[[i]]$mu.terms[[2]])
+
+  
+    # Summarize the model
+  sum <- summary(eb_list_preds[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+   mu_int <- sum[[1]]
+  mu_sd <- sum[[1,2]]
+   mu_sex_est <- sum[[2]]
+  mu_sex_sd <- sum[[2,2]]
+  mu_isced_med_est <- sum[[3]]
+  mu_isced_med_sd <- sum[[3,2]]
+  mu_isced_high_est <- sum[[4]]
+  mu_isced_high_sd <- sum[[4,2]]
+  mu_age_est <- sum[[5]]
+  mu_age_sd <- sum[[5,2]]
+
+    # Variance
+    sigma_int <- sum[[6]]
+  sigma_sd <- sum[[6,2]]
+  sig_sex_est <- sum[[7]]
+  sig_sex_sd <- sum[[7,2]]
+  sig_isced_med_est <- sum[[8]]
+  sig_isced_med_sd <- sum[[8,2]]
+  sig_isced_high_est <- sum[[9]]
+  sig_isced_high_sd <- sum[[9,2]]
+  sig_age_est <- sum[[10]]
+  sig_age_sd <- sum[[10,2]]
+  
+  # Put the results in df
+  eb_preds_df <- rbind(ess_indep_preds_df, data.frame(dep_var = dep_var, mu_int, mu_sd, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sigma_int, sigma_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd,sig_age_est, sig_age_sd))
+  
+}
+
+
+
+```
+
+
+
+

@@ -12,6 +12,17 @@ options(width = 100)
 colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
 ```
 
+```{css, echo=FALSE}
+pre {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 100px;
+}
+```
+
 In this script I extract the coefficients for gender, age and education and their interaction variables and put them in a dataset together, to use them as input for the meta-regression.
 
 ```{r}
@@ -58,14 +69,14 @@ for (i in seq_along(ess_list_interactions)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -123,14 +134,14 @@ for (i in seq_along(evs_list_interactions)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -186,14 +197,14 @@ for (i in seq_along(io_list_interactions)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -252,14 +263,14 @@ for (i in seq_along(issp_list_interactions)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -313,14 +324,14 @@ for (i in seq_along(issp_list_interactions_2_waves)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -378,14 +389,14 @@ for (i in seq_along(eb_list_interactions_1986)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -453,14 +464,14 @@ for (i in seq_along(eb_list_interactions_2007)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -512,14 +523,14 @@ for (i in seq_along(eb_list_interactions_2008)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -569,14 +580,14 @@ for (i in seq_along(eb_list_interactions_2009)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -626,14 +637,14 @@ for (i in seq_along(eb_list_interactions_2011)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -683,14 +694,14 @@ for (i in seq_along(eb_list_interactions_buyprod)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -740,14 +751,14 @@ for (i in seq_along(eb_list_interactions_cchange2)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -797,14 +808,14 @@ for (i in seq_along(eb_list_interactions_doprot)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -854,14 +865,14 @@ for (i in seq_along(eb_list_interactions_doprot_city)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -911,14 +922,14 @@ for (i in seq_along(eb_list_interactions_eff_daily)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -968,14 +979,14 @@ for (i in seq_along(eb_list_interactions_pers_imp)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -1025,14 +1036,14 @@ for (i in seq_along(eb_list_interactions_prsaction)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -1082,14 +1093,14 @@ for (i in seq_along(eb_list_interactions_quallife)) {
   mu_age_sd_inter <- sum[[7,2]]
 
   # Variance
-  sig_sex_est <- sum[[9]]
-  sig_sex_sd <- sum[[9,2]]
-  sig_isced_med_est <- sum[[10]]
-  sig_isced_med_sd <- sum[[10,2]]
-  sig_isced_high_est <- sum[[11]]
-  sig_isced_high_sd <- sum[[11,2]]
-  sig_age_est <- sum[[12]]
-  sig_age_sd <- sum[[12,2]]
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
   
   sig_sex_est_inter <- sum[[18]]
   sig_sex_sd_inter <- sum[[18,2]]
@@ -1111,6 +1122,218 @@ eb_indep_interactions_df <- rbind(eb_interactions_1986_df, eb_indep_interactions
 save(eb_indep_interactions_df, file= "./data/final_data/indep_var/eb_inter_var_new.RData" )
 ```
 
+## LISS {-}
+
+```{r}
+# Now the same for the LISS
+rm(list=ls())
+load("./data/final_data/regression_outputs/liss_list_interactions_w_new.RData")
+
+summary(liss_list_interactions[[1]])
+
+# Store the results in a new dataframe
+liss_indep_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(liss_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(liss_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(liss_list_interactions[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+  mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+  
+
+    # Variance
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+  
+  # Put the results 
+    liss_indep_interactions_df <- rbind(liss_indep_interactions_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+}
+
+
+save(liss_indep_interactions_df, file="./data/final_data/indep_var/liss_inter_var_new.RData")
+
+```
+
+## MOT {-}
+
+```{r}
+# Now the same for the MOT
+rm(list=ls())
+load("./data/final_data/regression_outputs/mot_list_interactions_w_new.RData")
+
+summary(mot_list_interactions[[1]])
+
+# Store the results in a new dataframe
+mot_indep_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(mot_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(mot_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(mot_list_interactions[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+  mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+  
+
+    # Variance
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+  
+  # Put the results 
+    mot_indep_interactions_df <- rbind(mot_indep_interactions_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+}
+
+
+save(mot_indep_interactions_df, file="./data/final_data/indep_var/mot_inter_var_new.RData")
+
+```
+
+
+## SOCON {-}
+
+```{r}
+# Now the same for the SOCON
+rm(list=ls())
+load("./data/final_data/regression_outputs/socon_list_interactions_w_new.RData")
+
+summary(socon_list_interactions[[1]])
+
+# Store the results in a new dataframe
+socon_indep_interactions_df <- data.frame(dep_var = character())
+
+# Loop over the list of models
+for (i in seq_along(socon_list_interactions)) {
+
+  # Extract the dependent variable so that we know for which dep var the effects are
+  dep_var <- as.character(socon_list_interactions[[i]]$mu.terms[[2]])
+  
+    # Summarize the model
+  sum <- summary(socon_list_interactions[[i]])
+  
+  # Extract the intercept and standard deviation for mu and sigma
+  mu_sex_est <- sum[[3]]
+  mu_sex_sd <- sum[[3,2]]
+  mu_isced_med_est <- sum[[4]]
+  mu_isced_med_sd <- sum[[4,2]]
+  mu_isced_high_est <- sum[[5]]
+  mu_isced_high_sd <- sum[[5,2]]
+  mu_age_est <- sum[[6]]
+  mu_age_sd <- sum[[6,2]]
+  
+  mu_sex_est_inter <- sum[[8]]
+  mu_sex_sd_inter <- sum[[8,2]]
+  mu_isced_med_est_inter <- sum[[9]]
+  mu_isced_med_sd_inter <- sum[[9,2]]
+  mu_isced_high_est_inter <- sum[[10]]
+  mu_isced_high_sd_inter <- sum[[10,2]]
+  mu_age_est_inter <- sum[[7]]
+  mu_age_sd_inter <- sum[[7,2]]
+  
+
+    # Variance
+  sig_sex_est <- sum[[13]]
+  sig_sex_sd <- sum[[13,2]]
+  sig_isced_med_est <- sum[[14]]
+  sig_isced_med_sd <- sum[[14,2]]
+  sig_isced_high_est <- sum[[15]]
+  sig_isced_high_sd <- sum[[15,2]]
+  sig_age_est <- sum[[16]]
+  sig_age_sd <- sum[[16,2]]
+  
+  sig_sex_est_inter <- sum[[18]]
+  sig_sex_sd_inter <- sum[[18,2]]
+  sig_isced_med_est_inter <- sum[[19]]
+  sig_isced_med_sd_inter <- sum[[19,2]]
+  sig_isced_high_est_inter <- sum[[20]]
+  sig_isced_high_sd_inter <- sum[[20,2]]
+  sig_age_est_inter <- sum[[17]]
+  sig_age_sd_inter <- sum[[17,2]]
+
+  
+  # Put the results 
+    socon_indep_interactions_df <- rbind(socon_indep_interactions_df, data.frame(dep_var = dep_var, mu_sex_est, mu_sex_sd, mu_isced_med_est, mu_isced_med_sd, mu_isced_high_est, mu_isced_high_sd, mu_age_est, mu_age_sd, sig_sex_est, sig_sex_sd, sig_isced_med_est, sig_isced_med_sd, sig_isced_high_est, sig_isced_high_sd, sig_age_est, sig_age_sd, mu_sex_est_inter, mu_sex_sd_inter, mu_isced_med_est_inter, mu_isced_med_sd_inter, mu_isced_high_est_inter, mu_isced_high_sd_inter, mu_age_est_inter, mu_age_sd_inter, sig_sex_est_inter, sig_sex_sd_inter, sig_isced_med_est_inter, sig_isced_med_sd_inter, sig_isced_high_est_inter, sig_isced_high_sd_inter, sig_age_est_inter, sig_age_sd_inter))
+}
+
+
+save(socon_indep_interactions_df, file="./data/final_data/indep_var/socon_inter_var_new.RData")
+
+```
+
+
 ## Merge everything into one dataset 
 
 ```{r}
@@ -1122,9 +1345,11 @@ load("./data/final_data/indep_var/evs_inter_var_new.RData")
 load("./data/final_data/indep_var/io_inter_var_new.RData")
 load("./data/final_data/indep_var/issp_2_inter_var_new.RData")
 load("./data/final_data/indep_var/issp_inter_var_new.RData")
+load("./data/final_data/indep_var/liss_inter_var_new.RData")
+load("./data/final_data/indep_var/socon_inter_var_new.RData")
+load("./data/final_data/indep_var/mot_inter_var_new.RData")
 
-
-total_inter_results <- rbind(eb_indep_interactions_df, ess_inter_preds_df, evs_indep_interactions_df, io_indep_interactions_df, issp_indep_interactions_df, issp_2_indep_interactions_df) 
+total_inter_results <- rbind(eb_indep_interactions_df, ess_inter_preds_df, evs_indep_interactions_df, io_indep_interactions_df, issp_indep_interactions_df, issp_2_indep_interactions_df, liss_indep_interactions_df, mot_indep_interactions_df, socon_indep_interactions_df) 
 
 save(total_inter_results, file= "./data/meta_analysis/total_inter_results_new.RData" )
 ```

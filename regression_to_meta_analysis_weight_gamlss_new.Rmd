@@ -12,6 +12,17 @@ options(width = 100)
 colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
 ```
 
+```{css, echo=FALSE}
+pre {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 100px;
+}
+```
+
 In this script I extract the coefficients for the time effects and intercepts and put them in a dataset together, to use them as input for the meta-regression.
 
 ```{r}
@@ -1262,6 +1273,84 @@ total_reg_results$national[total_reg_results$data == "EB"|
                              total_reg_results$data == "ESS" |
                              total_reg_results$data == "EVS" |
                              total_reg_results$data == "ISSP"] <- 0
+
+table(total_reg_results$national, useNA = "always")
+
+# I would like to change the names of the variables so that they are a bit more descriptive and look better
+total_reg_results$dep_var_name[total_reg_results$dep_var == "dodiff"] <- "Do things differently" 
+total_reg_results$dep_var_name[total_reg_results$dep_var == "frontrunner"] <- "NL frontrunner"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "min_contr"] <- "Minimal contribution"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "people_decide"] <- "Let people decide"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "econprotect"] <- "Need economic growth"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "growharm"] <- "Growth harms env"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "bus_decide"] <- "Let business decide"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "othersame"] <- "Others do same"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_citiz"] <- "Responsibility citizen"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "dk_start"] <- "Don't know where start"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "buss_help"] <- "Large companies reduce"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "envp_eg"] <- "Protection boosts growth"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "effr_eg"] <- "Use natural resources"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "env_quallife"] <- "Env affects quality life"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cc_unstop"] <- "Climate change unstoppable"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cc_poseu"] <- "Fighting cc pos impact EU"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "big_pol"] <- "Big polluters responsible"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "pers_resp"] <- "Personal responsiblity" 
+total_reg_results$dep_var_name[total_reg_results$dep_var == "worry"] <- "Worried climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "worried"] <- "Worry CO2 and climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "worry_future"] <- "Bleak future generations"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "willing_price"] <- "Willing pay higher prices"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "willing_tax"] <- "Willing pay higher taxes"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "willing_living"] <- "Willing cut std of living"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "do_right"] <- "Do what is right"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "climate5"] <- "Would give part income" 
+total_reg_results$dep_var_name[total_reg_results$dep_var == "prsaction"] <- "Taken personal action"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cc_prsact"] <- "Taken personal action"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "buyprod"] <- "Buy environmental products"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "worry_issp"] <- "Worry too much about future"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "lifeharm"] <- "Everything we do harms env"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "progharm"] <- "Worry too much about harm"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "moreimp"] <- "Other things more important"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "exag"] <- "Claims exaggerated" 
+total_reg_results$dep_var_name[total_reg_results$dep_var == "country_effort"] <- "Countries doing enough"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cause"] <- "Cause climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "human_resp"] <- "Humans responsible"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "env_ec_stat"] <- "Env vs economy"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "env_prsimp"] <- "Urgent problem"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cchange"] <- "Most important problem"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cchange2"] <- "2nd most important problem"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cchangetot"] <- "Mentioned as important problem"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "ccpercept"] <- "Serious climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "doprot_comp"] <- "Companies do enough" 
+total_reg_results$dep_var_name[total_reg_results$dep_var == "doprot_citiz"] <- "Citizens do enough"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "doprot_region"] <- "Region does enough"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "do_gov"] <- "Government does enough"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "doprot_natgov"] <- "Government does enough"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "doprot_eu"] <- "EU does enough"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "doprot_city"] <- "City does enough"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cc_exag"] <- "Seriousness exaggerated"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "role_ind"] <- "Individuals can play role"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "eff_daily"] <- "Env issues affect daily life"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "pers_imp"] <- "Personal importance"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "cchange_mot"] <- "Think about climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "worried_mot"] <- "Worry status climate"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "futuregen"] <- "Worry future generations"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "nowor"] <- "Don't worry global warming"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "ontime"] <- "Still on time to do sth"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "gov"] <- "Evaluation government action"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_gov"] <- "Responsibility gov"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_comp"] <- "Responsibility big comp"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_mkb"] <- "Responsibility SME"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_citiz_mot"] <- "Responsibility citizen"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "resp_you"] <- "Your responsibility"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "pers_resp_mot"] <- "Your responsibility CO2"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "sust_choice"] <- "Sustainability important"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "contr"] <- "Contribute to sustainable society"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "energy"] <- "Energy choices fight climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "noidea"] <- "No idea what to do"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "motiv"] <- "Motivated to fight climate change"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "fut_gen_socon"] <- "Worry future generations"
+total_reg_results$dep_var_name[total_reg_results$dep_var == "lifestyle"] <- "Importance changing lifestyle"
+
 
 # I also calculated the percentage of missings per variable, in how many waves it was asked and how many categories the original scale had. I collected these data in Excel.
 metavar <- readxl::read_excel("./data/meta_var.xlsx")
