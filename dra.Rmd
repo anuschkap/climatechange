@@ -19,121 +19,254 @@ library(dplyr)
 # Prepare two datasets to practice with the DRA
 load("./data/final_data/eb_tot.RData")
 
-# N berekenen
-count_per_year <- eb_tot %>%
-  group_by(surveyyear) %>%
-  summarise(N = n())
 
-index <- eb_tot %>%
- filter(env_ec_stat != 3) %>%
-  mutate(cat = ifelse(env_ec_stat > 3, 1, 0)) %>%
-  group_by(surveyyear) %>%
-  summarise(Index = sum(cat) / n()) %>%
-  mutate(Varname = "env_ec_stat")
+# Loop
+dra_df_eb <- data.frame(Varname = character(),
+                          Index = numeric(),
+                          N = numeric(),
+                         stringsAsFactors = FALSE)
+ 
+var_list <- c("env_ec_stat", "env_prsimp", "env_quallife", "pers_effort", "env_vs_ec", "role_ind", "big_pol", "buyprod", "eff_daily", "cc_unstop", "cc_exag", "cc_poseu", "cc_prsact", "ccpercept", "pers_imp", "cchange", "doprot_natgov", "doprot_eu", "doprot_region", "doprot_comp", "doprot_citiz", "envp_eg", "effr_eg", "cchange2", "cchangetot", "prsaction", "doprot_city" )  
+ 
+for (var in var_list) {
+ 
+  index_data <- eb_tot %>%
+    filter(get(var) != 3) %>% # ik kende {{}} niet, dat lijkt me python, ik gebruik altijd get()
+    mutate(cat = ifelse(get(var) > 3, 1, 0)) %>% #wat gebeurt er hier met missing values?
+    select(c("surveyyear", "cat")) %>% #zodat ik dadelijk kan tellen
+    group_by(surveyyear) %>%
+    summarise(Index = sum(cat) / n(),
+              N = n()) %>% #sla ook de N op. weet niet of dat nodig is en zo moet, maar leek me logisch
+      mutate(Varname = c(var)) #wil je de N van de sample of van mensen met een geldige niet neutrale score? 
 
-index2 <- eb_tot %>%
- filter(env_prsimp != 3) %>%
-  mutate(cat = ifelse(env_prsimp > 3, 1, 0)) %>%
-  group_by(surveyyear) %>%
-  summarise(Index = sum(cat) / n()) %>%
-  mutate(Varname = "env_prsimp")
-
-index3 <- eb_tot %>%
- filter(role_ind != 3) %>%
-  mutate(cat = ifelse(role_ind > 3, 1, 0)) %>%
-  group_by(surveyyear) %>%
-  summarise(Index = sum(cat) / n()) %>%
-  mutate(Varname = "role_ind")
-
-index4 <- eb_tot %>%
- filter(env_quallife != 3) %>%
-  mutate(cat = ifelse(env_quallife > 3, 1, 0)) %>%
-  group_by(surveyyear) %>%
-  summarise(Index = sum(cat) / n() ) %>%
-  mutate(Varname = "env_quallife")
-
-index5 <- eb_tot %>%
- filter(pers_effort != 3) %>%
-  mutate(cat = ifelse(pers_effort > 3, 1, 0)) %>%
-  group_by(surveyyear) %>%
-  summarise(Index = sum(cat) / n() ) %>%
-  mutate(Varname = "pers_effort")
-
-index6 <- eb_tot %>%
- filter(env_vs_ec != 3) %>%
-  mutate(cat = ifelse(env_vs_ec > 3, 1, 0)) %>%
-  group_by(surveyyear) %>%
-  summarise(Index = sum(cat) / n()) %>%
-  mutate(Varname = "env_vs_ec")
-
-index7 <- eb_tot %>%
- filter(eff_daily != 3) %>%
-  mutate(cat = ifelse(eff_daily > 3, 1, 0)) %>%
-  group_by(surveyyear) %>%
-  summarise(Index = sum(cat) / n()) %>%
-  mutate(Varname = "eff_daily")
-
-index8 <- eb_tot %>%
- filter(big_pol != 3) %>%
-  mutate(cat = ifelse(big_pol > 3, 1, 0)) %>%
-  group_by(surveyyear) %>%
-  summarise(Index = sum(cat) / n()) %>%
-  mutate(Varname = "big_pol")
-
-index9 <- eb_tot %>%
- filter(buyprod != 3) %>%
-  mutate(cat = ifelse(buyprod > 3, 1, 0)) %>%
-  group_by(surveyyear) %>%
-  summarise(Index = sum(cat) / n() ) %>%
-  mutate(Varname = "buyprod")
-
-index10 <- eb_tot %>%
- filter(cc_unstop != 3) %>%
-  mutate(cat = ifelse(cc_unstop > 3, 1, 0)) %>%
-  group_by(surveyyear) %>%
-  summarise(Index = sum(cat) / n()) %>%
-  mutate(Varname = "cc_unstop")
+  dra_df_eb <- bind_rows(dra_df_eb, index_data)
+}
+ 
 
 
-dra_df <- bind_rows(index, index2, index3, index4, index5, index6, index7, index8, index9, index10)
 
-dra_df <- merge(dra_df, count_per_year)
-
-dra_df$Date <- ISOdate(dra_df$surveyyear, 1, 1)
-dra_df$Date <- as.Date(dra_df$Date)
-dra_df$Ncases <- dra_df$N
+load("./data/final_data/esstotal.RData")
 
 
-output <- DyadRatios::extract(dra_df$Varname, dra_df$Date, dra_df$Index, dra_df$Ncases, mult=1,begindt=NA,enddt=NA,npass=1,smoothing=TRUE,endmonth=12)
+# Loop
+dra_df_ess <- data.frame(Varname = character(),
+                          Index = numeric(),
+                          N = numeric(),
+                         stringsAsFactors = FALSE)
+ 
+var_list <- c("worry", "cause", "pers_resp")  
+ 
+for (var in var_list) {
+ 
+  index_data <- esstotal %>%
+    filter(get(var) != 3) %>% # ik kende {{}} niet, dat lijkt me python, ik gebruik altijd get()
+    mutate(cat = ifelse(get(var) > 3, 1, 0)) %>% #wat gebeurt er hier met missing values?
+    select(c("surveyyear", "cat")) %>% #zodat ik dadelijk kan tellen
+    group_by(surveyyear) %>%
+    summarise(Index = sum(cat) / n(),
+              N = n()) %>% #sla ook de N op. weet niet of dat nodig is en zo moet, maar leek me logisch
+      mutate(Varname = c(var)) #wil je de N van de sample of van mensen met een geldige niet neutrale score? 
+
+  dra_df_ess <- bind_rows(dra_df_ess, index_data)
+}
+ 
+
+
+load("./data/final_data/evssel.RData")
+
+
+# Loop
+dra_df_evs <- data.frame(Varname = character(),
+                          Index = numeric(),
+                          N = numeric(),
+                         stringsAsFactors = FALSE)
+ 
+var_list <- c("climate5")  
+ 
+for (var in var_list) {
+ 
+  index_data <- evssel %>%
+    filter(get(var) != 3) %>% # 
+    mutate(cat = ifelse(get(var) > 3, 1, 0)) %>% #wat gebeurt er hier met missing values?
+    select(c("surveyyear", "cat")) %>%
+    group_by(surveyyear) %>%
+    summarise(Index = sum(cat) / n(),
+              N = n()) %>% 
+      mutate(Varname = c(var)) 
+
+  dra_df_evs <- bind_rows(dra_df_evs, index_data)
+}
+ 
+
+load("./data/final_data/io_total.RData")
+
+
+# Loop
+dra_df_io <- data.frame(Varname = character(),
+                          Index = numeric(),
+                          N = numeric(),
+                         stringsAsFactors = FALSE)
+ 
+var_list <- c("worried", "frontrunner", "worry_future", "resp_citiz", "dk_start", "do_gov", "buss_help", "min_contr", "human_resp")  
+ 
+for (var in var_list) {
+ 
+  index_data <- io_total %>%
+    filter(get(var) != 3) %>% 
+    mutate(cat = ifelse(get(var) > 3, 1, 0)) %>% #wat gebeurt er hier met missing values?
+    select(c("surveyyear", "cat")) %>% 
+    group_by(surveyyear) %>%
+    summarise(Index = sum(cat) / n(),
+              N = n()) %>%
+      mutate(Varname = c(var)) 
+
+  dra_df_io <- bind_rows(dra_df_io, index_data)
+}
+ 
+
+
+load("./data/final_data/issptotal.RData")
+
+
+# Loop
+dra_df_issp <- data.frame(Varname = character(),
+                          Index = numeric(),
+                          N = numeric(),
+                         stringsAsFactors = FALSE)
+
+issptotal <- issptotal %>% 
+  rename(worry_issp = worry)
+ 
+var_list <- c("worry_issp", "lifeharm", "willing_price", "willing_tax", "willing_living", "do_right", "progharm", "econprotect", "people_decide", "bus_decide", "exag", "moreimp", "othersame", "country_effort", "growharm")  
+ 
+for (var in var_list) {
+ 
+  index_data <- issptotal %>%
+    filter(get(var) != 3) %>% 
+    mutate(cat = ifelse(get(var) > 3, 1, 0)) %>% #wat gebeurt er hier met missing values?
+    select(c("surveyyear", "cat")) %>% 
+    group_by(surveyyear) %>%
+    summarise(Index = sum(cat) / n(),
+              N = n()) %>%
+      mutate(Varname = c(var)) 
+
+  dra_df_issp <- bind_rows(dra_df_issp, index_data)
+}
+ 
+dra_df_issp$surveyyear[is.na(dra_df_issp$surveyyear)] <- 2010
+
+
+load("./data/final_data/lisstotal.RData")
+
+
+# Loop
+dra_df_liss <- data.frame(Varname = character(),
+                          Index = numeric(),
+                          N = numeric(),
+                         stringsAsFactors = FALSE)
+ 
+var_list <- c("lifestyle")  
+ 
+for (var in var_list) {
+ 
+  index_data <- lisstotal %>%
+    filter(get(var) != 3) %>% 
+    mutate(cat = ifelse(get(var) > 3, 1, 0)) %>% #wat gebeurt er hier met missing values?
+    select(c("surveyyear", "cat")) %>% 
+    group_by(surveyyear) %>%
+    summarise(Index = sum(cat) / n(),
+              N = n()) %>%
+      mutate(Varname = c(var)) 
+
+  dra_df_liss <- bind_rows(dra_df_liss, index_data)
+}
+
+
+load("./data/final_data/mottotal.RData")
+
+
+# Loop
+dra_df_mot <- data.frame(Varname = character(),
+                          Index = numeric(),
+                          N = numeric(),
+                         stringsAsFactors = FALSE)
+ 
+var_list <- c("cchange_mot", "worried_mot", "futuregen", "nowor", "ontime", "gov", "resp_gov", "resp_comp", "resp_mkb", "resp_citiz_mot", "resp_you", "pers_resp_mot", "sust_choice", "contr", "energy", "noidea", "motiv")  
+ 
+for (var in var_list) {
+ 
+  index_data <- mottotal %>%
+    filter(get(var) != 3) %>% 
+    mutate(cat = ifelse(get(var) > 3, 1, 0)) %>% #wat gebeurt er hier met missing values?
+    select(c("surveyyear", "cat")) %>% 
+    group_by(surveyyear) %>%
+    summarise(Index = sum(cat) / n(),
+              N = n()) %>%
+      mutate(Varname = c(var)) 
+
+  dra_df_mot <- bind_rows(dra_df_mot, index_data)
+}
+
+load("./data/final_data/socontotal.RData")
+
+
+# Loop
+dra_df_socon <- data.frame(Varname = character(),
+                          Index = numeric(),
+                          N = numeric(),
+                         stringsAsFactors = FALSE)
+ 
+var_list <- c("fut_gen_socon")  
+ 
+for (var in var_list) {
+ 
+  index_data <- socontotal %>%
+    filter(get(var) != 3) %>% 
+    mutate(cat = ifelse(get(var) > 3, 1, 0)) %>% #wat gebeurt er hier met missing values?
+    select(c("surveyyear", "cat")) %>% 
+    group_by(surveyyear) %>%
+    summarise(Index = sum(cat) / n(),
+              N = n()) %>%
+      mutate(Varname = c(var)) 
+
+  dra_df_socon <- bind_rows(dra_df_socon, index_data)
+}
+
+
+# Merge everything into one dataset
+dra_total <- rbind(dra_df_eb, dra_df_ess, dra_df_evs, dra_df_io, dra_df_issp, dra_df_liss, dra_df_mot, dra_df_socon)
+
+dra_total$Date <- ISOdate(dra_total$surveyyear, 1, 1)
+dra_total$Date <- as.Date(dra_total$Date)
+dra_total$Date[is.na(dra_total$Date) & dra_total$surveyyear == 2020.58] <- ISOdate(2020, 6, 1)
+dra_total$Date[is.na(dra_total$Date) & dra_total$surveyyear == 2020.83] <- ISOdate(2020, 9, 1)
+
+save(dra_total, file = "./data/dra_total.RData")
+
+output <- DyadRatios::extract(dra_total$Varname, dra_total$Date, dra_total$Index, dra_total$N, mult=1,begindt=NA,enddt=NA,npass=1,smoothing=TRUE,endmonth=12)
 
 DyadRatios::summary.extract(output)
 DyadRatios::plot.extract(output)
 
-# Loop lukt niet 
+library(ggplot2)
 
 
-dra_df2 <- data.frame(Varname = character(),
-                         year = numeric(),
-                         Index = numeric(),
-                          cat = numeric(), 
-                         stringsAsFactors = FALSE)
+climate_attitudes <- output$latent1
+years <- output$period
 
-var_list <- c("env_ec_stat", "env_prsimp")  
 
-for (var in var_list) {
+dra_latent_df <- data.frame(climate_attitudes, 
+                years)
 
-  index_data <- eb_tot %>%
-    filter({{ var }} != 3) %>%
-    mutate(cat = ifelse({{ var }} > 3, 1, 0)) %>%
-    group_by(surveyyear) %>%
-    summarise(Index = sum(cat) / n()) %>%
-      mutate(Varname = c({{var}}))
-    
+dra_plot <- ggplot(data=dra_latent_df, aes(x=years, y=climate_attitudes, group=1)) +
+  geom_line()+
+  geom_point() + 
+  theme_classic() +
+  theme(text=element_text(size=8,  family="serif")) + 
+   xlab("Year") + ylab("Climate change attitude") + 
+  coord_cartesian(ylim = c(0,1))
   
-  dra_df2 <- bind_rows(dra_df2, index_data)
-}
-
-
+ggsave("dra_plot.png", width = 7, height = 5, path = "./output/dra_plot.png")  
 ```
 
 

@@ -30,6 +30,7 @@ rm(list=ls())
 library(tidyverse)
 library(dplyr)
 library(gamlss)
+library(readxl)
 ```
 
 ## ESS {-}
@@ -1358,6 +1359,14 @@ total_reg_results <- merge(total_reg_results, metavar)
 
 
 table(total_reg_results$data)
+save(total_reg_results, file= "./data/meta_analysis/total_reg_results_gam_w_new.RData" )
+```
+```{r}
+# In excel, based on the exact statements, I coded items with environment as 1, and all the rest as 0 
+load("./data/meta_analysis/total_reg_results_gam_w_new.RData")
+cc <- read_excel("./data/cc_versus_env.xlsx")
+
+total_reg_results <- merge(total_reg_results, cc)
 save(total_reg_results, file= "./data/meta_analysis/total_reg_results_gam_w_new.RData" )
 ```
 
