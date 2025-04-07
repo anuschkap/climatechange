@@ -23,7 +23,7 @@ pre[class] {
 }
 ```
 
-In this script I use loops to perform gamlss regressions for all 71 attitudes. The lists that I will get as output are saved with all the information, after which - in another script - i will extract the raw effects sizes used as input for the meta-regressions.  
+In this script I use loops to perform gamlss regressions for all 71 attitudes. The lists that I will get as output are saved with all the information, after which - in another script - i will extract the raw effects sizes used as input for the meta-regressions. In this script, rather than putting time to 0, i use actual surveyyears as input.  
 
 ```{r}
 rm(list = ls())
@@ -39,13 +39,10 @@ library(fastDummies)
 load("./data/final_data/esstotal.RData")
 
 # Gamlss cannot handle NAs, so I have to listwise delete all of them
+ess_complete <- esstotal %>% drop_na()
 
-ess_complete <- esstotal %>% dplyr::select(cause, worry, pers_resp, sex, isced_cat, isced, age, weightvec, surveyyear) %>%
-  drop_na()
-ess_complete$time <- ess_complete$surveyyear - min(ess_complete$surveyyear)
-
-# I want to build models. In the empty model, I only want to include time. 
-predictors <- c("time")
+# I want to build models. In the empty model, I only want to include surveyyear. 
+predictors <- c("surveyyear")
 deps <- c("worry", "cause", "pers_resp")
 
 ess_list_empty <- list()
@@ -66,10 +63,10 @@ summary(ess_list_empty[[2]]) # Sig neg effect on intercept, sig pos effect on va
 summary(ess_list_empty[[3]]) # Sig pos effect on intercept, sig neg effect on variance (pers_resp)
 
  
-save(ess_list_empty, file="./data/final_data/regression_outputs/ess_list_empty_w.RData")
+save(ess_list_empty, file="./data/final_data/regression_outputs/ess_list_empty_srvy.RData")
 
 #Estimate a second model with the indicators + time
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("worry", "cause", "pers_resp")
 
 ess_list_preds <- list()
@@ -86,15 +83,15 @@ ess_list_preds <- list()
 
 summary(ess_list_preds[[1]]) 
 
-save(ess_list_preds, file="./data/final_data/regression_outputs/ess_list_preds_w_new.RData")
+save(ess_list_preds, file="./data/final_data/regression_outputs/ess_list_preds_w_srvy.RData")
 
 #Now the last model with interaction of time on predictor variables
-ess_complete$age_time <- ess_complete$age * ess_complete$time
-ess_complete$sex_time <- as.numeric(ess_complete$sex) * ess_complete$time
+ess_complete$age_time <- ess_complete$age * ess_complete$surveyyear
+ess_complete$sex_time <- as.numeric(ess_complete$sex) * ess_complete$surveyyear
 ess_complete <- fastDummies::dummy_cols(ess_complete, select_columns = "isced_cat")
-ess_complete$isced_basic_time <- ess_complete$isced_cat_Basic * ess_complete$time
-ess_complete$isced_intermediate_time <- ess_complete$isced_cat_Intermediate * ess_complete$time
-ess_complete$isced_advanced_time <- ess_complete$isced_cat_Advanced * ess_complete$time
+ess_complete$isced_basic_time <- ess_complete$isced_cat_Basic * ess_complete$surveyyear
+ess_complete$isced_intermediate_time <- ess_complete$isced_cat_Intermediate * ess_complete$surveyyear
+ess_complete$isced_advanced_time <- ess_complete$isced_cat_Advanced * ess_complete$surveyyear
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -114,20 +111,20 @@ summary(ess_list_interactions[[1]])
 summary(ess_list_interactions[[2]]) 
 summary(ess_list_interactions[[3]])
 
-save(ess_list_interactions, file="./data/final_data/regression_outputs/ess_list_interactions_w_new.RData")
+save(ess_list_interactions, file="./data/final_data/regression_outputs/ess_list_interactions_w_srvy.RData")
 ```
 
 ## EVS {-}
 
 ```{r}
 # Perform the same procedure for the EVS
+rm(list=ls())
 load("./data/final_data/evssel.RData")
 
-evs_complete <- evssel %>% dplyr::select(surveyyear, climate5, sex, age, weightvec, isced_cat)
+evs_complete <- evssel %>% dplyr::select(surveyyear:marstat, weightvec, isced_cat)
 evs_complete <- evs_complete %>% drop_na()
-evs_complete$time <- evs_complete$surveyyear - min(evs_complete$surveyyear)
 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("climate5")
 
 evs_list_empty <- list()
@@ -142,14 +139,14 @@ evs_list_empty <- list()
   evs_list_empty[[i]] <- evs_fit
 } 
 
-summary(evs_list_empty[[1]]) #Sig pos effect of time on intercept
+summary(evs_list_empty[[1]]) 
 
 model1 <- evs_list_empty[[1]]
 
-save(evs_list_empty, file="./data/final_data/regression_outputs/evs_list_empty_w.RData")
+save(evs_list_empty, file="./data/final_data/regression_outputs/evs_list_empty_w_srvy.RData")
 
 # Predictor model
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("climate5")
 
 evs_list_preds <- list()
@@ -166,15 +163,15 @@ evs_list_preds <- list()
 
 summary(evs_list_preds[[1]]) 
 
-save(evs_list_preds, file="./data/final_data/regression_outputs/evs_list_preds_w_new.RData")
+save(evs_list_preds, file="./data/final_data/regression_outputs/evs_list_preds_w_srvy.RData")
 
 #Now the last model with interaction of time on predictor variables
-evs_complete$age_time <- evs_complete$age * evs_complete$time
-evs_complete$sex_time <- as.numeric(evs_complete$sex) * evs_complete$time
+evs_complete$age_time <- evs_complete$age * evs_complete$surveyyear
+evs_complete$sex_time <- as.numeric(evs_complete$sex) * evs_complete$surveyyear
 evs_complete <- fastDummies::dummy_cols(evs_complete, select_columns = "isced_cat")
-evs_complete$isced_basic_time <- evs_complete$isced_cat_Basic * evs_complete$time
-evs_complete$isced_intermediate_time <- evs_complete$isced_cat_Intermediate * evs_complete$time
-evs_complete$isced_advanced_time <- evs_complete$isced_cat_Advanced * evs_complete$time
+evs_complete$isced_basic_time <- evs_complete$isced_cat_Basic * evs_complete$surveyyear
+evs_complete$isced_intermediate_time <- evs_complete$isced_cat_Intermediate * evs_complete$surveyyear
+evs_complete$isced_advanced_time <- evs_complete$isced_cat_Advanced * evs_complete$surveyyear
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -191,22 +188,22 @@ evs_list_interactions <- list()
 
 summary(evs_list_interactions[[1]]) 
 
-save(evs_list_interactions, file="./data/final_data/regression_outputs/evs_list_interactions_w_new.RData")
+save(evs_list_interactions, file="./data/final_data/regression_outputs/evs_list_interactions_w_srvy.RData")
 
 ```
 
 ## I&O {-}
 
 ```{r}
+rm(list=ls())
 load("./data/final_data/io_total.RData")
 io_complete <- io_total %>% dplyr::select(worried:surveyyear, weightvec, isced_cat)
 #Urban, IOINKOMEN, IOPOL has to go away
 io_complete = subset(io_complete, select = -c(urban,IOINKOMEN, IOPOL2017) )
 io_complete <- io_complete %>% drop_na()
 
-io_complete$time <- io_complete$surveyyear - min(io_complete$surveyyear)
 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("worried", "frontrunner", "worry_future", "resp_citiz", "dk_start", "do_gov", "buss_help", "min_contr", "human_resp")
 
 io_list_empty <- list()
@@ -221,16 +218,14 @@ io_list_empty <- list()
   io_list_empty[[i]] <- io_fit
 } 
 
-summary(io_list_empty[[1]]) #Sig pos effect of time on intercept, not on variance
+summary(io_list_empty[[1]]) 
 summary(io_list_empty[[2]])
 
-model1 <- io_list_empty[[1]]
-plot(model1, ts = "true")
 
-save(io_list_empty, file="./data/final_data/regression_outputs/io_list_empty_w.RData")
+save(io_list_empty, file="./data/final_data/regression_outputs/io_list_empty_srvy.RData")
 
 # Predictor model
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("worried", "frontrunner", "worry_future", "resp_citiz", "dk_start", "do_gov", "buss_help", "min_contr", "human_resp")
 
 io_list_preds <- list()
@@ -247,15 +242,15 @@ io_list_preds <- list()
 
 summary(io_list_preds[[1]]) 
 
-save(io_list_preds, file="./data/final_data/regression_outputs/io_list_preds_w_new.RData")
+save(io_list_preds, file="./data/final_data/regression_outputs/io_list_preds_w_srvy.RData")
 
 #Now the last model with interaction of time on predictor variables
-io_complete$age_time <- io_complete$age * io_complete$time
-io_complete$sex_time <- as.numeric(io_complete$sex) * io_complete$time
+io_complete$age_time <- io_complete$age * io_complete$surveyyear
+io_complete$sex_time <- as.numeric(io_complete$sex) * io_complete$surveyyear
 io_complete <- fastDummies::dummy_cols(io_complete, select_columns = "isced_cat")
-io_complete$isced_basic_time <- io_complete$isced_cat_Basic * io_complete$time
-io_complete$isced_intermediate_time <- io_complete$isced_cat_Intermediate * io_complete$time
-io_complete$isced_advanced_time <- io_complete$isced_cat_Advanced * io_complete$time
+io_complete$isced_basic_time <- io_complete$isced_cat_Basic * io_complete$surveyyear
+io_complete$isced_intermediate_time <- io_complete$isced_cat_Intermediate * io_complete$surveyyear
+io_complete$isced_advanced_time <- io_complete$isced_cat_Advanced * io_complete$surveyyear
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -273,13 +268,14 @@ io_list_interactions <- list()
 
 summary(io_list_interactions[[1]]) 
 
-save(io_list_interactions, file="./data/final_data/regression_outputs/io_list_interactions_w_new.RData")
+save(io_list_interactions, file="./data/final_data/regression_outputs/io_list_interactions_w_srvy.RData")
 
 ```
 
 ## ISSP {-}
 
 ```{r}
+rm(list=ls())
 load("./data/final_data/issptotal.Rdata")
 issptotal$surveyyear[is.na(issptotal$surveyyear)] <- "2010"
 issptotal$surveyyear <- as.numeric(issptotal$surveyyear)
@@ -287,10 +283,9 @@ issptotal$surveyyear <- as.numeric(issptotal$surveyyear)
 # The issp has variables that are asked in all three waves, and variables that are asked only in 2 waves. So I have to run the code on subsets of the data. First I estimate the models for the statements that are asked throughout the three waves
 issp_complete <- issptotal %>% dplyr::select(surveyyear:marstat, weightvec, isced_cat)
 issp_complete <- issp_complete %>% drop_na()
-issp_complete$time <- issp_complete$surveyyear - min(issp_complete$surveyyear)
 
 # Time-only
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("worry", "lifeharm", "willing_price", "willing_tax", "willing_living", "do_right", "progharm", "econprotect", "people_decide")
 
 issp_list_empty <- list()
@@ -310,10 +305,10 @@ summary(issp_list_empty[[1]])
 summary(issp_list_empty[[2]]) 
 summary(issp_list_empty[[3]]) 
  
-save(issp_list_empty, file="./data/final_data/regression_outputs/issp_list_empty_w.RData")
+save(issp_list_empty, file="./data/final_data/regression_outputs/issp_list_empty_w_srvy.RData")
 
 # Now with predictors
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("worry", "lifeharm", "willing_price", "willing_tax", "willing_living", "do_right", "progharm", "econprotect", "people_decide" )
 
 issp_list_preds <- list()
@@ -329,17 +324,16 @@ issp_list_preds <- list()
   issp_list_preds[[i]] <- issp_fit
 } 
 
-summary(issp_list_preds[[9]]) 
 
-save(issp_list_preds, file="./data/final_data/regression_outputs/issp_list_preds_w_new.RData")
+save(issp_list_preds, file="./data/final_data/regression_outputs/issp_list_preds_w_srvy.RData")
 
 # And now interactions
-issp_complete$age_time <- issp_complete$age * issp_complete$time
-issp_complete$sex_time <- as.numeric(issp_complete$sex) * issp_complete$time
+issp_complete$age_time <- issp_complete$age * issp_complete$surveyyear
+issp_complete$sex_time <- as.numeric(issp_complete$sex) * issp_complete$surveyyear
 issp_complete <- fastDummies::dummy_cols(issp_complete, select_columns = "isced_cat")
-issp_complete$isced_basic_time <- issp_complete$isced_cat_Basic * issp_complete$time
-issp_complete$isced_intermediate_time <- issp_complete$isced_cat_Intermediate * issp_complete$time
-issp_complete$isced_advanced_time <- issp_complete$isced_cat_Advanced * issp_complete$time
+issp_complete$isced_basic_time <- issp_complete$isced_cat_Basic * issp_complete$surveyyear
+issp_complete$isced_intermediate_time <- issp_complete$isced_cat_Intermediate * issp_complete$surveyyear
+issp_complete$isced_advanced_time <- issp_complete$isced_cat_Advanced * issp_complete$surveyyear
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -354,17 +348,14 @@ issp_list_interactions <- list()
   issp_list_interactions[[i]] <- issp_fit
 } 
 
-summary(issp_list_interactions[[1]]) 
-
-save(issp_list_interactions, file="./data/final_data/regression_outputs/issp_list_interactions_w_new.RData")
+save(issp_list_interactions, file="./data/final_data/regression_outputs/issp_list_interactions_w_srvy.RData")
 
 # Now the variables that are only asked twice
 issp_complete <- issptotal %>% dplyr::select(surveyyear, isced:growharm, weightvec, isced_cat)
 issp_complete <- issp_complete %>% drop_na()
-issp_complete$time <- issp_complete$surveyyear - min(issp_complete$surveyyear)
 
 # Time-only model
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("exag", "moreimp", "othersame", "country_effort", "growharm")
 
 issp_list_empty_2_waves <- list()
@@ -378,15 +369,12 @@ issp_list_empty_2_waves <- list()
   
   issp_list_empty_2_waves[[i]] <- issp_fit
   } 
+ 
 
-summary(issp_list_empty_2_waves[[1]]) 
-summary(issp_list_empty_2_waves[[2]])
-summary(issp_list_empty_2_waves[[3]]) 
-
-save(issp_list_empty_2_waves, file="./data/final_data/regression_outputs/issp_list_empty_2_waves_w.RData")
+save(issp_list_empty_2_waves, file="./data/final_data/regression_outputs/issp_list_empty_2_waves_w_srvy.RData")
 
 # And the model with the predictors
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("exag", "moreimp", "othersame", "country_effort", "growharm")
 
 issp_list_preds_2_waves <- list()
@@ -403,15 +391,15 @@ issp_list_preds_2_waves <- list()
 
 summary(issp_list_preds_2_waves[[1]]) 
 
-save(issp_list_preds_2_waves, file="./data/final_data/regression_outputs/issp_list_preds_2_waves_w_new.RData")
+save(issp_list_preds_2_waves, file="./data/final_data/regression_outputs/issp_list_preds_2_waves_w_srvy.RData")
 
 # And lastly, again the interactions
-issp_complete$age_time <- issp_complete$age * issp_complete$time
-issp_complete$sex_time <- as.numeric(issp_complete$sex) * issp_complete$time
+issp_complete$age_time <- issp_complete$age * issp_complete$surveyyear
+issp_complete$sex_time <- as.numeric(issp_complete$sex) * issp_complete$surveyyear
 issp_complete <- fastDummies::dummy_cols(issp_complete, select_columns = "isced_cat")
-issp_complete$isced_basic_time <- issp_complete$isced_cat_Basic * issp_complete$time
-issp_complete$isced_intermediate_time <- issp_complete$isced_cat_Intermediate * issp_complete$time
-issp_complete$isced_advanced_time <- issp_complete$isced_cat_Advanced * issp_complete$time
+issp_complete$isced_basic_time <- issp_complete$isced_cat_Basic * issp_complete$surveyyear
+issp_complete$isced_intermediate_time <- issp_complete$isced_cat_Intermediate * issp_complete$surveyyear
+issp_complete$isced_advanced_time <- issp_complete$isced_cat_Advanced * issp_complete$surveyyear
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -426,14 +414,13 @@ issp_list_interactions_2_waves <- list()
   issp_list_interactions_2_waves[[i]] <- issp_fit
 } 
 
-summary(issp_list_interactions_2_waves[[1]]) 
-
-save(issp_list_interactions_2_waves, file="./data/final_data/regression_outputs/issp_list_interactions_2_waves_w_new.RData")
+save(issp_list_interactions_2_waves, file="./data/final_data/regression_outputs/issp_list_interactions_2_waves_w_srvy.RData")
 ```
 
 ## EB {-}
 
 ```{r}
+rm(list=ls())
 # Now the most difficult one: Eurobarometer. No items are asked steadily throughout time, so have to work with a lot of subsets. 
 load("./data/final_data/eb_tot.Rdata")
 
@@ -441,10 +428,10 @@ load("./data/final_data/eb_tot.Rdata")
 eb_complete <- eb_tot %>% dplyr::select(surveyyear, env_ec_stat, env_prsimp, sex, isced: urban, weightvec, isced_cat)
 # Religion is only asked in one wave
 eb_complete <- eb_complete %>% drop_na()
-eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
 
 # First empty model 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("env_ec_stat", "env_prsimp")
 
 eb_list_empty_1986 <- list()
@@ -460,13 +447,11 @@ eb_list_empty_1986 <- list()
   eb_list_empty_1986[[i]] <- eb_fit
 } 
 
-summary(eb_list_empty_1986[[1]]) 
-summary(eb_list_empty_1986[[2]])
 
-save(eb_list_empty_1986, file="./data/final_data/regression_outputs/eb_list_empty_1986_w.RData")
+save(eb_list_empty_1986, file="./data/final_data/regression_outputs/eb_list_empty_1986_w_srvy.RData")
 
 # Model with predictors
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("env_ec_stat", "env_prsimp")
 
 eb_list_preds_1986 <- list()
@@ -482,18 +467,15 @@ eb_list_preds_1986 <- list()
   eb_list_preds_1986[[i]] <- eb_fit
 } 
 
-summary(eb_list_preds_1986[[1]]) 
-summary(eb_list_preds_1986[[2]])
-
-save(eb_list_preds_1986, file="./data/final_data/regression_outputs/eb_list_preds_1986_w_new.RData")
+save(eb_list_preds_1986, file="./data/final_data/regression_outputs/eb_list_preds_1986_w_new_srvy.RData")
 
 # And the model with interactions
-eb_complete$age_time <- eb_complete$age * eb_complete$time
-eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete$age_time <- eb_complete$age * eb_complete$surveyyear
+eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$surveyyear
 eb_complete <- fastDummies::dummy_cols(eb_complete, select_columns = "isced_cat")
-eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$time
-eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$time
-eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$time
+eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$surveyyear
+eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$surveyyear
+eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$surveyyear
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -508,10 +490,7 @@ eb_list_interactions_1986 <- list()
   eb_list_interactions_1986[[i]] <- eb_fit
 } 
 
-summary(eb_list_interactions_1986[[1]]) 
-summary(eb_list_interactions_1986[[2]])
-
-save(eb_list_interactions_1986, file="./data/final_data/regression_outputs/eb_list_interactions_1986_w_new.RData")
+save(eb_list_interactions_1986, file="./data/final_data/regression_outputs/eb_list_interactions_1986_w_srvy.RData")
 ```
 
 ```{r}
@@ -519,10 +498,9 @@ save(eb_list_interactions_1986, file="./data/final_data/regression_outputs/eb_li
 eb_complete <- eb_tot %>% dplyr::select(surveyyear, env_quallife, sex, isced, urban, age, weightvec, isced_cat)
 # Lrplace and income are not asked in all waves
 eb_complete <- eb_complete %>% drop_na()
-eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
 
 # First empty model 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("env_quallife")
 
 eb_list_empty_quallife <- list()
@@ -539,10 +517,10 @@ eb_list_empty_quallife <- list()
 
 summary(eb_list_empty_quallife[[1]]) 
 
-save(eb_list_empty_quallife, file="./data/final_data/regression_outputs/eb_list_empty_quallife_w.RData")
+save(eb_list_empty_quallife, file="./data/final_data/regression_outputs/eb_list_empty_quallife_w_srvy.RData")
 
 # Model with predictors
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("env_quallife")
 
 eb_list_preds_quallife <- list()
@@ -558,18 +536,18 @@ eb_list_preds_quallife <- list()
   eb_list_preds_quallife[[i]] <- eb_fit
 } 
 
-summary(eb_list_preds_quallife[[1]]) 
-eb_list_preds_quallife
 
-save(eb_list_preds_quallife, file="./data/final_data/regression_outputs/eb_list_preds_quallife_w_new.RData")
+
+save(eb_list_preds_quallife, file="./data/final_data/regression_outputs/eb_list_preds_quallife_w_srvy.RData")
 
 # And the model with interactions
-eb_complete$age_time <- eb_complete$age * eb_complete$time
-eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete$age_time <- eb_complete$age * eb_complete$surveyyear
+eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$surveyyear
 eb_complete <- fastDummies::dummy_cols(eb_complete, select_columns = "isced_cat")
-eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$time
-eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$time
-eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$time
+eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$surveyyear
+eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$surveyyear
+eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$surveyyear
+
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -586,7 +564,7 @@ eb_list_interactions_quallife <- list()
 
 summary(eb_list_interactions_quallife[[1]]) 
 
-save(eb_list_interactions_quallife, file="./data/final_data/regression_outputs/eb_list_interactions_quallife_w_new.RData")
+save(eb_list_interactions_quallife, file="./data/final_data/regression_outputs/eb_list_interactions_quallife_w_srvy.RData")
 ```
 
 ```{r}
@@ -594,10 +572,9 @@ save(eb_list_interactions_quallife, file="./data/final_data/regression_outputs/e
 eb_complete <- eb_tot %>% dplyr::select(surveyyear, role_ind, big_pol, sex, isced, urban, age, weightvec, isced_cat)
 # Lrplace and income are not asked in all waves
 eb_complete <- eb_complete %>% drop_na()
-eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
 
 # First empty model 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("role_ind", "big_pol")
 
 eb_list_empty_2007 <- list()
@@ -614,10 +591,10 @@ eb_list_empty_2007 <- list()
 
 summary(eb_list_empty_2007[[2]]) 
 
-save(eb_list_empty_2007, file="./data/final_data/regression_outputs/eb_list_empty_2007_w.RData")
+save(eb_list_empty_2007, file="./data/final_data/regression_outputs/eb_list_empty_2007_w_srvy.RData")
 
 # Model with predictors
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("role_ind", "big_pol")
 
 eb_list_preds_2007 <- list()
@@ -634,15 +611,16 @@ eb_list_preds_2007 <- list()
 
 summary(eb_list_preds_2007[[1]]) 
 
-save(eb_list_preds_2007, file="./data/final_data/regression_outputs/eb_list_preds_2007_w_new.RData")
+save(eb_list_preds_2007, file="./data/final_data/regression_outputs/eb_list_preds_2007_w_new_srvy.RData")
 
 # And the model with interactions
-eb_complete$age_time <- eb_complete$age * eb_complete$time
-eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete$age_time <- eb_complete$age * eb_complete$surveyyear
+eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$surveyyear
 eb_complete <- fastDummies::dummy_cols(eb_complete, select_columns = "isced_cat")
-eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$time
-eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$time
-eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$time
+eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$surveyyear
+eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$surveyyear
+eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$surveyyear
+
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -659,17 +637,17 @@ eb_list_interactions_2007 <- list()
 
 summary(eb_list_interactions_2007[[1]]) 
 
-save(eb_list_interactions_2007, file="./data/final_data/regression_outputs/eb_list_interactions_2007_w_new.RData")
+save(eb_list_interactions_2007, file="./data/final_data/regression_outputs/eb_list_interactions_2007_w_srvy.RData")
 ```
 
 ```{r}
 # Now 2 statements that are asked 4 times
 eb_complete <- eb_tot %>% dplyr::select(surveyyear, buyprod, sex, isced, urban, age, weightvec, isced_cat)
 eb_complete <- eb_complete %>% drop_na()
-eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
 
 # First empty model 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("buyprod")
 
 eb_list_empty_buyprod <- list()
@@ -686,10 +664,10 @@ eb_list_empty_buyprod <- list()
 
 summary(eb_list_empty_buyprod[[1]]) 
 
-save(eb_list_empty_buyprod, file="./data/final_data/regression_outputs/eb_list_empty_buyprod_w.RData")
+save(eb_list_empty_buyprod, file="./data/final_data/regression_outputs/eb_list_empty_buyprod_w_srvy.RData")
 
 # Model with predictors
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("buyprod")
 
 eb_list_preds_buyprod <- list()
@@ -706,15 +684,16 @@ eb_list_preds_buyprod <- list()
 
 summary(eb_list_preds_buyprod[[1]]) 
 
-save(eb_list_preds_buyprod, file="./data/final_data/regression_outputs/eb_list_preds_buyprod_w_new.RData")
+save(eb_list_preds_buyprod, file="./data/final_data/regression_outputs/eb_list_preds_buyprod_w_srvy.RData")
 
 # And the model with interactions
-eb_complete$age_time <- eb_complete$age * eb_complete$time
-eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete$age_time <- eb_complete$age * eb_complete$surveyyear
+eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$surveyyear
 eb_complete <- fastDummies::dummy_cols(eb_complete, select_columns = "isced_cat")
-eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$time
-eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$time
-eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$time
+eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$surveyyear
+eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$surveyyear
+eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$surveyyear
+
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -729,19 +708,18 @@ eb_list_interactions_buyprod <- list()
   eb_list_interactions_buyprod[[i]] <- eb_fit
 } 
 
-summary(eb_list_interactions_buyprod[[1]]) 
 
-save(eb_list_interactions_buyprod, file="./data/final_data/regression_outputs/eb_list_interactions_buyprod_w_new.RData")
+save(eb_list_interactions_buyprod, file="./data/final_data/regression_outputs/eb_list_interactions_buyprod_w_srvy.RData")
 ```
 
 ```{r}
 # Now 2 statements that are asked 4 times
 eb_complete <- eb_tot %>% dplyr::select(surveyyear, eff_daily, sex, isced, urban, age, weightvec, isced_cat)
 eb_complete <- eb_complete %>% drop_na()
-eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
 
 # First empty model 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("eff_daily")
 
 eb_list_empty_eff_daily <- list()
@@ -758,10 +736,10 @@ eb_list_empty_eff_daily <- list()
 
 summary(eb_list_empty_eff_daily[[1]]) 
 
-save(eb_list_empty_eff_daily, file="./data/final_data/regression_outputs/eb_list_empty_eff_daily_w.RData")
+save(eb_list_empty_eff_daily, file="./data/final_data/regression_outputs/eb_list_empty_eff_daily_w_srvy.RData")
 
 # Model with predictors
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("eff_daily")
 
 eb_list_preds_eff_daily <- list()
@@ -778,15 +756,16 @@ eb_list_preds_eff_daily <- list()
 
 summary(eb_list_preds_eff_daily[[1]]) 
 
-save(eb_list_preds_eff_daily, file="./data/final_data/regression_outputs/eb_list_preds_eff_daily_w_new.RData")
+save(eb_list_preds_eff_daily, file="./data/final_data/regression_outputs/eb_list_preds_eff_daily_w_srvy.RData")
 
 # And the model with interactions
-eb_complete$age_time <- eb_complete$age * eb_complete$time
-eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete$age_time <- eb_complete$age * eb_complete$surveyyear
+eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$surveyyear
 eb_complete <- fastDummies::dummy_cols(eb_complete, select_columns = "isced_cat")
-eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$time
-eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$time
-eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$time
+eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$surveyyear
+eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$surveyyear
+eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$surveyyear
+
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -801,19 +780,17 @@ eb_list_interactions_eff_daily <- list()
   eb_list_interactions_eff_daily[[i]] <- eb_fit
 } 
 
-summary(eb_list_interactions_eff_daily[[1]]) 
 
-save(eb_list_interactions_eff_daily, file="./data/final_data/regression_outputs/eb_list_interactions_eff_daily_w_new.RData")
+save(eb_list_interactions_eff_daily, file="./data/final_data/regression_outputs/eb_list_interactions_eff_daily_w_srvy.RData")
 ```
 
 ```{r}
 # Now 4 vars that are asked 2 waves
 eb_complete <- eb_tot %>% dplyr::select(surveyyear, cc_unstop:cc_prsact, sex, isced, urban, age, weightvec, isced_cat)
 eb_complete <- eb_complete %>% drop_na()
-eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
 
 # First empty model 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("cc_unstop", "cc_exag", "cc_poseu", "cc_prsact")
 
 eb_list_empty_2008 <- list()
@@ -828,12 +805,11 @@ eb_list_empty_2008 <- list()
   eb_list_empty_2008[[i]] <- eb_fit
 } 
 
-summary(eb_list_empty_2008[[1]]) 
 
-save(eb_list_empty_2008, file="./data/final_data/regression_outputs/eb_list_empty_2008_w.RData")
+save(eb_list_empty_2008, file="./data/final_data/regression_outputs/eb_list_empty_2008_w_srvy.RData")
 
 # Model with predictors
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("cc_unstop", "cc_exag", "cc_poseu", "cc_prsact")
 
 eb_list_preds_2008 <- list()
@@ -848,17 +824,17 @@ eb_list_preds_2008 <- list()
   eb_list_preds_2008[[i]] <- eb_fit
 } 
 
-summary(eb_list_preds_2008[[1]]) 
 
-save(eb_list_preds_2008, file="./data/final_data/regression_outputs/eb_list_preds_2008_w_new.RData")
+save(eb_list_preds_2008, file="./data/final_data/regression_outputs/eb_list_preds_2008_w_srvy.RData")
 
 # And the model with interactions
-eb_complete$age_time <- eb_complete$age * eb_complete$time
-eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete$age_time <- eb_complete$age * eb_complete$surveyyear
+eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$surveyyear
 eb_complete <- fastDummies::dummy_cols(eb_complete, select_columns = "isced_cat")
-eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$time
-eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$time
-eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$time
+eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$surveyyear
+eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$surveyyear
+eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$surveyyear
+
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -873,9 +849,8 @@ eb_list_interactions_2008 <- list()
   eb_list_interactions_2008[[i]] <- eb_fit
 } 
 
-summary(eb_list_interactions_2008[[1]]) 
 
-save(eb_list_interactions_2008, file="./data/final_data/regression_outputs/eb_list_interactions_2008_w_new.RData")
+save(eb_list_interactions_2008, file="./data/final_data/regression_outputs/eb_list_interactions_2008_w_srvy.RData")
 ```
 
 
@@ -883,10 +858,10 @@ save(eb_list_interactions_2008, file="./data/final_data/regression_outputs/eb_li
 # Climate change perception asked in six waves
 eb_complete <- eb_tot %>% dplyr::select(surveyyear, ccpercept, cchange, sex, isced, urban, age, weightvec, isced_cat)
 eb_complete <- eb_complete %>% drop_na()
-eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
+
 
 # First empty model 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("ccpercept", "cchange")
 
 eb_list_empty_2009 <- list()
@@ -901,12 +876,10 @@ eb_list_empty_2009 <- list()
   eb_list_empty_2009[[i]] <- eb_fit
 } 
 
-summary(eb_list_empty_2009[[1]]) 
-
-save(eb_list_empty_2009, file="./data/final_data/regression_outputs/eb_list_empty_2009_w.RData")
+save(eb_list_empty_2009, file="./data/final_data/regression_outputs/eb_list_empty_2009_w_srvy.RData")
 
 # Model with predictors
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("ccpercept", "cchange")
 
 eb_list_preds_2009 <- list()
@@ -921,17 +894,17 @@ eb_list_preds_2009 <- list()
   eb_list_preds_2009[[i]] <- eb_fit
 } 
 
-summary(eb_list_preds_2009[[1]]) 
 
-save(eb_list_preds_2009, file="./data/final_data/regression_outputs/eb_list_preds_2009_w_new.RData")
+save(eb_list_preds_2009, file="./data/final_data/regression_outputs/eb_list_preds_2009_w_new_srvy.RData")
 
 # And the model with interactions
-eb_complete$age_time <- eb_complete$age * eb_complete$time
-eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete$age_time <- eb_complete$age * eb_complete$surveyyear
+eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$surveyyear
 eb_complete <- fastDummies::dummy_cols(eb_complete, select_columns = "isced_cat")
-eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$time
-eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$time
-eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$time
+eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$surveyyear
+eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$surveyyear
+eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$surveyyear
+
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -948,17 +921,16 @@ eb_list_interactions_2009 <- list()
 
 summary(eb_list_interactions_2009[[1]]) 
 
-save(eb_list_interactions_2009, file="./data/final_data/regression_outputs/eb_list_interactions_2009_w_new.RData")
+save(eb_list_interactions_2009, file="./data/final_data/regression_outputs/eb_list_interactions_2009_w_srvy.RData")
 ```
 
 ```{r}
 # Personal importance asked in 3 waves
 eb_complete <- eb_tot %>% dplyr::select(surveyyear, pers_imp, sex, isced, urban, age, weightvec, isced_cat)
 eb_complete <- eb_complete %>% drop_na()
-eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
 
 # First empty model 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("pers_imp")
 
 eb_list_empty_pers_imp <- list()
@@ -973,12 +945,10 @@ eb_list_empty_pers_imp <- list()
   eb_list_empty_pers_imp[[i]] <- eb_fit
 } 
 
-summary(eb_list_empty_pers_imp[[1]]) 
-
-save(eb_list_empty_pers_imp, file="./data/final_data/regression_outputs/eb_list_empty_pers_imp_w.RData")
+save(eb_list_empty_pers_imp, file="./data/final_data/regression_outputs/eb_list_empty_pers_imp_w_srvy.RData")
 
 # Model with predictors
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("pers_imp")
 
 eb_list_preds_pers_imp <- list()
@@ -994,17 +964,17 @@ eb_list_preds_pers_imp <- list()
   eb_list_preds_pers_imp[[i]] <- eb_fit
 } 
 
-summary(eb_list_preds_pers_imp[[1]]) 
 
-save(eb_list_preds_pers_imp, file="./data/final_data/regression_outputs/eb_list_preds_pers_imp_w_new.RData")
+save(eb_list_preds_pers_imp, file="./data/final_data/regression_outputs/eb_list_preds_pers_imp_w_srvy.RData")
 
 # And the model with interactions
-eb_complete$age_time <- eb_complete$age * eb_complete$time
-eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete$age_time <- eb_complete$age * eb_complete$surveyyear
+eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$surveyyear
 eb_complete <- fastDummies::dummy_cols(eb_complete, select_columns = "isced_cat")
-eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$time
-eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$time
-eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$time
+eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$surveyyear
+eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$surveyyear
+eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$surveyyear
+
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -1019,19 +989,17 @@ eb_list_interactions_pers_imp <- list()
   eb_list_interactions_pers_imp[[i]] <- eb_fit
 } 
 
-summary(eb_list_interactions_pers_imp[[1]]) 
 
-save(eb_list_interactions_pers_imp, file="./data/final_data/regression_outputs/eb_list_interactions_pers_imp_w_new.RData")
+save(eb_list_interactions_pers_imp, file="./data/final_data/regression_outputs/eb_list_interactions_pers_imp_w_srvy.RData")
 ```
 
 ```{r}
 # Questions about who does enough asked in 3 waves
 eb_complete <- eb_tot %>% dplyr::select(surveyyear, doprot_natgov:doprot_citiz, sex, isced, urban, age, weightvec, isced_cat)
 eb_complete <- eb_complete %>% drop_na()
-eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
 
 # First empty model 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("doprot_natgov", "doprot_eu", "doprot_region", "doprot_comp", "doprot_citiz")
 
 eb_list_empty_doprot <- list()
@@ -1046,12 +1014,11 @@ eb_list_empty_doprot <- list()
   eb_list_empty_doprot[[i]] <- eb_fit
 } 
 
-summary(eb_list_empty_doprot[[1]]) 
 
-save(eb_list_empty_doprot, file="./data/final_data/regression_outputs/eb_list_empty_doprot_w.RData")
+save(eb_list_empty_doprot, file="./data/final_data/regression_outputs/eb_list_empty_doprot_w_srvy.RData")
 
 # Model with predictors
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("doprot_natgov", "doprot_eu", "doprot_region", "doprot_comp", "doprot_citiz")
 
 eb_list_preds_doprot <- list()
@@ -1066,17 +1033,16 @@ eb_list_preds_doprot <- list()
   eb_list_preds_doprot[[i]] <- eb_fit
 } 
 
-summary(eb_list_preds_doprot[[1]]) 
-
-save(eb_list_preds_doprot, file="./data/final_data/regression_outputs/eb_list_preds_doprot_w_new.RData")
+save(eb_list_preds_doprot, file="./data/final_data/regression_outputs/eb_list_preds_doprot_w_srvy.RData")
 
 # And the model with interactions
-eb_complete$age_time <- eb_complete$age * eb_complete$time
-eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete$age_time <- eb_complete$age * eb_complete$surveyyear
+eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$surveyyear
 eb_complete <- fastDummies::dummy_cols(eb_complete, select_columns = "isced_cat")
-eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$time
-eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$time
-eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$time
+eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$surveyyear
+eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$surveyyear
+eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$surveyyear
+
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -1091,19 +1057,16 @@ eb_list_interactions_doprot <- list()
   eb_list_interactions_doprot[[i]] <- eb_fit
 } 
 
-summary(eb_list_interactions_doprot[[1]]) 
-
-save(eb_list_interactions_doprot, file="./data/final_data/regression_outputs/eb_list_interactions_doprot_w_new.RData")
+save(eb_list_interactions_doprot, file="./data/final_data/regression_outputs/eb_list_interactions_doprot_w_srvy.RData")
 ```
 
 ```{r}
 # Questions about environment asked in 2 waves
 eb_complete <- eb_tot %>% dplyr::select(surveyyear, envp_eg, effr_eg, sex, isced, urban, age, weightvec, isced_cat)
 eb_complete <- eb_complete %>% drop_na()
-eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
 
 # First empty model 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("envp_eg", "effr_eg")
 
 eb_list_empty_2011 <- list()
@@ -1120,10 +1083,10 @@ eb_list_empty_2011 <- list()
 
 summary(eb_list_empty_2011[[1]]) 
 
-save(eb_list_empty_2011, file="./data/final_data/regression_outputs/eb_list_empty_2011_w.RData")
+save(eb_list_empty_2011, file="./data/final_data/regression_outputs/eb_list_empty_2011_w_srvy.RData")
 
 # Model with predictors
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("envp_eg", "effr_eg")
 
 eb_list_preds_2011 <- list()
@@ -1138,17 +1101,17 @@ eb_list_preds_2011 <- list()
   eb_list_preds_2011[[i]] <- eb_fit
 } 
 
-summary(eb_list_preds_2011[[1]]) 
 
-save(eb_list_preds_2011, file="./data/final_data/regression_outputs/eb_list_preds_2011_w_new.RData")
+save(eb_list_preds_2011, file="./data/final_data/regression_outputs/eb_list_preds_2011_w_new_srvy.RData")
 
 # And the model with interactions
-eb_complete$age_time <- eb_complete$age * eb_complete$time
-eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete$age_time <- eb_complete$age * eb_complete$surveyyear
+eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$surveyyear
 eb_complete <- fastDummies::dummy_cols(eb_complete, select_columns = "isced_cat")
-eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$time
-eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$time
-eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$time
+eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$surveyyear
+eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$surveyyear
+eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$surveyyear
+
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -1163,19 +1126,17 @@ eb_list_interactions_2011 <- list()
   eb_list_interactions_2011[[i]] <- eb_fit
 } 
 
-summary(eb_list_interactions_2011[[1]]) 
 
-save(eb_list_interactions_2011, file="./data/final_data/regression_outputs/eb_list_interactions_2011_w_new.RData")
+save(eb_list_interactions_2011, file="./data/final_data/regression_outputs/eb_list_interactions_2011_w_srvy.RData")
 ```
 
 ```{r}
 # Questions about naming climate change a problem
 eb_complete <- eb_tot %>% dplyr::select(surveyyear, cchange2, cchangetot, sex, isced, urban, age, weightvec, isced_cat)
 eb_complete <- eb_complete %>% drop_na()
-eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
 
 # First empty model 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("cchange2", "cchangetot")
 
 eb_list_empty_cchange2 <- list()
@@ -1190,12 +1151,10 @@ eb_list_empty_cchange2 <- list()
   eb_list_empty_cchange2[[i]] <- eb_fit
 } 
 
-summary(eb_list_empty_cchange2[[1]]) 
-
-save(eb_list_empty_cchange2, file="./data/final_data/regression_outputs/eb_list_empty_cchange2_w.RData")
+save(eb_list_empty_cchange2, file="./data/final_data/regression_outputs/eb_list_empty_cchange2_w_srvy.RData")
 
 # Model with predictors
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("cchange2", "cchangetot")
 
 eb_list_preds_cchange2 <- list()
@@ -1211,17 +1170,17 @@ eb_list_preds_cchange2 <- list()
   eb_list_preds_cchange2[[i]] <- eb_fit
 } 
 
-summary(eb_list_preds_cchange2[[1]]) 
 
-save(eb_list_preds_cchange2, file="./data/final_data/regression_outputs/eb_list_preds_cchange2_w_new.RData")
+save(eb_list_preds_cchange2, file="./data/final_data/regression_outputs/eb_list_preds_cchange2_w_srvy.RData")
 
 # And the model with interactions
-eb_complete$age_time <- eb_complete$age * eb_complete$time
-eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete$age_time <- eb_complete$age * eb_complete$surveyyear
+eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$surveyyear
 eb_complete <- fastDummies::dummy_cols(eb_complete, select_columns = "isced_cat")
-eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$time
-eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$time
-eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$time
+eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$surveyyear
+eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$surveyyear
+eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$surveyyear
+
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -1236,19 +1195,17 @@ eb_list_interactions_cchange2 <- list()
   eb_list_interactions_cchange2[[i]] <- eb_fit
 } 
 
-summary(eb_list_interactions_cchange2[[1]]) 
 
-save(eb_list_interactions_cchange2, file="./data/final_data/regression_outputs/eb_list_interactions_cchange2_w_new.RData")
+save(eb_list_interactions_cchange2, file="./data/final_data/regression_outputs/eb_list_interactions_cchange2_w_srvy.RData")
 ```
 
 ```{r}
 # Question about personal action taken
 eb_complete <- eb_tot %>% dplyr::select(surveyyear, prsaction, sex, isced, urban, age, weightvec, isced_cat)
 eb_complete <- eb_complete %>% drop_na()
-eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
 
 # First empty model 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("prsaction")
 
 eb_list_empty_prsaction <- list()
@@ -1263,12 +1220,11 @@ eb_list_empty_prsaction <- list()
   eb_list_empty_prsaction[[i]] <- eb_fit
 } 
 
-summary(eb_list_empty_prsaction[[1]]) 
 
-save(eb_list_empty_prsaction, file="./data/final_data/regression_outputs/eb_list_empty_prsaction_w.RData")
+save(eb_list_empty_prsaction, file="./data/final_data/regression_outputs/eb_list_empty_prsaction_w_srvy.RData")
 
 # Model with predictors
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("prsaction")
 
 eb_list_preds_prsaction <- list()
@@ -1283,17 +1239,15 @@ eb_list_preds_prsaction <- list()
   eb_list_preds_prsaction[[i]] <- eb_fit
 } 
 
-summary(eb_list_preds_prsaction[[1]]) 
-
-save(eb_list_preds_prsaction, file="./data/final_data/regression_outputs/eb_list_preds_prsaction_w_new.RData")
+save(eb_list_preds_prsaction, file="./data/final_data/regression_outputs/eb_list_preds_prsaction_w_srvy.RData")
 
 # And the model with interactions
-eb_complete$age_time <- eb_complete$age * eb_complete$time
-eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete$age_time <- eb_complete$age * eb_complete$surveyyear
+eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$surveyyear
 eb_complete <- fastDummies::dummy_cols(eb_complete, select_columns = "isced_cat")
-eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$time
-eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$time
-eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$time
+eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$surveyyear
+eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$surveyyear
+eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$surveyyear
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -1308,19 +1262,17 @@ eb_list_interactions_prsaction <- list()
   eb_list_interactions_prsaction[[i]] <- eb_fit
 } 
 
-summary(eb_list_interactions_prsaction[[1]]) 
 
-save(eb_list_interactions_prsaction, file="./data/final_data/regression_outputs/eb_list_interactions_prsaction_w_new.RData")
+save(eb_list_interactions_prsaction, file="./data/final_data/regression_outputs/eb_list_interactions_prsaction_w_srvy.RData")
 ```
 
 ```{r}
 # Last item, whether the city undertakes enough action
 eb_complete <- eb_tot %>% dplyr::select(surveyyear, doprot_city, sex, isced, urban, age, weightvec, isced_cat)
 eb_complete <- eb_complete %>% drop_na()
-eb_complete$time <- eb_complete$surveyyear - min(eb_complete$surveyyear)
 
 # First empty model 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("doprot_city")
 
 eb_list_empty_doprot_city <- list()
@@ -1335,12 +1287,10 @@ eb_list_empty_doprot_city <- list()
   eb_list_empty_doprot_city[[i]] <- eb_fit
 } 
 
-summary(eb_list_empty_doprot_city[[1]]) 
-
-save(eb_list_empty_doprot_city, file="./data/final_data/regression_outputs/eb_list_empty_doprot_city_w.RData")
+save(eb_list_empty_doprot_city, file="./data/final_data/regression_outputs/eb_list_empty_doprot_city_w_srvy.RData")
 
 # Model with predictors
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("doprot_city")
 
 eb_list_preds_doprot_city <- list()
@@ -1355,17 +1305,17 @@ eb_list_preds_doprot_city <- list()
   eb_list_preds_doprot_city[[i]] <- eb_fit
 } 
 
-summary(eb_list_preds_doprot_city[[1]]) 
 
-save(eb_list_preds_doprot_city, file="./data/final_data/regression_outputs/eb_list_preds_doprot_city_w_new.RData")
+save(eb_list_preds_doprot_city, file="./data/final_data/regression_outputs/eb_list_preds_doprot_city_w_srvy.RData")
 
 # And the model with interactions
-eb_complete$age_time <- eb_complete$age * eb_complete$time
-eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$time
+eb_complete$age_time <- eb_complete$age * eb_complete$surveyyear
+eb_complete$sex_time <- as.numeric(eb_complete$sex) * eb_complete$surveyyear
 eb_complete <- fastDummies::dummy_cols(eb_complete, select_columns = "isced_cat")
-eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$time
-eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$time
-eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$time
+eb_complete$isced_basic_time <- eb_complete$isced_cat_Basic * eb_complete$surveyyear
+eb_complete$isced_intermediate_time <- eb_complete$isced_cat_Intermediate * eb_complete$surveyyear
+eb_complete$isced_advanced_time <- eb_complete$isced_cat_Advanced * eb_complete$surveyyear
+
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -1380,22 +1330,20 @@ eb_list_interactions_doprot_city <- list()
   eb_list_interactions_doprot_city[[i]] <- eb_fit
 } 
 
-summary(eb_list_interactions_doprot_city[[1]]) 
-
-save(eb_list_interactions_doprot_city, file="./data/final_data/regression_outputs/eb_list_interactions_doprot_city_w_new.RData")
+save(eb_list_interactions_doprot_city, file="./data/final_data/regression_outputs/eb_list_interactions_doprot_city_w_srvy.RData")
 ```
 
 
 ## Motivaction {-}
 ```{r}
+rm(list=ls())
 load("./data/final_data/mottotal.RData")
 
 # Gamlss cannot handle NAs, so I have to listwise delete all of them
 mot_complete <- mottotal %>% drop_na()
-mot_complete$time <- mot_complete$surveyyear - min(mot_complete$surveyyear)
 
 # I want to build models. In the empty model, I only want to include time. 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("cchange_mot", "worried_mot", "futuregen", "nowor", "ontime", "gov", "resp_gov", "resp_comp", "resp_mkb", "resp_citiz_mot", "resp_you", "pers_resp_mot", "sust_choice", "contr", "energy", "noidea", "motiv")
 
 mot_list_empty <- list()
@@ -1410,12 +1358,10 @@ mot_list_empty <- list()
   mot_list_empty[[i]] <- mot_fit
 } 
 
-summary(mot_list_empty[[8]]) 
-
-save(mot_list_empty, file="./data/final_data/regression_outputs/mot_list_empty_w.RData")
+save(mot_list_empty, file="./data/final_data/regression_outputs/mot_list_empty_w_srvy.RData")
 
 #Estimate a second model with the indicators + time
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("cchange_mot", "worried_mot", "futuregen", "nowor", "ontime", "gov", "resp_gov", "resp_comp", "resp_mkb", "resp_citiz_mot", "resp_you", "pers_resp_mot", "sust_choice", "contr", "energy", "noidea", "motiv")
 
 mot_list_preds <- list()
@@ -1430,17 +1376,15 @@ mot_list_preds <- list()
   mot_list_preds[[i]] <- mot_fit
 } 
 
-summary(mot_list_preds[[1]]) 
-
-save(mot_list_preds, file="./data/final_data/regression_outputs/mot_list_preds_w_new.RData")
+save(mot_list_preds, file="./data/final_data/regression_outputs/mot_list_preds_w_srvy.RData")
 
 #Now the last model with interaction of time on predictor variables
-mot_complete$age_time <- mot_complete$age * mot_complete$time
-mot_complete$sex_time <- as.numeric(mot_complete$sex) * mot_complete$time
+mot_complete$age_time <- mot_complete$age * mot_complete$surveyyear
+mot_complete$sex_time <- as.numeric(mot_complete$sex) * mot_complete$surveyyear
 mot_complete <- fastDummies::dummy_cols(mot_complete, select_columns = "isced_cat")
-mot_complete$isced_basic_time <- mot_complete$isced_cat_Basic * mot_complete$time
-mot_complete$isced_intermediate_time <- mot_complete$isced_cat_Intermediate * mot_complete$time
-mot_complete$isced_advanced_time <- mot_complete$isced_cat_Advanced * mot_complete$time
+mot_complete$isced_basic_time <- mot_complete$isced_cat_Basic * mot_complete$surveyyear
+mot_complete$isced_intermediate_time <- mot_complete$isced_cat_Intermediate * mot_complete$surveyyear
+mot_complete$isced_advanced_time <- mot_complete$isced_cat_Advanced * mot_complete$surveyyear
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -1457,9 +1401,7 @@ mot_list_interactions <- list()
 } 
 
 
-summary(mot_list_interactions[[1]]) 
-
-save(mot_list_interactions, file="./data/final_data/regression_outputs/mot_list_interactions_w_new.RData")
+save(mot_list_interactions, file="./data/final_data/regression_outputs/mot_list_interactions_w_srvy.RData")
 
 ```
 
@@ -1470,10 +1412,9 @@ load("./data/final_data/lisstotal.RData")
 
 # Gamlss cannot handle NAs, so I have to listwise delete all of them
 liss_complete <- lisstotal %>% drop_na()
-liss_complete$time <- liss_complete$surveyyear - min(liss_complete$surveyyear)
 
 # I want to build models. In the empty model, I only want to include time. 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("lifestyle")
 
 liss_list_empty <- list()
@@ -1488,12 +1429,11 @@ liss_list_empty <- list()
   liss_list_empty[[i]] <- liss_fit
 } 
 
-summary(liss_list_empty[[1]]) 
 
-save(liss_list_empty, file="./data/final_data/regression_outputs/liss_list_empty_w.RData")
+save(liss_list_empty, file="./data/final_data/regression_outputs/liss_list_empty_w_srvy.RData")
 
 #Estimate a second model with the indicators + time
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("lifestyle")
 
 
@@ -1509,19 +1449,18 @@ liss_list_preds <- list()
   liss_list_preds[[i]] <- liss_fit
 } 
 
-summary(liss_list_preds[[1]]) 
 
-save(liss_list_preds, file="./data/final_data/regression_outputs/liss_list_preds_w_new.RData")
+save(liss_list_preds, file="./data/final_data/regression_outputs/liss_list_preds_w_srvy.RData")
 
 
 
 #Now the last model with interaction of time on predictor variables
-liss_complete$age_time <- liss_complete$age * liss_complete$time
-liss_complete$sex_time <- as.numeric(liss_complete$sex) * liss_complete$time
+liss_complete$age_time <- liss_complete$age * liss_complete$surveyyear
+liss_complete$sex_time <- as.numeric(liss_complete$sex) * liss_complete$surveyyear
 liss_complete <- fastDummies::dummy_cols(liss_complete, select_columns = "isced_cat")
-liss_complete$isced_basic_time <- liss_complete$isced_cat_Basic * liss_complete$time
-liss_complete$isced_intermediate_time <- liss_complete$isced_cat_Intermediate * liss_complete$time
-liss_complete$isced_advanced_time <- liss_complete$isced_cat_Advanced * liss_complete$time
+liss_complete$isced_basic_time <- liss_complete$isced_cat_Basic * liss_complete$surveyyear
+liss_complete$isced_intermediate_time <- liss_complete$isced_cat_Intermediate * liss_complete$surveyyear
+liss_complete$isced_advanced_time <- liss_complete$isced_cat_Advanced * liss_complete$surveyyear
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -1537,12 +1476,7 @@ liss_list_interactions <- list()
 } 
 
 
-summary(liss_list_interactions[[1]]) 
-
-save(liss_list_interactions, file="./data/final_data/regression_outputs/liss_list_interactions_w_new.RData")
-
-
-
+save(liss_list_interactions, file="./data/final_data/regression_outputs/liss_list_interactions_w_srvy.RData")
 ```
 
 ## SOCON {-}
@@ -1552,10 +1486,9 @@ load("./data/final_data/socontotal.RData")
 
 # Gamlss cannot handle NAs, so I have to listwise delete all of them
 socon_complete <- socontotal %>% drop_na()
-socon_complete$time <- socon_complete$surveyyear - min(socon_complete$surveyyear)
 
 # I want to build models. In the empty model, I only want to include time. 
-predictors <- c("time")
+predictors <- c("surveyyear")
 deps <- c("fut_gen_socon")
 
 
@@ -1571,12 +1504,10 @@ socon_list_empty <- list()
   socon_list_empty[[i]] <- socon_fit
 } 
 
-summary(socon_list_empty[[1]]) 
-
-save(socon_list_empty, file="./data/final_data/regression_outputs/socon_list_empty_w.RData")
+save(socon_list_empty, file="./data/final_data/regression_outputs/socon_list_empty_w_srvy.RData")
 
 #Estimate a second model with the indicators + time
-predictors <- c("time", "sex", "isced_cat", "age")
+predictors <- c("surveyyear", "sex", "isced_cat", "age")
 deps <- c("fut_gen_socon")
 
 
@@ -1594,15 +1525,15 @@ socon_list_preds <- list()
 
 summary(socon_list_preds[[1]]) 
 
-save(socon_list_preds, file="./data/final_data/regression_outputs/socon_list_preds_w_new.RData")
+save(socon_list_preds, file="./data/final_data/regression_outputs/socon_list_preds_w_srvy.RData")
 
 #Now the last model with interaction of time on predictor variables
-socon_complete$age_time <- socon_complete$age * socon_complete$time
-socon_complete$sex_time <- as.numeric(socon_complete$sex) * socon_complete$time
+socon_complete$age_time <- socon_complete$age * socon_complete$surveyyear
+socon_complete$sex_time <- as.numeric(socon_complete$sex) * socon_complete$surveyyear
 socon_complete <- fastDummies::dummy_cols(socon_complete, select_columns = "isced_cat")
-socon_complete$isced_basic_time <- socon_complete$isced_cat_Basic * socon_complete$time
-socon_complete$isced_intermediate_time <- socon_complete$isced_cat_Intermediate * socon_complete$time
-socon_complete$isced_advanced_time <- socon_complete$isced_cat_Advanced * socon_complete$time
+socon_complete$isced_basic_time <- socon_complete$isced_cat_Basic * socon_complete$surveyyear
+socon_complete$isced_intermediate_time <- socon_complete$isced_cat_Intermediate * socon_complete$surveyyear
+socon_complete$isced_advanced_time <- socon_complete$isced_cat_Advanced * socon_complete$surveyyear
 
 interactions <- c("age_time", "sex_time", "isced_intermediate_time", "isced_advanced_time")
 
@@ -1619,9 +1550,7 @@ socon_list_interactions <- list()
 } 
 
 
-summary(socon_list_interactions[[1]]) 
-
-save(socon_list_interactions, file="./data/final_data/regression_outputs/socon_list_interactions_w_new.RData")
+save(socon_list_interactions, file="./data/final_data/regression_outputs/socon_list_interactions_w_srvy.RData")
 
 ```
 

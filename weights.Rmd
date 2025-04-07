@@ -18,12 +18,9 @@ rm(list = ls())
 #install.packages("anesrake")
 library(anesrake)
 library(tidyverse)
-library(here)
 library(kableExtra) # needed later to make an example table that compares the proportions
 set.seed(1)
-# I use the here package so that I do not have to load files from my personal documents. However, here does not seem to be compatible with the (d)plyr package. That is why in previous scripts you may have seen that I did load from my local device.
-here()
-here::i_am("scripts/analysis/single_regression.Rmd")
+
 ```
 
 ## ISSP {-}
@@ -220,7 +217,7 @@ save(issp10sel, file="/Users/anuschka/Documents/climatechange/climatechange/data
 
 ```{r}
 # And now for ESS, repeat the same measure
-load(here("./data/all_waves", "ess16sel.RData"))
+load("./data/all_waves/ess16sel.RData")
 
 sex <- c('Male', 'Female')
 sex <- c(0.50, 0.50)
@@ -258,13 +255,13 @@ summary(outsave)
 
 ess16sel$weightvec  <- unlist(outsave[1])
 
-save(ess16sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess16sel.Rdata")
+save(ess16sel, file="./data/all_waves/ess16sel.Rdata")
 ```
 
 
 ```{r}
 #And for ess2020
-load(here("./data/all_waves", "ess20sel.RData"))
+load("./data/all_waves/ess20sel.RData")
 
 sex <- c('Male', 'Female')
 sex <- c(0.50, 0.50)
@@ -300,8 +297,52 @@ summary(outsave)
 
 ess20sel$weightvec  <- unlist(outsave[1])
 
-save(ess20sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess20sel.Rdata")
+save(ess20sel, file="./data/all_waves/ess20sel.Rdata")
 ```
+
+
+
+```{r}
+#And for ess2023
+load("./data/all_waves/ess23sel.RData")
+
+sex <- c('Male', 'Female')
+sex <- c(0.50, 0.50)
+
+attributes(ess23sel$age)
+ess23sel$age_cat[ess23sel$age >=15 & ess23sel$age <= 30] <- 1
+ess23sel$age_cat[ess23sel$age >=31 & ess23sel$age <= 45] <- 2
+ess23sel$age_cat[ess23sel$age >=46 & ess23sel$age <= 60] <- 3
+ess23sel$age_cat[ess23sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.20, 0.18, 0.21, 0.25)
+
+urban <- c('Low urbanity', 'Medium urbanity', 'High urbanity')
+urban <- c(0.34, 0.17, 0.49)
+
+targets <- list(sex, age_cat, urban)
+names(targets) <- c("sex", "age_cat", "urban")
+
+ess23sel$caseid <- 1:length(ess23sel$sex)
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+ess23sel$sex <- as.numeric(ess23sel$sex)
+ess23sel$urban <- as.numeric(ess23sel$urban)
+anesrakefinder(targets, ess23sel, choosemethod = "total")
+
+outsave <- anesrake(targets, ess23sel, caseid = ess23sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+ess23sel$weightvec  <- unlist(outsave[1])
+table(ess23sel$weightvec)
+
+save(ess23sel, file="./data/all_waves/ess23sel.Rdata")
+```
+
 
 ## EVS {-}
 
@@ -421,8 +462,50 @@ evs2008$marstat <- as.factor(evs2008$marstat)
 # Bind the three together
 evssel <- dplyr::bind_rows(evs90, evs99, evs2008)
 
+# Also add the weights for 2017
+load("./data/all_waves/evs17sel.Rdata")
+
+sex <- c('Male', 'Female')
+sex <- c(0.50, 0.50)
+
+attributes(evs17sel$age)
+evs17sel$age_cat[evs17sel$age >=15 & evs17sel$age <= 30] <- 1
+evs17sel$age_cat[evs17sel$age >=31 & evs17sel$age <= 45] <- 2
+evs17sel$age_cat[evs17sel$age >=46 & evs17sel$age <= 60] <- 3
+evs17sel$age_cat[evs17sel$age >=61] <- 4
+
+age_cat <- c('u30', '3145', '4661', '61o')
+age_cat <- c(0.19, 0.28, 0.22, 0.23)
+
+
+targets <- list(sex, age_cat)
+names(targets) <- c("sex", "age_cat")
+
+# To use anesrakefinder, the variables in the original dataset have to be numeric
+evs17sel$sex <- as.numeric(evs17sel$sex) + 1 # For anesrake, everything has to start with 1
+evs17sel$age_cat <- as.numeric(evs17sel$age_cat) 
+
+evs17sel$caseid <- 1:length(evs17sel$sex)
+
+anesrakefinder(targets, evs17sel, choosemethod = "total")
+
+outsave <- anesrake(targets, evs17sel, caseid = evs17sel$caseid,
+  verbose= FALSE, cap = 5, choosemethod = "total",
+  type = "pctlim", pctlim = .05 , nlim = 5,
+  iterate = TRUE , force1 = TRUE)
+summary(outsave)
+
+evs17sel$weightvec  <- unlist(outsave[1])
+save(evs17sel, file = "./data/all_waves/evs17sel.Rdata")
+
+load("./data/final_data/evssel.Rdata")
+evssel <- dplyr::left_join(evssel, evs17sel)
+
+
 #Save the total to which now the weights are added per year
-save(evssel, file="/Users/anuschka/Documents/climatechange/climatechange//data/final_data/evssel.Rdata")
+save(evssel, file="./data/final_data/evssel.Rdata")
+
+
 ```
 
 ## I&O research {-}

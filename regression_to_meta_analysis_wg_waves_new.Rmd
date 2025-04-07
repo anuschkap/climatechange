@@ -642,6 +642,7 @@ save(issp_results_df, file="./data/final_data/regression_outputs/per_wave/issp_r
 rm(list=ls())
 load("./data/final_data/regression_outputs/per_wave/eb_list_empty_1986_1.RData")
 load("./data/final_data/regression_outputs/eb_list_empty_2007_1.RData")
+load("./data/final_data/regression_outputs/eb_list_empty_2008_w.RData")
 load("./data/final_data/regression_outputs/eb_list_empty_2009_1.RData")
 load("./data/final_data/regression_outputs/eb_list_empty_2011_w.RData")
 load("./data/final_data/regression_outputs/eb_list_empty_buyprod1.RData")
@@ -904,6 +905,13 @@ eb_results_empty_df$waveset <- 5
 
 save(eb_results_empty_df, file= "./data/final_data/regression_outputs/per_wave/eb_results_empty_df5_new.RData" )
 ```
+
+
+
+
+
+
+
 
 
 ```{r}
@@ -1997,6 +2005,7 @@ save(eb_interactions_df_waves, file= "./data/final_data/regression_outputs/per_w
 # And now one large dataframe of these three 
 load("./data/final_data/regression_outputs/per_wave/eb_empty_df_waves_new.RData")
 load("./data/final_data/regression_outputs/per_wave/eb_preds_df_waves_new.RData")
+load("./data/final_data/regression_outputs/per_wave/eb_interactions_df_waves_new.RData")
 
 # Merge the results
 eb_results_df <- left_join(eb_empty_df_waves, eb_preds_df_waves)

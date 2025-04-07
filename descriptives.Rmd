@@ -24,7 +24,7 @@ pre[class] {
 }
 ```
 
-In this script, I write the code to make some plots and tables that I use to in the data and analysis section. You will find the code for the plot with datasets per year, the Table with individual regression analysis for one variable of ISSP and the Table with all the pooled effects. 
+In this script, I write the code to make some plots and tables that I use in the data and analysis section. You will find the code for the plot with datasets per year, the Table with individual regression analysis for one variable of ISSP and the Table with all the pooled effects. 
 
 ```{r,results='hide', warning=FALSE, message=FALSE}
 library(dplyr)
@@ -78,10 +78,92 @@ yearplot <- ggplot(data = datayear, aes(x = year, y = dataset, color = color)) +
   theme(legend.position = "none")
 print(yearplot)
 
-ggsave("yearplot.png", width = 7, height = 5, path = "./output/yearplot_DEC.png")
+ggsave("yearplot.png", width = 7, height = 5, path = "./output/yearplot_APRIL25.png")
 
 
 ```
+
+
+## Make the same table as above, but then per item to get an overview of when these were asked. 
+
+```{r}
+rm(list=ls())
+load("./data/meta_analysis/total_reg_results_gam_w_new.RData")
+
+total_reg_results <- subset(total_reg_results, subset = dep_var != "cc_unstop")
+
+itemplot <- total_reg_results %>%
+  select(dep_var, dep_var_name, nr_waves, first_year, data)
+
+itemplot_x <- itemplot %>%
+  uncount(nr_waves) %>%  
+  group_by(dep_var) %>%  
+  dplyr::mutate(wave = row_number()) %>%  
+  ungroup() 
+
+itemplot_x <- itemplot_x %>%
+  mutate(surveyyear = case_when(
+    data == "ESS" & wave == 1 ~ 2016,
+    data == "ESS" & wave == 2 ~ 2020, 
+    data == "EVS" & wave == 1 ~ 1990,
+    data == "EVS" & wave == 2 ~ 1999,
+    data == "EVS" & wave == 3 ~ 2008,
+    data == "IO" & wave == 1 ~ 2019,
+    data == "IO" & wave == 2 ~ 2020,
+    data == "IO" & wave == 3 ~ 2022,
+    data == "MOT" & wave == 1 ~ 2019,
+    data == "MOT" & wave == 2 ~ 2021,
+    data == "SOCON" & wave == 1 ~ 2019,
+    data == "SOCON" & wave == 2 ~ 2020,
+    data == "SOCON" & wave == 3 ~ 2022,
+    data == "LISS" & wave == 1 ~ 2020,
+    data == "LISS" & wave == 2 ~ 2020,
+    data == "LISS" & wave == 3 ~ 2021,
+  ))
+
+
+#write.csv(itemplot_x, "./data/descriptives/itemplot.csv")
+itemplot_df <- read_excel("./data/descriptives/itemplot.xlsx")
+
+first_last_year <- itemplot_df %>%
+  ungroup() %>%
+  dplyr::group_by(dep_var_name) %>%
+  dplyr::summarize(first_year = min(surveyyear),
+            last_year = max(surveyyear))
+
+
+colors <- total_reg_results %>%
+  dplyr::group_by(dep_var) %>%
+  dplyr::summarize(colour, 
+            year_mean) 
+
+itemplot_df <- itemplot_df %>%
+  left_join(colors, by = "dep_var")
+
+# There are a few different variables with the same variable name
+itemplot_df$dep_var_name[itemplot_df$dep_var=="cc_prsact"] <- "Youve taken action"
+itemplot_df$dep_var_name[itemplot_df$dep_var=="fut_gen_socon"] <- "Worry fut gen socon"
+itemplot_df$dep_var_name[itemplot_df$dep_var=="resp_citiz_mot"] <- "Resp citizen mot"
+
+itemplot <- ggplot(data = itemplot_df, aes(x = surveyyear, y = dep_var_name)) +
+  geom_point(size = 1.2, aes(color = colour)) +  # Color legend
+  geom_line(aes(group = dep_var_name, color = colour), size = 1) +  # Line legend (uses same color)
+  geom_point(aes(x = year_mean, shape = "Mean Year"), color = "darkgrey", size = 2) +  # Diamond legend
+  labs(x = "Year", y = "Item", color = "Category", shape = " ") + 
+    scale_color_manual(
+    values = c("#B0CC52" = "#B0CC52", "#CC5279" = "#CC5279", "#2980B9" = "#2980B9"),  # Assigns colors
+    labels = c("#B0CC52" = "Behavioral", "#CC5279" = "Affective", "#2980B9" = "Cognitive")  # Custom names
+  ) + 
+  scale_shape_manual(values = c("Mean Year" = 19)) +  # Assigns the diamond shape
+  theme_classic() + 
+  theme(text = element_text(size = 5))
+
+ggsave("itemplot.png", width = 7, height = 5, path = "./output/itemplot.png")
+
+```
+
+
+
 
 ## Table of the GAMLSS regression output {-}
 
@@ -207,7 +289,7 @@ total_reg_results$sig_time_sd_pred_std <- total_reg_results$sig_time_sd_pred/tot
 
 total_reg_results$sig_time_int_std <- total_reg_results$sig_time_int/total_reg_results$sigma_intercept
 total_reg_results$sig_time_sd_int_std <- total_reg_results$sig_time_sd_int/total_reg_results$sigma_intercept
-save(total_reg_results, file = "./data/meta_analysis/total_reg_results_gam_w_new.RData")
+#save(total_reg_results, file = "./data/meta_analysis/total_reg_results_gam_w_new.RData")
 
 load("./data/meta_analysis/total_indep_var_results_new.RData")
 total_indep_var_results <- total_indep_var_results %>%
@@ -224,20 +306,17 @@ total_inter_results <- total_inter_results %>%
 
 save(total_inter_results, file = "./data/meta_analysis/total_inter_results_new.RData")
 
-hist(total_inter_results$sig_sex_est_inter_std)
-hist(total_inter_results$sig_age_est_inter_std)
-
 ```
 
 
 ```{r, eval=FALSE }
-rm(list=ls())
+#rm(list=ls())
 # I want to repeat the above Table, but instead of regressions I now want to put all the pooled effects in there
 # Starting with the time only model
 # You may notice that I use the rma function and metagen. The estimate TE.random of metagen (pooled effect) is the same as the beta in the rma model
 set.seed(1) #(as I am performing analyses with a random aspect)
 
-load("./data/meta_analysis/total_reg_results_gam_w_new.RData")
+#load("./data/meta_analysis/total_reg_results_gam_w_new.RData")
 
 # Delete outlier
 total_reg_results <- subset(total_reg_results, subset = dep_var != "cc_unstop")
@@ -260,8 +339,8 @@ one_df$SE <- one$se
 one_df$p <- one$pval
 
 # And now variance
-model_step_1_var <- rma(yi = sig_time_std,
-              sei = sig_time_sd_std,
+model_step_1_var <- rma(yi = sig_time,
+              sei = sig_time_sd,
               data = total_reg_results,
               method = "ML",
               test = "knha")
@@ -333,18 +412,23 @@ three_df$mu_sigma_1 <- c("Mean attitudes", "", "", "", "")
 three_df$Variable_1 <- c("Time", "Gender", "Age", "Isced intermediate (ref=basic)", "Isced advanced (ref=basic)")
 three_df$Estimate_1 <- c(as.numeric(m2_att$b), gender_gen$TE.random, age_gen$TE.random, edu_med_gen$TE.random, edu_high_gen$TE.random)
 three_df$SE_1 <- c(m2_att$se, gender_gen$seTE.random, age_gen$seTE.random, edu_med_gen$seTE.random, edu_high_gen$seTE.random)
-three_df$p_1 <- c(m2_att$pval, gender_gen$pval.random, age_gen$pval.random, edu_med_gen$pval.random, edu_high_gen$pval.random)                       
+three_df$p_1 <- c(m2_att$pval, gender_gen$pval.random, age_gen$pval.random, edu_med_gen$pval.random, edu_high_gen$pval.random)    
+
+numeric_cols <- sapply(total_indep_var_results, is.numeric)
+
+# Round only numeric columns to 9 decimals
+total_indep_var_results[numeric_cols] <- lapply(total_indep_var_results[numeric_cols], function(x) round(x, 9))
                        
 # The same for variance
-m2_var <- rma(yi = sig_time_pred_std,
-              sei = sig_time_sd_pred_std,
+m2_var <- rma(yi = sig_time_pred,
+              sei = sig_time_sd_pred,
               data = total_reg_results,
               method = "ML",
               test = "knha")
 
 # Gender
-gender_var_gen <- metagen(TE = sig_sex_est_std,
-                 seTE = sig_sex_sd_std,
+gender_var_gen <- metagen(TE = sig_sex_est,
+                 seTE = sig_sex_sd,
                  data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
@@ -352,8 +436,8 @@ gender_var_gen <- metagen(TE = sig_sex_est_std,
                  hakn = TRUE)
 
 # Age
-age_var_gen <- metagen(TE = sig_age_est_std,
-                 seTE = sig_age_sd_std,
+age_var_gen <- metagen(TE = sig_age_est,
+                 seTE = sig_age_sd,
                  data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
@@ -361,16 +445,16 @@ age_var_gen <- metagen(TE = sig_age_est_std,
                  hakn = TRUE)
 
 # Education
-edu_var_med_gen <- metagen(TE = sig_isced_med_est_std,
-                 seTE = sig_isced_med_sd_std,
+edu_var_med_gen <- metagen(TE = sig_isced_med_est,
+                 seTE = sig_isced_med_sd,
                  data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
                  method.tau = "ML",
                  hakn = TRUE)
 
-edu_var_high_gen <- metagen(TE = sig_isced_high_est_std,
-                 seTE = sig_isced_high_sd_std,
+edu_var_high_gen <- metagen(TE = sig_isced_high_est,
+                 seTE = sig_isced_high_sd,
                  data = total_indep_var_results,
                  fixed = FALSE,
                  random = TRUE,
@@ -490,8 +574,8 @@ m3_var <- rma(yi = sig_time_int_std,
               test = "knha")
 
 # Gender 
-gender_gen_int_var <- metagen(TE = sig_sex_est_std,
-                 seTE = sig_sex_sd_std,
+gender_gen_int_var <- metagen(TE = sig_sex_est,
+                 seTE = sig_sex_sd,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
@@ -499,8 +583,8 @@ gender_gen_int_var <- metagen(TE = sig_sex_est_std,
                  hakn = TRUE)
 
 # Age 
-age_gen_int_var <- metagen(TE = sig_age_est_std,
-                 seTE = sig_age_sd_std,
+age_gen_int_var <- metagen(TE = sig_age_est,
+                 seTE = sig_age_sd,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
@@ -508,16 +592,16 @@ age_gen_int_var <- metagen(TE = sig_age_est_std,
                  hakn = TRUE)
 
 # Educational level
-edu_med_gen_int_var <- metagen(TE = sig_isced_med_est_std,
-                 seTE = sig_isced_med_sd_std,
+edu_med_gen_int_var <- metagen(TE = sig_isced_med_est,
+                 seTE = sig_isced_med_sd,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
                  method.tau = "ML",
                  hakn = TRUE)
 
-edu_high_gen_int_var <- metagen(TE = sig_isced_high_est_std,
-                 seTE = sig_isced_high_sd_std,
+edu_high_gen_int_var <- metagen(TE = sig_isced_high_est,
+                 seTE = sig_isced_high_sd,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
@@ -526,8 +610,8 @@ edu_high_gen_int_var <- metagen(TE = sig_isced_high_est_std,
 
 # And the interaction effects 
 # Gender 
-gender_int_eff_var <- metagen(TE = sig_sex_est_inter_std,
-                 seTE = sig_sex_sd_inter_std,
+gender_int_eff_var <- metagen(TE = sig_sex_est_inter,
+                 seTE = sig_sex_sd_inter,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
@@ -535,8 +619,8 @@ gender_int_eff_var <- metagen(TE = sig_sex_est_inter_std,
                  hakn = TRUE)
 
 # Age 
-age_int_eff_var <- metagen(TE = sig_age_est_inter_std,
-                 seTE = sig_age_sd_inter_std,
+age_int_eff_var <- metagen(TE = sig_age_est_inter,
+                 seTE = sig_age_sd_inter,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
@@ -544,16 +628,16 @@ age_int_eff_var <- metagen(TE = sig_age_est_inter_std,
                  hakn = TRUE)
 
 # Educational level
-edu_med_int_eff_var <- metagen(TE = sig_isced_med_est_inter_std,
-                 seTE = sig_isced_med_sd_inter_std,
+edu_med_int_eff_var <- metagen(TE = sig_isced_med_est_inter,
+                 seTE = sig_isced_med_sd_inter,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,
                  method.tau = "ML",
                  hakn = TRUE)
 
-edu_high_int_eff_var <- metagen(TE = sig_isced_high_est_inter_std,
-                 seTE = sig_isced_high_sd_inter_std,
+edu_high_int_eff_var <- metagen(TE = sig_isced_high_est_inter,
+                 seTE = sig_isced_high_sd_inter,
                  data = total_inter_results,
                  fixed = FALSE,
                  random = TRUE,

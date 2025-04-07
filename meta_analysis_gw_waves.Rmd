@@ -38,6 +38,7 @@ set.seed(1)
 # With the final data
 load("./data/meta_analysis/total_results_waves_new.RData")
 
+
 #Somehow some missings on first and mean year 
 total_results_waves$first_year[total_results_waves$dep_var == "env_ec_stat"] <- 1986
 total_results_waves$first_year[total_results_waves$dep_var == "env_prsimp"] <- 1986
@@ -49,6 +50,8 @@ total_results_waves$mean_year_centered <- total_results_waves$mean_year - mean(t
 total_results_waves$attitude_cat <- factor(total_results_waves$attitude_cat)
 total_results_waves$attitude_cat <- relevel(total_results_waves$attitude_cat, ref = "behavioral")
 
+total_results_waves <- subset(total_results_waves, subset = dep_var != "cc_unstop")
+
 
 # Start with step 2 here, as I don't make forest plots for these models
 #Step 2. Empty model with meta-level indicators
@@ -57,6 +60,7 @@ model_step_1_att <- rma(yi = mu_time,
               data = total_results_waves,
               method = "ML",
               test = "knha")
+
 
 model_step_1_att
 
@@ -135,6 +139,7 @@ model_step_4_var <- rma(yi = sig_time,
               test = "knha")
 
 model_step_4_var
+
 
 
 ```

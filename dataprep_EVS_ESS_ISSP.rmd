@@ -155,6 +155,56 @@ save(evssel, file="./data/final_data/evssel.Rdata")
 evssel <- evssel %>% select(stdyno_w, S001, S002EVS, S006, S017, S018, S020, climate5, sex, X002, age, edu_yrs, isced,  religious, lrplace, income, income_quart, marstat, weightvec, X023, X023R, X047CS, X047_EVS, X047R_EVS) %>% 
         dplyr::rename(surveyyear = S020)
 
+
+# In the end, 2017 was apparently added. So add that to the existing dataset. 
+evs17 <- foreign::read.spss("C:/climate_data/evs2017.sav", use.value.labels = T,  to.data.frame = T)
+
+evs17sel <- evs17 %>% filter(c_abrv == "NL    ")  %>%
+            select(year, v199, v242, v225, age)
+
+evs17sel$climate <- as.numeric(evs17sel$v199)
+evs17sel$climate5 <- 6 - evs17sel$climate 
+table(evs17sel$climate, evs17sel$climate5)
+
+# Gender  and age
+table(evs17sel$age, useNA = "always")
+evs17sel$age <- as.numeric(as.character(evs17sel$age))
+
+evs17sel <- evs17sel %>%
+  mutate(sex = recode(v225, "Male" = "1", "Female" = "2")) %>%
+  mutate(age = replace_na(age, 82)) %>%
+  rename(surveyyear = year)
+
+evs17sel$sex <- (as.numeric(evs17sel$sex)) - 1
+evs17sel$surveyyear <- as.numeric(as.character(evs17sel$surveyyear))
+
+  
+# Education
+evs17sel$edu_yrs <- as.numeric(as.character(evs17sel$v242))
+evs17sel$edu_yrs <- evs17sel$edu_yrs - 6
+table(evs17sel$edu_yrs, evs17sel$v242, useNA = "always")
+mean(evs17sel$edu_yrs, na.rm=T)
+evs17sel$edu_yrs[is.na(evs17sel$edu_yrs)] <- 16.8859
+
+#Education as isced
+evs17sel$isced[evs17sel$edu_yrs <=4] <- 0
+evs17sel$isced[evs17sel$edu_yrs > 4 & evs17sel$edu_yrs <= 6] <- 1
+evs17sel$isced[evs17sel$edu_yrs > 6 & evs17sel$edu_yrs <= 10] <- 2
+evs17sel$isced[evs17sel$edu_yrs > 10 & evs17sel$edu_yrs <= 13] <- 3
+evs17sel$isced[evs17sel$edu_yrs > 13 & evs17sel$edu_yrs <= 15] <- 4
+evs17sel$isced[evs17sel$edu_yrs > 15 & evs17sel$edu_yrs <= 18] <- 5
+evs17sel$isced[evs17sel$edu_yrs > 18] <- 6
+table(evs17sel$isced, useNA = "always")
+
+save(evs17sel, file = "./data/all_waves/evs17sel.Rdata")
+# Merge the two datasets
+load("./data/final_data/evssel.Rdata")
+
+# In the meantime, construct weightvec in weights.rmd
+
+
+#evssel <- dplyr::bind_rows(evssel, evs17sel)
+
 save(evssel, file="./data/final_data/evssel.Rdata")
 ```
 
@@ -182,8 +232,8 @@ ess16sel$pers_resp <- (as.numeric(ess16sel$ccrdprs) - 1)* (4/10) + 1
 table(ess16sel$wrclmch, useNA = "always")
 ess16sel$worry <- as.numeric(ess16sel$wrclmch)
 
-save(ess16sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess16sel.Rdata")
-load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess16sel.Rdata")
+save(ess16sel, file="./data/all_waves/ess16sel.Rdata")
+load("./data/all_waves/ess16sel.Rdata")
 
 
 #Independent vars
@@ -240,7 +290,8 @@ for (var in mis_vars) {
   ess16sel[is.na(ess16sel[,var]), var] <- mean(ess16sel[,var], na.rm = TRUE)
 }
 
-save(ess16sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess16sel.Rdata")
+save(ess16sel, file="./data/all_waves/ess16sel.Rdata")
+
 
 
 ess2020 <- foreign::read.spss("/Users/anuschka/Documents/gesis_dir/ess/ESS10.sav", use.value.labels = T,  to.data.frame = T)
@@ -262,8 +313,6 @@ ess20sel$pers_resp <- (as.numeric(ess20sel$ccrdprs) - 1)* (4/10) + 1
 #How worried about climate change
 table(ess20sel$wrclmch, useNA = "always")
 ess20sel$worry <- as.numeric(ess20sel$wrclmch)
-
-save(ess20sel, file="/Users/anuschka/Documents/climatechange/climatechange/ess20sel.Rdata")
 
 # Independent vars 
 table(ess20sel$eduyrs, useNA = "always")
@@ -318,11 +367,11 @@ for (var in mis_vars) {
   ess20sel[is.na(ess20sel[,var]), var] <- mean(ess20sel[,var], na.rm = TRUE)
 }
 
-save(ess20sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess20sel.Rdata")
-load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess20sel.Rdata")
+save(ess20sel, file="./data/all_waves/ess20sel.Rdata")
+load("./data/all_waves/ess20sel.Rdata")
 
 #Merge data 2016 and 2020
-load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/ess16sel.Rdata")
+load("./data/all_waves/ess16sel.Rdata")
 
 #Select the variables that I want to keep
 ess16sel <- ess16sel %>% select(name, essround, proddate, idno, worry, cause, pers_resp, sex, eduyrs, isced,urban, ch_attend, income, income_quart, yrbrn, lrscale, age, marstat, brncntr, weightvec)
@@ -344,10 +393,62 @@ esstotal$sex <- esstotal$sex - 1
 table(esstotal$sex)
 save(esstotal, file="./data/final_data/esstotal.Rdata")
 
-# One time it did not correctly apply esstotal
-#esstotal$urban <- as.factor(esstotal$urban)
-#esstotal$urban <- revalue(esstotal$urban, c("1"="Low urbanity", "2"="Medium urbanity", "3"="High urbanity"))
-#esstotal$urban <- factor(esstotal$urban, levels=c("Low urbanity", "Medium urbanity", "High urbanity"), ordered=TRUE)
+
+# Add more recent data: ESS 2023
+ess2023 <- foreign::read.spss("C:/climate_data/ess11.sav", use.value.labels = T,  to.data.frame = T)
+
+ess23sel <- ess2023 %>% filter(cntry=="Netherlands")  %>%
+            select(name, essround, proddate, idno, ccnthum, ccrdprs, wrclmch, edulvlb,  eduyrs, mainact, gndr, agea, yrbrn, domicil)
+
+ess23sel$cause <- as.numeric(ess23sel$ccnthum)
+ess23sel$cause[ess23sel$cause==6] <- NA
+table(ess23sel$cause, ess23sel$ccnthum, useNA = "always")
+
+#Personal responsibility to reduce climate change
+attributes(ess23sel$ccrdprs)
+ess23sel$pers_resp <- (as.numeric(ess23sel$ccrdprs) - 1)* (4/10) + 1
+table(ess23sel$pers_resp, useNA = "always")
+
+#How worried about climate change
+table(ess23sel$wrclmch, useNA = "always")
+ess23sel$worry <- as.numeric(ess23sel$wrclmch)
+
+table(as.numeric(ess23sel$edulvlb), useNA = "always")
+ess23sel$edulvlb <- as.numeric(ess23sel$edulvlb)
+ess23sel$isced[ess23sel$edulvlb <=1] <- 0
+ess23sel$isced[ess23sel$edulvlb ==2] <- 1
+ess23sel$isced[ess23sel$edulvlb > 2 & ess23sel$edulvlb <= 5] <- 2
+ess23sel$isced[ess23sel$edulvlb > 5 & ess23sel$edulvlb <= 15] <- 3
+ess23sel$isced[ess23sel$edulvlb > 15 & ess23sel$edulvlb <= 20] <- 4
+ess23sel$isced[ess23sel$edulvlb > 20 & ess23sel$edulvlb <= 26] <- 5
+ess23sel$isced[ess23sel$edulvlb ==27] <- 6
+ess23sel$isced[ess23sel$edulvlb ==28] <- NA
+table(ess23sel$isced, useNA = "always")
+
+ess23sel <- ess23sel %>%
+    mutate(sex = recode(gndr, "Male" = "1", "Female" = "2")) %>%
+    mutate(sex = as.numeric(sex) -1) %>%
+    mutate(surveyyear = 2023) %>%
+    mutate(urban = recode(domicil, "Farm or home in countryside"= "Low urbanity", "Country village"="Low urbanity", "Town or small city"="Medium urbanity", "Suburbs or outskirts of big city"="High urbanity", "A big city"="High urbanity"))
+ess23sel$urban <- factor(ess23sel$urban, levels=c("Low urbanity", "Medium urbanity", "High urbanity"), ordered=TRUE)
+table(ess23sel$urban, useNA = "always")
+
+table(ess23sel$agea, useNA = "always")
+ess23sel$age <- as.numeric(as.character(ess23sel$agea))
+
+mis_vars <- c("age") 
+
+for (var in mis_vars) {
+  ess23sel[is.na(ess23sel[,var]), var] <- mean(ess23sel[,var], na.rm = TRUE)
+}
+
+save(ess23sel, file = "./data/all_waves/ess23sel.RData")
+# Merge it again with the larger ess file
+load("./data/final_data/esstotal.Rdata")
+ess23sel$eduyrs <- as.numeric(ess23sel$eduyrs)
+esstotal <- dplyr::bind_rows(ess23sel, esstotal)
+
+save(esstotal, file="./data/final_data/esstotal.Rdata")
 
 ```
 
@@ -433,8 +534,8 @@ issp93sel$marstat[issp93sel$V202 < 2] <- 1 #Living together
 issp93sel$marstat[issp93sel$V202 >= 2] <- 2 #Not living together
 
 
-save(issp93sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp93sel.Rdata")
-load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp93sel.Rdata")
+save(issp93sel, file="./data/all_waves/issp93sel.Rdata")
+load("./data/all_waves/issp93sel.Rdata")
 
 ```
 
@@ -535,8 +636,8 @@ for (var in mis_vars) {
   issp00sel[is.na(issp00sel[,var]), var] <- mean(issp00sel[,var], na.rm = TRUE)
 }
 
-save(issp00sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp00sel.Rdata")
-load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp00sel.Rdata")
+save(issp00sel, file="./data/all_waves/issp00sel.Rdata")
+load("./data/all_waves/issp00sel.Rdata")
 
 
 #Last dataset of 2010. 
@@ -617,7 +718,7 @@ issp10sel$MARITAL <- as.numeric(issp10sel$MARITAL)
 issp10sel$marstat[issp10sel$MARITAL < 2] <- 1 #Living together
 issp10sel$marstat[issp10sel$MARITAL >= 2] <- 2 #Not living together
 
-save(issp10sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp10sel.Rdata")
+save(issp10sel, file="./data/all_waves/issp10sel.Rdata")
 
 #Missings later ----------------------------------
 lapply(issp10sel, table, useNA = "always")
@@ -628,15 +729,15 @@ for (var in mis_vars) {
   issp10sel[is.na(issp10sel[,var]), var] <- mean(issp10sel[,var], na.rm = TRUE)
 }
 
-save(issp10sel, file="/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp10sel.Rdata")
+save(issp10sel, file="./data/all_waves/issp10sel.Rdata")
 
 ```
 
 ```{r}
 #Now I have to make one datafile of these three datasets. 
-load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp93sel.Rdata")
-load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp00sel.Rdata")
-load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/issp10sel.Rdata")
+load("./data/all_waves/issp93sel.Rdata")
+load("./data/all_waves/issp00sel.Rdata")
+load("./data/all_waves/issp10sel.Rdata")
 
 issp93sel <- issp93sel %>% select(V1, worry, lifeharm, willing_price, willing_tax, willing_living, do_right, progharm, econprotect, people_decide, bus_decide, eduyrs, isced, sex, lrscale, urban, ch_attend, income, income_quart, age, marstat, weightvec)
                                   
@@ -674,7 +775,7 @@ save(issptotal, file="./data/final_data/issptotal.Rdata")
 ## Merging all the data into large datasets {-}
 ```{r}
 # For the three datasets, change the isced into isced cat
-load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/evssel.Rdata")
+load("./data/final_data/evssel.Rdata")
 
 
 table(evssel$isced)
@@ -684,10 +785,10 @@ evssel$isced_cat[evssel$isced >=5] <- "Advanced"
 evssel$isced_cat <- factor(evssel$isced_cat, levels=c("Basic", "Intermediate", "Advanced"), ordered=TRUE)
 table(evssel$isced_cat)
 
-save(evssel, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/evssel.Rdata")
+save(evssel, file="./data/final_data/evssel.Rdata")
 
 
-load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/esstotal.Rdata")
+load("./data/final_data/esstotal.Rdata")
 
 
 table(esstotal$isced)
@@ -697,9 +798,9 @@ esstotal$isced_cat[esstotal$isced >=5] <- "Advanced"
 esstotal$isced_cat <- factor(esstotal$isced_cat, levels=c("Basic", "Intermediate", "Advanced"), ordered=TRUE)
 table(esstotal$isced_cat)
 
-save(esstotal, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/esstotal.Rdata")
+save(esstotal, file="./data/final_data/esstotal.Rdata")
 
-load("/Users/anuschka/Documents/climatechange/climatechange/data/final_data/issptotal.Rdata")
+load("./data/final_data/issptotal.Rdata")
 
 
 table(issptotal$isced)
@@ -709,7 +810,7 @@ issptotal$isced_cat[issptotal$isced >=5] <- "Advanced"
 issptotal$isced_cat <- factor(issptotal$isced_cat, levels=c("Basic", "Intermediate", "Advanced"), ordered=TRUE)
 table(issptotal$isced_cat)
 
-save(issptotal, file="/Users/anuschka/Documents/climatechange/climatechange/data/final_data/issptotal.Rdata")
+save(issptotal, file="./data/final_data/issptotal.Rdata")
 
 ```
 

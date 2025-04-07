@@ -134,7 +134,7 @@ table(io2019sel$marstat, useNA = "always")
 io2019sel$age <- as.numeric(as.character(io2019sel$LEEFTIJD))
 
 #Lr placement based on CHES en poppa data on expert means
-load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/expert.RData")
+load("./data/all_waves/expert.RData")
 io2019sel$party_name <- as.character(io2019sel$IOPOL2017)
 io2019sel$party_name <- revalue(io2019sel$party_name, c("ChristenUnie"= "CU", "50 Plus"="50PLUS", "GroenLinks"="GL", "Partij voor de Dieren"="PvdD", "Forum voor Democratie"="FvD"))
 io2019sel <- io2019sel %>% left_join(expert2, by="party_name") 
@@ -155,9 +155,9 @@ io2019sel <- io2019sel %>%
             select(id, worried, frontrunner, worry_future, resp_citiz, dk_start, do_gov, buss_help, min_contr, human_resp, sex, educ_cat, isced, urban, age, income_quart, IOINKOMEN, IOPOL2017, ethnicity, marstat, lroverall_mean)  %>%
             dplyr::rename (lrplace = lroverall_mean)
 
-save(io2019sel, file = "/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2019sel.RData")
+save(io2019sel, file = "./data/all_waves/io2019sel.RData")
 
-load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2019sel.RData")
+load("./data/all_waves/io2019sel.RData")
 ```
 
 ## 2020 {-}
@@ -251,7 +251,7 @@ io2020sel <- io2020sel %>%
             select(id, worried, frontrunner, worry_future, resp_citiz, dk_start, do_gov, buss_help, min_contr, human_resp, sex, educ_cat, isced, age, income_quart, IOINKOMEN, IOPOL2017, ethnicity, marstat, lroverall_mean) %>%
             dplyr::rename (lrplace = lroverall_mean)
 
-save(io2020sel, file = "/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2020sel.RData")
+save(io2020sel, file = "./data/all_waves/io2020sel.RData")
 ```
 
 ## 2022 {-}
@@ -344,7 +344,7 @@ io2022sel <- io2022sel %>%
             select(id, worried, frontrunner, worry_future, resp_citiz, dk_start, do_gov, buss_help, min_contr, human_resp, sex, educ_cat, isced, age, income_quart, IOINKOMEN_NEW, IOPOL2021, ethnicity, marstat, lroverall_mean) %>%
             dplyr::rename (lrplace = lroverall_mean)
 
-save(io2022sel, file = "/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2022sel.RData")
+save(io2022sel, file = "./data/all_waves/io2022sel.RData")
 ```
 
 ## Merging all datasets {-}
@@ -383,9 +383,9 @@ attributes(io2022sel$ethnicity)
 
 ```{r}
 #Merging the variables into one dataset is quite easy now all variables are the same
-load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2019sel.RData")
-load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2020sel.RData")
-load("/Users/anuschka/Documents/climatechange/climatechange/data/all_waves/io2022sel.RData")
+load("./data/all_waves/io2019sel.RData")
+load("./data/all_waves/io2020sel.RData")
+load("./data/all_waves/io2022sel.RData")
 
 io2019sel$surveyyear <- 2019
 io2020sel$surveyyear <- 2020
@@ -393,7 +393,7 @@ io2022sel$surveyyear <- 2022
 
 io_total <- plyr::rbind.fill(io2019sel, io2020sel, io2022sel)
 
-save(io_total, file = "/Users/anuschka/Documents/climatechange/climatechange/data/final_data/io_total.RData")
+save(io_total, file = "./data/final_data/io_total.RData")
 ```
 
 ```{r}
