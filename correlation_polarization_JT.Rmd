@@ -1,0 +1,288 @@
+---
+title: "Calculate correlations polarization measurements"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(number_sections = FALSE)
+options(width = 100)
+colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
+```
+
+
+In this script I calculate the correlations between our chosen measure of polarization (variance) and a bimodal measure
+
+```{r}
+rm(list=ls())
+library(tidyverse)
+library(dplyr)
+#library(gamlss)
+#library(multimode)
+library(agrmt)
+
+```
+
+```{r}
+fPvar <- function(positions, rangepos = NULL, method = "euclidean") {
+  positions <- positions[!is.na(positions)]
+  
+  #rescale to range of 2
+  if (is.null(rangepos)) rangepos <- range(positions)  
+  
+  positions <- 2* positions / (rangepos[2] - rangepos[1])
+  
+  #calculate distances
+  distances <- as.matrix(dist(positions, method = method))
+  
+  #don't include distance to yourself
+  diag(distances) <- NA
+  
+  #count dyads only once!
+  Pvar <- var(as.numeric(distances[lower.tri(distances)]), na.rm=TRUE)
+  
+  return(Pvar)
+}
+
+
+
+```
+
+
+
+```{r}
+# For some of the calculated measures we need the original answer cats
+load("C:/Github/climatechange/data/meta_analysis/total_reg_results_gam_w_new.RData")
+or_scale <- total_reg_results %>%
+  select(dep_var, or_scale)
+```
+
+
+
+
+```{r}
+# # Take the sigma and the excess mass from the first attitude of four datasets. 
+# load("./data/final_data/regression_outputs/ess_list_empty_srvy.RData")
+# 
+# ess_empty_df <- data.frame(dep_var = character())
+# 
+# for (i in seq_along(ess_list_empty)) {
+# 
+#   dep_var <- as.character(ess_list_empty[[i]]$mu.terms[[2]])
+#   
+#   sum <- summary(ess_list_empty[[i]])
+#   
+#   # Extract the variance of the intercept and of time
+#   sigma_int_ess <- sum[[3]]
+#   sig_time_ess <- sum[[4]]
+#   
+# 
+#   
+#   # Put the results in a df
+#   ess_empty_df <- rbind(ess_empty_df, data.frame(dep_var = dep_var, sigma_intercept = sigma_int_ess, sig_time = sig_time_ess))
+# }
+```
+
+
+# ESS {-}
+```{r}
+# Now also calculate the bimodality based on the residuals
+load("C:/Github/climatechange/data/final_data/esstotal.RData")
+
+# Match or_scale with esstotal
+dep_var <- c("cause", "pers_resp", "worry")
+
+df <- esstotal %>% 
+  group_by(surveyyear) %>% 
+  summarise(across(dep_var, list(mean = ~ mean(.x, na.rm = T), var = ~ var(.x, na.rm=T), fPvar = ~ fPvar(.x), pol = ~ polarization(agrmt::collapse(.x)))))
+
+nm <- 4 #number of measures
+x <- matrix(NA, nrow=length(dep_var), ncol=8)
+for (i in 1:length(dep_var)) { 
+  df2 <-  df %>% select(starts_with(dep_var[i]))
+  for (j in 1:nm) { 
+    if (j==1) {df3 <- df2[,j] %>% na.omit() %>% slice(c(1,n())) %>% t()}
+    if (j>1) {df3 <- c(df3, df2[,j] %>% na.omit() %>% slice(c(1,n())) %>% t())}
+  }
+  x[i,] <- df3[1:8]
+}
+rownames(x) <- dep_var
+colnames(x) <- c("mean_t1", "mean_t2", "var_t1", "var_t2", "Pvar_t1", "Pvar_t2", "pol_t1", "pol_t2")
+x
+ess_pol_df <- as.data.frame(x)
+```
+
+
+# EVS {-}
+
+```{r}
+load("C:/Github/climatechange/data/final_data/evssel.RData")
+
+dep_var <- c("climate5")
+
+df <- evssel %>% 
+  group_by(surveyyear) %>% 
+  summarise(across(dep_var, list(mean = ~ mean(.x, na.rm = T), var = ~ var(.x, na.rm=T), fPvar = ~ fPvar(.x), pol = ~ polarization(agrmt::collapse(.x)))))
+
+nm <- 4 #number of measures
+x <- matrix(NA, nrow=length(dep_var), ncol=8)
+for (i in 1:length(dep_var)) { 
+  df2 <-  df %>% select(starts_with(dep_var[i]))
+  for (j in 1:nm) { 
+    if (j==1) {df3 <- df2[,j] %>% na.omit() %>% slice(c(1,n())) %>% t()}
+    if (j>1) {df3 <- c(df3, df2[,j] %>% na.omit() %>% slice(c(1,n())) %>% t())}
+  }
+  x[i,] <- df3[1:8]
+}
+rownames(x) <- dep_var
+colnames(x) <- c("mean_t1", "mean_t2", "var_t1", "var_t2", "Pvar_t1", "Pvar_t2", "pol_t1", "pol_t2")
+x
+evs_pol_df <- as.data.frame(x)
+```
+
+```{r}
+load("C:/Github/climatechange/data/final_data/mottotal.RData")
+
+dep_var <- c("cchange_mot", "worried_mot", "futuregen", "nowor", "ontime", "gov", "resp_gov", "resp_comp", "resp_mkb", "resp_citiz_mot", "resp_you", "pers_resp_mot", "sust_choice", "contr", "energy", "noidea", "motiv")
+
+df <- mottotal %>% 
+  group_by(surveyyear) %>% 
+  summarise(across(dep_var, list(mean = ~ mean(.x, na.rm = T), var = ~ var(.x, na.rm=T), fPvar = ~ fPvar(.x), pol = ~ polarization(agrmt::collapse(.x)))))
+
+nm <- 4 #number of measures
+x <- matrix(NA, nrow=length(dep_var), ncol=8)
+for (i in 1:length(dep_var)) { 
+  df2 <-  df %>% select(starts_with(dep_var[i]))
+  for (j in 1:nm) { 
+    if (j==1) {df3 <- df2[,j] %>% na.omit() %>% slice(c(1,n())) %>% t()}
+    if (j>1) {df3 <- c(df3, df2[,j] %>% na.omit() %>% slice(c(1,n())) %>% t())}
+  }
+  x[i,] <- df3[1:8]
+}
+rownames(x) <- dep_var
+colnames(x) <- c("mean_t1", "mean_t2", "var_t1", "var_t2", "Pvar_t1", "Pvar_t2", "pol_t1", "pol_t2")
+x
+mot_pol_df <- as.data.frame(x)
+```
+
+
+# LISS {-}
+
+```{r}
+load("C:/Github/climatechange/data/final_data/mottotal.RData")
+
+dep_var <- c("cchange_mot", "worried_mot", "futuregen", "nowor", "ontime", "gov", "resp_gov", "resp_comp", "resp_mkb", "resp_citiz_mot", "resp_you", "pers_resp_mot", "sust_choice", "contr", "energy", "noidea", "motiv")
+
+df <- mottotal %>% 
+  group_by(surveyyear) %>% 
+  summarise(across(dep_var, list(mean = ~ mean(.x, na.rm = T), var = ~ var(.x, na.rm=T), fPvar = ~ fPvar(.x), pol = ~ polarization(agrmt::collapse(.x)))))
+
+nm <- 4 #number of measures
+x <- matrix(NA, nrow=length(dep_var), ncol=8)
+for (i in 1:length(dep_var)) { 
+  df2 <-  df %>% select(starts_with(dep_var[i]))
+  for (j in 1:nm) { 
+    if (j==1) {df3 <- df2[,j] %>% na.omit() %>% slice(c(1,n())) %>% t()}
+    if (j>1) {df3 <- c(df3, df2[,j] %>% na.omit() %>% slice(c(1,n())) %>% t())}
+  }
+  x[i,] <- df3[1:8]
+}
+rownames(x) <- dep_var
+colnames(x) <- c("mean_t1", "mean_t2", "var_t1", "var_t2", "Pvar_t1", "Pvar_t2", "pol_t1", "pol_t2")
+x
+mot_pol_df <- as.data.frame(x)
+```
+
+
+```{r}
+load("C:/Github/climatechange/data/final_data/socontotal.RData")
+
+dep_var <- c("fut_gen_socon")
+
+df <- socontotal %>% 
+  group_by(surveyyear) %>% 
+  summarise(across(dep_var, list(mean = ~ mean(.x, na.rm = T), var = ~ var(.x, na.rm=T), fPvar = ~ fPvar(.x), pol = ~ polarization(agrmt::collapse(.x)))))
+
+nm <- 4 #number of measures
+x <- matrix(NA, nrow=length(dep_var), ncol=8)
+for (i in 1:length(dep_var)) { 
+  df2 <-  df %>% select(starts_with(dep_var[i]))
+  for (j in 1:nm) { 
+    if (j==1) {df3 <- df2[,j] %>% na.omit() %>% slice(c(1,n())) %>% t()}
+    if (j>1) {df3 <- c(df3, df2[,j] %>% na.omit() %>% slice(c(1,n())) %>% t())}
+  }
+  x[i,] <- df3[1:8]
+}
+rownames(x) <- dep_var
+colnames(x) <- c("mean_t1", "mean_t2", "var_t1", "var_t2", "Pvar_t1", "Pvar_t2", "pol_t1", "pol_t2")
+x
+socon_pol_df <- as.data.frame(x)
+```
+
+
+# ISSP {-}
+
+```{r}
+load("C:/Github/climatechange/data/final_data/issptotal.RData")
+
+dep_var <- c("worry", "lifeharm", "willing_price", "willing_tax", "willing_living", "do_right", "progharm", "econprotect", "people_decide","exag", "moreimp", "othersame", "country_effort", "growharm")
+
+df <- issptotal %>% 
+  group_by(surveyyear) %>% 
+  summarise(across(dep_var, list(mean = ~ mean(.x, na.rm = T), var = ~ var(.x, na.rm=T), fPvar = ~ fPvar(.x), pol = ~ polarization(agrmt::collapse(.x)))))
+
+nm <- 4 #number of measures
+x <- matrix(NA, nrow=length(dep_var), ncol=8)
+for (i in 1:length(dep_var)) { 
+  df2 <-  df %>% select(starts_with(dep_var[i]))
+  for (j in 1:nm) { 
+    if (j==1) {df3 <- df2[,j] %>% na.omit() %>% slice(c(1,n())) %>% t()}
+    if (j>1) {df3 <- c(df3, df2[,j] %>% na.omit() %>% slice(c(1,n())) %>% t())}
+  }
+  x[i,] <- df3[1:8]
+}
+rownames(x) <- dep_var
+colnames(x) <- c("mean_t1", "mean_t2", "var_t1", "var_t2", "Pvar_t1", "Pvar_t2", "pol_t1", "pol_t2")
+x
+issp_pol_df <- as.data.frame(x)
+```
+
+
+```{r}
+total_df <- rbind(ess_pol_df, mot_pol_df, issp_pol_df, socon_pol_df, evs_pol_df)
+
+total_df$dep_var <- rownames(total_df) 
+
+load("C:/Github/climatechange/data/polmeasures.RData")
+
+polmeasures_df <- left_join(polmeasures_df, total_df, by="dep_var")
+
+polmeasures_df$Fpvar_dff <- polmeasures_df$Pvar_t2 - polmeasures_df$Pvar_t1
+polmeasures_df$pol_diff <- polmeasures_df$pol_t2 - polmeasures_df$pol_t1
+
+cor <- cor(polmeasures_df$sig_time, polmeasures_df$Fpvar_dff, use="complete.obs")
+cor2 <- cor(polmeasures_df$sig_time, polmeasures_df$pol_diff, use="complete.obs")
+cor3 <- cor(polmeasures_df$Fpvar_dff, polmeasures_df$pol_diff, use="complete.obs")
+
+pol_deps <- c("sig_time", "excess_mass_diff", "Fpvar_dff", "pol_diff")
+
+polmeasures_df <- polmeasures_df %>%
+  mutate(across(pol_deps, 
+                ~ if_else(.x >0, 1, 0), 
+                .names = "{.col}_dich"))
+
+#install.packages("irr")
+library(irr)
+
+kappa2(polmeasures_df[, c("sig_time_dich", "Fpvar_dff_dich")], weight = "unweighted") # 0.429
+kappa2(polmeasures_df[, c("sig_time_dich", "pol_diff_dich")], weight = "unweighted") # 0.672
+kappa2(polmeasures_df[, c("sig_time_dich", "excess_mass_diff_dich")], weight = "unweighted") # 0
+kappa2(polmeasures_df[, c("Fpvar_dff_dich", "pol_diff_dich")], weight = "unweighted") # 0.534
+
+save(polmeasures_df, file = "C:/Github/climatechange/data/polmeasures.RData")
+
+
+```
+

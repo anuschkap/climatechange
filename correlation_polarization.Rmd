@@ -1,0 +1,510 @@
+---
+title: "Calculate correlations polarization measurements"
+author: "Anuschka Peelen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(number_sections = FALSE)
+options(width = 100)
+colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
+```
+
+
+In this script I calculate the correlations between our chosen measure of polarization (variance) and a bimodal measure
+
+```{r}
+rm(list=ls())
+library(tidyverse)
+library(dplyr)
+#library(gamlss)
+#library(multimode)
+library(agrmt)
+
+```
+
+
+```{r}
+# For some of the calculated measures we need the original answer cats
+load("./data/meta_analysis/total_reg_results_gam_w_new.RData")
+or_scale <- total_reg_results %>%
+  select(dep_var, or_scale)
+```
+
+
+
+
+```{r}
+# Take the sigma and the excess mass from the first attitude of four datasets. 
+load("./data/final_data/regression_outputs/ess_list_empty_srvy.RData")
+
+ess_empty_df <- data.frame(dep_var = character())
+
+for (i in seq_along(ess_list_empty)) {
+
+  dep_var <- as.character(ess_list_empty[[i]]$mu.terms[[2]])
+  
+  sum <- summary(ess_list_empty[[i]])
+  
+  # Extract the variance of the intercept and of time
+  sigma_int_ess <- sum[[3]]
+  sig_time_ess <- sum[[4]]
+  
+
+  
+  # Put the results in a df
+  ess_empty_df <- rbind(ess_empty_df, data.frame(dep_var = dep_var, sigma_intercept = sigma_int_ess, sig_time = sig_time_ess))
+}
+
+
+# Now also calculate the bimodality based on the residuals
+load("./data/final_data/esstotal.RData")
+
+
+# Match or_scale with esstotal
+dep_var <- c("cause", "pers_resp", "worry")
+
+t1 <- min(esstotal$surveyyear)
+t2 <- max(esstotal$surveyyear)
+
+ess_results_df <- data.frame(
+  dep_var = character(0),
+  fPvar_t1 = numeric(0),
+  fPvar_t2 = numeric(0)
+)
+
+
+for (i in dep_var) {  
+  
+  # Only for the min and max year
+  for (year in c(t1, t2)) {
+   
+    x <- esstotal[esstotal$surveyyear == year, i]
+    fPvar_res <- fPvar(positions = x, rangepos = c(1, 5))
+    
+    if (year == t1) {
+      fPvar_t1 <- fPvar_res
+    } else if (year == t2) {
+      fPvar_t2 <- fPvar_res
+    }
+  }
+  
+  ess_results_df <- rbind(ess_results_df, data.frame(
+    dep_var = i,
+    fPvar_t1 = fPvar_t1,
+    fPvar_t2 = fPvar_t2
+  ))
+}
+
+
+
+
+fPvar(positions = x, rangepos = c(1,5))
+
+
+agrmt::polarization(collapse(esstotal$pers_resp, pos=1:5))
+
+ess_t1 <- esstotal %>%
+  filter(surveyyear == min(surveyyear))
+
+x <- ess_t1$pers_resp
+
+polarization(collapse(x, pos=1:5))
+
+
+ess_t2 <- esstotal %>% 
+  filter(surveyyear == max(surveyyear))
+
+
+
+# Excess mass
+excess_ess_df <- data.frame(dep_var = character())
+
+for (i in seq_along(ess_list_empty)) {
+  ess_complete <- esstotal %>% drop_na()
+  ess_complete$time <- ess_complete$surveyyear - min(ess_complete$surveyyear)  
+  residuals_ess <- ess_list_empty[[i]]$residuals
+  dep_var <- as.character(ess_list_empty[[i]]$mu.terms[[2]])
+  or_scale <- 
+  
+  # Calculate excess_mass for each time point
+  excess_mass_ess_t1 <- modetest(residuals_ess[ess_complete$time==0])$statistic
+  excess_mass_ess_t2 <- modetest(residuals_ess[ess_complete$time==4])$statistic
+  
+  var_t1 <- var(ess_complete[[dep_var]][ess_complete$time==0])
+  var_t2 <- var(ess_complete[[dep_var]][ess_complete$time==4])
+
+  
+  # Store the results in df
+ excess_ess_df <- rbind(excess_ess_df, data.frame(dep_var = dep_var, excess_mass_t1 = excess_mass_ess_t1, excess_mass_t2 = excess_mass_ess_t2, var_t1 = var_t1, var_t2 = var_t2))
+  
+}
+
+ess_cor <- merge(ess_empty_df, excess_ess_df)
+
+```
+
+
+
+
+
+```{r}
+load("./data/final_data/regression_outputs/evs_list_empty_w.RData") 
+
+evs_empty_df <- data.frame(dep_var = character())
+
+for (i in seq_along(evs_list_empty)) {
+
+  dep_var <- as.character(evs_list_empty[[i]]$mu.terms[[2]])
+  
+  sum <- summary(evs_list_empty[[i]])
+  
+  # Extract the variance of the intercept and of time
+  sigma_int_evs <- sum[[3]]
+  sig_time_evs <- sum[[4]]
+  
+  # Put the results in a df
+  evs_empty_df <- rbind(evs_empty_df, data.frame(dep_var = dep_var, sigma_intercept = sigma_int_evs, sig_time = sig_time_evs))
+}
+
+# Now also calculate the bimodality based on the residuals
+load("./data/final_data/evssel.RData")
+
+excess_evs_df <- data.frame(dep_var = character())
+
+for (i in seq_along(evs_list_empty)) {
+  evs_complete <- evssel%>% drop_na()
+  evs_complete$time <- evs_complete$surveyyear - min(evs_complete$surveyyear)  
+  residuals_evs <- evs_list_empty[[i]]$residuals
+  dep_var <- as.character(evs_list_empty[[i]]$mu.terms[[2]])
+  
+  # Calculate excess_mass for each time point
+  excess_mass_evs_t1 <- modetest(residuals_evs[evs_complete$time == 0])$statistic
+  excess_mass_evs_t2 <- modetest(residuals_evs[evs_complete$time == 18])$statistic
+  
+  var_t1 <- var(evs_complete[[dep_var]][evs_complete$time==0])
+  var_t2 <- var(evs_complete[[dep_var]][evs_complete$time==18])
+  
+  # Store the results in df
+ excess_evs_df <- rbind(excess_evs_df, data.frame(dep_var = dep_var, excess_mass_t1 = excess_mass_evs_t1, excess_mass_t2 = excess_mass_evs_t2, var_t1 = var_t1, var_t2 = var_t2))
+  
+}
+
+# Put variance and excevs mass in a df
+evs_cor <- merge(evs_empty_df, excess_evs_df)
+
+
+```
+
+```{r}
+load("./data/final_data/regression_outputs/mot_list_empty_w.RData") 
+
+mot_empty_df <- data.frame(dep_var = character())
+
+for (i in seq_along(mot_list_empty)) {
+
+  dep_var <- as.character(mot_list_empty[[i]]$mu.terms[[2]])
+  
+  sum <- summary(mot_list_empty[[i]])
+  
+  # Extract the variance of the intercept and of time
+  sigma_int_mot <- sum[[3]]
+  sig_time_mot <- sum[[4]]
+  
+  # Put the results in a df
+  mot_empty_df <- rbind(mot_empty_df, data.frame(dep_var = dep_var, sigma_intercept = sigma_int_mot, sig_time = sig_time_mot))
+}
+
+# Now also calculate the bimodality based on the residuals
+load("./data/final_data/mottotal.RData")
+
+excess_mot_df <- data.frame(dep_var = character())
+
+for (i in seq_along(mot_list_empty)) {
+  mot_complete <- mottotal %>% drop_na()
+  mot_complete$time <- mot_complete$surveyyear - min(mot_complete$surveyyear)  
+  residuals_mot <- mot_list_empty[[i]]$residuals
+  dep_var <- as.character(mot_list_empty[[i]]$mu.terms[[2]])
+  
+  # Calculate excmot_mass for each time point
+  excess_mass_mot_t1 <- modetest(residuals_mot[mot_complete$time == 0])$statistic
+  excess_mass_mot_t2 <- modetest(residuals_mot[mot_complete$time == 2])$statistic
+  
+  
+  var_t1 <- var(mot_complete[[dep_var]][mot_complete$time==0])
+  var_t2 <- var(mot_complete[[dep_var]][mot_complete$time==2])
+  
+  # Store the results in df
+ excess_mot_df <- rbind(excess_mot_df, data.frame(dep_var = dep_var, excess_mass_t1 = excess_mass_mot_t1, excess_mass_t2 = excess_mass_mot_t2, var_t1 = var_t1, var_t2 = var_t2))
+  
+}
+
+# Put variance and excess mass in a df
+mot_cor <- merge(mot_empty_df, excess_mot_df)
+
+```
+
+
+```{r}
+load("./data/final_data/regression_outputs/liss_list_empty_w.RData") 
+
+liss_empty_df <- data.frame(dep_var = character())
+
+for (i in seq_along(liss_list_empty)) {
+
+  dep_var <- as.character(liss_list_empty[[i]]$mu.terms[[2]])
+  
+  sum <- summary(liss_list_empty[[i]])
+  
+  # Extract the variance of the intercept and of time
+  sigma_int_liss <- sum[[3]]
+  sig_time_liss <- sum[[4]]
+  
+  # Put the results in a df
+  liss_empty_df <- rbind(liss_empty_df, data.frame(dep_var = dep_var, sigma_intercept = sigma_int_liss, sig_time = sig_time_liss))
+}
+
+# Now also calculate the bimodality based on the residuals
+load("./data/final_data/lisstotal.RData")
+
+excess_liss_df <- data.frame(dep_var = character())
+
+for (i in seq_along(liss_list_empty)) {
+  liss_complete <- lisstotal %>% drop_na()
+  liss_complete$time <- liss_complete$surveyyear - min(liss_complete$surveyyear)  
+  residuals_liss <- liss_list_empty[[i]]$residuals
+  dep_var <- as.character(liss_list_empty[[i]]$mu.terms[[2]])
+  
+  # Calculate excliss_mass for each time point
+  excess_mass_liss_t1 <- modetest(residuals_liss[liss_complete$time == 0])$statistic
+  excess_mass_liss_t2 <- modetest(residuals_liss[liss_complete$time == 2])$statistic
+  
+    var_t1 <- var(liss_complete[[dep_var]][liss_complete$time==0])
+  var_t2 <- var(liss_complete[[dep_var]][liss_complete$time==2])
+  
+  # Store the results in df
+ excess_liss_df <- rbind(excess_liss_df, data.frame(dep_var = dep_var, excess_mass_t1 = excess_mass_liss_t1, excess_mass_t2 = excess_mass_liss_t2, var_t1 = var_t1, var_t2 = var_t2))
+  
+}
+
+# Put variance and excess mass in a df
+liss_cor <- merge(liss_empty_df, excess_liss_df)
+
+```
+
+
+```{r}
+load("./data/final_data/regression_outputs/socon_list_empty_w.RData") 
+
+socon_empty_df <- data.frame(dep_var = character())
+
+for (i in seq_along(socon_list_empty)) {
+
+  dep_var <- as.character(socon_list_empty[[i]]$mu.terms[[2]])
+  
+  sum <- summary(socon_list_empty[[i]])
+  
+  # Extract the variance of the intercept and of time
+  sigma_int_socon <- sum[[3]]
+  sig_time_socon <- sum[[4]]
+  
+  # Put the results in a df
+  socon_empty_df <- rbind(socon_empty_df, data.frame(dep_var = dep_var, sigma_intercept = sigma_int_socon, sig_time = sig_time_socon))
+}
+
+# Now also calculate the bimodality based on the residuals
+load("./data/final_data/socontotal.RData")
+
+excess_socon_df <- data.frame(dep_var = character())
+
+for (i in seq_along(socon_list_empty)) {
+  socon_complete <- socontotal %>% drop_na()
+  socon_complete$time <- socon_complete$surveyyear - min(socon_complete$surveyyear)  
+  residuals_socon <- socon_list_empty[[i]]$residuals
+  dep_var <- as.character(socon_list_empty[[i]]$mu.terms[[2]])
+
+  excess_mass_socon_t1 <- modetest(residuals_socon[socon_complete$time == 0])$statistic
+  excess_mass_socon_t2 <- modetest(residuals_socon[socon_complete$time == 2])$statistic
+  
+    var_t1 <- var(socon_complete[[dep_var]][socon_complete$time==0])
+  var_t2 <- var(socon_complete[[dep_var]][socon_complete$time==2])
+  
+  # Store the results in df
+ excess_socon_df <- rbind(excess_socon_df, data.frame(dep_var = dep_var, excess_mass_t1 = excess_mass_socon_t1, excess_mass_t2 = excess_mass_socon_t2, var_t1 = var_t1, var_t2 = var_t2))
+  
+}
+
+# Put variance and excess mass in a df
+socon_cor <- merge(socon_empty_df, excess_socon_df)
+
+```
+
+```{r}
+load("./data/final_data/regression_outputs/issp_list_empty_w.RData") 
+
+issp_empty_df <- data.frame(dep_var = character())
+
+for (i in seq_along(issp_list_empty)) {
+
+  dep_var <- as.character(issp_list_empty[[i]]$mu.terms[[2]])
+  
+  sum <- summary(issp_list_empty[[i]])
+  
+  # Extract the variance of the intercept and of time
+  sigma_int_issp <- sum[[3]]
+  sig_time_issp <- sum[[4]]
+  
+  # Put the results in a df
+  issp_empty_df <- rbind(issp_empty_df, data.frame(dep_var = dep_var, sigma_intercept = sigma_int_issp, sig_time = sig_time_issp))
+}
+
+# Now also calculate the bimodality based on the residuals
+# As the ISSP has variables asked in two waves and others in three waves, I will only include those for two waves for the ease of the analysis
+load("./data/final_data/issptotal.RData")
+
+excess_issp_df <- data.frame(dep_var = character())
+
+for (i in seq_along(issp_list_empty)) {
+issp_complete <- issptotal %>% dplyr::select(surveyyear:marstat, weightvec, isced_cat)
+issp_complete <- issp_complete %>% drop_na()
+issp_complete$time <- issp_complete$surveyyear - min(issp_complete$surveyyear)  
+  residuals_issp <- issp_list_empty[[i]]$residuals
+  dep_var <- as.character(issp_list_empty[[i]]$mu.terms[[2]])
+  
+  # Calculate excess mass for each time point
+  excess_mass_issp_t1 <- modetest(residuals_issp[issp_complete$time == 0])$statistic
+  excess_mass_issp_t2 <- modetest(residuals_issp[issp_complete$time == 7])$statistic
+  
+      var_t1 <- var(issp_complete[[dep_var]][issp_complete$time==0])
+  var_t2 <- var(issp_complete[[dep_var]][issp_complete$time==7])
+  
+  # Store the results in df
+ excess_issp_df <- rbind(excess_issp_df, data.frame(dep_var = dep_var, excess_mass_t1 = excess_mass_issp_t1, excess_mass_t2 = excess_mass_issp_t2, var_t1 = var_t1, var_t2 = var_t2))
+  
+}
+
+# Put variance and excess mass in a df
+issp_cor <- merge(issp_empty_df, excess_issp_df)
+
+```
+
+```{r}
+library(plyr)
+cor_pol <- rbind.fill(ess_cor, evs_cor, mot_cor, liss_cor, socon_cor, issp_cor)
+cor_pol$excess_mass_diff <- cor_pol$excess_mass_t2 - cor_pol$excess_mass_t1
+cor <- cor(cor_pol$sig_time, cor_pol$excess_mass_diff)
+cor_pol$var_diff <- cor_pol$var_t2 - cor_pol$var_t1
+corvar <- cor(cor_pol$sig_time, cor_pol$var_diff) #0.73
+corvar2 <- cor(cor_pol$var_diff, cor_pol$excess_mass_diff)
+
+cor_pol_a <- cor_pol[order(cor_pol$sig_time, cor_pol$excess_mass_diff), ]
+
+save(cor_pol, file = "C:/Github/climatechange/data/polmeasures.RData")
+writexl::write_xlsx(cor_pol_a, "C:/Github/climatechange/data/polmeasures.xlsx")
+
+```
+
+
+
+
+```{r}
+# Done in meeting
+ess_fit <- lm(worry ~ time, data = ess_complete)
+
+residuals <- ess_fit$residuals
+table(residuals)
+install.packages("multimode")
+library(multimode)
+table(ess_complete$time)
+modetest(residuals[ess_complete$time == 0])
+modetest(residuals[ess_complete$time == 4])
+
+var(residuals[ess_complete$time == 0])
+var(residuals[ess_complete$time == 4])
+
+
+residuals2 <- ess_list_empty[[1]]$residuals
+modetest(residuals2[ess_complete$time == 0])
+modetest(residuals2[ess_complete$time == 4])
+
+(var(residuals2[ess_complete$time == 0]))^2
+var(residuals2[ess_complete$time == 4])
+
+t1 <- lm(worry ~ time, data=ess_complete)
+summary(t1)
+
+nmodes(residuals, bw=0.5)
+?multimode
+
+```
+
+```{r}
+
+
+# Now the same for another dataset
+load("./data/final_data/regression_outputs/evs_list_empty_w.RData") 
+sum_evs <- summary(evs_list_empty[[1]])
+
+  sigma_evs <- sum_evs[[3]]
+  
+load("./data/final_data/evssel.RData")
+evs_complete <- evssel %>% drop_na()
+evs_complete$time <- evs_complete$surveyyear - min(evs_complete$surveyyear)
+table(evs_complete$time)
+residuals_evs <- evs_list_empty[[1]]$residuals
+excess_mass_evs_t1 <- modetest(residuals_evs[evs_complete$time == 0])  
+excess_mass_evs_t1 <- excess_mass_evs_t1$statistic
+excess_mass_evs_t2 <- modetest(residuals_evs[evs_complete$time == 18]) 
+excess_mass_evs_t2 <- excess_mass_evs_t2$statistic
+
+
+# And another one
+load("./data/final_data/regression_outputs/mot_list_empty_w.RData") 
+sum_mot <- summary(mot_list_empty[[1]])
+sigma_mot <- sum_mot[[3]]
+  
+load("./data/final_data/mottotal.RData")
+mot_complete <- mottotal %>% drop_na()
+mot_complete$time <- mot_complete$surveyyear - min(mot_complete$surveyyear)
+table(mot_complete$time)
+residuals_mot <- evs_list_empty[[1]]$residuals
+excess_mass_mot_t1 <- modetest(residuals_mot[mot_complete$time == 0])  
+excess_mass_mot_t1 <- excess_mass_mot_t1$statistic
+excess_mass_mot_t2 <- modetest(residuals_mot[mot_complete$time == 2]) 
+excess_mass_mot_t2 <- excess_mass_mot_t2$statistic
+
+#And another dataset 
+load("./data/final_data/regression_outputs/liss_list_empty_w.RData") 
+sum_liss <- summary(liss_list_empty[[1]])
+
+  sigma_liss <- sum_liss[[3]]
+  
+load("./data/final_data/lisstotal.RData")
+liss_complete <- lisstotal %>% drop_na()
+liss_complete$time <- liss_complete$surveyyear - min(liss_complete$surveyyear)
+table(liss_complete$time)
+residuals_liss <- liss_list_empty[[1]]$residuals
+excess_mass_liss_t1 <- modetest(residuals_liss[liss_complete$time == 0])  
+excess_mass_liss_t1 <- excess_mass_liss_t1$statistic
+excess_mass_liss_t2 <- modetest(residuals_liss[liss_complete$time == 2]) 
+excess_mass_liss_t2 <- excess_mass_liss_t2$statistic
+
+
+# Let's try to make a dataset out of these scores. 
+dataset <- c("ESS", "EVS", "MOT", "LISS")
+sigma <- c(sigma_ess, sigma_evs, sigma_mot, sigma_liss)
+excess_mass_t1 <- c(excess_mass_ess_t1, excess_mass_evs_t1, excess_mass_mot_t1, excess_mass_liss_t1)
+excess_mass_t2 <- c(excess_mass_ess_t2, excess_mass_evs_t2, excess_mass_mot_t2, excess_mass_liss_t2)
+
+cor_pol <- data.frame(dataset, sigma, excess_mass_t1, excess_mass_t2)
+# As sigma is measured over time, I want to correlate this to the increase or decrease of the excess mass over the same time span. 
+cor_pol$excess_mass_diff <- cor_pol$excess_mass_t2 - cor_pol$excess_mass_t1
+
+# And calculate the correlation
+cor <- cor(cor_pol$sigma, cor_pol$excess_mass_t1)
+
+
+```
+
